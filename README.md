@@ -370,6 +370,35 @@ longest pause in the tail of the cue that also keeps clusters intact. On the
 17-minute recording that took cues starting with a combining mark from 1 to 0,
 and moved the breaks onto real phrase boundaries.
 
+### RTF hides where the time goes
+
+Every result now records CPU time, peak RSS and GPU allocation alongside the
+real-time factor, because RTF alone cannot tell a compute-bound backend from
+one that is idling. Same 13.6 s clip, one process each, on a 12-core M2 Max:
+
+| backend | RTF | cores busy | peak RSS | torch GPU |
+|---|---:|---:|---:|---:|
+| MMS-1B | 0.04 | 0.42 | 486 MB | 4.4 GB |
+| Seamless M4T v2 | 0.13 | 2.20 | 1.0 GB | 6.3 GB |
+| omniASR 300M GGUF | 0.19 | 0.05 | 1.4 GB | — |
+| Dolphin small | 0.19 | 1.91 | 4.9 GB | 0 |
+
+Three things this says that RTF did not:
+
+* **Nothing saturates the machine.** The busiest backend keeps 2.2 of 12 cores
+  working. Throughput is being left on the floor — the constraint is that we
+  transcribe one file at a time, not that the models are slow.
+* **Dolphin never touches the GPU** and is the heaviest on memory by 5×,
+  costing 4.9 GB to run a 400 MB model on two cores.
+* **The GGUF backend uses 0.05 cores**, which is the Metal path working as
+  intended. Its GPU column is blank because ggml allocates outside torch, so
+  that number is genuinely unavailable rather than zero.
+
+Peak RSS is a process high-water mark, so it answers "how much memory does this
+need" rather than "how much did this file use"; model weights dominate it.
+Host details (cores, RAM, platform) are stamped on every record, since the same
+model on another machine is a different number.
+
 ## Model weights
 
 Downloaded on first use, cached outside this repo:
@@ -389,6 +418,7 @@ src/stt/
   evaluate.py         CER/WER scoring
   registry.py         Backend registry
   vote.py             ROVER-style voting across runs
+  telemetry.py        CPU/RAM/GPU measurement around each transcription
   align.py            CTC forced alignment: timestamps + confidence for any text
   quality.py          Reference-free defect detection (decoder loops)
   native.py           fd-level silencing of chatty native runtimes

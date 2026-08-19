@@ -16,6 +16,8 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
+from stt.telemetry import ResourceUsage
+
 #: How a segment's timings were obtained. Recorded so that a run mixing
 #: backends stays honest about which timings were measured and which inferred.
 #:
@@ -62,6 +64,8 @@ class TranscriptionResult:
     #: Timed breakdown of ``text``, when the backend can provide one. ``None``
     #: means "not available", which is different from "the audio was silent".
     segments: list[Segment] | None = None
+    #: What this file cost in CPU, memory and GPU. See :mod:`stt.telemetry`.
+    resources: ResourceUsage | None = None
 
     @property
     def rtf(self) -> float | None:
@@ -76,6 +80,9 @@ class TranscriptionResult:
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)  # nested Segment dataclasses flatten to dicts here
         d["rtf"] = self.rtf
+        # ResourceUsage has a derived property worth persisting, so it writes
+        # itself rather than going through asdict's plain field copy.
+        d["resources"] = self.resources.to_dict() if self.resources else None
         return d
 
 
@@ -116,10 +123,15 @@ def read_jsonl(path: Path) -> list[TranscriptionResult]:
             d = json.loads(line)
             d.pop("rtf", None)  # derived property, not a constructor field
             segments = d.pop("segments", None)
+            usage = d.pop("resources", None)
+            if usage is not None:
+                # `cpu_utilization` is derived on write; it is not a field.
+                usage = ResourceUsage(**{k: v for k, v in usage.items() if k != "cpu_utilization"})
             results.append(
                 TranscriptionResult(
                     **d,
                     segments=[Segment(**s) for s in segments] if segments else None,
+                    resources=usage,
                 )
             )
     return results

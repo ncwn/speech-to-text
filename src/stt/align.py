@@ -173,18 +173,23 @@ def _forced_align(
 ) -> tuple[torch.Tensor, torch.Tensor]:
     """Constrain the CTC lattice to the one path spelling ``targets``.
 
-    Isolated in its own function on purpose. ``torchaudio.functional.forced_align``
-    is deprecated upstream and scheduled for removal in torchaudio 2.9; we are
-    pinned to 2.8.0 (fairseq2n requires it exactly), so nothing breaks today,
-    and when that pin moves this is the only body that has to be replaced.
+    The deprecation warning torchaudio 2.8 emits here is stale. ``forced_align``
+    was slated for deletion in 2.9 as part of the move to a Python-only
+    TorchAudio, but the C++-backed operators were reprieved: pytorch/audio#3902
+    records that ``forced_align``, ``lfilter``, ``RNNTLoss``, ``CUCTC`` and
+    ``overdrive`` were preserved in 2.10 by porting them to PyTorch's stable ABI.
+    The warning text shipped in 2.8 predates that reversal.
+
+    So there is nothing to migrate to. It stays isolated in its own function
+    anyway, because that is cheap and this is the only third-party call in the
+    alignment path.
     """
     import warnings
 
     import torchaudio.functional as AF
 
     with warnings.catch_warnings():
-        # The deprecation notice is addressed by the pin above, so it is noise
-        # on every single alignment rather than something a user can act on.
+        # Suppressed because it is inaccurate, not merely inconvenient.
         warnings.filterwarnings("ignore", message=".*forced_align has been deprecated.*")
         return AF.forced_align(log_probs, targets, blank=blank)
 

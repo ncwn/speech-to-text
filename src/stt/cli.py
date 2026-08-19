@@ -30,6 +30,7 @@ from stt.results import (
     write_text,
     write_vtt,
 )
+from stt.telemetry import describe_host, measure
 from stt.vote import DEFAULT_WEIGHTS, rover
 
 app = typer.Typer(
@@ -181,6 +182,20 @@ def fetch_fleurs_cmd(
 # -------------------------------------------------------------- transcribe
 
 
+def _report_resources(results: list[TranscriptionResult]) -> None:
+    """Summarise what the run cost, beyond wall-clock time."""
+    usages = [r.resources for r in results if r.resources]
+    if not usages:
+        return
+    cores = [u.cpu_utilization for u in usages if u.cpu_utilization is not None]
+    gpu = [u.gpu_mb for u in usages if u.gpu_mb is not None]
+    line = f"[dim]CPU {sum(cores) / len(cores):.1f} cores busy" if cores else "[dim]CPU —"
+    line += f" · peak RSS {max(u.peak_rss_mb for u in usages):.0f} MB"
+    if gpu:
+        line += f" · GPU {max(gpu):.0f} MB"
+    console.print(line + "[/dim]")
+
+
 def _subtitle_paths(out: Path, results: list[TranscriptionResult], srt: bool, vtt: bool) -> None:
     """Write per-file subtitles next to the JSONL, if asked and if timed."""
     if not (srt or vtt):
@@ -283,9 +298,20 @@ def _run_backend(
         instance.load()
 
     results: list[TranscriptionResult] = []
+    # Stamped on every record so a timing stays interpretable later: the same
+    # model on a different machine is a different number.
+    host = describe_host()
     with typer.progressbar(files, label="Transcribing") as bar:
         for f in bar:
-            results.extend(instance.transcribe([f], language=language, batch_size=batch_size))
+            # Measured here rather than inside each backend: this is the one
+            # place every backend passes through, so all of them are
+            # instrumented identically and none can forget to be.
+            with measure() as usage:
+                batch = instance.transcribe([f], language=language, batch_size=batch_size)
+            for r in batch:
+                r.resources = usage[0]
+                r.metadata.setdefault("host", host)
+            results.extend(batch)
     instance.unload()
     return results
 
@@ -361,6 +387,7 @@ def transcribe(
         f"\n[green]{len(results) - failed}/{len(results)} transcribed[/green] · "
         f"mean RTF {_fmt(rtf, '.2f')} → [bold]{out}[/bold]"
     )
+    _report_resources(results)
 
 
 # -------------------------------------------------------------------- align
