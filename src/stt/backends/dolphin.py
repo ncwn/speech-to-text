@@ -63,6 +63,37 @@ def cache_dir(size: str) -> Path:
     return CACHE_ROOT / size
 
 
+def _demote_float64(module: Any) -> list[str]:
+    """Cast a model's float64 buffers to float32, in place.
+
+    Metal does not implement float64 at all, so a single such tensor makes the
+    whole model unloadable. In Dolphin's case there are exactly two, both tiny:
+    ``encoder.global_cmvn.mean`` and ``.std``, the 80-dimensional mean and
+    standard deviation used to normalise filterbank features. All 819 real
+    parameters are already float32.
+
+    Normalisation statistics do not need more than float32's seven significant
+    digits, so this is a compatibility cast rather than a quantisation — but it
+    is a change to the numbers, so it is applied only when the device demands
+    it, and the names it touched are returned for the caller to record.
+
+    Returns the qualified names that were cast.
+    """
+    import torch
+
+    changed: list[str] = []
+    for name, buffer in list(module.named_buffers()):
+        if buffer.dtype is not torch.float64:
+            continue
+        owner = module
+        *path, attribute = name.split(".")
+        for part in path:
+            owner = getattr(owner, part)
+        setattr(owner, attribute, buffer.float())
+        changed.append(name)
+    return changed
+
+
 @register
 class DolphinBackend(ASRBackend):
     name: ClassVar[str] = "dolphin"
@@ -103,9 +134,17 @@ class DolphinBackend(ASRBackend):
             return self.device_arg
         if torch.cuda.is_available():
             return "cuda"
-        # Dolphin runs on funasr, whose Whisper-style blocks have not been
-        # validated on Metal. CPU is the honest default; --device mps is there
-        # to experiment with.
+        # Metal works here — see `_demote_float64` for what it took — but it is
+        # slower for this model, so it is not the default. Measured on three
+        # FLEURS clips, identical text either way:
+        #
+        #   cpu   RTF 0.18   1.89 cores
+        #   mps   RTF 0.25   0.27 cores, 5.0 GB GPU
+        #
+        # Dolphin is small and runs 20-second windows one at a time, so kernel
+        # launch overhead outweighs what the GPU wins back. `--device mps` is
+        # still worth having: it frees the CPU almost entirely, which is what
+        # matters when something else needs those cores.
         return "cpu"
 
     def estimated_download_mb(self) -> int | None:
@@ -120,8 +159,23 @@ class DolphinBackend(ASRBackend):
         directory = cache_dir(self.spec.size)
         directory.mkdir(parents=True, exist_ok=True)
         self.resolved_device = self._resolve_device()
+
         with suppress_native_output(not self.options.get("verbose")):
-            self.engine = dolphin.load_model(self.spec.size, str(directory), self.resolved_device)
+            if self.resolved_device == "mps":
+                # Metal has no float64 at all, and `load_model` moves the model
+                # to the device itself, so the cast has to happen in between.
+                self.engine = dolphin.load_model(self.spec.size, str(directory), "cpu")
+                _demote_float64(self.engine)
+                self.engine = self.engine.to("mps")
+                # `dolphin.transcribe` places its inputs with `model.device`,
+                # a plain string set when the model was built. Moving the
+                # module does not update it, so it has to be corrected or every
+                # decode fails on a cpu/mps tensor mismatch.
+                self.engine.device = "mps"
+            else:
+                self.engine = dolphin.load_model(
+                    self.spec.size, str(directory), self.resolved_device
+                )
         self._loaded = True
 
     def unload(self) -> None:

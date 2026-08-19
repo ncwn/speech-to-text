@@ -477,6 +477,44 @@ also the best of 24 configurations chosen on the same file it was measured on,
 which is not a result. The **mechanism** generalises; that particular number
 does not.
 
+### Every backend can now use Metal — but Metal is not always the right answer
+
+All four run on the GPU. Whether they *should* is a separate question, and the
+answer differs per model:
+
+| backend | Metal | default device | why |
+|---|---|---|---|
+| `omniasr-gguf` | yes | Metal | ggml's Metal backend; 0.05 CPU cores |
+| `hf` (Seamless, MMS, Whisper) | yes | Metal | transformers' MPS path works |
+| `omniasr-torch` | yes | **Metal** | RTF 0.61 against 2.14 on CPU, identical text |
+| `dolphin` | yes | **CPU** | Metal works but is *slower* here — see below |
+
+Dolphin would not load on Metal at all until this session, failing with
+`Cannot convert a MPS Tensor to float64`. The cause was exactly two tensors out
+of 822: `encoder.global_cmvn.mean` and `.std`, the 80-dimensional filterbank
+normalisation statistics, stored as float64. Metal implements no float64
+whatsoever, so those two made the whole model unloadable. Casting them to
+float32 fixes it — normalisation statistics have no use for sixteen significant
+digits — and a second, separate bug had to go with it: `dolphin.transcribe`
+places its inputs using `model.device`, a plain string that moving the module
+does not update.
+
+With both fixed, Dolphin on Metal produces **identical text**, and is slower:
+
+| device | RTF | cores busy | GPU |
+|---|---:|---:|---:|
+| cpu | **0.18** | 1.89 | — |
+| mps | 0.25 | 0.27 | 5.0 GB |
+
+It is a small model decoding 20-second windows one at a time, so kernel launch
+overhead costs more than the GPU wins back. `--device mps` is still worth having
+because it frees the CPU almost entirely, which matters when something else
+needs those cores — but CPU stays the default.
+
+This is the same shape as the dtype result above: the fastest configuration
+belongs to the model, not only to the chip. Metal for omniASR, CPU for Dolphin,
+float16 for omniASR, float32 for Seamless — each one measured, none assumed.
+
 ## Model weights
 
 Downloaded on first use, cached outside this repo:

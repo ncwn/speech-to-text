@@ -340,3 +340,54 @@ def test_split_on_quiet_still_splits_continuous_speech():
     bounds = split_on_quiet(pcm, 16000, window_s=20.0)
     assert len(bounds) >= 4
     assert max(end - start for start, end in bounds) <= 16000 * 23
+
+
+def test_float64_buffers_are_demoted_for_metal():
+    """Metal implements no float64 at all, so one such buffer makes a model
+    unloadable. Dolphin has exactly two: the CMVN mean and standard deviation."""
+    torch = pytest.importorskip("torch")
+    from stt.backends.dolphin import _demote_float64
+
+    class Inner(torch.nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.register_buffer("mean", torch.zeros(4, dtype=torch.float64))
+            self.register_buffer("std", torch.ones(4, dtype=torch.float64))
+            self.register_buffer("ok", torch.ones(4, dtype=torch.float32))
+
+    class Outer(torch.nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.cmvn = Inner()
+            self.linear = torch.nn.Linear(4, 4)
+
+    model = Outer()
+    changed = _demote_float64(model)
+
+    assert sorted(changed) == ["cmvn.mean", "cmvn.std"]
+    assert all(b.dtype is not torch.float64 for b in model.buffers())
+    assert model.cmvn.ok.dtype is torch.float32  # untouched
+    assert model.linear.weight.dtype is torch.float32
+
+
+def test_demoting_a_clean_model_changes_nothing():
+    torch = pytest.importorskip("torch")
+    from stt.backends.dolphin import _demote_float64
+
+    model = torch.nn.Linear(2, 2)
+    assert _demote_float64(model) == []
+
+
+def test_demoted_values_survive_the_cast():
+    """It is a compatibility cast, not a quantisation — the numbers must hold."""
+    torch = pytest.importorskip("torch")
+    from stt.backends.dolphin import _demote_float64
+
+    class M(torch.nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.register_buffer("mean", torch.tensor([1.5, -2.25], dtype=torch.float64))
+
+    model = M()
+    _demote_float64(model)
+    assert torch.allclose(model.mean, torch.tensor([1.5, -2.25]), atol=1e-6)
