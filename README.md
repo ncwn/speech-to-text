@@ -344,8 +344,12 @@ matters more than it sounds: error is concentrated, so it can be bought cheaply.
 | 25% | 47.9% | 1.87× |
 | 50% | 78.4% | 1.56× |
 
-Voting currently pays 4× compute on every second of audio. Spending it only
-where confidence is low should buy most of the accuracy for a fraction of that.
+Note what this does *not* justify. Making the vote itself selective would save
+almost nothing: the four-model vote costs only **1.21× the pivot alone** on
+FLEURS and **1.11×** on the held-out recording, because the 7B pivot is 82–90%
+of the bill and the other three are nearly free. The expensive thing is the
+pivot, so the concentration above is an argument for running the *pivot*
+selectively — a cheap model everywhere, the 7B only where confidence is low.
 
 A caveat on the other confidence source: CrispASR's `no_speech_prob` measures
 how likely a span is to be *silence*, not how likely the transcript is to be
@@ -398,6 +402,40 @@ Peak RSS is a process high-water mark, so it answers "how much memory does this
 need" rather than "how much did this file use"; model weights dominate it.
 Host details (cores, RAM, platform) are stamped on every record, since the same
 model on another machine is a different number.
+
+### Splicing two transcripts together costs about 11 characters per seam
+
+Routing between a cheap model and an expensive one only pays if the join is
+free, and it is not. Substituting the 7B's text into Seamless's least-confident
+regions, holding the escalated share of audio at ~30% and varying only how many
+separate regions that share is split into:
+
+| splice seams | CER |
+|---:|---:|
+| 139 | 0.1620 |
+| 61 | 0.1247 |
+| 33 | 0.1025 |
+| 18 | 0.0881 |
+| 7 | 0.0820 |
+| 3 | 0.0748 |
+
+Monotonic, and the span is enormous — the same 30% of audio escalated to the
+same model scores 0.162 or 0.075 depending only on fragmentation. The cause is
+that the two models' segment boundaries do not coincide, so each seam drops or
+duplicates a few characters. At ~16,980 reference characters the slope works out
+to roughly 11 characters per seam.
+
+Two consequences. Switching has to happen in **coarse blocks**, not per segment;
+and any future work that stitches model outputs together — selective voting,
+diarization-driven routing — pays this same tax and has to be measured with it
+included, not assumed away.
+
+A worked correctness check that caught this: an earlier version of the splice
+scored 0.1821 when escalating **100%** of the audio, which must by definition
+reproduce the 7B's 0.0857. Base segments did not tile the timeline, so 7B
+segments landing in the gaps were silently dropped. The simulation now refuses
+to report intermediate numbers unless the 0% and 100% ends reproduce the two
+source transcripts exactly.
 
 ## Model weights
 
