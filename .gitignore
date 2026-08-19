@@ -17,8 +17,10 @@ models/
 # Audio and transcripts
 data/audio/**
 !data/audio/.gitkeep
-data/reference/**
-!data/reference/.gitkeep
+# Hand-corrected reference transcripts ARE tracked -- they are the only
+# ground truth we have for audio the models cannot have trained on, and
+# unlike the FLEURS sets they cannot be re-fetched.
+!data/reference/**
 data/fleurs*/
 # Resampled 16 kHz mono copies produced by stt.audio, and ad-hoc slices
 data/.converted/
