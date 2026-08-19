@@ -16,10 +16,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, ClassVar
 
+from stt.audio import join_segments
 from stt.backends.base import ASRBackend
 from stt.native import suppress_native_output
 from stt.registry import register
-from stt.results import TranscriptionResult
+from stt.results import Segment, TranscriptionResult
 
 _HF = "https://huggingface.co"
 
@@ -84,6 +85,23 @@ MODELS: dict[str, GgufModel] = {
 }
 
 DEFAULT_MODEL = "llm-unlimited-300m-v2"
+
+
+def _speech_confidence(no_speech_prob: float) -> float | None:
+    """Turn CrispASR's no-speech probability into a confidence, or ``None``.
+
+    The omniasr-llm backend does not compute this and reports ``-1.0`` as a
+    sentinel. Passing that through as ``1 - (-1) = 2.0`` would hand downstream
+    routing a confidence above 1, so an out-of-range value becomes "unknown".
+
+    Even when it is real this measures how likely the span is to be *silence*,
+    not how likely the transcript is to be right — a weaker signal than the
+    posterior that forced alignment gives (see :mod:`stt.align`).
+    """
+    probability = float(no_speech_prob)
+    if not 0.0 <= probability <= 1.0:
+        return None
+    return 1.0 - probability
 
 
 @register
@@ -212,7 +230,20 @@ class OmniASRGgufBackend(ASRBackend):
                         raise RuntimeError(f"{exc}\n{log.tail()}") from exc
                 elapsed = time.perf_counter() - started
 
-                text = " ".join(s.text.strip() for s in segments if s.text.strip())
+                # CrispASR already timed every segment, so keep the timings
+                # rather than flattening the whole decode down to a string.
+                timed = [
+                    Segment(
+                        text=s.text.strip(),
+                        start=float(s.start),
+                        end=float(s.end),
+                        confidence=_speech_confidence(s.no_speech_prob),
+                        source="native",
+                    )
+                    for s in segments
+                    if s.text.strip()
+                ]
+                text = join_segments(timed)
 
                 results.append(
                     TranscriptionResult(
@@ -229,6 +260,7 @@ class OmniASRGgufBackend(ASRBackend):
                             "n_threads": self.n_threads,
                             "n_segments": len(segments),
                         },
+                        segments=timed or None,
                     )
                 )
             except Exception as exc:  # noqa: BLE001 - one bad clip must not abort the sweep

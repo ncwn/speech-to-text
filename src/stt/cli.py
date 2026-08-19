@@ -5,6 +5,7 @@ stt models                       available model names per backend
 stt fetch-fleurs                 download Burmese eval audio + references
 stt transcribe AUDIO...          run one backend
 stt eval RESULTS.jsonl           score a run against references
+stt align AUDIO --text FILE      time an existing transcript (subtitles)
 stt compare AUDIO...             run every installed backend and compare
 """
 
@@ -21,7 +22,14 @@ from stt import audio as audio_mod
 from stt.burmese import NormalizeOptions, describe_encoding
 from stt.evaluate import load_references, mean_rtf, score_results
 from stt.registry import all_backends, get_backend
-from stt.results import TranscriptionResult, read_jsonl, write_jsonl, write_text
+from stt.results import (
+    TranscriptionResult,
+    read_jsonl,
+    write_jsonl,
+    write_srt,
+    write_text,
+    write_vtt,
+)
 from stt.vote import DEFAULT_WEIGHTS, rover
 
 app = typer.Typer(
@@ -173,6 +181,71 @@ def fetch_fleurs_cmd(
 # -------------------------------------------------------------- transcribe
 
 
+def _subtitle_paths(out: Path, results: list[TranscriptionResult], srt: bool, vtt: bool) -> None:
+    """Write per-file subtitles next to the JSONL, if asked and if timed."""
+    if not (srt or vtt):
+        return
+    timed = [r for r in results if r.segments]
+    if not timed:
+        console.print(
+            "[yellow]No subtitles written: this backend produced no timings. "
+            "Re-run with --align to recover them.[/yellow]"
+        )
+        return
+    for r in timed:
+        stem = out.parent / f"{out.stem}-{Path(r.audio_path).stem}"
+        if srt:
+            write_srt(r, stem.with_suffix(".srt"))
+        if vtt:
+            write_vtt(r, stem.with_suffix(".vtt"))
+    console.print(f"[dim]subtitles for {len(timed)} file(s) → {out.parent}/[/dim]")
+
+
+def _add_alignment(results: list[TranscriptionResult], device: str = "cpu") -> None:
+    """Fill in timings for results whose backend could not supply any.
+
+    Only touches results that need it, so a backend with native timestamps
+    keeps its own — they are measured, whereas these are inferred.
+    """
+    from stt.align import align, load_aligner
+
+    pending = [r for r in results if not r.error and r.text.strip() and not r.segments]
+    if not pending:
+        return
+
+    with console.status(f"Aligning {len(pending)} transcript(s)…"):
+        aligner = load_aligner(device)
+        for r in pending:
+            try:
+                r.segments = align(r.text, Path(r.audio_path), aligner=aligner) or None
+            except Exception as exc:  # noqa: BLE001 - alignment is best-effort
+                r.metadata["align_error"] = f"{type(exc).__name__}: {exc}"
+                console.print(f"[yellow]align failed for {Path(r.audio_path).name}: {exc}[/yellow]")
+
+
+def _report_loops(results: list[TranscriptionResult]) -> None:
+    """Flag decoder degeneration, which CER barely penalises but users notice.
+
+    A sentence emitted four times costs a few percent of CER and destroys the
+    transcript. With segments we can also say *when* it happened.
+    """
+    from stt.quality import find_loops, loop_summary
+
+    for r in results:
+        if r.error or not r.text.strip():
+            continue
+        sites = find_loops(r.text)
+        if not sites:
+            continue
+        r.metadata["loops"] = [{"text": s.text, "count": s.count} for s in sites]
+        where = ""
+        if r.segments:
+            hits = [s.start for s in r.segments if sites[0].text[:12] in s.text]
+            if hits:
+                where = f", first at {hits[0]:.0f}s"
+        console.print(f"[yellow]⚠ {Path(r.audio_path).name}: {loop_summary(sites)}{where}[/yellow]")
+
+
 def _prepare(paths: list[Path], limit: int, convert: bool) -> list[Path]:
     files = audio_mod.find_audio(paths)
     if not files:
@@ -239,6 +312,15 @@ def transcribe(
         bool, typer.Option("--no-convert", help="Skip 16 kHz mono normalisation")
     ] = False,
     show: Annotated[bool, typer.Option("--show/--no-show", help="Print transcripts")] = True,
+    do_align: Annotated[
+        bool,
+        typer.Option(
+            "--align/--no-align",
+            help="Recover timestamps by forced alignment when the backend has none",
+        ),
+    ] = False,
+    srt: Annotated[bool, typer.Option("--srt", help="Also write SubRip subtitles")] = False,
+    vtt: Annotated[bool, typer.Option("--vtt", help="Also write WebVTT subtitles")] = False,
     verbose: Annotated[
         bool, typer.Option("--verbose", "-v", help="Show the runtime's own native logs")
     ] = False,
@@ -255,9 +337,14 @@ def transcribe(
         {"device": device, "dtype": dtype, "n_threads": threads, "verbose": verbose or None},
     )
 
+    if do_align or srt or vtt:
+        _add_alignment(results)
+
     out = output or DEFAULT_OUTPUT_DIR / f"{backend}.jsonl"
     write_jsonl(results, out)
     write_text(results, out.with_suffix(".txt"))
+    _subtitle_paths(out, results, srt, vtt)
+    _report_loops(results)
 
     if show:
         for r in results:
@@ -273,6 +360,87 @@ def transcribe(
     console.print(
         f"\n[green]{len(results) - failed}/{len(results)} transcribed[/green] · "
         f"mean RTF {_fmt(rtf, '.2f')} → [bold]{out}[/bold]"
+    )
+
+
+# -------------------------------------------------------------------- align
+def _same_audio(recorded: str, audio: Path) -> bool:
+    """Whether a stored result refers to ``audio``.
+
+    Results usually record the *converted* file, which `stt.audio.to_16k_mono`
+    names ``<parent>__<stem>.16k.wav`` to keep same-named files in different
+    folders apart. So the original path has to be matched against that
+    derived name as well as against itself.
+    """
+    stem = Path(recorded).stem.removesuffix(".16k")
+    return stem in {audio.stem, f"{audio.parent.name}__{audio.stem}"}
+
+
+@app.command("align")
+def align_cmd(
+    audio: Annotated[Path, typer.Argument(help="Audio file to align against")],
+    text: Annotated[
+        Path | None, typer.Option("--text", "-t", help="Transcript file (UTF-8)")
+    ] = None,
+    results: Annotated[
+        Path | None, typer.Option("--results", "-r", help="JSONL from a previous run")
+    ] = None,
+    output: Annotated[Path | None, typer.Option("--output", "-o", help="Output stem")] = None,
+    device: Annotated[str, typer.Option(help="cpu, mps or cuda")] = "cpu",
+    srt: Annotated[bool, typer.Option("--srt/--no-srt", help="Write SubRip")] = True,
+    vtt: Annotated[bool, typer.Option("--vtt", help="Also write WebVTT")] = False,
+) -> None:
+    """Time an existing transcript against its audio.
+
+    Gives timestamps and per-segment confidence to any transcript, including
+    ones from backends that cannot produce them, which is what makes subtitles
+    and per-region error reporting possible.
+    """
+    from stt.align import align as align_text
+
+    if (text is None) == (results is None):
+        raise typer.BadParameter("Pass exactly one of --text or --results")
+
+    if text is not None:
+        transcript = text.read_text(encoding="utf-8")
+    else:
+        assert results is not None
+        loaded = read_jsonl(results)
+        matching = [r for r in loaded if _same_audio(r.audio_path, audio)]
+        if not matching:
+            known = ", ".join(sorted({Path(r.audio_path).stem for r in loaded})[:3])
+            raise typer.BadParameter(f"No result in {results} for {audio.stem!r}. Found: {known}")
+        transcript = matching[0].text
+
+    converted = audio_mod.to_16k_mono(audio, DEFAULT_CACHE)
+    with console.status("Aligning…"):
+        segments = align_text(transcript, converted, device=device)
+
+    if not segments:
+        console.print("[red]Alignment produced no segments.[/red]")
+        raise typer.Exit(1)
+
+    result = TranscriptionResult(
+        audio_path=str(audio),
+        text=transcript,
+        backend="align",
+        model="mms-1b-all",
+        audio_duration_s=audio_mod.duration_of(converted),
+        segments=segments,
+    )
+    stem = output or DEFAULT_OUTPUT_DIR / f"{audio.stem}"
+    if srt:
+        console.print(f"{write_srt(result, stem.with_suffix('.srt'))} cues → {stem}.srt")
+    if vtt:
+        console.print(f"{write_vtt(result, stem.with_suffix('.vtt'))} cues → {stem}.vtt")
+    write_jsonl([result], stem.with_suffix(".jsonl"))
+
+    confidences = [s.confidence for s in segments if s.confidence is not None]
+    mean_conf = sum(confidences) / len(confidences) if confidences else None
+    weak = sum(1 for c in confidences if c < 0.5)
+    console.print(
+        f"[green]{len(segments)} segments[/green] · "
+        f"mean confidence {_fmt(mean_conf, '.3f')} · {weak} below 0.5"
     )
 
 

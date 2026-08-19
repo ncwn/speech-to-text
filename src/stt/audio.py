@@ -9,12 +9,17 @@ from __future__ import annotations
 
 import shutil
 import subprocess
+from collections.abc import Callable
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import numpy as np
 import soundfile as sf
 
 TARGET_SAMPLE_RATE = 16_000
+
+if TYPE_CHECKING:
+    from stt.results import Segment
 
 AUDIO_SUFFIXES = {".wav", ".flac", ".mp3", ".m4a", ".ogg", ".opus", ".aac", ".mp4", ".webm"}
 
@@ -187,3 +192,49 @@ def split_on_quiet(
         start = cut
 
     return bounds
+
+
+def windowed(
+    pcm: np.ndarray,
+    sample_rate: int,
+    window_s: float,
+    decode: Callable[[np.ndarray], str],
+    min_s: float = 0.2,
+) -> list[Segment]:
+    """Decode a waveform window by window, keeping each window's timing.
+
+    Seamless and Dolphin both have a fixed input length, so both have to slice
+    long audio and stitch the pieces back together. Sharing the loop here means
+    the sample offsets :func:`split_on_quiet` already computed survive into the
+    result instead of being thrown away, which is what makes subtitles and
+    per-region confidence possible for those backends.
+
+    Windows shorter than ``min_s`` are skipped: a sub-200 ms tail carries no
+    intelligible speech and models tend to hallucinate a token for it.
+
+    ``decode`` is called once per window and returns that window's transcript.
+    """
+    from stt.results import Segment
+
+    segments: list[Segment] = []
+    for start, end in split_on_quiet(pcm, sample_rate, window_s):
+        chunk = pcm[start:end]
+        if len(chunk) < sample_rate * min_s:
+            continue
+        text = decode(chunk).strip()
+        if not text:
+            continue
+        segments.append(
+            Segment(
+                text=text,
+                start=start / sample_rate,
+                end=end / sample_rate,
+                source="chunk",
+            )
+        )
+    return segments
+
+
+def join_segments(segments: list[Segment]) -> str:
+    """Concatenate segment texts the way the backends previously did."""
+    return " ".join(s.text for s in segments if s.text).strip()

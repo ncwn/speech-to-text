@@ -16,15 +16,17 @@ https://github.com/DataoceanAI/Dolphin/blob/main/languages.md
 
 from __future__ import annotations
 
+import itertools
 import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, ClassVar
 
+from stt.audio import join_segments
 from stt.backends.base import ASRBackend
 from stt.native import suppress_native_output
 from stt.registry import register
-from stt.results import TranscriptionResult
+from stt.results import Segment, TranscriptionResult
 
 #: Dolphin inherits Whisper's fixed 30-second input window.
 WINDOW_SEC = 30.0
@@ -139,7 +141,7 @@ class DolphinBackend(ASRBackend):
                 f"The {self.name} backend is wired for Burmese (my/MM); got {language!r}."
             )
 
-    def _transcribe_file(self, path: Path) -> str:
+    def _transcribe_file(self, path: Path) -> list[Segment]:
         """Window the audio at 30 s, since Dolphin decodes in a single pass.
 
         ``dolphin.transcribe`` does no chunking of its own and the model
@@ -152,19 +154,19 @@ class DolphinBackend(ASRBackend):
         import dolphin
         import soundfile as sf
 
-        from stt.audio import split_on_quiet
+        from stt.audio import windowed
 
         pcm, rate = sf.read(str(path), dtype="float32", always_2d=False)
         if pcm.ndim > 1:
             pcm = pcm.mean(axis=1)
 
-        pieces: list[str] = []
         with tempfile.TemporaryDirectory(prefix="stt-dolphin-") as tmp:
-            for index, (start, end) in enumerate(split_on_quiet(pcm, rate, WINDOW_SEC)):
-                chunk = pcm[start:end]
-                if len(chunk) < rate * 0.2:  # drop a sub-200 ms tail
-                    continue
-                window_path = Path(tmp) / f"w{index:05d}.wav"
+            counter = itertools.count()
+
+            def decode(chunk) -> str:
+                # Dolphin's Python API only accepts a path, so each window has
+                # to be written out before it can be decoded.
+                window_path = Path(tmp) / f"w{next(counter):05d}.wav"
                 sf.write(str(window_path), chunk, rate)
                 out = dolphin.transcribe(
                     self.engine,
@@ -174,10 +176,9 @@ class DolphinBackend(ASRBackend):
                 )
                 # `text` still carries the <my><MM> control tokens; the
                 # nospecial variant is the actual transcript.
-                text = (getattr(out, "text_nospecial", None) or "").strip()
-                if text:
-                    pieces.append(text)
-        return " ".join(pieces)
+                return (getattr(out, "text_nospecial", None) or "").strip()
+
+            return windowed(pcm, rate, WINDOW_SEC, decode)
 
     def transcribe(
         self,
@@ -200,7 +201,8 @@ class DolphinBackend(ASRBackend):
                 duration = duration_of(path)
                 started = time.perf_counter()
                 with suppress_native_output(not self.options.get("verbose")):
-                    text = self._transcribe_file(path)
+                    segments = self._transcribe_file(path)
+                text = join_segments(segments)
                 elapsed = time.perf_counter() - started
 
                 results.append(
@@ -213,6 +215,7 @@ class DolphinBackend(ASRBackend):
                         elapsed_s=elapsed,
                         audio_duration_s=duration,
                         metadata=dict(meta),
+                        segments=segments or None,
                     )
                 )
             except Exception as exc:  # noqa: BLE001 - one bad clip must not abort the sweep

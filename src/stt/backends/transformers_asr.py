@@ -25,9 +25,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, ClassVar
 
+from stt.audio import join_segments
 from stt.backends.base import ASRBackend
 from stt.registry import register
-from stt.results import TranscriptionResult
+from stt.results import Segment, TranscriptionResult
 
 #: Longest window fed to the model in one go, and how much neighbouring context
 #: overlaps it. Whisper was trained on 30 s windows; CTC models have no such
@@ -262,13 +263,13 @@ class TransformersASRBackend(ASRBackend):
 
     # ------------------------------------------------------------- inference
 
-    def _transcribe_seamless(self, path: Path) -> str:
+    def _transcribe_seamless(self, path: Path) -> list[Segment]:
         """SeamlessM4T has no ASR pipeline, so window the audio by hand."""
         import numpy as np
         import soundfile as sf
         import torch
 
-        from stt.audio import split_on_quiet
+        from stt.audio import windowed
 
         assert self._seamless is not None
         processor, model = self._seamless
@@ -278,20 +279,17 @@ class TransformersASRBackend(ASRBackend):
         if pcm.ndim > 1:
             pcm = pcm.mean(axis=1)
 
-        pieces: list[str] = []
-        for start, end in split_on_quiet(pcm, rate, window):
-            chunk = pcm[start:end]
-            if len(chunk) < rate * 0.2:  # skip a sub-200 ms tail
-                continue
+        def decode(chunk: np.ndarray) -> str:
             inputs = processor(
                 audios=np.asarray(chunk), sampling_rate=rate, return_tensors="pt"
             ).to(model.device, model.dtype)
             with torch.inference_mode():
                 tokens = model.generate(**inputs, tgt_lang=self.spec.lang)
-            pieces.append(processor.decode(tokens[0].tolist(), skip_special_tokens=True).strip())
-        return " ".join(p for p in pieces if p)
+            return processor.decode(tokens[0].tolist(), skip_special_tokens=True).strip()
 
-    def _transcribe_pipeline(self, path: Path) -> str:
+        return windowed(pcm, rate, window, decode)
+
+    def _transcribe_pipeline(self, path: Path) -> tuple[str, list[Segment]]:
         kwargs: dict[str, Any]
         if self.spec.family == "whisper":
             # Deliberately no chunk_length_s. Whisper carries its own sequential
@@ -309,7 +307,28 @@ class TransformersASRBackend(ASRBackend):
             window, stride = _CHUNKING[self.spec.family]
             kwargs = {"chunk_length_s": window, "stride_length_s": stride}
         out = self.pipe(str(path), **kwargs)
-        return (out["text"] if isinstance(out, dict) else str(out)).strip()
+        if not isinstance(out, dict):
+            return str(out).strip(), []
+        text = str(out.get("text", "")).strip()
+
+        # Whisper's sequential long-form path returns per-window timestamps.
+        # CTC families run without them, so `chunks` is simply absent there.
+        segments: list[Segment] = []
+        for chunk in out.get("chunks") or []:
+            stamp = chunk.get("timestamp") or (None, None)
+            piece = str(chunk.get("text", "")).strip()
+            # The final chunk's end is None when the decoder hit the audio end.
+            if not piece or stamp[0] is None:
+                continue
+            segments.append(
+                Segment(
+                    text=piece,
+                    start=float(stamp[0]),
+                    end=float(stamp[1] if stamp[1] is not None else stamp[0]),
+                    source="native",
+                )
+            )
+        return text, segments
 
     def transcribe(
         self,
@@ -337,9 +356,10 @@ class TransformersASRBackend(ASRBackend):
                 duration = duration_of(path)
                 started = time.perf_counter()
                 if self.spec.family == "seamless":
-                    text = self._transcribe_seamless(path)
+                    segments = self._transcribe_seamless(path)
+                    text = join_segments(segments)
                 else:
-                    text = self._transcribe_pipeline(path)
+                    text, segments = self._transcribe_pipeline(path)
                 elapsed = time.perf_counter() - started
 
                 results.append(
@@ -352,6 +372,7 @@ class TransformersASRBackend(ASRBackend):
                         elapsed_s=elapsed,
                         audio_duration_s=duration,
                         metadata=dict(meta),
+                        segments=segments or None,
                     )
                 )
             except Exception as exc:  # noqa: BLE001 - one bad clip must not abort the sweep

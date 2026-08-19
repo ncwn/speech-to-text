@@ -93,6 +93,12 @@ uv run stt compare data/fleurs/audio --reference data/fleurs/references.tsv --li
 # Combine several runs by per-character vote — best model FIRST
 uv run stt vote out-7b.jsonl out-seamless.jsonl out-dolphin.jsonl out-mms.jsonl \
     -o voted.jsonl
+
+# Transcribe and write subtitles, recovering timings if the backend has none
+uv run stt transcribe recording.mp3 -b omniasr-torch --align --srt
+
+# Time a transcript you already have, against its audio
+uv run stt align recording.mp3 --results outputs/omniasr-torch.jsonl
 ```
 
 ## Measured baseline
@@ -307,6 +313,63 @@ uv run stt fetch-fleurs --split test --limit 120 --dest data/fleurs-test
 uv run stt compare data/fleurs-test/audio -r data/fleurs-test/references.tsv
 ```
 
+### Confidence predicts error, which is what makes routing possible
+
+Every backend now returns `Segment`s carrying `start`, `end` and — where it can
+be had — a confidence. Three of them already knew all of this and were throwing
+it away: CrispASR times every segment, and Seamless and Dolphin compute window
+offsets they then discarded.
+
+The most accurate model was the problem. omniASR's fairseq2 pipeline returns a
+bare `List[str]`: no timings, no scores, nothing to point at. `stt align`
+recovers all of it after the fact by forced alignment against MMS-1B, whose
+Burmese adapter is character-level — the right granularity for a script written
+without word delimiters. Out-of-vocabulary characters on a real transcript came
+to **0.15%**, all uppercase Latin, which lowercasing removes.
+
+The signal is real, measured on the 7B's transcript of the held-out recording
+against the human reference:
+
+| | mean confidence | mean CER |
+|---|---:|---:|
+| least-confident quartile | 0.690 | 0.1739 |
+| most-confident quartile | 0.867 | 0.0288 |
+
+Pearson **r = −0.75**, and a **6.0×** error ratio between the quartiles. That
+matters more than it sounds: error is concentrated, so it can be bought cheaply.
+
+| escalate this share of audio | errors it covers | leverage |
+|---:|---:|---:|
+| 10% | 28.6% | 2.77× |
+| 25% | 47.9% | 1.87× |
+| 50% | 78.4% | 1.56× |
+
+Voting currently pays 4× compute on every second of audio. Spending it only
+where confidence is low should buy most of the accuracy for a fraction of that.
+
+A caveat on the other confidence source: CrispASR's `no_speech_prob` measures
+how likely a span is to be *silence*, not how likely the transcript is to be
+right, and the omniasr-llm backend does not compute it at all — it returns
+`-1.0`. That is now reported as unknown rather than converted into a confidence
+of 2.0.
+
+### Subtitles have to respect Burmese syllable clusters
+
+omniASR emits no `၊` or `။` whatsoever, so cue boundaries fall back to a length
+limit. Cutting blindly there splits grapheme clusters, and a cue that opens with
+a bare `ာ` is not readable:
+
+```
+...လူတိုင်းသိချင်ကြပါတယ်ကောင်းတ
+ာလုပ်ရင်နတ်ပြည်ရောက်မယ်...
+```
+
+Burmese stacks vowel signs, medials and tone marks onto a base consonant, and
+the virama binds the consonant after it. Forced breaks now retreat to the
+longest pause in the tail of the cue that also keeps clusters intact. On the
+17-minute recording that took cues starting with a combining mark from 1 to 0,
+and moved the breaks onto real phrase boundaries.
+
 ## Model weights
 
 Downloaded on first use, cached outside this repo:
@@ -318,14 +381,16 @@ Downloaded on first use, cached outside this repo:
 
 ```
 src/stt/
-  cli.py              Typer CLI: transcribe, eval, compare, backends, fetch-fleurs
+  cli.py              Typer CLI: transcribe, align, eval, compare, vote, backends
   audio.py            Discovery + 16 kHz mono normalisation (cached)
   burmese.py          NFC, Zawgyi detection, CER-safe normalisation
   datasets.py         FLEURS Burmese fetcher
-  results.py          TranscriptionResult + JSONL/text writers
+  results.py          TranscriptionResult + Segment; JSONL/text/SRT/VTT writers
   evaluate.py         CER/WER scoring
   registry.py         Backend registry
   vote.py             ROVER-style voting across runs
+  align.py            CTC forced alignment: timestamps + confidence for any text
+  quality.py          Reference-free defect detection (decoder loops)
   native.py           fd-level silencing of chatty native runtimes
   backends/
     base.py           The ASRBackend interface every engine implements

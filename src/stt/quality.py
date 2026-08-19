@@ -72,13 +72,34 @@ def find_loops(
     ]
     candidates.sort(key=lambda c: (-(c[1] - c[2]), -c[1]))
 
+    # One loop yields many overlapping n-grams — a 40-character clause repeated
+    # four times matches at eleven different offsets. Reporting each as its own
+    # defect would tell a user they have eleven problems when they have one, so
+    # candidates are collapsed by *where* they occur rather than by how similar
+    # their text looks: a comparison on text alone misses pairs that overlap by
+    # less than they differ.
     sites: list[LoopSite] = []
+    covered: list[tuple[int, int]] = []
     for gram, n, ref_n in candidates:
-        # Two n-grams from the same loop overlap heavily; keep the first only.
-        if any(gram[: k // 2] in seen.text or seen.text[: k // 2] in gram for seen in sites):
+        spans = _occurrences(hyp, gram)
+        if any(
+            any(start < c_end and c_start < end for c_start, c_end in covered)
+            for start, end in spans
+        ):
             continue
         sites.append(LoopSite(gram, n, ref_n))
+        covered.extend(spans)
     return sites
+
+
+def _occurrences(text: str, needle: str) -> list[tuple[int, int]]:
+    """Every ``(start, end)`` at which ``needle`` appears, including overlaps."""
+    spans: list[tuple[int, int]] = []
+    start = text.find(needle)
+    while start != -1:
+        spans.append((start, start + len(needle)))
+        start = text.find(needle, start + 1)
+    return spans
 
 
 def loop_summary(sites: list[LoopSite], k: int = DEFAULT_K) -> str:
