@@ -1,0 +1,79 @@
+[project]
+name = "stt"
+version = "0.1.0"
+description = "Burmese-focused ASR evaluation harness for local and cloud speech-to-text models"
+readme = "README.md"
+license = { text = "MIT" }
+# fairseq2n ships wheels for cp310-cp312 only, and omnilingual-asr caps at 3.12.
+requires-python = ">=3.12,<3.13"
+
+dependencies = [
+    "typer>=0.15",
+    "rich>=13.0",
+    "numpy>=1.26",
+    "soundfile>=0.13.1",
+    "huggingface-hub>=0.32",
+    "tqdm>=4.67",
+    "jiwer>=4.0",
+    "myanmartools>=1.2.1",
+]
+
+[project.optional-dependencies]
+# Meta's reference PyTorch/fairseq2 runtime. CPU-only on Apple Silicon.
+# fairseq2n 0.6 pins torch==2.8.0 exactly (it links against libtorch's C++ ABI).
+omniasr = [
+    "omnilingual-asr==0.2.0",
+    "torch==2.8.0",
+    "torchaudio==2.8.0",
+]
+
+# ggml/GGUF runtime with a Metal backend. Ships a prebuilt macOS arm64 wheel,
+# so no cmake build is needed. Covers the smaller omniASR LLM cards only.
+gguf = [
+    "crispasr>=0.8.29",
+]
+
+# Hugging Face runtime for everything that is not omniASR: Burmese Whisper
+# fine-tunes, MMS-1B, SeamlessM4T v2, w2v-BERT. Runs on Metal (MPS).
+# torch is pinned to match the omniasr extra so the two compose in one venv.
+hf = [
+    "transformers>=4.45",
+    "torch==2.8.0",
+    "torchaudio==2.8.0",
+    "sentencepiece>=0.2",
+    "protobuf>=4.25",
+    "accelerate>=1.0",
+]
+
+# DataoceanAI Dolphin. Pulls funasr and modelscope, which are heavier than the
+# model itself; keep it in its own extra so it cannot break the other runtimes.
+dolphin = [
+    "dataoceanai-dolphin>=20260513",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "ruff>=0.9",
+]
+
+[project.scripts]
+stt = "stt.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/stt"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

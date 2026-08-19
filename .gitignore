@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Model weights and caches — never commit, these are 1-31 GB each
+models/
+*.pt
+*.gguf
+*.safetensors
+*.mlmodelc/
+
+# Audio and transcripts
+data/audio/**
+!data/audio/.gitkeep
+data/reference/**
+!data/reference/.gitkeep
+data/fleurs*/
+# Resampled 16 kHz mono copies produced by stt.audio, and ad-hoc slices
+data/.converted/
+data/.slices/
+outputs/**
+!outputs/.gitkeep
+
+# Third-party sources built from scratch
+vendor/
+
+# Secrets (ElevenLabs / Google Cloud keys, for later backends)
+.env
+*.json.key
+service-account*.json
+
+# macOS
+.DS_Store
