@@ -1,6 +1,7 @@
 """Command-line interface.
 
 stt backends                     what is installed and working
+stt hardware                     what this machine is and its fastest precision
 stt models                       available model names per backend
 stt fetch-fleurs                 download Burmese eval audio + references
 stt transcribe AUDIO...          run one backend
@@ -21,7 +22,6 @@ from rich.table import Table
 from stt import audio as audio_mod
 from stt.burmese import NormalizeOptions, describe_encoding
 from stt.evaluate import load_references, mean_rtf, score_results
-from stt.hardware import tune_torch_threads
 from stt.registry import all_backends, get_backend
 from stt.results import (
     TranscriptionResult,
@@ -153,6 +153,54 @@ def models(
         console.print("[dim]Only base and small were publicly released.[/dim]")
 
 
+@app.command()
+def hardware(
+    refresh: Annotated[
+        bool, typer.Option("--refresh", help="Re-run the dtype probe instead of using the cache")
+    ] = False,
+) -> None:
+    """Show what this machine is, and which precision it runs fastest.
+
+    Everything shown is read or measured from the machine — nothing about the
+    chip is written down in this repo.
+    """
+    from stt.hardware import describe, fastest_dtype
+
+    facts = describe()
+    table = Table(title=facts["chip"])
+    table.add_column("", style="bold")
+    table.add_column("")
+    for name, count in facts["cores"].items():
+        table.add_row(f"{name} cores", str(count))
+    table.add_row("RAM", f"{facts['ram_mb'] / 1024:.0f} GB" if facts["ram_mb"] else "—")
+    table.add_row("platform", facts["platform"])
+
+    try:
+        import torch
+
+        device = (
+            "cuda"
+            if torch.cuda.is_available()
+            else "mps"
+            if torch.backends.mps.is_available()
+            else "cpu"
+        )
+        table.add_row("torch device", device)
+        threads = f"{torch.get_num_threads()}  [dim](its own default)[/dim]"
+        table.add_row("torch threads", threads)
+        with console.status("Timing float16 against bfloat16…" if refresh else "Reading probe…"):
+            best = fastest_dtype(device, refresh=refresh)
+        table.add_row("fastest GPU dtype", best)
+    except ImportError:
+        table.add_row("torch", "[dim]not installed[/dim]")
+
+    console.print(table)
+    console.print(
+        "[dim]Thread counts are left to macOS and to each runtime: measured on this "
+        "stack, 4, 8 and 12 threads all give the same RTF.[/dim]"
+    )
+
+
 # ------------------------------------------------------------------- data
 
 
@@ -281,8 +329,6 @@ def _run_backend(
     batch_size: int,
     options: dict,
 ) -> list[TranscriptionResult]:
-    tune_torch_threads()
-
     cls = get_backend(backend_name)
     ok, reason = cls.is_available()
     if not ok:

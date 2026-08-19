@@ -109,18 +109,29 @@ class OmniASRTorchBackend(ASRBackend):
         # runs at RTF 8.85 against float32's 2.14, a 4.1x penalty for identical
         # text. So float32 unless the machine cannot hold it: the large cards
         # need roughly 34 GB resident at float32, on top of the checkpoint read.
-        size = self._model_size_tag()
-        if size in {"3B", "7B"} and not self._has_headroom_for_float32():
+        if not self._has_headroom_for_float32():
             return torch.bfloat16
         return torch.float32
 
-    @staticmethod
-    def _has_headroom_for_float32(required_gb: int = 48) -> bool:
-        """Whether this machine can hold a large card at float32 comfortably."""
-        from stt.telemetry import describe_host
+    #: Resident memory runs to roughly the checkpoint size plus activations and
+    #: the buffers used to read it. Derived from the download size rather than
+    #: from a per-card constant, so a new card needs no new number here.
+    _FLOAT32_OVERHEAD = 1.5
 
-        ram_mb = describe_host().get("ram_mb")
-        return bool(ram_mb and ram_mb >= required_gb * 1024)
+    def _has_headroom_for_float32(self) -> bool:
+        """Whether this machine can hold this particular card at float32.
+
+        Asks how big the checkpoint is and how much memory the machine has,
+        rather than comparing a model name against a fixed threshold — the same
+        card is comfortable on a 64 GB machine and impossible on a 16 GB one.
+        """
+        from stt.hardware import total_ram_mb
+
+        checkpoint_mb = _DOWNLOAD_MB.get(self._model_size_tag())
+        ram_mb = total_ram_mb()
+        if not checkpoint_mb or not ram_mb:
+            return True  # unknown card or unknown machine: keep the fast path
+        return ram_mb >= checkpoint_mb * self._FLOAT32_OVERHEAD
 
     def _model_size_tag(self) -> str:
         for tag in ("300M", "1B", "3B", "7B"):

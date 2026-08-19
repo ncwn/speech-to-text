@@ -181,26 +181,46 @@ omniASR's LLM decoder is matmul-bound and gains from float16; Seamless is not
 and does not. So the probe drives `omniasr-torch` only, and the `hf` backend
 keeps float32.
 
-### Performance cores versus efficiency cores
+### Thread counts are left to macOS
 
-Efficiency cores make a parallel step finish later, because it finishes with its
-slowest thread. The split is not a constant, so the repo reads macOS's own
-naming (`hw.perflevel<N>.name`) and counts everything that is not called
-*Efficiency*:
+macOS places threads across performance and efficiency cores itself, and
+nothing here overrides it. That is a measured decision, not a stylistic one:
 
-| chip | levels | threads used |
-|---|---|---:|
-| M2 Max | Performance 8 + Efficiency 4 | 8 of 12 |
-| M5 Pro | Super 6 + Performance 12 | 18 of 18 |
+* the GGUF backend runs at **RTF 0.182 on 4, 8 and 12 threads alike** — the
+  work is on the GPU and the CPU sits at 0.05 cores;
+* a torch matmul scales **1.09× from 1 thread to 12**, because Accelerate does
+  its own threading through the AMX unit;
+* torch already derives its default from the system — it picks 8 on an M2 Max,
+  matching `hw.perflevel0.physicalcpu`, without being told.
 
-Reading the names rather than taking the fastest level is what makes this
-correct on an M5 Pro, which has **no efficiency cores at all** — taking only
-level 0 there would idle two thirds of the CPU. This sets torch's thread pool
-and the GGUF backend's `n_threads`, which was previously hardcoded to 8: right
-for an M2 Max by coincidence, wrong for a base M4 (4 performance cores) and for
-an M5 Pro.
+An earlier version of this repo set thread counts from a detected performance-
+core count and hardcoded `n_threads=8` for the GGUF backend. Both are gone:
+neither changed any measurement, and both could only be wrong on hardware that
+has not been tested.
 
-Note that thread count is a small lever on this stack today. Apple's Accelerate
-backend does its own threading through the AMX unit, so a torch matmul scales
-only 1.09× from 1 thread to 12 — and with Metal working, the heavy models are
-not on the CPU at all.
+The core split *is* still detected, for reporting — a benchmark number is not
+interpretable without knowing the machine. `stt hardware` shows it, and it is
+stamped on every result record. Reading macOS's level *names*
+(`hw.perflevel<N>.name`) rather than assuming level 0 is what keeps that correct
+across chips:
+
+| chip | levels |
+|---|---|
+| M2 Max | Performance 8 + Efficiency 4 |
+| M5 Pro | Super 6 + Performance 12 — no efficiency tier at all |
+
+### Nothing about a chip is written down here
+
+Precision, memory headroom and core layout are all read or timed from the
+machine at runtime and cached:
+
+* the float16-versus-bfloat16 choice is **timed on the device**, not looked up,
+  because which one is fast changes by generation and the public accounts
+  disagree;
+* whether a card can afford float32 on CPU is computed from **its checkpoint
+  size against detected RAM**, not from a fixed threshold — the same model is
+  comfortable on a 64 GB machine and impossible on a 16 GB one;
+* core counts and names come from `sysctl`.
+
+`stt hardware` prints the lot. On an untested chip it should need no code
+change to do the right thing.

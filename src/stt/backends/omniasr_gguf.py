@@ -18,7 +18,6 @@ from typing import Any, ClassVar
 
 from stt.audio import join_segments
 from stt.backends.base import ASRBackend
-from stt.hardware import compute_threads
 from stt.native import suppress_native_output
 from stt.registry import register
 from stt.results import Segment, TranscriptionResult
@@ -125,11 +124,11 @@ class OmniASRGgufBackend(ASRBackend):
         if model not in MODELS:
             raise ValueError(f"Unknown GGUF model {model!r}. Available: {', '.join(MODELS)}")
         self.spec = MODELS[model]
-        # 8 happens to be right for an M2 Max and wrong for most other chips:
-        # a base M4 has 4 performance cores, an M5 Pro has 15-18 and no
-        # efficiency cores at all. Efficiency cores are excluded because a
-        # parallel step finishes with its slowest thread.
-        self.n_threads = n_threads if n_threads is not None else compute_threads()
+        # Left to CrispASR unless asked for. Measured on this backend: 4, 8 and
+        # 12 threads all give RTF 0.182, because the work is on the GPU and the
+        # CPU sits at 0.05 cores. Picking a number here would be noise dressed
+        # up as tuning.
+        self.n_threads = n_threads
         # 0 lets CrispASR choose its own chunking for long audio.
         self.chunk_seconds = chunk_seconds
         # ggml logs every Metal kernel compile to fd 1/2; off unless asked for.
@@ -172,11 +171,10 @@ class OmniASRGgufBackend(ASRBackend):
 
         with suppress_native_output(not self.verbose) as log:
             try:
-                self.session = Session(
-                    self.model_path,
-                    n_threads=self.n_threads,
-                    backend=self.spec.crisp_backend,
-                )
+                options: dict[str, Any] = {"backend": self.spec.crisp_backend}
+                if self.n_threads is not None:
+                    options["n_threads"] = self.n_threads
+                self.session = Session(self.model_path, **options)
             except Exception as exc:
                 raise RuntimeError(f"Failed to open {self.spec.filename}:\n{log.tail()}") from exc
         self._loaded = True
@@ -262,7 +260,7 @@ class OmniASRGgufBackend(ASRBackend):
                         metadata={
                             "gguf": self.spec.filename,
                             "crisp_backend": self.spec.crisp_backend,
-                            "n_threads": self.n_threads,
+                            "n_threads": self.n_threads,  # None means CrispASR chose
                             "n_segments": len(segments),
                         },
                         segments=timed or None,

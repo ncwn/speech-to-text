@@ -11,12 +11,21 @@ generation accelerates bfloat16 is disputed and changes between chips, so this
 module measures the machine in front of it instead of consulting a table that
 will be wrong for the next one.
 
-**Which cores.** Apple splits the CPU into performance and efficiency cores,
-and scheduling compute onto efficiency cores costs throughput. The split is not
-a constant: an M2 Max is 8 performance + 4 efficiency, while an M5 Pro has no
-efficiency cores at all — it pairs super cores with performance cores. macOS
-names each level (``hw.perflevel0.name``), so the names decide, not the counts
-and not the chip's marketing name.
+**How many cores, for reporting only.** Apple splits the CPU into performance
+and efficiency cores, and macOS places threads across them itself. This module
+reports the split so a benchmark stays interpretable; it does not override
+anyone's thread count. Measurement is why: the GGUF backend runs at RTF 0.182
+on 4, 8 or 12 threads alike because the work is on the GPU, a torch matmul
+scales 1.09x from 1 thread to 12 because Accelerate threads itself through the
+AMX unit, and torch already derives its own default from the system. Forcing a
+number on top of that changed nothing measurable and could only be wrong on
+hardware we have not seen.
+
+The core split is not a constant, which is the other reason not to encode one:
+an M2 Max is 8 performance + 4 efficiency, while an M5 Pro has no efficiency
+cores at all — it pairs super cores with performance cores. macOS names each
+level (``hw.perflevel0.name``), so the names are read rather than the counts
+guessed at.
 
 Everything here is cached: the probe runs once per machine, not once per run.
 """
@@ -59,10 +68,12 @@ class CoreLayout:
 
     @property
     def compute(self) -> int:
-        """Cores worth running compute on — everything but the efficiency ones.
+        """Cores that are not efficiency cores — reported, never imposed.
 
         On an M2 Max this is 8 of 12. On an M5 Pro, whose levels are super and
-        performance with no efficiency tier, it is all of them.
+        performance with no efficiency tier, it is all of them. Read the names
+        rather than taking the fastest level, or an M5 Pro looks like a 6-core
+        machine.
         """
         n = sum(count for name, count in self.levels if EFFICIENCY not in name.lower())
         return n or self.total
@@ -104,11 +115,12 @@ def chip_name() -> str:
 
 
 def compute_threads() -> int:
-    """Default thread count for CPU work: performance cores only.
+    """How many non-efficiency cores this machine has.
 
-    Handing work to efficiency cores as well tends to cost more in stragglers
-    than the extra cores contribute, because a parallel step finishes with its
-    slowest thread.
+    Informational. Nothing in this repo sets a thread count from it: macOS
+    schedules across the levels itself, torch already derives its default from
+    the system, and the measurements above found no workload here that responds
+    to the number anyway.
     """
     return core_layout().compute
 
@@ -204,33 +216,30 @@ def fastest_dtype(device: str, refresh: bool = False) -> str:
 
 
 def describe() -> dict[str, Any]:
-    """Everything worth recording alongside a benchmark result."""
+    """Everything worth recording alongside a benchmark result.
+
+    All of it is read from the machine. A timing without this is not
+    reproducible, and a chip name alone does not distinguish a 32 GB machine
+    from a 64 GB one running the same model at different precisions.
+    """
+    import platform
+
     layout = core_layout()
     return {
         "chip": chip_name(),
-        "cores": {name: n for name, n in layout.levels},
+        "platform": platform.platform(),
+        "machine": platform.machine(),
+        "cores": dict(layout.levels),
         "compute_threads": layout.compute,
         "cpu_count": layout.total,
+        "ram_mb": total_ram_mb(),
     }
 
 
-def tune_torch_threads() -> int | None:
-    """Point torch's CPU thread pool at the performance cores.
-
-    Torch's own default is usually right on an M2 Max, but it is derived from
-    the fastest performance level alone. That undercounts a chip whose second
-    level is also fast — an M5 Pro pairs super cores with performance cores and
-    has no efficiency tier, so taking only the top level would leave two thirds
-    of the CPU idle.
-
-    Returns the thread count set, or ``None`` if torch is not installed.
-    """
+def total_ram_mb() -> int | None:
+    """Physical memory in MB, or ``None`` where it cannot be determined."""
+    raw = _sysctl("hw.memsize")
     try:
-        import torch
-    except ImportError:
+        return int(raw) // (1024 * 1024) if raw else None
+    except ValueError:
         return None
-
-    threads = compute_threads()
-    if threads and threads != torch.get_num_threads():
-        torch.set_num_threads(threads)
-    return threads

@@ -15,7 +15,6 @@ dependency and cannot itself fail a run.
 
 from __future__ import annotations
 
-import os
 import resource
 import sys
 import time
@@ -134,22 +133,8 @@ def describe_host() -> dict[str, Any]:
 
     A number measured on a busy laptop is not the same number measured on an
     idle one, and comparing across machines without this is meaningless.
+    Detection lives in :mod:`stt.hardware`; this is the recording end of it.
     """
-    import platform
+    from stt.hardware import describe
 
-    info: dict[str, Any] = {
-        "platform": platform.platform(),
-        "machine": platform.machine(),
-        "cpu_count": os.cpu_count(),
-    }
-    try:  # physical core count and RAM, macOS only, no dependency
-        import subprocess
-
-        for key, label in (("hw.physicalcpu", "physical_cores"), ("hw.memsize", "ram_mb")):
-            out = subprocess.run(
-                ["sysctl", "-n", key], capture_output=True, text=True, check=True
-            ).stdout.strip()
-            info[label] = int(out) // (1024 * 1024) if label == "ram_mb" else int(out)
-    except Exception:  # noqa: BLE001 - host detail is best-effort
-        pass
-    return info
+    return describe()
