@@ -437,6 +437,38 @@ segments landing in the gaps were silently dropped. The simulation now refuses
 to report intermediate numbers unless the 0% and 100% ends reproduce the two
 source transcripts exactly.
 
+### Routing by confidence buys most of the big model for a third of its compute
+
+If confidence predicts error, the expensive model only needs to run where the
+cheap one is unsure. Held-out check on the FLEURS 120-clip test set, routing
+whole clips — Seamless everywhere, escalating the least-confident clips to the
+7B. Whole-clip routing means no splice seams, so the seam tax above does not
+confound it.
+
+| escalated | CER | if routed at random | gap closed | RTF | vs 7B alone |
+|---:|---:|---:|---:|---:|---:|
+| 0% | 0.1301 | — | — | 0.16 | 10.9× |
+| 10% | 0.1220 | 0.1273 | 28.5% | 0.34 | 5.3× |
+| 20% | 0.1146 | 0.1244 | 54.6% | 0.52 | 3.4× |
+| **30%** | **0.1095** | 0.1216 | **72.5%** | **0.70** | **2.6×** |
+| 50% | 0.1066 | 0.1159 | 82.7% | 1.06 | 1.7× |
+| 100% | 0.1017 | — | 100% | 1.95 | 1.0× |
+
+Thirty percent of the compute budget captures **72.5%** of the 7B's advantage
+over Seamless. Routing the same 30% at random would capture 30% by definition,
+so the ordering is doing real work — this is the error concentration measured
+above, cashed in.
+
+**What did not replicate.** On the 17-minute recording, block routing appeared
+to beat *both* models (CER 0.0701 against the 7B's 0.0857). That does not hold
+here: per-clip routing approaches the 7B from above and never passes it. The
+difference is that on that recording the two models are nearly tied (0.0887 vs
+0.0857), so mixing them plays to each one's strengths, whereas on FLEURS the 7B
+is 22% better outright and mixing can only interpolate. The 0.0701 figure was
+also the best of 24 configurations chosen on the same file it was measured on,
+which is not a result. The **mechanism** generalises; that particular number
+does not.
+
 ## Model weights
 
 Downloaded on first use, cached outside this repo:
