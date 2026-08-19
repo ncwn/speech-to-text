@@ -9,7 +9,7 @@ w2v-BERT) and **DataoceanAI Dolphin**. ElevenLabs Scribe v2 and Google Chirp 3
 drop in as additional backends without restructuring anything.
 
 On 120 FLEURS Burmese test clips the winner is `omniASR_LLM_Unlimited_7B_v2` at
-**CER 0.1017**, Apache-2.0, CPU-only at RTF 1.79. See
+**CER 0.1017**, Apache-2.0, and it runs on Metal at RTF 0.70. See
 [Measured baseline](#measured-baseline).
 
 ## Why this exists
@@ -119,20 +119,28 @@ faster.
 
 ### Which one to use
 
-**omniASR 7B** tops this table and is Apache-2.0. It needs 31.2 GB on disk,
-~40 GB of RAM at fp32, and CPU-only inference — RTF 1.79 on short clips but
-**3.60 on a single long file**, so budget an hour for a 17-minute recording. It
-also emits **no punctuation at all**. Use it when licence and raw accuracy
-matter more than turnaround, and when you can post-process sentence breaks.
+**omniASR 7B** tops this table, is Apache-2.0, and — contrary to what this
+README said until recently — **runs on Metal**: RTF 0.70 against 8.85 for the
+same dtype on CPU, for bit-identical text. It needs 31.2 GB on disk and about
+14 GB resident on the GPU. It still emits **no punctuation at all**. Use it when
+licence and raw accuracy matter, and when you can post-process sentence breaks.
 
-**SeamlessM4T v2** is the practical default. Eleven times faster on Metal
-(RTF 0.16), it segments output into real sentences, and on held-out audio it is
+The RTF 1.79 and 3.60 figures quoted elsewhere in this file are CPU float32
+runs, kept because the accuracy numbers beside them were measured that way.
+
+**SeamlessM4T v2** remains the fastest option. At RTF 0.16 it segments output
+into real sentences, and on held-out audio it is
 *more* accurate than the 7B once a single proper noun is set aside — see
 [the held-out check](#held-out-check-a-17-minute-recording-with-a-human-reference).
 The catch is the licence: **CC-BY-NC**, so evaluation only, never a product.
 
 **Dolphin small** is the Apache-2.0 fallback if you need permissive licensing
-and Metal-class speed and can accept ~30 % more error.
+and can accept ~30 % more error — though note it never touches the GPU and
+costs 4.9 GB of RAM to do it.
+
+With Metal working, the 7B's speed disadvantage largely disappears, so the
+licence question matters more than the throughput one: omniASR is Apache-2.0,
+Seamless is CC-BY-NC.
 
 Note how little separates omniASR 300M from Seamless (0.1298 vs 0.1301) despite
 a 10x parameter difference and completely different architectures. Above about

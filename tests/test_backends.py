@@ -67,16 +67,32 @@ def test_torch_backend_reports_download_size():
     assert cls("some_unrecognised_card").estimated_download_mb() is None
 
 
-def test_cpu_dtype_defaults_trade_speed_against_memory():
-    """fp32 is faster on CPU, but the big cards would not fit — so they get bf16."""
+def test_cpu_prefers_float32_because_bfloat16_is_emulated_there():
+    """Measured on the 7B: bf16 on CPU is RTF 8.85 against fp32's 2.14, for
+    identical text. PyTorch has no native half kernels on CPU, so the only
+    reason to pick bf16 is not fitting in memory."""
     torch = pytest.importorskip("torch")
     cls = get_backend("omniasr-torch")
 
-    small = cls("omniASR_LLM_Unlimited_300M_v2")
-    assert small._resolve_dtype("cpu") is torch.float32
-
+    assert cls("omniASR_LLM_Unlimited_300M_v2")._resolve_dtype("cpu") is torch.float32
     large = cls("omniASR_LLM_Unlimited_7B_v2")
+    expected = torch.float32 if large._has_headroom_for_float32() else torch.bfloat16
+    assert large._resolve_dtype("cpu") is expected
+
+
+def test_a_large_card_falls_back_to_bfloat16_on_a_small_machine():
+    """fp32 for the big cards needs ~34 GB resident; bf16 is the fit-in-RAM path."""
+    torch = pytest.importorskip("torch")
+    cls = get_backend("omniasr-torch")
+    large = cls("omniASR_LLM_Unlimited_7B_v2")
+    large._has_headroom_for_float32 = lambda *a, **k: False
     assert large._resolve_dtype("cpu") is torch.bfloat16
+
+
+def test_gpu_always_uses_bfloat16():
+    torch = pytest.importorskip("torch")
+    cls = get_backend("omniasr-torch")
+    assert cls("omniASR_LLM_Unlimited_7B_v2")._resolve_dtype("mps") is torch.bfloat16
 
 
 def test_explicit_dtype_overrides_auto():
@@ -94,11 +110,25 @@ def test_unknown_dtype_is_rejected():
         cls("omniASR_LLM_Unlimited_7B_v2", dtype="float8")._resolve_dtype("cpu")
 
 
-def test_mps_is_never_auto_selected():
-    """fairseq2 has no validated Metal path, so auto must not pick it."""
+def test_metal_is_auto_selected_when_available():
+    """Metal was measured on the 7B: identical text to CPU, RTF 0.70 against
+    8.85 at the same dtype, and 13.9 GB against 22.3 GB. Faster and smaller
+    with no change in output, so auto should take it."""
+    torch = pytest.importorskip("torch")
+    cls = get_backend("omniasr-torch")
+    resolved = cls("omniASR_LLM_Unlimited_7B_v2")._resolve_device()
+    if torch.cuda.is_available():
+        assert resolved == "cuda"
+    elif torch.backends.mps.is_available():
+        assert resolved == "mps"
+    else:
+        assert resolved == "cpu"
+
+
+def test_an_explicit_device_overrides_auto():
     pytest.importorskip("torch")
     cls = get_backend("omniasr-torch")
-    assert cls("omniASR_LLM_Unlimited_7B_v2")._resolve_device() in {"cpu", "cuda"}
+    assert cls("omniASR_LLM_Unlimited_7B_v2", device="cpu")._resolve_device() == "cpu"
     assert cls("omniASR_LLM_Unlimited_7B_v2", device="mps")._resolve_device() == "mps"
 
 

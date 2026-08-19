@@ -70,8 +70,13 @@ class OmniASRTorchBackend(ASRBackend):
             return self.device_arg
         if torch.cuda.is_available():
             return "cuda"
-        # MPS is deliberately not auto-selected: fairseq2 has no validated Metal
-        # path and several ops fall back or error. Opt in with --device mps.
+        if torch.backends.mps.is_available():
+            # Metal was measured, not assumed. On the 7B card, five FLEURS clips
+            # decoded to text identical to CPU, at RTF 0.70 against 8.85 for the
+            # same dtype on CPU and 2.14 for CPU's fastest dtype, using 13.9 GB
+            # against 22.3 GB. Faster and smaller with no change in output, so
+            # it is the default; `transcribe` falls back to CPU if it fails.
+            return "mps"
         return "cpu"
 
     def _resolve_dtype(self, device: str) -> Any:
@@ -94,13 +99,22 @@ class OmniASRTorchBackend(ASRBackend):
             return torch.bfloat16
 
         # On CPU, float32 is the fast path — PyTorch lacks native half-precision
-        # kernels there and emulates them, which upstream users measured as
-        # 2-3x slower. But float32 for the larger cards would need ~34 GB
-        # resident on top of a 31 GB checkpoint read, so those get bfloat16.
+        # kernels there and emulates them. Measured on the 7B: bfloat16 on CPU
+        # runs at RTF 8.85 against float32's 2.14, a 4.1x penalty for identical
+        # text. So float32 unless the machine cannot hold it: the large cards
+        # need roughly 34 GB resident at float32, on top of the checkpoint read.
         size = self._model_size_tag()
-        if size in {"3B", "7B"}:
+        if size in {"3B", "7B"} and not self._has_headroom_for_float32():
             return torch.bfloat16
         return torch.float32
+
+    @staticmethod
+    def _has_headroom_for_float32(required_gb: int = 48) -> bool:
+        """Whether this machine can hold a large card at float32 comfortably."""
+        from stt.telemetry import describe_host
+
+        ram_mb = describe_host().get("ram_mb")
+        return bool(ram_mb and ram_mb >= required_gb * 1024)
 
     def _model_size_tag(self) -> str:
         for tag in ("300M", "1B", "3B", "7B"):
@@ -159,6 +173,34 @@ class OmniASRTorchBackend(ASRBackend):
             hint = f" Did you mean one of: {', '.join(near[:5])}?" if near else ""
             raise ValueError(f"Language {language!r} is not supported by omniASR.{hint}")
 
+    def _transcribe_one(self, path: str, lang_arg: list[str] | None, batch_size: int) -> list[str]:
+        """Decode one file, retrying on CPU if Metal fails.
+
+        Metal is the measured-faster default, but fairseq2 does not test it and
+        an unimplemented kernel would otherwise turn a slow run into a failed
+        one. Falling back costs speed; not falling back costs the transcript.
+        The switch is permanent for this instance, so a systematic failure does
+        not pay the Metal attempt on every remaining file.
+        """
+        assert self.pipeline is not None
+        try:
+            return self.pipeline.transcribe([path], lang=lang_arg, batch_size=batch_size)
+        except Exception as exc:  # noqa: BLE001 - any Metal failure is worth retrying on CPU
+            if self.resolved_device != "mps":
+                raise
+            import logging
+
+            logging.getLogger(__name__).warning(
+                "Metal failed (%s: %s); falling back to CPU for the rest of this run.",
+                type(exc).__name__,
+                exc,
+            )
+            self.unload()
+            self.device_arg = "cpu"
+            self.load()
+            assert self.pipeline is not None
+            return self.pipeline.transcribe([path], lang=lang_arg, batch_size=batch_size)
+
     def transcribe(
         self,
         audio_paths: list[Path],
@@ -190,7 +232,7 @@ class OmniASRTorchBackend(ASRBackend):
 
                 started = time.perf_counter()
                 lang_arg = [language] if language else None
-                texts = self.pipeline.transcribe([str(path)], lang=lang_arg, batch_size=batch_size)
+                texts = self._transcribe_one(str(path), lang_arg, batch_size)
                 elapsed = time.perf_counter() - started
 
                 results.append(

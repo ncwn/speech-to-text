@@ -6,26 +6,43 @@ covers 1,672 languages. Burmese (`mya_Mymr`) is in the supported set with
 model. Two neighbouring languages in the same script are also covered: Mon
 (`mnw_Mymr`) and Shan (`shn_Mymr`).
 
-## The GPU problem
+## Running the 7B on Apple Silicon
 
-There is **no Metal path for the 7B LLM variant**. Three independent runtimes
-exist and none of them covers that combination:
+**fairseq2's PyTorch MPS path works for the 7B LLM card**, which this repo
+previously stated was impossible. Measured on five FLEURS clips, same model,
+same audio:
+
+| config | RTF | peak RSS | GPU | text |
+|---|---:|---:|---:|---|
+| CPU, bfloat16 | 8.85 | 22.3 GB | — | reference |
+| CPU, float32 | 2.14 | — | — | identical |
+| **Metal (MPS), bfloat16** | **0.70** | **13.9 GB** | 17.1 GB | identical |
+
+Corpus CER was 0.0280 in all three. Metal is **12.6× faster than CPU at the same
+dtype**, 3.0× faster than CPU's best dtype, and uses less memory — so
+`--device auto` now selects it, with an automatic fall back to CPU if a Metal
+kernel fails mid-run.
+
+Two things this table also settles:
+
+* **bfloat16 on CPU is a trap.** PyTorch has no native half-precision CPU
+  kernels and emulates them, costing 4.1× for identical output. On CPU, float32
+  is the fast path; bfloat16 is only for machines that cannot hold float32.
+* The published RTF 1.79 baseline for the 7B was a float32 CPU run.
+
+The other two runtimes still have the gaps described below, so they remain the
+reason to reach for `omniasr-gguf` when iterating:
 
 | Runtime | GPU | Variants ported | API |
 |---|---|---|---|
-| Meta `omnilingual-asr` (PyTorch + fairseq2) | CUDA only | all | Python |
+| Meta `omnilingual-asr` (PyTorch + fairseq2) | CUDA, **Metal (measured here)** | all | Python |
 | [soniqo/speech-swift](https://github.com/soniqo/speech-swift) (MLX + CoreML) | Metal / ANE | **CTC only**, 300M–7B | Swift |
 | [CrispASR](https://github.com/CrispStrobe/CrispASR) (ggml) | Metal | **LLM 300M/1B**, CTC 300M/1B | C++, Python, others |
 
-- fairseq2 has no validated MPS backend. `--device mps` is exposed by this repo
-  as an experiment, not a supported path.
 - The MLX port's docs state the LLM decoder variant is "a separate follow-up
   module" — it has not been built. Its CTC models also ignore the language
   hint entirely, which matters when you specifically want Burmese decoding.
 - The GGUF ladder stops at 1B. No 3B or 7B LLM conversion exists.
-
-So the practical workflow is: **iterate on `omniasr-gguf`, confirm on
-`omniasr-torch`.**
 
 ## Model families
 
