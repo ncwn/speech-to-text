@@ -89,6 +89,10 @@ uv run stt eval outputs/omniasr-gguf.jsonl --reference data/fleurs/references.ts
 
 # Run every installed backend over the same clips and compare
 uv run stt compare data/fleurs/audio --reference data/fleurs/references.tsv --limit 10
+
+# Combine several runs by per-character vote — best model FIRST
+uv run stt vote out-7b.jsonl out-seamless.jsonl out-dolphin.jsonl out-mms.jsonl \
+    -o voted.jsonl
 ```
 
 ## Measured baseline
@@ -188,6 +192,43 @@ margin — roughly half the failure rate of anything else — and that, more tha
 the average, is what matters for a long recording, where one runaway segment
 contaminates everything after it.
 
+### Voting across models beats every single model
+
+The systems fail on different words. An oracle picking the better of the top
+two per 200-character span would score **0.0571** where the best single model
+scores 0.0857 — a third of the remaining error is recoverable without a better
+model, just by choosing between hypotheses already in hand.
+
+`stt vote` implements the practical version: align every run to a pivot, then
+vote position by position, weighted by measured accuracy. Chosen on FLEURS and
+verified on held-out audio, changing nothing between the two:
+
+| | best single | voted | |
+|---|---:|---:|---:|
+| FLEURS 120 test clips | 0.1017 | **0.0945** | −7.1 % |
+| held-out 16.8 min recording | 0.0857 | **0.0718** | −16.2 % |
+
+Three things that turned out to matter:
+
+**The pivot must be your best model.** Voting can only correct characters the
+pivot proposed, so the first run given anchors the result. Ties break toward
+the pivot, which is why adding a system can never do worse than a wash.
+
+**A pool of weak systems achieves nothing.** SeamlessM4T + Dolphin + MMS scores
+0.1301 — exactly what SeamlessM4T scores alone. The 7B is load-bearing.
+
+**Spacing convention dominates the alignment.** SeamlessM4T emits a space per
+sub-word, omniASR emits none, so on raw text the aligner spends its budget on
+whitespace instead of on the characters being voted: raw 0.0764,
+`tidy_spacing` 0.0718, full normalisation 0.0714. The default is
+`tidy_spacing`, which captures nearly all of it while keeping the ၊ and ။
+delimiters that full normalisation discards.
+
+Cost is modest. Adding SeamlessM4T, Dolphin and MMS to a 7B run takes the total
+real-time factor from 3.60 to 4.03 — 12 % more compute for 8.6 % less error on
+FLEURS. Adding the 3B as well reaches 0.0900 but costs RTF 6.63, which is 84 %
+more compute for a further 3 %.
+
 ### Held-out check: a 17-minute recording with a human reference
 
 FLEURS is public and may be in these models' training data, so the ranking was
@@ -284,6 +325,7 @@ src/stt/
   results.py          TranscriptionResult + JSONL/text writers
   evaluate.py         CER/WER scoring
   registry.py         Backend registry
+  vote.py             ROVER-style voting across runs
   native.py           fd-level silencing of chatty native runtimes
   backends/
     base.py           The ASRBackend interface every engine implements
