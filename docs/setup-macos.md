@@ -131,3 +131,76 @@ two sizes at one directory leaves the first model's config next to the second
 model's weights, and the load dies with `size mismatch for
 decoder.decoders.5.norm3.bias`. This backend gives each size its own directory
 under `~/.cache/dolphin/<size>/`; delete any older flat cache.
+
+## Apple Silicon: which precision, which cores
+
+Two hardware-dependent choices matter, and both are measured rather than
+assumed — the repo probes the machine once and caches the answer under
+`~/.cache/stt/hardware.json`.
+
+### bfloat16 is not the safe default on Apple GPUs
+
+Apple's GPUs are built around float16. bfloat16 is *accepted* everywhere but is
+not equally *accelerated*. A 4096² matmul on an M2 Max:
+
+| dtype | GFLOP/s |
+|---|---:|
+| float16 | **12,306** |
+| float32 | 11,253 |
+| bfloat16 | 5,797 |
+
+bfloat16 is 2.1× slower than float16 and slower than float32 — it is being
+emulated. Metal exposes the `bfloat` type broadly, but the simdgroup matrix
+intrinsics that make it fast arrived with Metal 3.1 and the M3-era GPUs, and
+whether *any* shipped Apple GPU has true hardware bfloat16 matrix units is
+disputed. Since that answer changes per generation, `stt.hardware.fastest_dtype`
+times both formats on the actual device instead of consulting a table.
+
+End to end on the omniASR 7B, five FLEURS clips, all producing identical text
+and identical corpus CER (0.0280):
+
+| config | RTF | GPU |
+|---|---:|---:|
+| Metal float16 | **0.61** | 17.1 GB |
+| Metal bfloat16 | 0.70 | 17.1 GB |
+| CPU float32 | 2.14 | — |
+| CPU bfloat16 | 8.85 | — |
+
+### …but the best dtype belongs to the model, not just the chip
+
+SeamlessM4T v2 on the same GPU goes the other way — float32 is both faster and
+more accurate, so half precision buys only memory:
+
+| dtype | RTF | CER |
+|---|---:|---:|
+| float32 | **0.16** | **0.0420** |
+| float16 | 0.26 | 0.0455 |
+| bfloat16 | 0.26 | 0.0420 |
+
+omniASR's LLM decoder is matmul-bound and gains from float16; Seamless is not
+and does not. So the probe drives `omniasr-torch` only, and the `hf` backend
+keeps float32.
+
+### Performance cores versus efficiency cores
+
+Efficiency cores make a parallel step finish later, because it finishes with its
+slowest thread. The split is not a constant, so the repo reads macOS's own
+naming (`hw.perflevel<N>.name`) and counts everything that is not called
+*Efficiency*:
+
+| chip | levels | threads used |
+|---|---|---:|
+| M2 Max | Performance 8 + Efficiency 4 | 8 of 12 |
+| M5 Pro | Super 6 + Performance 12 | 18 of 18 |
+
+Reading the names rather than taking the fastest level is what makes this
+correct on an M5 Pro, which has **no efficiency cores at all** — taking only
+level 0 there would idle two thirds of the CPU. This sets torch's thread pool
+and the GGUF backend's `n_threads`, which was previously hardcoded to 8: right
+for an M2 Max by coincidence, wrong for a base M4 (4 performance cores) and for
+an M5 Pro.
+
+Note that thread count is a small lever on this stack today. Apple's Accelerate
+backend does its own threading through the AMX unit, so a torch matmul scales
+only 1.09× from 1 thread to 12 — and with Metal working, the heavy models are
+not on the CPU at all.

@@ -96,7 +96,13 @@ class OmniASRTorchBackend(ASRBackend):
             return named[self.dtype_arg]
 
         if device != "cpu":
-            return torch.bfloat16
+            # Which 16-bit format is fastest is a property of the GPU, not of
+            # the model: an M2 Max runs float16 at 12,306 GFLOP/s and bfloat16
+            # at 5,797, while later chips may invert that. Measured once per
+            # machine and cached rather than assumed.
+            from stt.hardware import fastest_dtype
+
+            return named[fastest_dtype(device)]
 
         # On CPU, float32 is the fast path — PyTorch lacks native half-precision
         # kernels there and emulates them. Measured on the 7B: bfloat16 on CPU

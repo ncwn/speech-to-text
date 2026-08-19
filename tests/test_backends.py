@@ -89,10 +89,19 @@ def test_a_large_card_falls_back_to_bfloat16_on_a_small_machine():
     assert large._resolve_dtype("cpu") is torch.bfloat16
 
 
-def test_gpu_always_uses_bfloat16():
+def test_gpu_dtype_follows_the_measured_probe_not_a_constant():
+    """Which 16-bit format is fast is a property of the GPU. An M2 Max runs
+    float16 at 12,306 GFLOP/s and bfloat16 at 5,797; a later chip may invert
+    that, so the backend asks rather than hardcoding either one."""
     torch = pytest.importorskip("torch")
+    if not torch.backends.mps.is_available():
+        pytest.skip("no Metal device")
+    from stt.hardware import fastest_dtype
+
     cls = get_backend("omniasr-torch")
-    assert cls("omniASR_LLM_Unlimited_7B_v2")._resolve_dtype("mps") is torch.bfloat16
+    resolved = cls("omniASR_LLM_Unlimited_7B_v2")._resolve_dtype("mps")
+    assert resolved is getattr(torch, fastest_dtype("mps"))
+    assert resolved in {torch.float16, torch.bfloat16}
 
 
 def test_explicit_dtype_overrides_auto():

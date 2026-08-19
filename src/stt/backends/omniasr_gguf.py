@@ -18,6 +18,7 @@ from typing import Any, ClassVar
 
 from stt.audio import join_segments
 from stt.backends.base import ASRBackend
+from stt.hardware import compute_threads
 from stt.native import suppress_native_output
 from stt.registry import register
 from stt.results import Segment, TranscriptionResult
@@ -115,7 +116,7 @@ class OmniASRGgufBackend(ASRBackend):
     def __init__(
         self,
         model: str = DEFAULT_MODEL,
-        n_threads: int = 8,
+        n_threads: int | None = None,
         chunk_seconds: int = 0,
         verbose: bool = False,
         **options: Any,
@@ -124,7 +125,11 @@ class OmniASRGgufBackend(ASRBackend):
         if model not in MODELS:
             raise ValueError(f"Unknown GGUF model {model!r}. Available: {', '.join(MODELS)}")
         self.spec = MODELS[model]
-        self.n_threads = n_threads
+        # 8 happens to be right for an M2 Max and wrong for most other chips:
+        # a base M4 has 4 performance cores, an M5 Pro has 15-18 and no
+        # efficiency cores at all. Efficiency cores are excluded because a
+        # parallel step finishes with its slowest thread.
+        self.n_threads = n_threads if n_threads is not None else compute_threads()
         # 0 lets CrispASR choose its own chunking for long audio.
         self.chunk_seconds = chunk_seconds
         # ggml logs every Metal kernel compile to fd 1/2; off unless asked for.

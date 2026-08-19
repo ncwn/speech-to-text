@@ -178,9 +178,18 @@ class TransformersASRBackend(ASRBackend):
             if self.dtype_arg not in named:
                 raise ValueError(f"Unknown dtype {self.dtype_arg!r}. Choose from {sorted(named)}")
             return named[self.dtype_arg]
-        # float32 everywhere by default. Half precision on MPS silently produces
-        # NaNs in some attention kernels, and we already know from the GGUF
-        # comparison how expensive a quiet precision regression is to diagnose.
+        # float32 everywhere by default, and measurement backs this up rather
+        # than mere caution. On five FLEURS clips with SeamlessM4T v2 on Metal:
+        #
+        #   float32   RTF 0.16   CER 0.0420
+        #   float16   RTF 0.26   CER 0.0455   (4/5 transcripts differ)
+        #   bfloat16  RTF 0.26   CER 0.0420   (4/5 transcripts differ)
+        #
+        # Half precision is both slower *and* no more accurate here, so it buys
+        # nothing but GPU memory. That is the opposite of omniASR's LLM decoder,
+        # which is matmul-bound and gains from float16 — the best dtype is a
+        # property of the model as much as of the chip, so this backend does not
+        # share omniASR's probe.
         return torch.float32
 
     def estimated_download_mb(self) -> int | None:

@@ -21,6 +21,7 @@ from rich.table import Table
 from stt import audio as audio_mod
 from stt.burmese import NormalizeOptions, describe_encoding
 from stt.evaluate import load_references, mean_rtf, score_results
+from stt.hardware import tune_torch_threads
 from stt.registry import all_backends, get_backend
 from stt.results import (
     TranscriptionResult,
@@ -280,6 +281,8 @@ def _run_backend(
     batch_size: int,
     options: dict,
 ) -> list[TranscriptionResult]:
+    tune_torch_threads()
+
     cls = get_backend(backend_name)
     ok, reason = cls.is_available()
     if not ok:
