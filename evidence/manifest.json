@@ -1,0 +1,590 @@
+{
+  "version": 1,
+  "document": "docs/findings.md",
+  "blocks": [
+    {
+      "id": "publication-status",
+      "corpus": "fleurs-test-120",
+      "reference": "data/fleurs-test/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/t120-omni7b.jsonl",
+          "label": "omniASR 7B Unlimited v2",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_7B_v2"
+        },
+        {
+          "artifact": "outputs/t120-seamless-1.jsonl",
+          "label": "SeamlessM4T v2 large",
+          "backend": "hf",
+          "model": "seamless-m4t-v2"
+        }
+      ],
+      "metrics": []
+    },
+    {
+      "id": "measurement-base",
+      "corpus": "fleurs-test-120",
+      "reference": "data/fleurs-test/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/t120-omni7b.jsonl",
+          "label": "legacy FLEURS 120-clip run",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_7B_v2"
+        }
+      ],
+      "metrics": []
+    },
+    {
+      "id": "baseline",
+      "corpus": "fleurs-test-120",
+      "reference": "data/fleurs-test/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/t120-omni7b.jsonl",
+          "label": "omniASR 7B Unlimited v2",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_7B_v2"
+        },
+        {
+          "artifact": "outputs/t120-omni3b.jsonl",
+          "label": "omniASR 3B Unlimited v2",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_3B_v2"
+        },
+        {
+          "artifact": "outputs/t120-omni300m.jsonl",
+          "label": "omniASR 300M Unlimited v2",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_300M_v2"
+        },
+        {
+          "artifact": "outputs/t120-seamless-1.jsonl",
+          "label": "SeamlessM4T v2 large",
+          "backend": "hf",
+          "model": "seamless-m4t-v2"
+        },
+        {
+          "artifact": "outputs/t120-dolphin-small.jsonl",
+          "label": "Dolphin small (372M)",
+          "backend": "dolphin",
+          "model": "small"
+        },
+        {
+          "artifact": "outputs/t120-mms.jsonl",
+          "label": "MMS-1B",
+          "backend": "hf",
+          "model": "mms-1b-all"
+        }
+      ],
+      "metrics": [
+        {"name": "cer", "label": "CER", "digits": 4},
+        {"name": "rtf", "label": "RTF", "digits": 2}
+      ]
+    },
+    {
+      "id": "tails",
+      "corpus": "fleurs-test-120",
+      "reference": "data/fleurs-test/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/t120-omni7b.jsonl",
+          "label": "omniASR 7B Unlimited v2",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_7B_v2"
+        },
+        {
+          "artifact": "outputs/t120-omni3b.jsonl",
+          "label": "omniASR 3B Unlimited v2",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_3B_v2"
+        },
+        {
+          "artifact": "outputs/t120-seamless-1.jsonl",
+          "label": "SeamlessM4T v2 large",
+          "backend": "hf",
+          "model": "seamless-m4t-v2"
+        },
+        {
+          "artifact": "outputs/t120-omni300m.jsonl",
+          "label": "omniASR 300M Unlimited v2",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_300M_v2"
+        },
+        {
+          "artifact": "outputs/t120-dolphin-small.jsonl",
+          "label": "Dolphin small (372M)",
+          "backend": "dolphin",
+          "model": "small"
+        },
+        {
+          "artifact": "outputs/t120-mms.jsonl",
+          "label": "MMS-1B",
+          "backend": "hf",
+          "model": "mms-1b-all"
+        }
+      ],
+      "metrics": [
+        {"name": "cer", "label": "CER", "digits": 4}
+      ]
+    },
+    {
+      "id": "held-out",
+      "corpus": "held-out-eternity",
+      "reference": "data/reference/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/eternity-omni7b.jsonl",
+          "label": "omniASR 7B",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_7B_v2"
+        },
+        {
+          "artifact": "outputs/eternity-seamless.jsonl",
+          "label": "SeamlessM4T v2",
+          "backend": "hf",
+          "model": "seamless-m4t-v2"
+        },
+        {
+          "artifact": "outputs/eternity-dolphin.jsonl",
+          "label": "Dolphin small",
+          "backend": "dolphin",
+          "model": "small"
+        },
+        {
+          "artifact": "outputs/eternity-gguf.jsonl",
+          "label": "omniASR 300M Q4_K",
+          "backend": "omniasr-gguf",
+          "model": "llm-unlimited-300m-v2"
+        }
+      ],
+      "metrics": [
+        {"name": "cer", "label": "CER", "digits": 4}
+      ]
+    },
+    {
+      "id": "held-out-name-corrected",
+      "corpus": "held-out-eternity",
+      "reference": "data/reference/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/eternity-omni7b.jsonl",
+          "label": "omniASR 7B",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_7B_v2"
+        },
+        {
+          "artifact": "outputs/eternity-seamless.jsonl",
+          "label": "SeamlessM4T v2",
+          "backend": "hf",
+          "model": "seamless-m4t-v2"
+        }
+      ],
+      "metrics": [
+        {"name": "cer", "label": "CER", "digits": 4}
+      ]
+    },
+    {
+      "id": "punctuation",
+      "corpus": "held-out-eternity",
+      "reference": "data/reference/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/eternity-omni7b.jsonl",
+          "label": "omniASR 7B",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_7B_v2"
+        },
+        {
+          "artifact": "outputs/eternity-seamless.jsonl",
+          "label": "SeamlessM4T v2",
+          "backend": "hf",
+          "model": "seamless-m4t-v2"
+        },
+        {
+          "artifact": "outputs/eternity-dolphin.jsonl",
+          "label": "Dolphin small",
+          "backend": "dolphin",
+          "model": "small"
+        },
+        {
+          "artifact": "outputs/eternity-gguf.jsonl",
+          "label": "omniASR 300M Q4_K",
+          "backend": "omniasr-gguf",
+          "model": "llm-unlimited-300m-v2"
+        }
+      ],
+      "metrics": [
+        {"name": "rtf", "label": "RTF", "digits": 2}
+      ]
+    },
+    {
+      "id": "voting",
+      "corpus": "fleurs-test-120",
+      "reference": "data/fleurs-test/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/t120-omni7b.jsonl",
+          "label": "best single",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_7B_v2"
+        },
+        {
+          "artifact": "outputs/t120-voted.jsonl",
+          "label": "voted",
+          "backend": "vote",
+          "model": "mms-1b-all+omniASR_LLM_Unlimited_7B_v2+seamless-m4t-v2+small"
+        }
+      ],
+      "metrics": [
+        {"name": "cer", "label": "CER", "digits": 4}
+      ]
+    },
+    {
+      "id": "confidence-quartiles",
+      "corpus": "held-out-eternity",
+      "reference": "data/reference/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/eternity-omni7b.jsonl",
+          "label": "omniASR 7B confidence run",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_7B_v2"
+        }
+      ],
+      "metrics": [
+        {"name": "cer", "label": "CER", "digits": 4}
+      ]
+    },
+    {
+      "id": "confidence-routing",
+      "corpus": "held-out-eternity",
+      "reference": "data/reference/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/eternity-omni7b.jsonl",
+          "label": "omniASR 7B confidence run",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_7B_v2"
+        }
+      ],
+      "metrics": [
+        {"name": "cer", "label": "CER", "digits": 4}
+      ]
+    },
+    {
+      "id": "seam-tax",
+      "corpus": "held-out-eternity",
+      "reference": "data/reference/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/eternity-seamless.jsonl",
+          "label": "SeamlessM4T v2",
+          "backend": "hf",
+          "model": "seamless-m4t-v2"
+        },
+        {
+          "artifact": "outputs/eternity-omni7b.jsonl",
+          "label": "omniASR 7B",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_7B_v2"
+        }
+      ],
+      "metrics": [
+        {"name": "cer", "label": "CER", "digits": 4}
+      ]
+    },
+    {
+      "id": "routing",
+      "corpus": "fleurs-test-120",
+      "reference": "data/fleurs-test/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/t120-seamless-1.jsonl",
+          "label": "SeamlessM4T v2",
+          "backend": "hf",
+          "model": "seamless-m4t-v2"
+        },
+        {
+          "artifact": "outputs/t120-omni7b.jsonl",
+          "label": "omniASR 7B",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_7B_v2"
+        }
+      ],
+      "metrics": [
+        {"name": "cer", "label": "CER", "digits": 4},
+        {"name": "rtf", "label": "RTF", "digits": 2}
+      ]
+    },
+    {
+      "id": "device-defaults",
+      "corpus": "fleurs-test-120",
+      "reference": "data/fleurs-test/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/t120-omni7b.jsonl",
+          "label": "omniASR Torch",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_7B_v2"
+        },
+        {
+          "artifact": "outputs/bench-omniasr-gguf-.jsonl",
+          "label": "omniASR GGUF",
+          "backend": "omniasr-gguf",
+          "model": "llm-unlimited-300m-v2"
+        },
+        {
+          "artifact": "outputs/bench-hf-seamless-m4t-v2.jsonl",
+          "label": "Hugging Face",
+          "backend": "hf",
+          "model": "seamless-m4t-v2"
+        },
+        {
+          "artifact": "outputs/bench-dolphin-.jsonl",
+          "label": "Dolphin",
+          "backend": "dolphin",
+          "model": "small"
+        }
+      ],
+      "metrics": [
+        {"name": "rtf", "label": "RTF", "digits": 2}
+      ]
+    },
+    {
+      "id": "omniasr-metal",
+      "corpus": "fleurs-test-5",
+      "reference": "data/fleurs-test/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/t120-omni7b.jsonl",
+          "label": "omniASR Torch device sweep",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_7B_v2"
+        }
+      ],
+      "metrics": [
+        {"name": "rtf", "label": "RTF", "digits": 2}
+      ]
+    },
+    {
+      "id": "dolphin-device",
+      "corpus": "fleurs-test-5",
+      "reference": "data/fleurs-test/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/bench-dolphin-.jsonl",
+          "label": "Dolphin device sweep",
+          "backend": "dolphin",
+          "model": "small"
+        }
+      ],
+      "metrics": [
+        {"name": "rtf", "label": "RTF", "digits": 2}
+      ]
+    },
+    {
+      "id": "precision-gflops",
+      "corpus": "m2-max-matmul",
+      "reference": "data/fleurs-test/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/telemetry-test.jsonl",
+          "label": "M2 Max dtype probe",
+          "backend": "omniasr-gguf",
+          "model": "llm-unlimited-300m-v2"
+        }
+      ],
+      "metrics": []
+    },
+    {
+      "id": "seamless-dtype",
+      "corpus": "fleurs-test-5",
+      "reference": "data/fleurs-test/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/bench-hf-seamless-m4t-v2.jsonl",
+          "label": "SeamlessM4T v2 dtype sweep",
+          "backend": "hf",
+          "model": "seamless-m4t-v2"
+        }
+      ],
+      "metrics": [
+        {"name": "rtf", "label": "RTF", "digits": 2},
+        {"name": "cer", "label": "CER", "digits": 4}
+      ]
+    },
+    {
+      "id": "threads",
+      "corpus": "fleurs-test-5",
+      "reference": "data/fleurs-test/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/bench-omniasr-gguf-.jsonl",
+          "label": "GGUF thread sweep",
+          "backend": "omniasr-gguf",
+          "model": "llm-unlimited-300m-v2"
+        }
+      ],
+      "metrics": [
+        {"name": "rtf", "label": "RTF", "digits": 3}
+      ]
+    },
+    {
+      "id": "telemetry-snapshot",
+      "corpus": "fleurs-test-5",
+      "reference": "data/fleurs-test/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/bench-hf-mms-1b-all.jsonl",
+          "label": "MMS-1B",
+          "backend": "hf",
+          "model": "mms-1b-all"
+        },
+        {
+          "artifact": "outputs/bench-hf-seamless-m4t-v2.jsonl",
+          "label": "SeamlessM4T v2",
+          "backend": "hf",
+          "model": "seamless-m4t-v2"
+        },
+        {
+          "artifact": "outputs/bench-omniasr-gguf-.jsonl",
+          "label": "omniASR 300M GGUF",
+          "backend": "omniasr-gguf",
+          "model": "llm-unlimited-300m-v2"
+        },
+        {
+          "artifact": "outputs/bench-dolphin-.jsonl",
+          "label": "Dolphin small",
+          "backend": "dolphin",
+          "model": "small"
+        }
+      ],
+      "metrics": [
+        {"name": "rtf", "label": "RTF", "digits": 2}
+      ]
+    },
+    {
+      "id": "telemetry-cost",
+      "corpus": "fleurs-test-5",
+      "reference": "data/fleurs-test/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/telemetry-test.jsonl",
+          "label": "observer cost probe",
+          "backend": "omniasr-gguf",
+          "model": "llm-unlimited-300m-v2"
+        }
+      ],
+      "metrics": []
+    },
+    {
+      "id": "batching",
+      "corpus": "fleurs-test-8",
+      "reference": "data/fleurs-test/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/bench-hf-seamless-m4t-v2.jsonl",
+          "label": "SeamlessM4T v2 batching probe",
+          "backend": "hf",
+          "model": "seamless-m4t-v2"
+        }
+      ],
+      "metrics": [
+        {"name": "rtf", "label": "RTF", "digits": 3}
+      ]
+    },
+    {
+      "id": "methodology-screen",
+      "corpus": "fleurs-dev-12",
+      "reference": "data/fleurs/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/fleurs-hf-seamless-m4t-v2.jsonl",
+          "label": "SeamlessM4T v2",
+          "backend": "hf",
+          "model": "seamless-m4t-v2"
+        },
+        {
+          "artifact": "outputs/fleurs-torch-3b.jsonl",
+          "label": "omniASR 3B",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_3B_v2"
+        },
+        {
+          "artifact": "outputs/fleurs-torch-300m.jsonl",
+          "label": "omniASR 300M",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_300M_v2"
+        },
+        {
+          "artifact": "outputs/fleurs-dolphin-small.jsonl",
+          "label": "Dolphin small",
+          "backend": "dolphin",
+          "model": "small"
+        },
+        {
+          "artifact": "outputs/fleurs-hf-mms-1b-all.jsonl",
+          "label": "MMS-1B",
+          "backend": "hf",
+          "model": "mms-1b-all"
+        }
+      ],
+      "metrics": [
+        {"name": "cer", "label": "CER", "digits": 4}
+      ]
+    },
+    {
+      "id": "methodology-card",
+      "corpus": "fleurs-test-120",
+      "reference": "data/fleurs-test/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/t120-omni300m.jsonl",
+          "label": "300M",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_300M_v2"
+        },
+        {
+          "artifact": "outputs/t120-omni3b.jsonl",
+          "label": "3B",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_3B_v2"
+        },
+        {
+          "artifact": "outputs/t120-omni7b.jsonl",
+          "label": "7B",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_7B_v2"
+        }
+      ],
+      "metrics": [
+        {"name": "cer", "label": "CER", "digits": 4}
+      ]
+    }
+  ]
+}
