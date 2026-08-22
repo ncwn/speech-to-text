@@ -1,0 +1,275 @@
+{
+  "metadata": {
+    "entrypoint_order": [
+      "reference",
+      "adapter"
+    ]
+  },
+  "schema": "parity-v1",
+  "schema_version": 1,
+  "subjects": {
+    "hf+mms-1b-all": {
+      "backend": "hf",
+      "binding_stable": true,
+      "cases": [
+        {
+          "adapter_metadata": {
+            "decoder": "transformers.pipelines.audio_utils.ffmpeg_read",
+            "entrypoint": "transformers-pipeline",
+            "pipeline_manages_inference_mode": true
+          },
+          "audio": {
+            "audio_id": "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a",
+            "channels": 1,
+            "duration_s": 12.78,
+            "frames": 204480,
+            "pcm_sha256": "04f3631c67ae49a523e8c82de1182ff29cfb23c8f3ff5bae6339bbd8eafe4431",
+            "representation": {
+              "byte_order": "little",
+              "dtype": "int16",
+              "kind": "pcm16",
+              "shape": [
+                204480,
+                1
+              ]
+            },
+            "sample_rate": 16000,
+            "sha256": "04f3631c67ae49a523e8c82de1182ff29cfb23c8f3ff5bae6339bbd8eafe4431"
+          },
+          "contract_issues": [],
+          "first_divergent_stage": null,
+          "parity_eligible": true,
+          "reference_metadata": {
+            "decoder": "soundfile",
+            "entrypoint": "feature-extractor-model-tokenizer",
+            "torch_inference_mode": true
+          },
+          "stages": [
+            {
+              "adapter": {
+                "digest": "243144f8c32778647547527ad3b05ccb32ac3e8ffa118377b9de4c24e770bc22",
+                "reachable": true,
+                "representation": {
+                  "dtype": "float32",
+                  "kind": "array",
+                  "shape": [
+                    204480
+                  ]
+                }
+              },
+              "max_abs": null,
+              "max_rel": null,
+              "name": "decoded_pcm",
+              "reason": null,
+              "reference": {
+                "digest": "243144f8c32778647547527ad3b05ccb32ac3e8ffa118377b9de4c24e770bc22",
+                "reachable": true,
+                "representation": {
+                  "dtype": "float32",
+                  "kind": "array",
+                  "shape": [
+                    204480
+                  ]
+                }
+              },
+              "status": "match",
+              "tolerance": null
+            },
+            {
+              "adapter": {
+                "digest": "940b7d6d8e7bd249812a8eb2f76949903dc804c9ce110b9e8d7bb66f138f046d",
+                "reachable": true,
+                "representation": {
+                  "dtype": "float32",
+                  "kind": "array",
+                  "shape": [
+                    1,
+                    204480
+                  ]
+                }
+              },
+              "max_abs": 0.0,
+              "max_rel": 0.0,
+              "name": "features",
+              "reason": null,
+              "reference": {
+                "digest": "940b7d6d8e7bd249812a8eb2f76949903dc804c9ce110b9e8d7bb66f138f046d",
+                "reachable": true,
+                "representation": {
+                  "dtype": "float32",
+                  "kind": "array",
+                  "shape": [
+                    1,
+                    204480
+                  ]
+                }
+              },
+              "status": "match",
+              "tolerance": {
+                "atol": 1e-06,
+                "rtol": 1e-06
+              }
+            },
+            {
+              "adapter": {
+                "digest": "eee6b9653b5c58e0a70a52b509d9c330b71b03e91195c8974a7b82af422c8511",
+                "reachable": true,
+                "representation": {
+                  "dtype": "float32",
+                  "kind": "array",
+                  "shape": [
+                    1,
+                    638,
+                    140
+                  ]
+                }
+              },
+              "max_abs": 0.0,
+              "max_rel": 0.0,
+              "name": "logits_or_encoder",
+              "reason": null,
+              "reference": {
+                "digest": "eee6b9653b5c58e0a70a52b509d9c330b71b03e91195c8974a7b82af422c8511",
+                "reachable": true,
+                "representation": {
+                  "dtype": "float32",
+                  "kind": "array",
+                  "shape": [
+                    1,
+                    638,
+                    140
+                  ]
+                }
+              },
+              "status": "match",
+              "tolerance": {
+                "atol": 1e-05,
+                "rtol": 0.0001
+              }
+            },
+            {
+              "adapter": {
+                "digest": "69c836dec140a905c6388805bce001cf50b9ca68a47ab4cb42b30d3c6aa66e36",
+                "reachable": true,
+                "representation": {
+                  "dtype": "int64",
+                  "kind": "array",
+                  "shape": [
+                    1,
+                    638
+                  ]
+                }
+              },
+              "max_abs": null,
+              "max_rel": null,
+              "name": "token_ids",
+              "reason": null,
+              "reference": {
+                "digest": "69c836dec140a905c6388805bce001cf50b9ca68a47ab4cb42b30d3c6aa66e36",
+                "reachable": true,
+                "representation": {
+                  "dtype": "int64",
+                  "kind": "array",
+                  "shape": [
+                    1,
+                    638
+                  ]
+                }
+              },
+              "status": "match",
+              "tolerance": null
+            },
+            {
+              "adapter": {
+                "digest": "1e3a9b024c6a03a88639652d5c4d6fe790711c0551a6b4556de87c3a24d26fb2",
+                "reachable": true,
+                "representation": {
+                  "encoding": "utf-8",
+                  "kind": "text"
+                }
+              },
+              "max_abs": null,
+              "max_rel": null,
+              "name": "raw_transcript",
+              "reason": null,
+              "reference": {
+                "digest": "1e3a9b024c6a03a88639652d5c4d6fe790711c0551a6b4556de87c3a24d26fb2",
+                "reachable": true,
+                "representation": {
+                  "encoding": "utf-8",
+                  "kind": "text"
+                }
+              },
+              "status": "match",
+              "tolerance": null
+            },
+            {
+              "adapter": {
+                "digest": "1e3a9b024c6a03a88639652d5c4d6fe790711c0551a6b4556de87c3a24d26fb2",
+                "reachable": true,
+                "representation": {
+                  "encoding": "utf-8",
+                  "kind": "text"
+                }
+              },
+              "max_abs": null,
+              "max_rel": null,
+              "name": "final_transcript",
+              "reason": null,
+              "reference": {
+                "digest": "1e3a9b024c6a03a88639652d5c4d6fe790711c0551a6b4556de87c3a24d26fb2",
+                "reachable": true,
+                "representation": {
+                  "encoding": "utf-8",
+                  "kind": "text"
+                }
+              },
+              "status": "match",
+              "tolerance": null
+            }
+          ]
+        }
+      ],
+      "key": "hf+mms-1b-all",
+      "language": "mya_Mymr",
+      "loaded_instance_id": null,
+      "metadata": {
+        "content_sha256": "b6bf21929e857519387e3994e47a10f6530f7bbcb9427c87ebc3ca064b573cd6",
+        "contract": {
+          "backend": "hf",
+          "expected_reachability": {
+            "decoded_pcm": true,
+            "features": true,
+            "final_transcript": true,
+            "logits_or_encoder": true,
+            "raw_transcript": true,
+            "token_ids": true
+          },
+          "model": "mms-1b-all",
+          "tolerances": {
+            "features": {
+              "atol": 1e-06,
+              "rtol": 1e-06
+            },
+            "logits_or_encoder": {
+              "atol": 1e-05,
+              "rtol": 0.0001
+            }
+          }
+        },
+        "entrypoint_order": [
+          "reference",
+          "adapter"
+        ],
+        "execution_sha256": "6f3d5050ce54f8a3e96726ac66d113dfb2aaf95b636852084959767ab74aefab",
+        "source_sha256": "8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28"
+      },
+      "model": "mms-1b-all",
+      "parity_eligible": true,
+      "settings": {
+        "device": "cpu",
+        "dtype": "float32"
+      }
+    }
+  }
+}
