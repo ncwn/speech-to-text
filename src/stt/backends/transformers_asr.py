@@ -592,6 +592,7 @@ class TransformersASRBackend(ASRBackend):
 
             paths = [path for _, path, _ in valid]
             can_batch = batch_size > 1 and len(paths) > 1 and self.spec.family != "whisper"
+            measured: list[float] = []
             started = time.perf_counter()
             try:
                 if can_batch and self.spec.family == "seamless":
@@ -602,22 +603,31 @@ class TransformersASRBackend(ASRBackend):
                 elif can_batch:
                     decoded = self._transcribe_pipeline_batch(paths, batch_size)
                 else:
+                    # Serial decode: each file is its own forward pass, so time
+                    # them individually. Whisper always lands here, and copying
+                    # the whole loop's wall onto every item made a five-file
+                    # chunk report five times the work it did.
                     decoded = []
                     for path in paths:
+                        item_started = time.perf_counter()
                         if self.spec.family == "seamless":
                             items = self._transcribe_seamless(path)
                             decoded.append((join_segments(items), items))
                         else:
                             decoded.append(self._transcribe_pipeline(path))
+                        measured.append(time.perf_counter() - item_started)
                 elapsed = time.perf_counter() - started
                 total_duration = sum(duration for _, _, duration in valid)
+                # One aggregate call can only be apportioned; a serial loop was
+                # actually measured per item.
                 weights = (
                     [duration / total_duration for _, _, duration in valid]
                     if can_batch and total_duration > 0
                     else [1.0] * len(valid)
                 )
-                for (index, path, duration), (text, segments), weight in zip(
-                    valid, decoded, weights, strict=True
+                per_item = measured if len(measured) == len(valid) else None
+                for position, ((index, path, duration), (text, segments), weight) in enumerate(
+                    zip(valid, decoded, weights, strict=True)
                 ):
                     slots[index] = TranscriptionResult(
                         audio_path=str(path),
@@ -625,7 +635,9 @@ class TransformersASRBackend(ASRBackend):
                         backend=self.name,
                         model=self.model,
                         language=language,
-                        elapsed_s=elapsed * weight,
+                        elapsed_s=(
+                            per_item[position] if per_item is not None else elapsed * weight
+                        ),
                         audio_duration_s=duration,
                         metadata={
                             **meta,
@@ -637,7 +649,13 @@ class TransformersASRBackend(ASRBackend):
                                     "elapsed_s_source": "batch_proportional",
                                 }
                                 if can_batch
-                                else {}
+                                else {
+                                    "batch_size": batch_size,
+                                    "batch_items": len(paths),
+                                    "elapsed_s_source": (
+                                        "measured" if per_item is not None else "serial_share"
+                                    ),
+                                }
                             ),
                         },
                         segments=segments or None,

@@ -72,7 +72,9 @@ def test_hf_pipeline_batch_forwards_list_and_preserves_order(monkeypatch, tmp_pa
     assert pipe.calls[0][0] == [str(path) for path in paths[:2]]
     assert pipe.calls[0][1]["batch_size"] == 2
     assert results[0].metadata["elapsed_s_source"] == "batch_proportional"
-    assert results[2].metadata.get("elapsed_s_source") is None
+    # The trailing chunk holds one file, so it is decoded serially and its
+    # time is measured rather than apportioned.
+    assert results[2].metadata["elapsed_s_source"] == "measured"
 
 
 def test_hf_batch_failure_retries_individually(monkeypatch, tmp_path):
@@ -248,3 +250,52 @@ def test_hf_bound_snapshot_rejects_duplicate_path_selection(tmp_path):
 
     with pytest.raises(RuntimeError, match="duplicate path names"):
         _bound_hf_snapshot(malformed)
+
+
+class SleepingPipeline:
+    """A pipeline whose per-file cost differs measurably."""
+
+    def __init__(self, seconds: dict[str, float]) -> None:
+        self.seconds = seconds
+
+    def __call__(self, audio, **kwargs):
+        import time as _time
+
+        if isinstance(audio, list):
+            raise AssertionError("whisper must not be batched")
+        _time.sleep(self.seconds[Path(audio).stem])
+        return {"text": Path(audio).stem}
+
+
+def test_serial_decode_times_each_file_instead_of_copying_the_loop(monkeypatch, tmp_path):
+    """A serial loop is measured per item, not billed the whole loop each time.
+
+    Whisper never batches, so before this every file in a chunk was stamped
+    with the wall time of the entire loop -- three files reported three times
+    the work actually done, and the corpus RTF derived from those numbers was
+    wrong by the chunk size.
+    """
+    names = ("first", "second", "third")
+    paths = [tmp_path / f"{name}.wav" for name in names]
+    monkeypatch.setattr("stt.audio.duration_of", lambda path: 1.0)
+    costs = {"first": 0.002, "second": 0.02, "third": 0.002}
+
+    backend = TransformersASRBackend("whisper-my-small")
+    backend.pipe = SleepingPipeline(costs)
+    backend._loaded = True
+    backend.resolved_device = "cpu"
+    backend.resolved_dtype = "float32"
+    backend._check_language = lambda language: None
+
+    results = backend.transcribe(paths, language="my", batch_size=3)
+
+    assert [result.text for result in results] == list(names)
+    assert all(result.metadata["elapsed_s_source"] == "measured" for result in results)
+    elapsed = [result.elapsed_s for result in results]
+    assert all(value is not None for value in elapsed)
+    # Disjoint sub-intervals of one loop: they must sum to no more than the
+    # loop, where copying the total would have summed to three times it.
+    assert sum(elapsed) <= sum(costs.values()) * 3 + 0.5
+    # The slow file must be visibly the slow one.
+    assert elapsed[1] > elapsed[0]
+    assert elapsed[1] > elapsed[2]
