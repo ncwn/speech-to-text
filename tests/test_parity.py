@@ -206,3 +206,18 @@ def test_omniasr_contract_requires_all_observed_stages():
     contract = contract_for("omniasr-torch", "omniASR_LLM_Unlimited_7B_v2")
     assert contract.expected_reachability == {stage: True for stage in STAGE_NAMES}
     assert set(contract.tolerances) == {"features", "logits_or_encoder"}
+
+
+def test_gguf_contract_is_model_dependent():
+    llm = contract_for("omniasr-gguf", "llm-unlimited-300m-v2")
+    assert llm.expected_reachability == {
+        "decoded_pcm": True,
+        "features": False,
+        "logits_or_encoder": False,
+        "token_ids": False,
+        "raw_transcript": True,
+        "final_transcript": True,
+    }
+    ctc = contract_for("omniasr-gguf", "ctc-300m-v2")
+    assert ctc.expected_reachability["logits_or_encoder"]
+    assert ctc.expected_reachability["token_ids"]

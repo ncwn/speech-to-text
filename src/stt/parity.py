@@ -163,6 +163,29 @@ def contract_for(backend: str, model: str) -> ParityContract:
                 "logits_or_encoder": StageTolerance(atol=1e-5, rtol=1e-4),
             },
         )
+    if backend == "omniasr-gguf":
+        ctc_models = {"ctc-1b-v2", "ctc-300m-v2"}
+        llm_models = {
+            "llm-unlimited-300m-v2",
+            "llm-unlimited-300m-v2-f16",
+            "llm-300m-v2",
+            "llm-1b",
+        }
+        if model not in ctc_models | llm_models:
+            raise ParityError(f"no reviewed parity contract for {backend}/{model}")
+        ctc = model in ctc_models
+        return ParityContract(
+            backend,
+            model,
+            {
+                "decoded_pcm": True,
+                "features": False,
+                "logits_or_encoder": ctc,
+                "token_ids": ctc,
+                "raw_transcript": True,
+                "final_transcript": True,
+            },
+        )
     raise ParityError(f"no reviewed parity contract for {backend}/{model}")
 
 
