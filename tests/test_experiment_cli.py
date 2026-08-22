@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import numpy as np
 import soundfile as sf
@@ -14,7 +15,8 @@ from stt.experiment import ExperimentSpec, build_schedule
 runner = CliRunner()
 
 
-def test_observer_spec_pins_subjects_arms_and_balanced_schedule(tmp_path):
+def test_observer_spec_pins_subjects_arms_and_balanced_schedule(monkeypatch, tmp_path):
+    monkeypatch.setattr("stt.cli.checkout_root", lambda: tmp_path)
     audio = tmp_path / "clip.wav"
     sf.write(audio, np.zeros(16_000), 16_000, subtype="PCM_16")
     output = tmp_path / "observer.json"
@@ -28,6 +30,10 @@ def test_observer_spec_pins_subjects_arms_and_balanced_schedule(tmp_path):
     spec = ExperimentSpec.from_dict(json.loads(output.read_text(encoding="utf-8")))
     assert len(spec.conditions) == 6
     assert len(spec.contrasts) == 4
+    assert all(
+        not Path(item.source_path).is_absolute() and not Path(item.prepared_path).is_absolute()
+        for item in spec.input_sets[0].inputs
+    )
     by_id = {condition.condition_id: condition for condition in spec.conditions}
     assert by_id["fast-off"].subject.backend == "hf"
     assert by_id["fast-off"].subject.options["device"] == "mps"

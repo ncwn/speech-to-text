@@ -59,6 +59,7 @@ from stt.measurement import (
     new_run_id,
     write_json_atomic,
 )
+from stt.paths import checkout_root
 from stt.provenance import (
     ModelBinding,
     ProvenanceError,
@@ -1575,6 +1576,27 @@ def _read_experiment_spec(path: Path) -> ExperimentSpec:
         raise typer.BadParameter(f"Cannot read experiment specification {path}: {exc}") from exc
 
 
+def _portable_audio_input(prepared: audio_mod.PreparedAudio) -> AudioInput:
+    """Keep repository-owned paths portable in committed experiment specs."""
+    item = AudioInput.from_prepared(prepared)
+    root = checkout_root()
+    if root is None:
+        return item
+
+    def portable(value: str) -> str:
+        path = Path(value)
+        try:
+            return path.relative_to(root).as_posix()
+        except ValueError:
+            return value
+
+    return replace(
+        item,
+        source_path=portable(item.source_path),
+        prepared_path=portable(item.prepared_path),
+    )
+
+
 @experiment_app.command("observer-spec")
 def experiment_observer_spec(
     audio: Annotated[list[Path], typer.Argument(help="Canonical observer corpus")],
@@ -1597,7 +1619,7 @@ def experiment_observer_spec(
             "observer calibration requires at least 6 sessions, 3 warmups, and 3 repeats"
         )
     prepared = _prepare(audio, limit, convert=True)
-    inputs = tuple(AudioInput.from_prepared(item) for item in prepared)
+    inputs = tuple(_portable_audio_input(item) for item in prepared)
 
     def subject(backend: str, model: str, device: str, dtype: str) -> SubjectSpec:
         return SubjectSpec(

@@ -43,8 +43,9 @@ def _phase(name: str, usage: ResourceUsage, *, repeat_index: int | None = None) 
 
 def _validate_input(item: AudioInput) -> None:
     item.validate()
-    source = Path(item.source_path)
-    prepared = Path(item.prepared_path)
+    resolved = item.prepared()
+    source = resolved.source_path
+    prepared = resolved.prepared_path
     if file_sha256(source) != item.source_sha256:
         raise RuntimeError(f"source bytes changed before worker start: {item.reference_id}")
     if canonical_audio_id(prepared) != item.audio_id:

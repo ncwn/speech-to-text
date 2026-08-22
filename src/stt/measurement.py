@@ -120,9 +120,19 @@ class AudioInput:
 
     def prepared(self) -> PreparedAudio:
         self.validate()
+        source_path = Path(self.source_path)
+        prepared_path = Path(self.prepared_path)
+        if not source_path.is_absolute() or not prepared_path.is_absolute():
+            from stt.paths import checkout_root
+
+            root = checkout_root() or Path.cwd()
+            if not source_path.is_absolute():
+                source_path = root / source_path
+            if not prepared_path.is_absolute():
+                prepared_path = root / prepared_path
         return PreparedAudio(
-            source_path=Path(self.source_path),
-            prepared_path=Path(self.prepared_path),
+            source_path=source_path,
+            prepared_path=prepared_path,
             reference_id=self.reference_id,
             source_sha256=self.source_sha256,
             audio_id=self.audio_id,

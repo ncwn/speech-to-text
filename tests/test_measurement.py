@@ -52,6 +52,28 @@ def test_worker_request_round_trip_keeps_canonical_audio_facts(tmp_path):
     assert restored.subject.request_key.startswith("fake/model:")
 
 
+def test_relative_audio_paths_resolve_against_the_checkout(monkeypatch, tmp_path):
+    import stt.paths as paths_mod
+
+    monkeypatch.setattr(paths_mod, "checkout_root", lambda: tmp_path)
+    item = AudioInput(
+        source_path="data/source.wav",
+        prepared_path="data/prepared.wav",
+        reference_id="clip",
+        source_sha256="1" * 64,
+        audio_id="pcm16:16000:1:" + "2" * 64,
+        duration_s=1.0,
+        sample_rate=16_000,
+        channels=1,
+        frames=16_000,
+    )
+
+    prepared = item.prepared()
+
+    assert prepared.source_path == tmp_path / "data/source.wav"
+    assert prepared.prepared_path == tmp_path / "data/prepared.wav"
+
+
 def test_worker_request_round_trip_keeps_uss_observer_choice(tmp_path):
     request = replace(_request(tmp_path), profile=True, sample_uss=True)
     path = tmp_path / "request.json"
