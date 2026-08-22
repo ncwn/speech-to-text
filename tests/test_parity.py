@@ -14,6 +14,7 @@ from stt.parity import (
     ParityError,
     ParityTrace,
     StageTolerance,
+    contract_for,
     run_parity,
 )
 from stt.provenance import ArtifactDigest, ModelBinding, ModelProvenance
@@ -193,3 +194,9 @@ def test_parity_rejects_missing_hooks_and_execution_drift(tmp_path):
             reference_backend=FakeBackend(drifted, _trace()),
             contract=_contract(),
         )
+
+
+def test_dolphin_contract_requires_all_observed_stages():
+    contract = contract_for("dolphin", "small")
+    assert contract.expected_reachability == {stage: True for stage in STAGE_NAMES}
+    assert set(contract.tolerances) == {"features", "logits_or_encoder"}

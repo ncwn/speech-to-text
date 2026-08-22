@@ -143,6 +143,16 @@ def contract_for(backend: str, model: str) -> ParityContract:
                 "logits_or_encoder": StageTolerance(atol=1e-5, rtol=1e-4),
             },
         )
+    if (backend, model) == ("dolphin", "small"):
+        return ParityContract(
+            backend,
+            model,
+            {stage: True for stage in STAGE_NAMES},
+            {
+                "features": StageTolerance(atol=1e-5, rtol=1e-4),
+                "logits_or_encoder": StageTolerance(atol=1e-5, rtol=1e-4),
+            },
+        )
     raise ParityError(f"no reviewed parity contract for {backend}/{model}")
 
 

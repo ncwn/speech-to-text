@@ -257,6 +257,139 @@ class DolphinBackend(ASRBackend):
 
             return windowed(pcm, rate, WINDOW_SEC, decode)
 
+    def _parity_trace(self, path: Path, *, language: str | None, adapter: bool):
+        """Capture Dolphin's repository path and its upstream single-file path.
+
+        The repository path writes each fixed-window chunk to a temporary WAV
+        before calling ``dolphin.transcribe``.  The reference path calls that
+        upstream function on the prepared file directly.  Both paths share the
+        same loaded model, while hooks capture the values each call actually
+        decoded, fed to the encoder, and passed through the CTC head.
+        """
+        if self.engine is None:
+            raise RuntimeError("Dolphin parity requires a loaded model")
+        self._check_language(language)
+        import importlib
+
+        import numpy as np
+        import soundfile as sf
+        import torch
+        import torchaudio
+
+        from stt.parity import ParityTrace
+
+        info = sf.info(str(path))
+        if info.duration >= WINDOW_SEC:
+            raise RuntimeError("Dolphin parity fixture must be shorter than one adapter window")
+
+        dolphin = importlib.import_module("dolphin")
+        transcribe_module = importlib.import_module("dolphin.transcribe")
+        original_entry = dolphin.transcribe
+        original_extract = transcribe_module.extract_feats
+        original_decode = self.engine.decode
+        original_ctc = self.engine.ctc_logprobs
+        features: list[np.ndarray] = []
+        encoders: list[np.ndarray] = []
+        ctc_values: list[np.ndarray] = []
+        token_values: list[np.ndarray] = []
+        decoded: list[np.ndarray] = []
+        outputs: list[Any] = []
+
+        def capture_features(audios, configs):
+            batch = original_extract(audios, configs)
+            features.append(batch["feats"].detach().cpu().numpy().copy())
+            source = audios[0]
+            if isinstance(source, (str, Path)):
+                waveform, _ = torchaudio.load(str(source))
+            elif isinstance(source, torch.Tensor):
+                waveform = source.detach().cpu()
+            else:
+                waveform = torch.as_tensor(source).detach().cpu()
+            if waveform.ndim > 1:
+                waveform = waveform[0]
+            decoded.append(waveform.numpy().copy())
+            return batch
+
+        def capture_encoder(module, args, output):
+            del module, args
+            value = output[0] if isinstance(output, tuple) else output
+            encoders.append(value.detach().cpu().numpy().copy())
+
+        def capture_ctc(*args, **kwargs):
+            value = original_ctc(*args, **kwargs)
+            ctc_values.append(value.detach().cpu().numpy().copy())
+            return value
+
+        def capture_decode(*args, **kwargs):
+            result = original_decode(*args, **kwargs)
+            method = kwargs.get("methods", ["attention_rescoring"])[0]
+            item = result[method][0]
+            tokens = getattr(item, "tokens", None)
+            if tokens is None:
+                raise RuntimeError("Dolphin parity could not observe decoded token IDs")
+            token_values.append(np.asarray(tokens, dtype=np.int64).copy())
+            return result
+
+        def capture_entry(*args, **kwargs):
+            result = original_entry(*args, **kwargs)
+            outputs.append(result)
+            return result
+
+        encoder_hook = self.engine.encoder.register_forward_hook(capture_encoder)
+        self.engine.ctc_logprobs = capture_ctc
+        self.engine.decode = capture_decode
+        transcribe_module.extract_feats = capture_features
+        dolphin.transcribe = capture_entry
+        try:
+            if adapter:
+                segments = self._transcribe_file(path)
+                final = join_segments(segments).strip()
+                entrypoint = "repository-windowed-upstream"
+            else:
+                result = dolphin.transcribe(
+                    self.engine,
+                    str(path),
+                    lang_sym=BURMESE_LANG,
+                    region_sym=BURMESE_REGION,
+                )
+                final = (getattr(result, "text_nospecial", None) or "").strip()
+                entrypoint = "dolphin-transcribe-direct"
+        finally:
+            dolphin.transcribe = original_entry
+            transcribe_module.extract_feats = original_extract
+            self.engine.decode = original_decode
+            self.engine.ctc_logprobs = original_ctc
+            encoder_hook.remove()
+
+        if len(features) != 1 or len(decoded) != 1 or len(encoders) != 1:
+            raise RuntimeError("Dolphin parity expected one feature and encoder call")
+        if len(ctc_values) != 1 or len(token_values) != 1 or len(outputs) != 1:
+            raise RuntimeError("Dolphin parity expected one CTC decode result")
+        result = outputs[0]
+        raw = str(getattr(result, "text", ""))
+        return ParityTrace(
+            decoded_pcm=decoded[0],
+            features=features[0],
+            logits_or_encoder=ctc_values[0],
+            token_ids=token_values[0],
+            raw_transcript=raw,
+            final_transcript=final,
+            metadata={
+                "entrypoint": entrypoint,
+                "decoder": "dolphin.transcribe",
+                "feature_extractor": "dolphin.processor.extract_feats",
+                "encoder_observed": True,
+                "ctc_stage": "ctc_logprobs",
+                "torch_inference_mode": False,
+            },
+        )
+
+    def parity_adapter_trace(self, path: Path, *, language: str | None = None):
+        return self._parity_trace(path, language=language, adapter=True)
+
+    def parity_reference_trace(self, path: Path, *, language: str | None = None):
+        return self._parity_trace(path, language=language, adapter=False)
+
     def transcribe(
         self,
         audio_paths: list[Path],
