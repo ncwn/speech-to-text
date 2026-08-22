@@ -604,6 +604,8 @@ class TransformersASRBackend(ASRBackend):
 
     def parity_adapter_trace(self, path: Path, *, language: str | None = None):
         """Observe the tensors used by the real Transformers pipeline path."""
+        if self.spec.family == "seamless":
+            return self._parity_seamless_trace(path, language=language, adapter=True)
         if self.spec.family != "mms" or self.pipe is None:
             raise RuntimeError(f"adapter parity is not implemented for {self.model}")
         self._check_language(language)
@@ -656,6 +658,8 @@ class TransformersASRBackend(ASRBackend):
 
     def parity_reference_trace(self, path: Path, *, language: str | None = None):
         """Run the official processor/model/tokenizer components directly."""
+        if self.spec.family == "seamless":
+            return self._parity_seamless_trace(path, language=language, adapter=False)
         if self.spec.family != "mms" or self.pipe is None:
             raise RuntimeError(f"reference parity is not implemented for {self.model}")
         self._check_language(language)
@@ -696,6 +700,95 @@ class TransformersASRBackend(ASRBackend):
             final_transcript=raw.strip(),
             metadata={
                 "entrypoint": "feature-extractor-model-tokenizer",
+                "decoder": "soundfile",
+                "torch_inference_mode": True,
+            },
+        )
+
+    def _parity_seamless_trace(
+        self,
+        path: Path,
+        *,
+        language: str | None,
+        adapter: bool,
+    ):
+        """Capture the single-window Seamless processor/generate path."""
+        if self._seamless is None:
+            raise RuntimeError("Seamless parity requires a loaded processor and model")
+        self._check_language(language)
+        import numpy as np
+        import soundfile as sf
+        import torch
+
+        from stt.parity import ParityTrace
+
+        processor, model = self._seamless
+        decoded_pcm, sample_rate = sf.read(str(path), dtype="float32", always_2d=False)
+        if decoded_pcm.ndim > 1:
+            decoded_pcm = decoded_pcm.mean(axis=1)
+        if len(decoded_pcm) >= sample_rate * _CHUNKING["seamless"][0]:
+            raise RuntimeError("Seamless parity fixture must be shorter than one adapter window")
+
+        features: list[np.ndarray] = []
+        encoder_outputs: list[np.ndarray] = []
+
+        def capture_features(module, args, kwargs):
+            del module, args
+            value = kwargs.get("input_features")
+            if value is None:
+                raise RuntimeError("Seamless parity could not observe input features")
+            features.append(value.detach().cpu().numpy())
+
+        def capture_encoder(module, args, kwargs, output):
+            del module, args, kwargs
+            value = output[0] if isinstance(output, tuple) else output.last_hidden_state
+            encoder_outputs.append(value.detach().cpu().numpy())
+
+        before = model.speech_encoder.register_forward_pre_hook(capture_features, with_kwargs=True)
+        after = model.speech_encoder.register_forward_hook(capture_encoder, with_kwargs=True)
+        generated: list[Any] = []
+        try:
+            if adapter:
+                original_generate = model.generate
+
+                def capture_generate(*args, **kwargs):
+                    tokens = original_generate(*args, **kwargs)
+                    generated.append(tokens.detach().cpu())
+                    return tokens
+
+                model.generate = capture_generate
+                try:
+                    segments = self._transcribe_seamless(path)
+                finally:
+                    model.generate = original_generate
+                final = join_segments(segments)
+            else:
+                inputs = processor(
+                    **_audio_kwarg(np.asarray(decoded_pcm)),
+                    sampling_rate=sample_rate,
+                    return_tensors="pt",
+                ).to(model.device, model.dtype)
+                with torch.inference_mode():
+                    tokens = model.generate(**inputs, tgt_lang=self.spec.lang)
+                generated.append(tokens.detach().cpu())
+                final = processor.decode(tokens[0].tolist(), skip_special_tokens=True).strip()
+        finally:
+            before.remove()
+            after.remove()
+        if len(features) != 1 or len(encoder_outputs) != 1 or len(generated) != 1:
+            raise RuntimeError("Seamless parity expected one processor/encoder/generate call")
+        raw = processor.decode(generated[0][0].tolist(), skip_special_tokens=True)
+        return ParityTrace(
+            decoded_pcm=np.asarray(decoded_pcm),
+            features=features[0],
+            logits_or_encoder=encoder_outputs[0],
+            token_ids=generated[0].numpy(),
+            raw_transcript=raw,
+            final_transcript=final,
+            metadata={
+                "entrypoint": (
+                    "repository-single-window" if adapter else "processor-generate-direct"
+                ),
                 "decoder": "soundfile",
                 "torch_inference_mode": True,
             },

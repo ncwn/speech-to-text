@@ -1834,9 +1834,9 @@ def parity(
     language: Annotated[str, typer.Option("--language", "-l")] = BURMESE,
     device: Annotated[str, typer.Option(help="Resolved parity device")] = "cpu",
     dtype: Annotated[str, typer.Option(help="Resolved parity dtype")] = "float32",
-    output: Annotated[Path, typer.Option("--output", "-o", help="Parity report JSON")] = Path(
-        "evidence/parity/hf-mms-1b-all.json"
-    ),
+    output: Annotated[
+        Path | None, typer.Option("--output", "-o", help="Parity report JSON")
+    ] = None,
     reference_first: Annotated[
         bool,
         typer.Option("--reference-first", help="Run the official entry point before the adapter"),
@@ -1870,6 +1870,11 @@ def parity(
         return value
 
     order = ("reference", "adapter") if reference_first else ("adapter", "reference")
+    report_path = output or Path("evidence/parity") / (
+        f"{backend}-{model}-{device}-{dtype}"
+        + ("-reference-first" if reference_first else "")
+        + ".json"
+    )
     report = run_parity(
         instance(),
         prepared.prepared_path,
@@ -1879,7 +1884,7 @@ def parity(
         entrypoint_order=order,
         metadata={"source_sha256": prepared.source_sha256},
     )
-    write_parity_report(report, output)
+    write_parity_report(report, report_path)
     subject = report.subjects[f"{backend}+{model}"]
     table = Table(title=f"Parity · {backend}/{model}")
     table.add_column("Stage", style="bold")
@@ -1894,7 +1899,7 @@ def parity(
             _fmt(stage.max_rel, ".3g"),
         )
     console.print(table)
-    console.print(f"parity report → {output}")
+    console.print(f"parity report → {report_path}")
     if not subject.parity_eligible:
         raise typer.Exit(1)
 

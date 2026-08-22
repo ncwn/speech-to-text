@@ -351,7 +351,7 @@ def test_mms_parity_hooks_capture_pipeline_and_direct_tensors(tmp_path):
     from stt.parity import compare_traces, contract_for
 
     path = tmp_path / "clip.wav"
-    sf.write(path, np.linspace(-0.5, 0.5, 1600), 16_000, subtype="PCM_16")
+    sf.write(path, np.linspace(-0.5, 0.5, 8000), 16_000, subtype="PCM_16")
 
     class Batch(dict):
         def to(self, device=None, dtype=None):
@@ -416,3 +416,76 @@ def test_mms_parity_hooks_capture_pipeline_and_direct_tensors(tmp_path):
     assert all(item.status == "match" for item in comparisons)
     assert adapter.metadata["entrypoint"] == "transformers-pipeline"
     assert reference.metadata["entrypoint"] == "feature-extractor-model-tokenizer"
+
+
+def test_seamless_parity_hooks_capture_adapter_and_direct_encoder(tmp_path):
+    import types
+
+    import numpy as np
+    import soundfile as sf
+    import torch
+
+    from stt.parity import compare_traces, contract_for
+
+    path = tmp_path / "clip.wav"
+    sf.write(path, np.linspace(-0.5, 0.5, 8000), 16_000, subtype="PCM_16")
+
+    class Batch(dict):
+        def to(self, device=None, dtype=None):
+            for key, value in tuple(self.items()):
+                if isinstance(value, torch.Tensor):
+                    value = value.to(device=device)
+                    if dtype is not None and value.is_floating_point():
+                        value = value.to(dtype=dtype)
+                    self[key] = value
+            return self
+
+    class Processor:
+        def __call__(self, **kwargs):
+            audio = kwargs.get("audio", kwargs.get("audios"))
+            values = torch.from_numpy(np.array(audio, dtype=np.float32, copy=True)).unsqueeze(0)
+            return Batch(
+                input_features=values,
+                attention_mask=torch.ones_like(values, dtype=torch.long),
+            )
+
+        @staticmethod
+        def decode(tokens, skip_special_tokens=True):
+            del tokens, skip_special_tokens
+            return " စာ "
+
+    class Encoder(torch.nn.Module):
+        def forward(self, input_features, attention_mask=None):
+            del attention_mask
+            return types.SimpleNamespace(last_hidden_state=input_features * 2)
+
+    class Model(torch.nn.Module):
+        device = torch.device("cpu")
+        dtype = torch.float32
+
+        def __init__(self):
+            super().__init__()
+            self.speech_encoder = Encoder()
+
+        def generate(self, input_features, attention_mask=None, tgt_lang=None):
+            del tgt_lang
+            self.speech_encoder(
+                input_features=input_features,
+                attention_mask=attention_mask,
+            )
+            return torch.tensor([[1, 2, 3]])
+
+    backend = TransformersASRBackend("seamless-m4t-v2", device="cpu", dtype="float32")
+    backend._seamless = (Processor(), Model())
+    backend._loaded = True
+    backend.resolved_device = "cpu"
+    backend.resolved_dtype = "float32"
+
+    adapter = backend.parity_adapter_trace(path, language="mya_Mymr")
+    reference = backend.parity_reference_trace(path, language="mya_Mymr")
+    contract = contract_for("hf", "seamless-m4t-v2")
+    comparisons = compare_traces(adapter, reference, tolerances=contract.tolerances)
+
+    assert all(item.status == "match" for item in comparisons)
+    assert adapter.metadata["entrypoint"] == "repository-single-window"
+    assert reference.metadata["entrypoint"] == "processor-generate-direct"
