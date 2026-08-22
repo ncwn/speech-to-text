@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+#
+# Runs the fast guards before every commit. Enable with:  make hooks
+#
+# Deliberately does NOT run `make bench` — that loads five models and takes
+# minutes. A hook that slow gets disabled, and then nothing is guarded at all.
+#
+# Skip once, when you know what you are doing:  git commit --no-verify
+
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+
+if ! command -v uv >/dev/null; then
+    echo "pre-commit: uv not found, skipping checks" >&2
+    exit 0
+fi
+
+printf '\033[2mpre-commit: ruff + tests…\033[0m\n'
+if ! make check >/tmp/stt-precommit.log 2>&1; then
+    printf '\033[31mpre-commit failed\033[0m — commit aborted\n\n' >&2
+    tail -30 /tmp/stt-precommit.log >&2
+    printf '\nFull log: /tmp/stt-precommit.log\n' >&2
+    exit 1
+fi
+printf '\033[32mpre-commit ok\033[0m\n'

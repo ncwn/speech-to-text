@@ -77,3 +77,9 @@ select = ["E", "F", "I", "UP", "B"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+# `weights` tests load real models from the cache. Deselected by default so the
+# suite stays offline and fast; `make bench` runs them.
+addopts = "-m 'not weights'"
+markers = [
+    "weights: needs model weights on disk (deselected by default)",
+]
