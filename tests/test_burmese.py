@@ -23,6 +23,14 @@ def test_detects_myanmar_script():
     assert not has_myanmar("")
 
 
+def test_detects_myanmar_extended_a_boundaries():
+    """Myanmar Extended-A (U+A9E0-U+A9FF) is part of the script."""
+    assert has_myanmar("\ua9e0")
+    assert has_myanmar("\ua9ff")
+    assert not has_myanmar("\ua9df")
+    assert not has_myanmar("\uaa00")
+
+
 def test_non_myanmar_text_is_not_zawgyi():
     assert zawgyi_probability("plain ascii") == 0.0
     assert not is_zawgyi("plain ascii")
