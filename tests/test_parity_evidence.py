@@ -17,6 +17,10 @@ REPORT_PAIRS = {
         ROOT / "evidence/parity/hf-seamless-m4t-v2-cpu-v1.json",
         ROOT / "evidence/parity/hf-seamless-m4t-v2-cpu-v1-reference-first.json",
     ),
+    "dolphin+small": (
+        ROOT / "evidence/parity/dolphin-small-cpu-v1.json",
+        ROOT / "evidence/parity/dolphin-small-cpu-v1-reference-first.json",
+    ),
 }
 
 
@@ -57,3 +61,7 @@ def test_mms_parity_passes_in_both_entrypoint_orders():
 
 def test_seamless_parity_passes_in_both_entrypoint_orders():
     _assert_parity_pair("hf+seamless-m4t-v2")
+
+
+def test_dolphin_parity_passes_in_both_entrypoint_orders():
+    _assert_parity_pair("dolphin+small")
