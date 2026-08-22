@@ -672,6 +672,10 @@ def capture_environment(root: Path | None = None) -> dict[str, Any]:
         "packages": packages,
         "git_commit": commit,
         "git_dirty": bool(dirty),
+        # Recorded so process isolation is checkable rather than asserted: two
+        # subjects sharing a pid would mean the second inherited the first's
+        # RSS high-water and whatever runtime state it left behind.
+        "pid": os.getpid(),
         "uv_lock_sha256": _sha256_file(lock_path),
         "power": _command_output(["pmset", "-g", "batt"]) if sys.platform == "darwin" else None,
         "thermal": (

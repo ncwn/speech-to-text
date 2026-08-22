@@ -249,6 +249,9 @@ class ResourceUsage:
     profiler_cpu_s: float = 0.0
     cpu: Series | None = None
     rss: Series | None = None
+    #: Unique set size, collected only when explicitly asked for. See
+    #: :func:`uss_now_mb` for why it is not on by default.
+    uss: Series | None = None
     gpu_util: Series | None = None
     gpu_mem: Series | None = None
 
@@ -294,7 +297,7 @@ class ResourceUsage:
         if self.profiler_cpu_s:
             d["profiler_cpu_s"] = round(self.profiler_cpu_s, 4)
         if include_series:
-            for name in ("cpu", "rss", "gpu_util", "gpu_mem"):
+            for name in ("cpu", "rss", "uss", "gpu_util", "gpu_mem"):
                 value = getattr(self, name)
                 if value is not None:
                     d[name] = value.to_dict()
@@ -338,6 +341,32 @@ def rss_now_mb() -> float | None:
         return _PROCESS.memory_info().rss / (1024 * 1024)
     except Exception:  # noqa: BLE001 - telemetry must never break a run
         return peak_rss_mb()
+
+
+def uss_now_mb() -> float | None:
+    """Unique set size — memory that would be freed if this process exited.
+
+    RSS counts shared pages, so a worker that memory-maps a 31 GB checkpoint
+    reports memory it does not exclusively own. USS is the honest figure for
+    "what did this model cost", but it is measurably dearer to collect: about
+    0.1 ms per sample against 0.005 ms for RSS on an M2 Max, because it walks
+    the process's memory map rather than reading a counter.
+
+    That 20x is why this is opt-in and diagnostic rather than the default
+    memory series, and why the observer calibration measures it rather than
+    assuming it is free. ``None`` means the platform refused the read, which is
+    common enough — some systems require elevated privileges — that it must
+    never take the sampler down with it.
+    """
+    global _PROCESS
+    try:
+        if _PROCESS is None:
+            import psutil
+
+            _PROCESS = psutil.Process()
+        return _PROCESS.memory_full_info().uss / (1024 * 1024)
+    except Exception:  # noqa: BLE001 - telemetry must never break a run
+        return None
 
 
 def gpu_allocated_mb() -> float | None:
@@ -389,19 +418,23 @@ class Profiler:
         gpu_interval_s: float = GPU_SAMPLE_INTERVAL_S,
         settle_s: float = SAMPLE_INTERVAL_S,
         sample_gpu: bool = True,
+        sample_uss: bool = False,
     ) -> None:
         self.interval_s = max(0.001, interval_s)
         self.gpu_interval_s = max(self.interval_s, gpu_interval_s)
         self.gpu_every = max(1, round(self.gpu_interval_s / self.interval_s))
         self.settle_s = max(0.0, settle_s)
         self.sample_gpu = sample_gpu
+        self.sample_uss = sample_uss
         self.samples: list[float] = []  # compatibility alias for GPU samples
         self.cpu_samples: list[float] = []
         self.rss_samples: list[float] = []
+        self.uss_samples: list[float] = []
         self.gpu_mem_samples: list[float] = []
         self.gpu_offsets_ns: list[int] = []
         self.cpu_offsets_ns: list[int] = []
         self.rss_offsets_ns: list[int] = []
+        self.uss_offsets_ns: list[int] = []
         self.gpu_mem_offsets_ns: list[int] = []
         self.cpu_cost_s = 0.0
         self.thread_cpu_s = 0.0
@@ -458,6 +491,12 @@ class Profiler:
         if rss is not None and rss_offset is not None:
             self.rss_samples.append(rss)
             self.rss_offsets_ns.append(rss_offset)
+        if self.sample_uss:
+            uss = uss_now_mb()
+            uss_offset = self._offset(time.perf_counter_ns())
+            if uss is not None and uss_offset is not None:
+                self.uss_samples.append(uss)
+                self.uss_offsets_ns.append(uss_offset)
         return now, cpu_now, child_now
 
     def _run(self) -> None:
@@ -568,6 +607,16 @@ class Profiler:
         )
 
     @property
+    def uss(self) -> Series | None:
+        return self._series(
+            self.uss_samples,
+            self.uss_offsets_ns,
+            idle_threshold=0.0,
+            source="psutil-uss",
+            scope="worker-process",
+        )
+
+    @property
     def gpu_util(self) -> Series | None:
         return self._series(
             self.samples,
@@ -614,10 +663,11 @@ def measure(
     profile: bool = True,
     device: str | None = None,
     phase: str | None = None,
+    sample_uss: bool = False,
 ):
     """Measure a block and yield a one-element list containing its usage."""
     box: list[ResourceUsage] = []
-    sampler = GpuSampler(sample_gpu=sample_gpu).start() if profile else None
+    sampler = GpuSampler(sample_gpu=sample_gpu, sample_uss=sample_uss).start() if profile else None
     synchronize_device(device)
     cpu_started = _cpu_seconds(include_children=sample_gpu)
     started_ns = time.perf_counter_ns()
@@ -644,6 +694,7 @@ def measure(
         profiler_cost = getattr(sampler, "thread_cpu_s", 0.0) if sampler else 0.0
         gpu_series = getattr(sampler, "gpu_util", None) if sampler else None
         rss_series = getattr(sampler, "rss", None) if sampler else None
+        uss_series = getattr(sampler, "uss", None) if sampler else None
         current_rss = [value for value in (rss_start, rss_end) if value is not None]
         if rss_series:
             current_rss.extend(rss_series.samples)
@@ -669,6 +720,7 @@ def measure(
                 profiler_cpu_s=profiler_cost,
                 cpu=getattr(sampler, "cpu", None) if sampler else None,
                 rss=rss_series,
+                uss=uss_series,
                 gpu_util=gpu_series,
                 gpu_mem=getattr(sampler, "gpu_mem", None) if sampler else None,
             )

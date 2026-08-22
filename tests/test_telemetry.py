@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import json
+import time
 
 import pytest
 
+import stt.telemetry as telemetry
 from stt.results import TranscriptionResult, read_jsonl, write_jsonl
 from stt.telemetry import Profiler, ResourceUsage, Series, describe_host, measure, peak_rss_mb
 
@@ -299,3 +301,97 @@ def test_saturation_names_the_busy_resource():
     # A GPU-bound run is called that even when the CPU is nearly idle: that is
     # the GGUF case, and calling it "underutilised" was the old blind spot.
     assert saturation(usage(0.05, gpu=78.0), 12) == "GPU-bound"
+
+
+def test_uss_is_off_by_default_and_collected_when_asked():
+    """USS costs about 20x an RSS read, so it is opt-in rather than standard."""
+    sampler = telemetry.GpuSampler(sample_gpu=False)
+    assert sampler.sample_uss is False
+    assert sampler.uss is None
+
+    asked = telemetry.GpuSampler(sample_gpu=False, sample_uss=True)
+    assert asked.sample_uss is True
+
+
+def test_an_unavailable_uss_reading_does_not_take_the_sampler_down(monkeypatch):
+    """Some platforms refuse memory_full_info; that must stay a missing series.
+
+    A refused read must not cost the RSS series that shares the same tick.
+    """
+    import time as _time
+
+    monkeypatch.setattr(telemetry, "uss_now_mb", lambda: None)
+    sampler = telemetry.GpuSampler(sample_gpu=False, sample_uss=True)
+    started = _time.perf_counter_ns()
+    sampler.begin(started)
+    sampler._sample_cpu_rss(None)
+    sampler.finish(_time.perf_counter_ns() + 1_000_000)
+
+    assert sampler.uss is None
+    assert sampler.rss is not None
+
+
+def test_uss_series_survives_a_jsonl_round_trip(tmp_path):
+    """A diagnostic nobody can read back is not a diagnostic."""
+    usage = telemetry.ResourceUsage(
+        wall_s=1.0,
+        cpu_s=1.0,
+        peak_rss_mb=100.0,
+        uss=telemetry.Series.from_samples(
+            [10.0, 12.0, 11.0],
+            offsets_ns=[0, 1_000, 2_000],
+            window_ns=3_000,
+            source="psutil-uss",
+            scope="worker-process",
+        ),
+    )
+    result = TranscriptionResult(
+        audio_path="a.wav", text="x", backend="b", model="m", resources=usage
+    )
+    path = tmp_path / "run.jsonl"
+    write_jsonl([result], path)
+
+    loaded = read_jsonl(path)[0].resources
+    assert loaded is not None and loaded.uss is not None
+    assert loaded.uss.samples == [10.0, 12.0, 11.0]
+    assert loaded.uss.source == "psutil-uss"
+
+
+@pytest.mark.weights
+def test_real_mps_work_is_synchronized_on_both_sides_of_the_wall():
+    """The fake-clock test proves the calls happen; this proves they bite.
+
+    MPS dispatch is asynchronous, so without a real synchronize the measured
+    wall can close while the GPU is still working and the corpus looks faster
+    than it was. Queue enough work that an unsynchronized wall would visibly
+    under-measure it, then check the wall covers the work rather than the
+    dispatch.
+    """
+    torch = pytest.importorskip("torch")
+    if not torch.backends.mps.is_available():
+        pytest.skip("no MPS device")
+
+    size = 2048
+    left = torch.randn(size, size, device="mps")
+    right = torch.randn(size, size, device="mps")
+    torch.mps.synchronize()
+
+    with measure(profile=False, device="mps") as box:
+        product = left
+        for _ in range(60):
+            product = product @ right
+    usage = box[0]
+
+    # Time the same work with an explicit synchronize as the reference.
+    torch.mps.synchronize()
+    reference_start = time.perf_counter()
+    product = left
+    for _ in range(60):
+        product = product @ right
+    torch.mps.synchronize()
+    reference = time.perf_counter() - reference_start
+
+    assert usage.wall_s >= reference * 0.5, (
+        f"measured wall {usage.wall_s:.4f}s is far below the synchronized "
+        f"reference {reference:.4f}s, so the wall closed before the GPU did"
+    )

@@ -196,7 +196,7 @@ def read_jsonl(path: Path) -> list[TranscriptionResult]:
             if usage is not None:
                 # `cpu_utilization` is derived on write; it is not a field.
                 usage.pop("cpu_utilization", None)
-                for name in ("cpu", "rss", "gpu_util", "gpu_mem"):
+                for name in ("cpu", "rss", "uss", "gpu_util", "gpu_mem"):
                     series = usage.get(name)
                     if series is not None:
                         usage[name] = Series.from_dict(

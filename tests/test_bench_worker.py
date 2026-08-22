@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 from dataclasses import replace
@@ -142,3 +143,31 @@ def test_parent_accepts_a_valid_incomplete_worker_response(tmp_path):
     assert response.termination is None
     stem = response_path.name.removesuffix(".response.json")
     assert (response_path.parent / f"{stem}.journal.json").is_file()
+
+
+def test_every_subject_gets_its_own_process(tmp_path):
+    """One subject per process, checked rather than assumed.
+
+    A worker that loaded a second model would inherit the first one's RSS
+    high-water and whatever runtime state it left behind, which is the whole
+    reason the benchmark spawns a process per subject. Distinct pids are the
+    observable form of that claim; the reported lifetime RSS comes from each
+    worker's own getrusage, so it cannot carry across.
+    """
+    pids: list[int] = []
+    for index in range(3):
+        request = replace(
+            _request(tmp_path, backend="definitely-not-a-backend", warmups=0, repeats=1),
+            worker_index=index,
+            session_index=index,
+            # Deliberately varied: if isolation depended on launch order, this
+            # is where it would show.
+            launch_position=(index + 1) % 3,
+        )
+        response, _ = run_subject_worker(request, artifact_dir=tmp_path / "artifacts", timeout_s=60)
+        pid = response.environment.get("pid")
+        assert isinstance(pid, int)
+        pids.append(pid)
+
+    assert len(set(pids)) == 3, f"workers shared a process: {pids}"
+    assert os.getpid() not in pids, "a subject ran inside the orchestrator"
