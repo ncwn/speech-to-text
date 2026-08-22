@@ -1,0 +1,2115 @@
+{
+  "complete": true,
+  "condition_id": "fast-profile",
+  "environment": {
+    "git_commit": "85cc56a24d5357e7a9ee46f8e162b3fe9d9dbf65",
+    "git_dirty": false,
+    "machine": "arm64",
+    "packages": {
+      "accelerate": "1.14.0",
+      "crispasr": "0.8.29",
+      "dataoceanai-dolphin": "20260513",
+      "fairseq2": "0.6",
+      "funasr": "1.4.2",
+      "huggingface-hub": "0.36.2",
+      "modelscope": "1.39.1",
+      "omnilingual-asr": "0.2.0",
+      "psutil": "5.9.8",
+      "sentencepiece": "0.2.2",
+      "soundfile": "0.14.0",
+      "tokenizers": "0.22.2",
+      "torch": "2.8.0",
+      "torchaudio": "2.8.0",
+      "transformers": "4.57.6"
+    },
+    "pid": 71127,
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "power": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=24641635)\t80%; AC attached; not charging present: true",
+    "python": "3.12.13",
+    "python_executable": ".venv/bin/python3",
+    "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+    "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+  },
+  "error": null,
+  "experiment_id": "observer-calibration-v3",
+  "host": {
+    "chip": "Apple M2 Max",
+    "compute_threads": 8,
+    "cores": {
+      "Efficiency": 4,
+      "Performance": 8
+    },
+    "cpu_count": 12,
+    "machine": "arm64",
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "ram_mb": 65536
+  },
+  "journal_recovered": false,
+  "launch_position": 2,
+  "load_resources": {
+    "cpu": {
+      "idle_pct": 0.0,
+      "idle_threshold": 0.05,
+      "max": 1.0005867419226262,
+      "mean": 0.6071913121343916,
+      "n": 76,
+      "offsets_ns": [
+        57083584,
+        110839417,
+        160628709,
+        210693334,
+        260679125,
+        312095000,
+        361430959,
+        410556959,
+        460541167,
+        525492334,
+        566275084,
+        610551959,
+        660592542,
+        715099375,
+        761123125,
+        810549167,
+        861313917,
+        910217250,
+        960254042,
+        1034926584,
+        1062079125,
+        1110549000,
+        1166804459,
+        1215607542,
+        1260541959,
+        1327456292,
+        1361193542,
+        1405646542,
+        1461022917,
+        1510006125,
+        1562794459,
+        1610564167,
+        1660542417,
+        1710685292,
+        1766805250,
+        1831263459,
+        1863624000,
+        1911113875,
+        1960572709,
+        2009198834,
+        2060545875,
+        2110543584,
+        2160543167,
+        2210543000,
+        2260542209,
+        2310544625,
+        2360542875,
+        2410543000,
+        2460541375,
+        2510541250,
+        2557342500,
+        2609546542,
+        2660542334,
+        2710546334,
+        2760544709,
+        2810542084,
+        2860541375,
+        2910540584,
+        2960541750,
+        3010541292,
+        3060543834,
+        3110541667,
+        3157781084,
+        3210544250,
+        3260547959,
+        3310545417,
+        3360543542,
+        3410544584,
+        3460542459,
+        3510547667,
+        3560553917,
+        3609993417,
+        3660546500,
+        3710550625,
+        3760542709,
+        3810543000
+      ],
+      "p50": 0.6375257072296127,
+      "p95": 1.000074473638902,
+      "phase": "load",
+      "samples": [
+        0.9983012721230838,
+        1.000077516970928,
+        1.000074473638902,
+        1.0005867419226262,
+        0.9860002014669711,
+        0.7986832860300743,
+        0.7353054596143923,
+        0.7151406587424435,
+        0.6953996347825212,
+        0.9040330252290291,
+        0.9036173381661319,
+        0.8294849177628282,
+        0.9111404635521831,
+        0.8680012651578166,
+        0.8107553164020105,
+        0.8144896574210145,
+        0.8477536082251267,
+        0.9263376793863428,
+        0.8429397311762158,
+        0.8840063327444213,
+        0.8039026621855573,
+        0.8746876279981787,
+        0.9694881344818683,
+        0.9782988507569126,
+        0.9544354385529767,
+        0.9432358833884773,
+        0.9697885870134803,
+        0.9276539264203387,
+        0.8619199070756566,
+        0.8245274586206459,
+        0.8341615782565951,
+        0.9046318640805462,
+        0.8126134869096019,
+        0.8534412915190813,
+        0.9473100461487223,
+        0.9960717338172764,
+        1.000539515270339,
+        0.4795969667597837,
+        0.46703486761300966,
+        0.39898305715017324,
+        0.601709453818166,
+        0.28509306300386944,
+        0.28302236030584543,
+        0.27444091668437043,
+        0.27842440464927476,
+        0.278166558915432,
+        0.27376958207207897,
+        0.2744593137506402,
+        0.27332888316088827,
+        0.28586071472377456,
+        0.6375257072296127,
+        0.2721436780505922,
+        0.27557175697773273,
+        0.28175745929722756,
+        0.28424923823676146,
+        0.27917465668359,
+        0.2742438886738525,
+        0.27932441888743015,
+        0.27491358915189607,
+        0.28014256604718013,
+        0.637207604311596,
+        0.2641114465665513,
+        0.2834708988504109,
+        0.2659620539404371,
+        0.28257903823259506,
+        0.29081478518364323,
+        0.2863307373844296,
+        0.28253411186533983,
+        0.2699514729306648,
+        0.26965191320071863,
+        0.3947506561139533,
+        0.5753698965553631,
+        0.27596734301234327,
+        0.2715975932492731,
+        0.27468348784360225,
+        0.32489810910887534
+      ],
+      "scope": "worker-process",
+      "source": "process-cpu-time",
+      "window_ns": 3813546834
+    },
+    "cpu_s": 2.2999,
+    "cpu_utilization": 0.6,
+    "ended_ns": 161081101125625,
+    "gpu_mb": 4240.4,
+    "peak_rss_mb": 442.9,
+    "phase": "load",
+    "process_peak_rss_mb": 442.9,
+    "profiler_cpu_s": 0.0033,
+    "rss": {
+      "idle_pct": 0.0,
+      "max": 435.421875,
+      "mean": 370.57871443285467,
+      "n": 78,
+      "offsets_ns": [
+        5480917,
+        57104500,
+        110855459,
+        160643292,
+        210704834,
+        260696417,
+        312109750,
+        361445125,
+        410575000,
+        460553875,
+        525523209,
+        566302000,
+        610573584,
+        660654709,
+        715124917,
+        761173459,
+        810570875,
+        861333084,
+        910235417,
+        960275459,
+        1034963459,
+        1062094292,
+        1110564292,
+        1166816667,
+        1215618417,
+        1260554459,
+        1327479125,
+        1361211584,
+        1405665792,
+        1461049959,
+        1510027875,
+        1562813292,
+        1610582834,
+        1660558167,
+        1710698459,
+        1766817542,
+        1831297084,
+        1863640459,
+        1911126084,
+        1960584334,
+        2009223709,
+        2060573959,
+        2110564917,
+        2160563042,
+        2210559625,
+        2260557834,
+        2310569625,
+        2360560792,
+        2410561209,
+        2460563500,
+        2510557417,
+        2557363542,
+        2609567292,
+        2660561750,
+        2710574459,
+        2760562834,
+        2810558417,
+        2860563250,
+        2910561625,
+        2960561500,
+        3010556500,
+        3060565792,
+        3110558292,
+        3157809125,
+        3210561167,
+        3260581667,
+        3310567917,
+        3360564625,
+        3410566584,
+        3460558209,
+        3510585500,
+        3560593625,
+        3610026584,
+        3660574000,
+        3710578167,
+        3760560959,
+        3810557667,
+        3813546709
+      ],
+      "p50": 420.390625,
+      "p95": 434.953125,
+      "phase": "load",
+      "samples": [
+        214.0,
+        214.609375,
+        214.796875,
+        214.828125,
+        214.984375,
+        215.609375,
+        222.609375,
+        232.171875,
+        243.890625,
+        252.765625,
+        257.8125,
+        261.75,
+        269.5625,
+        273.5625,
+        283.359375,
+        287.890625,
+        292.375,
+        300.078125,
+        305.125,
+        309.9375,
+        315.234375,
+        318.546875,
+        323.8125,
+        328.84375,
+        331.296875,
+        336.703125,
+        350.859375,
+        356.6875,
+        362.46875,
+        371.6875,
+        380.40625,
+        388.078125,
+        391.6875,
+        396.90625,
+        404.15625,
+        410.6875,
+        413.078125,
+        417.34375,
+        423.078125,
+        430.234375,
+        435.421875,
+        435.3125,
+        435.15625,
+        434.953125,
+        434.796875,
+        434.59375,
+        434.421875,
+        434.21875,
+        434.046875,
+        433.90625,
+        433.703125,
+        433.640625,
+        433.4375,
+        433.296875,
+        433.0625,
+        432.921875,
+        432.71875,
+        432.53125,
+        432.34375,
+        432.15625,
+        432.015625,
+        431.890625,
+        431.734375,
+        431.546875,
+        431.390625,
+        431.15625,
+        431.03125,
+        430.8125,
+        430.65625,
+        430.46875,
+        430.296875,
+        430.15625,
+        430.046875,
+        429.875,
+        429.6875,
+        429.515625,
+        420.390625,
+        420.390625
+      ],
+      "scope": "worker-process",
+      "source": "psutil-rss",
+      "window_ns": 3813546834
+    },
+    "rss_peak_mb": 435.4,
+    "started_ns": 161077287578791,
+    "wall_s": 3.8135
+  },
+  "model_provenance": {
+    "adapter_git_commit": "85cc56a24d5357e7a9ee46f8e162b3fe9d9dbf65",
+    "adapter_git_dirty": false,
+    "artifacts": [
+      {
+        "name": "adapter.mya.safetensors",
+        "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+        "role": "model-or-processor",
+        "sha256": "c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+        "size_bytes": 9357088,
+        "stat": {
+          "ctime_ns": 1787158435149503713,
+          "device": 16777235,
+          "inode": 5984066,
+          "mtime_ns": 1787079596406661677,
+          "size": 9357088
+        }
+      },
+      {
+        "name": "config.json",
+        "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/dd547cc1b61ca6edfefb2f0cf65e3d8f81eceb6a",
+        "role": "model-or-processor",
+        "sha256": "ee172ef39a0e40c55403fb811fa0f56c6198c7ed21a2bdf5bd0e72e52c07a41c",
+        "size_bytes": 2040,
+        "stat": {
+          "ctime_ns": 1787158435152482514,
+          "device": 16777235,
+          "inode": 5984069,
+          "mtime_ns": 1787079452518242432,
+          "size": 2040
+        }
+      },
+      {
+        "name": "create_adapters.py",
+        "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b2e99c339dafb630e1b02c44f5c267927979106f",
+        "role": "model-or-processor",
+        "sha256": "b5f11c4e55342e718fa90697f34f82664fbff16a421d8fae206d997045f73921",
+        "size_bytes": 10188,
+        "stat": {
+          "ctime_ns": 1787235792760670739,
+          "device": 16777235,
+          "inode": 5986586,
+          "mtime_ns": 1787235792759124152,
+          "size": 10188
+        }
+      },
+      {
+        "name": "create_vocab.py",
+        "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b36fe95573033e2a2742aaeed8d3078946b7a320",
+        "role": "model-or-processor",
+        "sha256": "a6e7e16a54f0b09f46045b9135483776393267d0d8a6b3e86072906e61be46f5",
+        "size_bytes": 878,
+        "stat": {
+          "ctime_ns": 1787235792684531696,
+          "device": 16777235,
+          "inode": 5986580,
+          "mtime_ns": 1787235792683967611,
+          "size": 878
+        }
+      },
+      {
+        "name": "model.safetensors",
+        "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+        "role": "model-or-processor",
+        "sha256": "0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+        "size_bytes": 3859521128,
+        "stat": {
+          "ctime_ns": 1787158436530154511,
+          "device": 16777235,
+          "inode": 5984070,
+          "mtime_ns": 1787079592306092277,
+          "size": 3859521128
+        }
+      },
+      {
+        "name": "preprocessor_config.json",
+        "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/e7d53bd058c34639e2dec1357537a3d013bcda63",
+        "role": "model-or-processor",
+        "sha256": "f724fdad65341e79bd9741888fe4e8ce1bb2e7b44fc8216c28c591afb1e202f4",
+        "size_bytes": 254,
+        "stat": {
+          "ctime_ns": 1787158435150048006,
+          "device": 16777235,
+          "inode": 5984067,
+          "mtime_ns": 1787079443378807804,
+          "size": 254
+        }
+      },
+      {
+        "name": "special_tokens_map.json",
+        "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/fdafe480f024ff444c7492147536765ce5d55a2d",
+        "role": "model-or-processor",
+        "sha256": "9046da57c270c8e74d0f38832b4adce269c9d914ef21d2a0925e7772152dd793",
+        "size_bytes": 96,
+        "stat": {
+          "ctime_ns": 1787158435143879487,
+          "device": 16777235,
+          "inode": 5984065,
+          "mtime_ns": 1787079449792831686,
+          "size": 96
+        }
+      },
+      {
+        "name": "tokenizer_config.json",
+        "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/8119434548d4a82fbe4e5e53c95d186bca037257",
+        "role": "model-or-processor",
+        "sha256": "42a65547cf0654d12263ece7c909c4b0c574b660c78658f806c772cc223bc01b",
+        "size_bytes": 397,
+        "stat": {
+          "ctime_ns": 1787158435143238985,
+          "device": 16777235,
+          "inode": 5984064,
+          "mtime_ns": 1787079445299892278,
+          "size": 397
+        }
+      },
+      {
+        "name": "vocab.json",
+        "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/5c1626173fb1db1da574d16b6e924e8efc1ade4c",
+        "role": "model-or-processor",
+        "sha256": "0375a07a977a599040a7ff333b6974996965cd93754020619518c15db7691f01",
+        "size_bytes": 1340148,
+        "stat": {
+          "ctime_ns": 1787158435151871262,
+          "device": 16777235,
+          "inode": 5984068,
+          "mtime_ns": 1787079449054862750,
+          "size": 1340148
+        }
+      },
+      {
+        "name": "vocabs/mya.txt",
+        "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/49191e00b11ea3281db39a6b8022d0b003bae2da",
+        "role": "model-or-processor",
+        "sha256": "d01af8e834039592efc79902675773d7ef622a4ce07cccd46fb2644785cc0734",
+        "size_bytes": 1005,
+        "stat": {
+          "ctime_ns": 1787235938363752533,
+          "device": 16777235,
+          "inode": 5987135,
+          "mtime_ns": 1787235938362249071,
+          "size": 1005
+        }
+      }
+    ],
+    "backend": "hf",
+    "content_sha256": "b6bf21929e857519387e3994e47a10f6530f7bbcb9427c87ebc3ca064b573cd6",
+    "execution_sha256": "6d359e472ec895c95c80621b4d36aa76462dc4259978978826688fed6044bcac",
+    "fallback_history": [],
+    "issues": [],
+    "requested_model": "mms-1b-all",
+    "requested_settings": {
+      "batch_size": 1,
+      "device": "mps",
+      "dtype": "float32",
+      "language": "mya_Mymr"
+    },
+    "resolved_settings": {
+      "chunk_seconds": null,
+      "device": "mps",
+      "dtype": "float32",
+      "family": "mms",
+      "lang": "mya",
+      "n_threads": null
+    },
+    "revision_status": "pinned",
+    "runtime_packages": {
+      "accelerate": "1.14.0",
+      "crispasr": "0.8.29",
+      "dataoceanai-dolphin": "20260513",
+      "fairseq2": "0.6",
+      "funasr": "1.4.2",
+      "huggingface-hub": "0.36.2",
+      "modelscope": "1.39.1",
+      "omnilingual-asr": "0.2.0",
+      "psutil": "5.9.8",
+      "sentencepiece": "0.2.2",
+      "soundfile": "0.14.0",
+      "tokenizers": "0.22.2",
+      "torch": "2.8.0",
+      "torchaudio": "2.8.0",
+      "transformers": "4.57.6"
+    },
+    "schema_version": 1,
+    "source_kind": "huggingface",
+    "source_locator": "facebook/mms-1b-all",
+    "upstream_revision": "3d33597edbdaaba14a8e858e2c8caa76e3cec0cd",
+    "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+  },
+  "phases": [
+    {
+      "ended_ns": 161077286762000,
+      "error": null,
+      "name": "process-start",
+      "repeat_index": null,
+      "started_ns": 161076136154583,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 161081101125625,
+      "error": null,
+      "name": "load",
+      "repeat_index": null,
+      "started_ns": 161077287578791,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 161081104739791,
+      "error": null,
+      "name": "load-validation",
+      "repeat_index": null,
+      "started_ns": 161081101394000,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 161081559094875,
+      "error": null,
+      "name": "warmup-0",
+      "repeat_index": null,
+      "started_ns": 161081107908833,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 161081856748666,
+      "error": null,
+      "name": "warmup-1",
+      "repeat_index": null,
+      "started_ns": 161081566820916,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 161082156178625,
+      "error": null,
+      "name": "warmup-2",
+      "repeat_index": null,
+      "started_ns": 161081864047833,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 161082452847125,
+      "error": null,
+      "name": "repeat-0",
+      "repeat_index": 0,
+      "started_ns": 161082164250041,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 161082764685125,
+      "error": null,
+      "name": "repeat-1",
+      "repeat_index": 1,
+      "started_ns": 161082463053458,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 161083063634166,
+      "error": null,
+      "name": "repeat-2",
+      "repeat_index": 2,
+      "started_ns": 161082775512416,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 161083164246333,
+      "error": null,
+      "name": "unload",
+      "repeat_index": null,
+      "started_ns": 161083073695583,
+      "status": "ok"
+    }
+  ],
+  "protocol_version": 3,
+  "provenance_issues": [],
+  "repeats": [
+    {
+      "complete": true,
+      "expected_audio_s": 12.78,
+      "index": 0,
+      "phase": {
+        "ended_ns": 161082452847125,
+        "error": null,
+        "name": "repeat-0",
+        "repeat_index": 0,
+        "started_ns": 161082164250041,
+        "status": "ok"
+      },
+      "resources": {
+        "cpu": {
+          "idle_pct": 54.9236176620551,
+          "idle_threshold": 0.05,
+          "max": 0.41643143638353614,
+          "mean": 0.13527994590817072,
+          "n": 5,
+          "offsets_ns": [
+            55111334,
+            105090750,
+            155087500,
+            205082709,
+            255092792
+          ],
+          "p50": 0.0017401131076178102,
+          "p95": 0.41643143638353614,
+          "phase": "repeat-0",
+          "samples": [
+            0.2246982514446179,
+            0.41643143638353614,
+            0.0017401131076178102,
+            0.0012401188281049064,
+            0.0013197338629514532
+          ],
+          "scope": "worker-process",
+          "source": "process-cpu-time",
+          "window_ns": 288597084
+        },
+        "cpu_s": 0.0721,
+        "cpu_utilization": 0.25,
+        "ended_ns": 161082452847125,
+        "gpu_mb": 4363.3,
+        "gpu_mem": {
+          "idle_pct": 0.0,
+          "max": 4363.359375,
+          "mean": 4363.359375,
+          "n": 1,
+          "offsets_ns": [
+            282670417
+          ],
+          "p50": 4363.359375,
+          "p95": 4363.359375,
+          "phase": "repeat-0",
+          "samples": [
+            4363.359375
+          ],
+          "scope": "worker-process",
+          "source": "torch-driver-allocation",
+          "window_ns": 288597084
+        },
+        "gpu_util": {
+          "idle_pct": 0.0,
+          "idle_threshold": 1.0,
+          "max": 94.0,
+          "mean": 94.0,
+          "n": 1,
+          "offsets_ns": [
+            282628625
+          ],
+          "p50": 94.0,
+          "p95": 94.0,
+          "phase": "repeat-0",
+          "samples": [
+            94.0
+          ],
+          "scope": "whole-gpu",
+          "source": "ioreg-device-utilization",
+          "window_ns": 288597084
+        },
+        "gpu_util_mean": 94.0,
+        "gpu_util_peak": 94.0,
+        "peak_rss_mb": 481.2,
+        "phase": "repeat-0",
+        "process_peak_rss_mb": 481.2,
+        "profiler_cpu_s": 0.0076,
+        "rss": {
+          "idle_pct": 0.0,
+          "max": 481.25,
+          "mean": 481.2383322588855,
+          "n": 7,
+          "offsets_ns": [
+            9125,
+            55178667,
+            105139209,
+            155116917,
+            205109042,
+            255126250,
+            288596959
+          ],
+          "p50": 481.25,
+          "p95": 481.25,
+          "phase": "repeat-0",
+          "samples": [
+            481.1875,
+            481.21875,
+            481.25,
+            481.25,
+            481.25,
+            481.25,
+            481.25
+          ],
+          "scope": "worker-process",
+          "source": "psutil-rss",
+          "window_ns": 288597084
+        },
+        "rss_peak_mb": 481.2,
+        "sampler_cpu_s": 0.0194,
+        "started_ns": 161082164250041,
+        "wall_s": 0.2886
+      },
+      "results": [
+        {
+          "audio_duration_s": 12.78,
+          "audio_id": "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28.wav",
+          "backend": "hf",
+          "elapsed_s": 0.288378333003493,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_items": 1,
+            "batch_size": 1,
+            "corpus_index": 0,
+            "corpus_size": 1,
+            "corpus_wall_s": 0.288597084,
+            "device": "mps",
+            "dtype": "float32",
+            "elapsed_s_source": "measured",
+            "family": "mms",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "repo": "facebook/mms-1b-all",
+            "requested_batch_size": 1,
+            "resource_scope": "corpus"
+          },
+          "model": "mms-1b-all",
+          "model_provenance": {
+            "adapter_git_commit": "85cc56a24d5357e7a9ee46f8e162b3fe9d9dbf65",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "adapter.mya.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "role": "model-or-processor",
+                "sha256": "c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "size_bytes": 9357088,
+                "stat": {
+                  "ctime_ns": 1787158435149503713,
+                  "device": 16777235,
+                  "inode": 5984066,
+                  "mtime_ns": 1787079596406661677,
+                  "size": 9357088
+                }
+              },
+              {
+                "name": "config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/dd547cc1b61ca6edfefb2f0cf65e3d8f81eceb6a",
+                "role": "model-or-processor",
+                "sha256": "ee172ef39a0e40c55403fb811fa0f56c6198c7ed21a2bdf5bd0e72e52c07a41c",
+                "size_bytes": 2040,
+                "stat": {
+                  "ctime_ns": 1787158435152482514,
+                  "device": 16777235,
+                  "inode": 5984069,
+                  "mtime_ns": 1787079452518242432,
+                  "size": 2040
+                }
+              },
+              {
+                "name": "create_adapters.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b2e99c339dafb630e1b02c44f5c267927979106f",
+                "role": "model-or-processor",
+                "sha256": "b5f11c4e55342e718fa90697f34f82664fbff16a421d8fae206d997045f73921",
+                "size_bytes": 10188,
+                "stat": {
+                  "ctime_ns": 1787235792760670739,
+                  "device": 16777235,
+                  "inode": 5986586,
+                  "mtime_ns": 1787235792759124152,
+                  "size": 10188
+                }
+              },
+              {
+                "name": "create_vocab.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b36fe95573033e2a2742aaeed8d3078946b7a320",
+                "role": "model-or-processor",
+                "sha256": "a6e7e16a54f0b09f46045b9135483776393267d0d8a6b3e86072906e61be46f5",
+                "size_bytes": 878,
+                "stat": {
+                  "ctime_ns": 1787235792684531696,
+                  "device": 16777235,
+                  "inode": 5986580,
+                  "mtime_ns": 1787235792683967611,
+                  "size": 878
+                }
+              },
+              {
+                "name": "model.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "role": "model-or-processor",
+                "sha256": "0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "size_bytes": 3859521128,
+                "stat": {
+                  "ctime_ns": 1787158436530154511,
+                  "device": 16777235,
+                  "inode": 5984070,
+                  "mtime_ns": 1787079592306092277,
+                  "size": 3859521128
+                }
+              },
+              {
+                "name": "preprocessor_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/e7d53bd058c34639e2dec1357537a3d013bcda63",
+                "role": "model-or-processor",
+                "sha256": "f724fdad65341e79bd9741888fe4e8ce1bb2e7b44fc8216c28c591afb1e202f4",
+                "size_bytes": 254,
+                "stat": {
+                  "ctime_ns": 1787158435150048006,
+                  "device": 16777235,
+                  "inode": 5984067,
+                  "mtime_ns": 1787079443378807804,
+                  "size": 254
+                }
+              },
+              {
+                "name": "special_tokens_map.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/fdafe480f024ff444c7492147536765ce5d55a2d",
+                "role": "model-or-processor",
+                "sha256": "9046da57c270c8e74d0f38832b4adce269c9d914ef21d2a0925e7772152dd793",
+                "size_bytes": 96,
+                "stat": {
+                  "ctime_ns": 1787158435143879487,
+                  "device": 16777235,
+                  "inode": 5984065,
+                  "mtime_ns": 1787079449792831686,
+                  "size": 96
+                }
+              },
+              {
+                "name": "tokenizer_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/8119434548d4a82fbe4e5e53c95d186bca037257",
+                "role": "model-or-processor",
+                "sha256": "42a65547cf0654d12263ece7c909c4b0c574b660c78658f806c772cc223bc01b",
+                "size_bytes": 397,
+                "stat": {
+                  "ctime_ns": 1787158435143238985,
+                  "device": 16777235,
+                  "inode": 5984064,
+                  "mtime_ns": 1787079445299892278,
+                  "size": 397
+                }
+              },
+              {
+                "name": "vocab.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/5c1626173fb1db1da574d16b6e924e8efc1ade4c",
+                "role": "model-or-processor",
+                "sha256": "0375a07a977a599040a7ff333b6974996965cd93754020619518c15db7691f01",
+                "size_bytes": 1340148,
+                "stat": {
+                  "ctime_ns": 1787158435151871262,
+                  "device": 16777235,
+                  "inode": 5984068,
+                  "mtime_ns": 1787079449054862750,
+                  "size": 1340148
+                }
+              },
+              {
+                "name": "vocabs/mya.txt",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/49191e00b11ea3281db39a6b8022d0b003bae2da",
+                "role": "model-or-processor",
+                "sha256": "d01af8e834039592efc79902675773d7ef622a4ce07cccd46fb2644785cc0734",
+                "size_bytes": 1005,
+                "stat": {
+                  "ctime_ns": 1787235938363752533,
+                  "device": 16777235,
+                  "inode": 5987135,
+                  "mtime_ns": 1787235938362249071,
+                  "size": 1005
+                }
+              }
+            ],
+            "backend": "hf",
+            "content_sha256": "b6bf21929e857519387e3994e47a10f6530f7bbcb9427c87ebc3ca064b573cd6",
+            "execution_sha256": "6d359e472ec895c95c80621b4d36aa76462dc4259978978826688fed6044bcac",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "mms-1b-all",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "mps",
+              "dtype": "float32",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float32",
+              "family": "mms",
+              "lang": "mya",
+              "n_threads": null
+            },
+            "revision_status": "pinned",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 1,
+            "source_kind": "huggingface",
+            "source_locator": "facebook/mms-1b-all",
+            "upstream_revision": "3d33597edbdaaba14a8e858e2c8caa76e3cec0cd",
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "14755840805814218163",
+          "resources": {
+            "cpu": {
+              "idle_pct": 54.9236176620551,
+              "idle_threshold": 0.05,
+              "max": 0.41643143638353614,
+              "mean": 0.13527994590817072,
+              "n": 5,
+              "offsets_ns": [
+                55111334,
+                105090750,
+                155087500,
+                205082709,
+                255092792
+              ],
+              "p50": 0.0017401131076178102,
+              "p95": 0.41643143638353614,
+              "phase": "repeat-0",
+              "samples": [
+                0.2246982514446179,
+                0.41643143638353614,
+                0.0017401131076178102,
+                0.0012401188281049064,
+                0.0013197338629514532
+              ],
+              "scope": "worker-process",
+              "source": "process-cpu-time",
+              "window_ns": 288597084
+            },
+            "cpu_s": 0.0721,
+            "cpu_utilization": 0.25,
+            "ended_ns": 161082452847125,
+            "gpu_mb": 4363.3,
+            "gpu_mem": {
+              "idle_pct": 0.0,
+              "max": 4363.359375,
+              "mean": 4363.359375,
+              "n": 1,
+              "offsets_ns": [
+                282670417
+              ],
+              "p50": 4363.359375,
+              "p95": 4363.359375,
+              "phase": "repeat-0",
+              "samples": [
+                4363.359375
+              ],
+              "scope": "worker-process",
+              "source": "torch-driver-allocation",
+              "window_ns": 288597084
+            },
+            "gpu_util": {
+              "idle_pct": 0.0,
+              "idle_threshold": 1.0,
+              "max": 94.0,
+              "mean": 94.0,
+              "n": 1,
+              "offsets_ns": [
+                282628625
+              ],
+              "p50": 94.0,
+              "p95": 94.0,
+              "phase": "repeat-0",
+              "samples": [
+                94.0
+              ],
+              "scope": "whole-gpu",
+              "source": "ioreg-device-utilization",
+              "window_ns": 288597084
+            },
+            "gpu_util_mean": 94.0,
+            "gpu_util_peak": 94.0,
+            "peak_rss_mb": 481.2,
+            "phase": "repeat-0",
+            "process_peak_rss_mb": 481.2,
+            "profiler_cpu_s": 0.0076,
+            "rss": {
+              "idle_pct": 0.0,
+              "max": 481.25,
+              "mean": 481.2383322588855,
+              "n": 7,
+              "offsets_ns": [
+                9125,
+                55178667,
+                105139209,
+                155116917,
+                205109042,
+                255126250,
+                288596959
+              ],
+              "p50": 481.25,
+              "p95": 481.25,
+              "phase": "repeat-0",
+              "samples": [
+                481.1875,
+                481.21875,
+                481.25,
+                481.25,
+                481.25,
+                481.25,
+                481.25
+              ],
+              "scope": "worker-process",
+              "source": "psutil-rss",
+              "window_ns": 288597084
+            },
+            "rss_peak_mb": 481.2,
+            "sampler_cpu_s": 0.0194,
+            "started_ns": 161082164250041,
+            "wall_s": 0.2886
+          },
+          "rtf": 0.022564814789005714,
+          "segments": null,
+          "source_path": "data/fleurs/audio/14755840805814218163.wav",
+          "source_sha256": "8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28",
+          "text": "လွန်ခဲ့သောနှင့်ထောင်ပေါင်းများစွာကအရီစတာချကခဟုကေါ်သောပြိုးသားတစ်ဦးသည်နေပတ်လည်တွင်ဆိုလာစနစ်သည်ရေရှားလျပ်ရှိသည်ဟုပြောဆိုခဲ့သည်",
+          "trust_issues": [],
+          "trusted": true
+        }
+      ],
+      "trust_issues": []
+    },
+    {
+      "complete": true,
+      "expected_audio_s": 12.78,
+      "index": 1,
+      "phase": {
+        "ended_ns": 161082764685125,
+        "error": null,
+        "name": "repeat-1",
+        "repeat_index": 1,
+        "started_ns": 161082463053458,
+        "status": "ok"
+      },
+      "resources": {
+        "cpu": {
+          "idle_pct": 57.46771044434138,
+          "idle_threshold": 0.05,
+          "max": 0.4136572019408645,
+          "mean": 0.12324590684662762,
+          "n": 5,
+          "offsets_ns": [
+            55076042,
+            105059458,
+            151522250,
+            205086458,
+            251231333
+          ],
+          "p50": 0.0021887587733510953,
+          "p95": 0.4136572019408645,
+          "phase": "repeat-1",
+          "samples": [
+            0.21171692943770865,
+            0.4136572019408645,
+            0.0009685169156243781,
+            0.0013255119909781545,
+            0.0021887587733510953
+          ],
+          "scope": "worker-process",
+          "source": "process-cpu-time",
+          "window_ns": 301631667
+        },
+        "cpu_s": 0.0766,
+        "cpu_utilization": 0.25,
+        "ended_ns": 161082764685125,
+        "gpu_mb": 4363.3,
+        "gpu_mem": {
+          "idle_pct": 0.0,
+          "max": 4363.359375,
+          "mean": 4363.359375,
+          "n": 1,
+          "offsets_ns": [
+            277957167
+          ],
+          "p50": 4363.359375,
+          "p95": 4363.359375,
+          "phase": "repeat-1",
+          "samples": [
+            4363.359375
+          ],
+          "scope": "worker-process",
+          "source": "torch-driver-allocation",
+          "window_ns": 301631667
+        },
+        "gpu_util": {
+          "idle_pct": 0.0,
+          "idle_threshold": 1.0,
+          "max": 93.0,
+          "mean": 93.0,
+          "n": 1,
+          "offsets_ns": [
+            277914333
+          ],
+          "p50": 93.0,
+          "p95": 93.0,
+          "phase": "repeat-1",
+          "samples": [
+            93.0
+          ],
+          "scope": "whole-gpu",
+          "source": "ioreg-device-utilization",
+          "window_ns": 301631667
+        },
+        "gpu_util_mean": 93.0,
+        "gpu_util_peak": 93.0,
+        "peak_rss_mb": 481.3,
+        "phase": "repeat-1",
+        "process_peak_rss_mb": 481.3,
+        "profiler_cpu_s": 0.0074,
+        "rss": {
+          "idle_pct": 0.0,
+          "max": 481.3125,
+          "mean": 481.30134534778057,
+          "n": 7,
+          "offsets_ns": [
+            9583,
+            55124708,
+            105075167,
+            151554417,
+            205127917,
+            251280542,
+            301631542
+          ],
+          "p50": 481.3125,
+          "p95": 481.3125,
+          "phase": "repeat-1",
+          "samples": [
+            481.25,
+            481.28125,
+            481.3125,
+            481.3125,
+            481.3125,
+            481.3125,
+            481.3125
+          ],
+          "scope": "worker-process",
+          "source": "psutil-rss",
+          "window_ns": 301631667
+        },
+        "rss_peak_mb": 481.3,
+        "sampler_cpu_s": 0.0189,
+        "started_ns": 161082463053458,
+        "wall_s": 0.3016
+      },
+      "results": [
+        {
+          "audio_duration_s": 12.78,
+          "audio_id": "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28.wav",
+          "backend": "hf",
+          "elapsed_s": 0.3014319170033559,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_items": 1,
+            "batch_size": 1,
+            "corpus_index": 0,
+            "corpus_size": 1,
+            "corpus_wall_s": 0.301631667,
+            "device": "mps",
+            "dtype": "float32",
+            "elapsed_s_source": "measured",
+            "family": "mms",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "repo": "facebook/mms-1b-all",
+            "requested_batch_size": 1,
+            "resource_scope": "corpus"
+          },
+          "model": "mms-1b-all",
+          "model_provenance": {
+            "adapter_git_commit": "85cc56a24d5357e7a9ee46f8e162b3fe9d9dbf65",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "adapter.mya.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "role": "model-or-processor",
+                "sha256": "c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "size_bytes": 9357088,
+                "stat": {
+                  "ctime_ns": 1787158435149503713,
+                  "device": 16777235,
+                  "inode": 5984066,
+                  "mtime_ns": 1787079596406661677,
+                  "size": 9357088
+                }
+              },
+              {
+                "name": "config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/dd547cc1b61ca6edfefb2f0cf65e3d8f81eceb6a",
+                "role": "model-or-processor",
+                "sha256": "ee172ef39a0e40c55403fb811fa0f56c6198c7ed21a2bdf5bd0e72e52c07a41c",
+                "size_bytes": 2040,
+                "stat": {
+                  "ctime_ns": 1787158435152482514,
+                  "device": 16777235,
+                  "inode": 5984069,
+                  "mtime_ns": 1787079452518242432,
+                  "size": 2040
+                }
+              },
+              {
+                "name": "create_adapters.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b2e99c339dafb630e1b02c44f5c267927979106f",
+                "role": "model-or-processor",
+                "sha256": "b5f11c4e55342e718fa90697f34f82664fbff16a421d8fae206d997045f73921",
+                "size_bytes": 10188,
+                "stat": {
+                  "ctime_ns": 1787235792760670739,
+                  "device": 16777235,
+                  "inode": 5986586,
+                  "mtime_ns": 1787235792759124152,
+                  "size": 10188
+                }
+              },
+              {
+                "name": "create_vocab.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b36fe95573033e2a2742aaeed8d3078946b7a320",
+                "role": "model-or-processor",
+                "sha256": "a6e7e16a54f0b09f46045b9135483776393267d0d8a6b3e86072906e61be46f5",
+                "size_bytes": 878,
+                "stat": {
+                  "ctime_ns": 1787235792684531696,
+                  "device": 16777235,
+                  "inode": 5986580,
+                  "mtime_ns": 1787235792683967611,
+                  "size": 878
+                }
+              },
+              {
+                "name": "model.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "role": "model-or-processor",
+                "sha256": "0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "size_bytes": 3859521128,
+                "stat": {
+                  "ctime_ns": 1787158436530154511,
+                  "device": 16777235,
+                  "inode": 5984070,
+                  "mtime_ns": 1787079592306092277,
+                  "size": 3859521128
+                }
+              },
+              {
+                "name": "preprocessor_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/e7d53bd058c34639e2dec1357537a3d013bcda63",
+                "role": "model-or-processor",
+                "sha256": "f724fdad65341e79bd9741888fe4e8ce1bb2e7b44fc8216c28c591afb1e202f4",
+                "size_bytes": 254,
+                "stat": {
+                  "ctime_ns": 1787158435150048006,
+                  "device": 16777235,
+                  "inode": 5984067,
+                  "mtime_ns": 1787079443378807804,
+                  "size": 254
+                }
+              },
+              {
+                "name": "special_tokens_map.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/fdafe480f024ff444c7492147536765ce5d55a2d",
+                "role": "model-or-processor",
+                "sha256": "9046da57c270c8e74d0f38832b4adce269c9d914ef21d2a0925e7772152dd793",
+                "size_bytes": 96,
+                "stat": {
+                  "ctime_ns": 1787158435143879487,
+                  "device": 16777235,
+                  "inode": 5984065,
+                  "mtime_ns": 1787079449792831686,
+                  "size": 96
+                }
+              },
+              {
+                "name": "tokenizer_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/8119434548d4a82fbe4e5e53c95d186bca037257",
+                "role": "model-or-processor",
+                "sha256": "42a65547cf0654d12263ece7c909c4b0c574b660c78658f806c772cc223bc01b",
+                "size_bytes": 397,
+                "stat": {
+                  "ctime_ns": 1787158435143238985,
+                  "device": 16777235,
+                  "inode": 5984064,
+                  "mtime_ns": 1787079445299892278,
+                  "size": 397
+                }
+              },
+              {
+                "name": "vocab.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/5c1626173fb1db1da574d16b6e924e8efc1ade4c",
+                "role": "model-or-processor",
+                "sha256": "0375a07a977a599040a7ff333b6974996965cd93754020619518c15db7691f01",
+                "size_bytes": 1340148,
+                "stat": {
+                  "ctime_ns": 1787158435151871262,
+                  "device": 16777235,
+                  "inode": 5984068,
+                  "mtime_ns": 1787079449054862750,
+                  "size": 1340148
+                }
+              },
+              {
+                "name": "vocabs/mya.txt",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/49191e00b11ea3281db39a6b8022d0b003bae2da",
+                "role": "model-or-processor",
+                "sha256": "d01af8e834039592efc79902675773d7ef622a4ce07cccd46fb2644785cc0734",
+                "size_bytes": 1005,
+                "stat": {
+                  "ctime_ns": 1787235938363752533,
+                  "device": 16777235,
+                  "inode": 5987135,
+                  "mtime_ns": 1787235938362249071,
+                  "size": 1005
+                }
+              }
+            ],
+            "backend": "hf",
+            "content_sha256": "b6bf21929e857519387e3994e47a10f6530f7bbcb9427c87ebc3ca064b573cd6",
+            "execution_sha256": "6d359e472ec895c95c80621b4d36aa76462dc4259978978826688fed6044bcac",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "mms-1b-all",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "mps",
+              "dtype": "float32",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float32",
+              "family": "mms",
+              "lang": "mya",
+              "n_threads": null
+            },
+            "revision_status": "pinned",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 1,
+            "source_kind": "huggingface",
+            "source_locator": "facebook/mms-1b-all",
+            "upstream_revision": "3d33597edbdaaba14a8e858e2c8caa76e3cec0cd",
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "14755840805814218163",
+          "resources": {
+            "cpu": {
+              "idle_pct": 57.46771044434138,
+              "idle_threshold": 0.05,
+              "max": 0.4136572019408645,
+              "mean": 0.12324590684662762,
+              "n": 5,
+              "offsets_ns": [
+                55076042,
+                105059458,
+                151522250,
+                205086458,
+                251231333
+              ],
+              "p50": 0.0021887587733510953,
+              "p95": 0.4136572019408645,
+              "phase": "repeat-1",
+              "samples": [
+                0.21171692943770865,
+                0.4136572019408645,
+                0.0009685169156243781,
+                0.0013255119909781545,
+                0.0021887587733510953
+              ],
+              "scope": "worker-process",
+              "source": "process-cpu-time",
+              "window_ns": 301631667
+            },
+            "cpu_s": 0.0766,
+            "cpu_utilization": 0.25,
+            "ended_ns": 161082764685125,
+            "gpu_mb": 4363.3,
+            "gpu_mem": {
+              "idle_pct": 0.0,
+              "max": 4363.359375,
+              "mean": 4363.359375,
+              "n": 1,
+              "offsets_ns": [
+                277957167
+              ],
+              "p50": 4363.359375,
+              "p95": 4363.359375,
+              "phase": "repeat-1",
+              "samples": [
+                4363.359375
+              ],
+              "scope": "worker-process",
+              "source": "torch-driver-allocation",
+              "window_ns": 301631667
+            },
+            "gpu_util": {
+              "idle_pct": 0.0,
+              "idle_threshold": 1.0,
+              "max": 93.0,
+              "mean": 93.0,
+              "n": 1,
+              "offsets_ns": [
+                277914333
+              ],
+              "p50": 93.0,
+              "p95": 93.0,
+              "phase": "repeat-1",
+              "samples": [
+                93.0
+              ],
+              "scope": "whole-gpu",
+              "source": "ioreg-device-utilization",
+              "window_ns": 301631667
+            },
+            "gpu_util_mean": 93.0,
+            "gpu_util_peak": 93.0,
+            "peak_rss_mb": 481.3,
+            "phase": "repeat-1",
+            "process_peak_rss_mb": 481.3,
+            "profiler_cpu_s": 0.0074,
+            "rss": {
+              "idle_pct": 0.0,
+              "max": 481.3125,
+              "mean": 481.30134534778057,
+              "n": 7,
+              "offsets_ns": [
+                9583,
+                55124708,
+                105075167,
+                151554417,
+                205127917,
+                251280542,
+                301631542
+              ],
+              "p50": 481.3125,
+              "p95": 481.3125,
+              "phase": "repeat-1",
+              "samples": [
+                481.25,
+                481.28125,
+                481.3125,
+                481.3125,
+                481.3125,
+                481.3125,
+                481.3125
+              ],
+              "scope": "worker-process",
+              "source": "psutil-rss",
+              "window_ns": 301631667
+            },
+            "rss_peak_mb": 481.3,
+            "sampler_cpu_s": 0.0189,
+            "started_ns": 161082463053458,
+            "wall_s": 0.3016
+          },
+          "rtf": 0.02358622198774303,
+          "segments": null,
+          "source_path": "data/fleurs/audio/14755840805814218163.wav",
+          "source_sha256": "8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28",
+          "text": "လွန်ခဲ့သောနှင့်ထောင်ပေါင်းများစွာကအရီစတာချကခဟုကေါ်သောပြိုးသားတစ်ဦးသည်နေပတ်လည်တွင်ဆိုလာစနစ်သည်ရေရှားလျပ်ရှိသည်ဟုပြောဆိုခဲ့သည်",
+          "trust_issues": [],
+          "trusted": true
+        }
+      ],
+      "trust_issues": []
+    },
+    {
+      "complete": true,
+      "expected_audio_s": 12.78,
+      "index": 2,
+      "phase": {
+        "ended_ns": 161083063634166,
+        "error": null,
+        "name": "repeat-2",
+        "repeat_index": 2,
+        "started_ns": 161082775512416,
+        "status": "ok"
+      },
+      "resources": {
+        "cpu": {
+          "idle_pct": 54.855202878644185,
+          "idle_threshold": 0.05,
+          "max": 0.4207328454710374,
+          "mean": 0.1372830827403135,
+          "n": 5,
+          "offsets_ns": [
+            55096750,
+            105076209,
+            155067750,
+            205071500,
+            255074584
+          ],
+          "p50": 0.0013202233556809367,
+          "p95": 0.4207328454710374,
+          "phase": "repeat-2",
+          "samples": [
+            0.2289924533404603,
+            0.4207328454710374,
+            0.0013202233556809367,
+            0.0009999250052840421,
+            0.0011799272226661701
+          ],
+          "scope": "worker-process",
+          "source": "process-cpu-time",
+          "window_ns": 288121750
+        },
+        "cpu_s": 0.0721,
+        "cpu_utilization": 0.25,
+        "ended_ns": 161083063634166,
+        "gpu_mb": 4363.3,
+        "gpu_mem": {
+          "idle_pct": 0.0,
+          "max": 4363.359375,
+          "mean": 4363.359375,
+          "n": 1,
+          "offsets_ns": [
+            281249209
+          ],
+          "p50": 4363.359375,
+          "p95": 4363.359375,
+          "phase": "repeat-2",
+          "samples": [
+            4363.359375
+          ],
+          "scope": "worker-process",
+          "source": "torch-driver-allocation",
+          "window_ns": 288121750
+        },
+        "gpu_util": {
+          "idle_pct": 0.0,
+          "idle_threshold": 1.0,
+          "max": 94.0,
+          "mean": 94.0,
+          "n": 1,
+          "offsets_ns": [
+            281212334
+          ],
+          "p50": 94.0,
+          "p95": 94.0,
+          "phase": "repeat-2",
+          "samples": [
+            94.0
+          ],
+          "scope": "whole-gpu",
+          "source": "ioreg-device-utilization",
+          "window_ns": 288121750
+        },
+        "gpu_util_mean": 94.0,
+        "gpu_util_peak": 94.0,
+        "peak_rss_mb": 481.3,
+        "phase": "repeat-2",
+        "process_peak_rss_mb": 481.3,
+        "profiler_cpu_s": 0.0068,
+        "rss": {
+          "idle_pct": 0.0,
+          "max": 481.3125,
+          "mean": 481.3125,
+          "n": 7,
+          "offsets_ns": [
+            9542,
+            55149209,
+            105117000,
+            155087834,
+            205098250,
+            255099209,
+            288121625
+          ],
+          "p50": 481.3125,
+          "p95": 481.3125,
+          "phase": "repeat-2",
+          "samples": [
+            481.3125,
+            481.3125,
+            481.3125,
+            481.3125,
+            481.3125,
+            481.3125,
+            481.3125
+          ],
+          "scope": "worker-process",
+          "source": "psutil-rss",
+          "window_ns": 288121750
+        },
+        "rss_peak_mb": 481.3,
+        "sampler_cpu_s": 0.0188,
+        "started_ns": 161082775512416,
+        "wall_s": 0.2881
+      },
+      "results": [
+        {
+          "audio_duration_s": 12.78,
+          "audio_id": "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28.wav",
+          "backend": "hf",
+          "elapsed_s": 0.28793541601044126,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_items": 1,
+            "batch_size": 1,
+            "corpus_index": 0,
+            "corpus_size": 1,
+            "corpus_wall_s": 0.28812175,
+            "device": "mps",
+            "dtype": "float32",
+            "elapsed_s_source": "measured",
+            "family": "mms",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "repo": "facebook/mms-1b-all",
+            "requested_batch_size": 1,
+            "resource_scope": "corpus"
+          },
+          "model": "mms-1b-all",
+          "model_provenance": {
+            "adapter_git_commit": "85cc56a24d5357e7a9ee46f8e162b3fe9d9dbf65",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "adapter.mya.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "role": "model-or-processor",
+                "sha256": "c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "size_bytes": 9357088,
+                "stat": {
+                  "ctime_ns": 1787158435149503713,
+                  "device": 16777235,
+                  "inode": 5984066,
+                  "mtime_ns": 1787079596406661677,
+                  "size": 9357088
+                }
+              },
+              {
+                "name": "config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/dd547cc1b61ca6edfefb2f0cf65e3d8f81eceb6a",
+                "role": "model-or-processor",
+                "sha256": "ee172ef39a0e40c55403fb811fa0f56c6198c7ed21a2bdf5bd0e72e52c07a41c",
+                "size_bytes": 2040,
+                "stat": {
+                  "ctime_ns": 1787158435152482514,
+                  "device": 16777235,
+                  "inode": 5984069,
+                  "mtime_ns": 1787079452518242432,
+                  "size": 2040
+                }
+              },
+              {
+                "name": "create_adapters.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b2e99c339dafb630e1b02c44f5c267927979106f",
+                "role": "model-or-processor",
+                "sha256": "b5f11c4e55342e718fa90697f34f82664fbff16a421d8fae206d997045f73921",
+                "size_bytes": 10188,
+                "stat": {
+                  "ctime_ns": 1787235792760670739,
+                  "device": 16777235,
+                  "inode": 5986586,
+                  "mtime_ns": 1787235792759124152,
+                  "size": 10188
+                }
+              },
+              {
+                "name": "create_vocab.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b36fe95573033e2a2742aaeed8d3078946b7a320",
+                "role": "model-or-processor",
+                "sha256": "a6e7e16a54f0b09f46045b9135483776393267d0d8a6b3e86072906e61be46f5",
+                "size_bytes": 878,
+                "stat": {
+                  "ctime_ns": 1787235792684531696,
+                  "device": 16777235,
+                  "inode": 5986580,
+                  "mtime_ns": 1787235792683967611,
+                  "size": 878
+                }
+              },
+              {
+                "name": "model.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "role": "model-or-processor",
+                "sha256": "0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "size_bytes": 3859521128,
+                "stat": {
+                  "ctime_ns": 1787158436530154511,
+                  "device": 16777235,
+                  "inode": 5984070,
+                  "mtime_ns": 1787079592306092277,
+                  "size": 3859521128
+                }
+              },
+              {
+                "name": "preprocessor_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/e7d53bd058c34639e2dec1357537a3d013bcda63",
+                "role": "model-or-processor",
+                "sha256": "f724fdad65341e79bd9741888fe4e8ce1bb2e7b44fc8216c28c591afb1e202f4",
+                "size_bytes": 254,
+                "stat": {
+                  "ctime_ns": 1787158435150048006,
+                  "device": 16777235,
+                  "inode": 5984067,
+                  "mtime_ns": 1787079443378807804,
+                  "size": 254
+                }
+              },
+              {
+                "name": "special_tokens_map.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/fdafe480f024ff444c7492147536765ce5d55a2d",
+                "role": "model-or-processor",
+                "sha256": "9046da57c270c8e74d0f38832b4adce269c9d914ef21d2a0925e7772152dd793",
+                "size_bytes": 96,
+                "stat": {
+                  "ctime_ns": 1787158435143879487,
+                  "device": 16777235,
+                  "inode": 5984065,
+                  "mtime_ns": 1787079449792831686,
+                  "size": 96
+                }
+              },
+              {
+                "name": "tokenizer_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/8119434548d4a82fbe4e5e53c95d186bca037257",
+                "role": "model-or-processor",
+                "sha256": "42a65547cf0654d12263ece7c909c4b0c574b660c78658f806c772cc223bc01b",
+                "size_bytes": 397,
+                "stat": {
+                  "ctime_ns": 1787158435143238985,
+                  "device": 16777235,
+                  "inode": 5984064,
+                  "mtime_ns": 1787079445299892278,
+                  "size": 397
+                }
+              },
+              {
+                "name": "vocab.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/5c1626173fb1db1da574d16b6e924e8efc1ade4c",
+                "role": "model-or-processor",
+                "sha256": "0375a07a977a599040a7ff333b6974996965cd93754020619518c15db7691f01",
+                "size_bytes": 1340148,
+                "stat": {
+                  "ctime_ns": 1787158435151871262,
+                  "device": 16777235,
+                  "inode": 5984068,
+                  "mtime_ns": 1787079449054862750,
+                  "size": 1340148
+                }
+              },
+              {
+                "name": "vocabs/mya.txt",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/49191e00b11ea3281db39a6b8022d0b003bae2da",
+                "role": "model-or-processor",
+                "sha256": "d01af8e834039592efc79902675773d7ef622a4ce07cccd46fb2644785cc0734",
+                "size_bytes": 1005,
+                "stat": {
+                  "ctime_ns": 1787235938363752533,
+                  "device": 16777235,
+                  "inode": 5987135,
+                  "mtime_ns": 1787235938362249071,
+                  "size": 1005
+                }
+              }
+            ],
+            "backend": "hf",
+            "content_sha256": "b6bf21929e857519387e3994e47a10f6530f7bbcb9427c87ebc3ca064b573cd6",
+            "execution_sha256": "6d359e472ec895c95c80621b4d36aa76462dc4259978978826688fed6044bcac",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "mms-1b-all",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "mps",
+              "dtype": "float32",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float32",
+              "family": "mms",
+              "lang": "mya",
+              "n_threads": null
+            },
+            "revision_status": "pinned",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 1,
+            "source_kind": "huggingface",
+            "source_locator": "facebook/mms-1b-all",
+            "upstream_revision": "3d33597edbdaaba14a8e858e2c8caa76e3cec0cd",
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "14755840805814218163",
+          "resources": {
+            "cpu": {
+              "idle_pct": 54.855202878644185,
+              "idle_threshold": 0.05,
+              "max": 0.4207328454710374,
+              "mean": 0.1372830827403135,
+              "n": 5,
+              "offsets_ns": [
+                55096750,
+                105076209,
+                155067750,
+                205071500,
+                255074584
+              ],
+              "p50": 0.0013202233556809367,
+              "p95": 0.4207328454710374,
+              "phase": "repeat-2",
+              "samples": [
+                0.2289924533404603,
+                0.4207328454710374,
+                0.0013202233556809367,
+                0.0009999250052840421,
+                0.0011799272226661701
+              ],
+              "scope": "worker-process",
+              "source": "process-cpu-time",
+              "window_ns": 288121750
+            },
+            "cpu_s": 0.0721,
+            "cpu_utilization": 0.25,
+            "ended_ns": 161083063634166,
+            "gpu_mb": 4363.3,
+            "gpu_mem": {
+              "idle_pct": 0.0,
+              "max": 4363.359375,
+              "mean": 4363.359375,
+              "n": 1,
+              "offsets_ns": [
+                281249209
+              ],
+              "p50": 4363.359375,
+              "p95": 4363.359375,
+              "phase": "repeat-2",
+              "samples": [
+                4363.359375
+              ],
+              "scope": "worker-process",
+              "source": "torch-driver-allocation",
+              "window_ns": 288121750
+            },
+            "gpu_util": {
+              "idle_pct": 0.0,
+              "idle_threshold": 1.0,
+              "max": 94.0,
+              "mean": 94.0,
+              "n": 1,
+              "offsets_ns": [
+                281212334
+              ],
+              "p50": 94.0,
+              "p95": 94.0,
+              "phase": "repeat-2",
+              "samples": [
+                94.0
+              ],
+              "scope": "whole-gpu",
+              "source": "ioreg-device-utilization",
+              "window_ns": 288121750
+            },
+            "gpu_util_mean": 94.0,
+            "gpu_util_peak": 94.0,
+            "peak_rss_mb": 481.3,
+            "phase": "repeat-2",
+            "process_peak_rss_mb": 481.3,
+            "profiler_cpu_s": 0.0068,
+            "rss": {
+              "idle_pct": 0.0,
+              "max": 481.3125,
+              "mean": 481.3125,
+              "n": 7,
+              "offsets_ns": [
+                9542,
+                55149209,
+                105117000,
+                155087834,
+                205098250,
+                255099209,
+                288121625
+              ],
+              "p50": 481.3125,
+              "p95": 481.3125,
+              "phase": "repeat-2",
+              "samples": [
+                481.3125,
+                481.3125,
+                481.3125,
+                481.3125,
+                481.3125,
+                481.3125,
+                481.3125
+              ],
+              "scope": "worker-process",
+              "source": "psutil-rss",
+              "window_ns": 288121750
+            },
+            "rss_peak_mb": 481.3,
+            "sampler_cpu_s": 0.0188,
+            "started_ns": 161082775512416,
+            "wall_s": 0.2881
+          },
+          "rtf": 0.022530157747295873,
+          "segments": null,
+          "source_path": "data/fleurs/audio/14755840805814218163.wav",
+          "source_sha256": "8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28",
+          "text": "လွန်ခဲ့သောနှင့်ထောင်ပေါင်းများစွာကအရီစတာချကခဟုကေါ်သောပြိုးသားတစ်ဦးသည်နေပတ်လည်တွင်ဆိုလာစနစ်သည်ရေရှားလျပ်ရှိသည်ဟုပြောဆိုခဲ့သည်",
+          "trust_issues": [],
+          "trusted": true
+        }
+      ],
+      "trust_issues": []
+    }
+  ],
+  "request_key": "hf/mms-1b-all:6bd4d1faa9ac1420",
+  "request_sha256": "87d7c71d1d632445e049412e00e01695cfa7199a03a06dd410107a1aee526870",
+  "resolved_device": "mps",
+  "resolved_dtype": "float32",
+  "resolved_model": "mms-1b-all",
+  "run_id": "observer-calibration-v3",
+  "runtime": {
+    "device": "mps",
+    "dtype": "float32",
+    "model": "mms-1b-all",
+    "n_threads": null,
+    "revision": null
+  },
+  "schedule_seed": 20260823,
+  "session_id": "observer-calibration-v3:session-1",
+  "session_index": 1,
+  "subject": {
+    "backend": "hf",
+    "batch_size": 1,
+    "language": "mya_Mymr",
+    "model": "mms-1b-all",
+    "options": {
+      "batch_size": 1,
+      "device": "mps",
+      "dtype": "float32",
+      "language": "mya_Mymr"
+    }
+  },
+  "termination": null,
+  "worker_index": 1
+}

@@ -1,0 +1,758 @@
+{
+  "complete": true,
+  "condition_id": "slow-off",
+  "environment": {
+    "git_commit": "85cc56a24d5357e7a9ee46f8e162b3fe9d9dbf65",
+    "git_dirty": false,
+    "machine": "arm64",
+    "packages": {
+      "accelerate": "1.14.0",
+      "crispasr": "0.8.29",
+      "dataoceanai-dolphin": "20260513",
+      "fairseq2": "0.6",
+      "funasr": "1.4.2",
+      "huggingface-hub": "0.36.2",
+      "modelscope": "1.39.1",
+      "omnilingual-asr": "0.2.0",
+      "psutil": "5.9.8",
+      "sentencepiece": "0.2.2",
+      "soundfile": "0.14.0",
+      "tokenizers": "0.22.2",
+      "torch": "2.8.0",
+      "torchaudio": "2.8.0",
+      "transformers": "4.57.6"
+    },
+    "pid": 73446,
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "power": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=24641635)\t80%; AC attached; not charging present: true",
+    "python": "3.12.13",
+    "python_executable": ".venv/bin/python3",
+    "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+    "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+  },
+  "error": null,
+  "experiment_id": "observer-calibration-v3",
+  "host": {
+    "chip": "Apple M2 Max",
+    "compute_threads": 8,
+    "cores": {
+      "Efficiency": 4,
+      "Performance": 8
+    },
+    "cpu_count": 12,
+    "machine": "arm64",
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "ram_mb": 65536
+  },
+  "journal_recovered": false,
+  "launch_position": 1,
+  "load_resources": {
+    "cpu_s": 37.1656,
+    "cpu_utilization": 1.38,
+    "ended_ns": 162157262160208,
+    "gpu_mb": 0.4,
+    "peak_rss_mb": 24104.5,
+    "phase": "load",
+    "process_peak_rss_mb": 24104.5,
+    "rss_peak_mb": 7391.9,
+    "started_ns": 162130349625583,
+    "wall_s": 26.9125
+  },
+  "model_provenance": {
+    "adapter_git_commit": "85cc56a24d5357e7a9ee46f8e162b3fe9d9dbf65",
+    "adapter_git_dirty": false,
+    "artifacts": [
+      {
+        "name": "omniASR-LLM-Unlimited-7B-v2.pt",
+        "path": ".cache/fairseq2/assets/be8b45a4444380016fa2f991/omniASR-LLM-Unlimited-7B-v2.pt",
+        "role": "weights",
+        "sha256": "600199f8be430aed4e43b6b1c7cf70fd83d471fac574c61c95b6bce90c47b68e",
+        "size_bytes": 31220520831,
+        "stat": {
+          "ctime_ns": 1787159223984645852,
+          "device": 16777235,
+          "inode": 5984141,
+          "mtime_ns": 1787087265633906879,
+          "size": 31220520831
+        }
+      },
+      {
+        "name": "omniASR_tokenizer_written_v2.model",
+        "path": ".cache/fairseq2/assets/e7be1a6acb8f76fdbca19dce/omniASR_tokenizer_written_v2.model",
+        "role": "tokenizer",
+        "sha256": "8aa11a1092142ef472537476ef6e76541123e2f0d789b79f3ebd119008240b1e",
+        "size_bytes": 91481,
+        "stat": {
+          "ctime_ns": 1787159200848561084,
+          "device": 16777235,
+          "inode": 5984130,
+          "mtime_ns": 1787060037638994009,
+          "size": 91481
+        }
+      },
+      {
+        "name": "omniASR_LLM_Unlimited_7B_v2.card.json",
+        "path": null,
+        "role": "card-metadata",
+        "sha256": "7c355b28c11a521c875d344a31d00dda3f152c3bf42b57a8cee0afde491b3e53",
+        "size_bytes": 349,
+        "stat": {}
+      }
+    ],
+    "backend": "omniasr-torch",
+    "content_sha256": "bed4307b49fe3162ff3f980d744831c81a262bffd3b1f2df79c3c6e3c53ee154",
+    "execution_sha256": "fcdfa693cd19a281e02ac3a57405fd158205f30c47d201c99a7894ed45239a10",
+    "fallback_history": [],
+    "issues": [],
+    "requested_model": "omniASR_LLM_Unlimited_7B_v2",
+    "requested_settings": {
+      "batch_size": 1,
+      "device": "cpu",
+      "dtype": "float32",
+      "language": "mya_Mymr"
+    },
+    "resolved_settings": {
+      "chunk_seconds": null,
+      "device": "cpu",
+      "dtype": "float32",
+      "n_threads": null
+    },
+    "revision_status": "unavailable-content-addressed",
+    "runtime_packages": {
+      "accelerate": "1.14.0",
+      "crispasr": "0.8.29",
+      "dataoceanai-dolphin": "20260513",
+      "fairseq2": "0.6",
+      "funasr": "1.4.2",
+      "huggingface-hub": "0.36.2",
+      "modelscope": "1.39.1",
+      "omnilingual-asr": "0.2.0",
+      "psutil": "5.9.8",
+      "sentencepiece": "0.2.2",
+      "soundfile": "0.14.0",
+      "tokenizers": "0.22.2",
+      "torch": "2.8.0",
+      "torchaudio": "2.8.0",
+      "transformers": "4.57.6"
+    },
+    "schema_version": 1,
+    "source_kind": "fairseq2-card",
+    "source_locator": "omniASR_LLM_Unlimited_7B_v2",
+    "upstream_revision": null,
+    "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+  },
+  "phases": [
+    {
+      "ended_ns": 162130348983833,
+      "error": null,
+      "name": "process-start",
+      "repeat_index": null,
+      "started_ns": 162127719820750,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 162157262160208,
+      "error": null,
+      "name": "load",
+      "repeat_index": null,
+      "started_ns": 162130349625583,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 162157274493125,
+      "error": null,
+      "name": "load-validation",
+      "repeat_index": null,
+      "started_ns": 162157272736291,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 162204302342541,
+      "error": null,
+      "name": "warmup-0",
+      "repeat_index": null,
+      "started_ns": 162157276086750,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 162226793402875,
+      "error": null,
+      "name": "warmup-1",
+      "repeat_index": null,
+      "started_ns": 162204306037916,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 162249284418916,
+      "error": null,
+      "name": "warmup-2",
+      "repeat_index": null,
+      "started_ns": 162226797051208,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 162272919832666,
+      "error": null,
+      "name": "repeat-0",
+      "repeat_index": 0,
+      "started_ns": 162249288171208,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 162296376827083,
+      "error": null,
+      "name": "repeat-1",
+      "repeat_index": 1,
+      "started_ns": 162272924360375,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 162319657621750,
+      "error": null,
+      "name": "repeat-2",
+      "repeat_index": 2,
+      "started_ns": 162296382031958,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 162319975397041,
+      "error": null,
+      "name": "unload",
+      "repeat_index": null,
+      "started_ns": 162319662371458,
+      "status": "ok"
+    }
+  ],
+  "protocol_version": 3,
+  "provenance_issues": [],
+  "repeats": [
+    {
+      "complete": true,
+      "expected_audio_s": 12.78,
+      "index": 0,
+      "phase": {
+        "ended_ns": 162272919832666,
+        "error": null,
+        "name": "repeat-0",
+        "repeat_index": 0,
+        "started_ns": 162249288171208,
+        "status": "ok"
+      },
+      "resources": {
+        "cpu_s": 43.5182,
+        "cpu_utilization": 1.84,
+        "ended_ns": 162272919832666,
+        "gpu_mb": 0.4,
+        "peak_rss_mb": 31806.5,
+        "phase": "repeat-0",
+        "process_peak_rss_mb": 31806.5,
+        "rss_peak_mb": 31712.8,
+        "started_ns": 162249288171208,
+        "wall_s": 23.6317
+      },
+      "results": [
+        {
+          "audio_duration_s": 12.78,
+          "audio_id": "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28.wav",
+          "backend": "omniasr-torch",
+          "elapsed_s": 23.631520541995997,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_elapsed_s": 23.631520541995997,
+            "batch_items": 1,
+            "batch_size": 1,
+            "corpus_index": 0,
+            "corpus_size": 1,
+            "corpus_wall_s": 23.631661458,
+            "device": "cpu",
+            "dtype": "float32",
+            "elapsed_s_source": "batch_proportional",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "requested_batch_size": 1,
+            "resource_scope": "corpus"
+          },
+          "model": "omniASR_LLM_Unlimited_7B_v2",
+          "model_provenance": {
+            "adapter_git_commit": "85cc56a24d5357e7a9ee46f8e162b3fe9d9dbf65",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "omniASR-LLM-Unlimited-7B-v2.pt",
+                "path": ".cache/fairseq2/assets/be8b45a4444380016fa2f991/omniASR-LLM-Unlimited-7B-v2.pt",
+                "role": "weights",
+                "sha256": "600199f8be430aed4e43b6b1c7cf70fd83d471fac574c61c95b6bce90c47b68e",
+                "size_bytes": 31220520831,
+                "stat": {
+                  "ctime_ns": 1787159223984645852,
+                  "device": 16777235,
+                  "inode": 5984141,
+                  "mtime_ns": 1787087265633906879,
+                  "size": 31220520831
+                }
+              },
+              {
+                "name": "omniASR_tokenizer_written_v2.model",
+                "path": ".cache/fairseq2/assets/e7be1a6acb8f76fdbca19dce/omniASR_tokenizer_written_v2.model",
+                "role": "tokenizer",
+                "sha256": "8aa11a1092142ef472537476ef6e76541123e2f0d789b79f3ebd119008240b1e",
+                "size_bytes": 91481,
+                "stat": {
+                  "ctime_ns": 1787159200848561084,
+                  "device": 16777235,
+                  "inode": 5984130,
+                  "mtime_ns": 1787060037638994009,
+                  "size": 91481
+                }
+              },
+              {
+                "name": "omniASR_LLM_Unlimited_7B_v2.card.json",
+                "path": null,
+                "role": "card-metadata",
+                "sha256": "7c355b28c11a521c875d344a31d00dda3f152c3bf42b57a8cee0afde491b3e53",
+                "size_bytes": 349,
+                "stat": {}
+              }
+            ],
+            "backend": "omniasr-torch",
+            "content_sha256": "bed4307b49fe3162ff3f980d744831c81a262bffd3b1f2df79c3c6e3c53ee154",
+            "execution_sha256": "fcdfa693cd19a281e02ac3a57405fd158205f30c47d201c99a7894ed45239a10",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "omniASR_LLM_Unlimited_7B_v2",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "cpu",
+              "dtype": "float32",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "cpu",
+              "dtype": "float32",
+              "n_threads": null
+            },
+            "revision_status": "unavailable-content-addressed",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 1,
+            "source_kind": "fairseq2-card",
+            "source_locator": "omniASR_LLM_Unlimited_7B_v2",
+            "upstream_revision": null,
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "14755840805814218163",
+          "resources": {
+            "cpu_s": 43.5182,
+            "cpu_utilization": 1.84,
+            "ended_ns": 162272919832666,
+            "gpu_mb": 0.4,
+            "peak_rss_mb": 31806.5,
+            "phase": "repeat-0",
+            "process_peak_rss_mb": 31806.5,
+            "rss_peak_mb": 31712.8,
+            "started_ns": 162249288171208,
+            "wall_s": 23.6317
+          },
+          "rtf": 1.849101763849452,
+          "segments": null,
+          "source_path": "data/fleurs/audio/14755840805814218163.wav",
+          "source_sha256": "8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28",
+          "text": "လွန်ခဲ့သောနှစ် ထောင်ပေါင်းများစွာက အရီစတာချက်ဇ် ဟုခေါ်သော အမျိုးသားတစ်ဦးသည် နေပတ်လည်တွင် ဆိုလာစနစ်သည် ရွေ့လျားလျက်ရှိသည်ဟု ပြောဆိုခဲ့သည်",
+          "trust_issues": [],
+          "trusted": true
+        }
+      ],
+      "trust_issues": []
+    },
+    {
+      "complete": true,
+      "expected_audio_s": 12.78,
+      "index": 1,
+      "phase": {
+        "ended_ns": 162296376827083,
+        "error": null,
+        "name": "repeat-1",
+        "repeat_index": 1,
+        "started_ns": 162272924360375,
+        "status": "ok"
+      },
+      "resources": {
+        "cpu_s": 43.5476,
+        "cpu_utilization": 1.86,
+        "ended_ns": 162296376827083,
+        "gpu_mb": 0.4,
+        "peak_rss_mb": 31806.5,
+        "phase": "repeat-1",
+        "process_peak_rss_mb": 31806.5,
+        "rss_peak_mb": 31713.1,
+        "started_ns": 162272924360375,
+        "wall_s": 23.4525
+      },
+      "results": [
+        {
+          "audio_duration_s": 12.78,
+          "audio_id": "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28.wav",
+          "backend": "omniasr-torch",
+          "elapsed_s": 23.452267334010685,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_elapsed_s": 23.452267334010685,
+            "batch_items": 1,
+            "batch_size": 1,
+            "corpus_index": 0,
+            "corpus_size": 1,
+            "corpus_wall_s": 23.452466708,
+            "device": "cpu",
+            "dtype": "float32",
+            "elapsed_s_source": "batch_proportional",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "requested_batch_size": 1,
+            "resource_scope": "corpus"
+          },
+          "model": "omniASR_LLM_Unlimited_7B_v2",
+          "model_provenance": {
+            "adapter_git_commit": "85cc56a24d5357e7a9ee46f8e162b3fe9d9dbf65",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "omniASR-LLM-Unlimited-7B-v2.pt",
+                "path": ".cache/fairseq2/assets/be8b45a4444380016fa2f991/omniASR-LLM-Unlimited-7B-v2.pt",
+                "role": "weights",
+                "sha256": "600199f8be430aed4e43b6b1c7cf70fd83d471fac574c61c95b6bce90c47b68e",
+                "size_bytes": 31220520831,
+                "stat": {
+                  "ctime_ns": 1787159223984645852,
+                  "device": 16777235,
+                  "inode": 5984141,
+                  "mtime_ns": 1787087265633906879,
+                  "size": 31220520831
+                }
+              },
+              {
+                "name": "omniASR_tokenizer_written_v2.model",
+                "path": ".cache/fairseq2/assets/e7be1a6acb8f76fdbca19dce/omniASR_tokenizer_written_v2.model",
+                "role": "tokenizer",
+                "sha256": "8aa11a1092142ef472537476ef6e76541123e2f0d789b79f3ebd119008240b1e",
+                "size_bytes": 91481,
+                "stat": {
+                  "ctime_ns": 1787159200848561084,
+                  "device": 16777235,
+                  "inode": 5984130,
+                  "mtime_ns": 1787060037638994009,
+                  "size": 91481
+                }
+              },
+              {
+                "name": "omniASR_LLM_Unlimited_7B_v2.card.json",
+                "path": null,
+                "role": "card-metadata",
+                "sha256": "7c355b28c11a521c875d344a31d00dda3f152c3bf42b57a8cee0afde491b3e53",
+                "size_bytes": 349,
+                "stat": {}
+              }
+            ],
+            "backend": "omniasr-torch",
+            "content_sha256": "bed4307b49fe3162ff3f980d744831c81a262bffd3b1f2df79c3c6e3c53ee154",
+            "execution_sha256": "fcdfa693cd19a281e02ac3a57405fd158205f30c47d201c99a7894ed45239a10",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "omniASR_LLM_Unlimited_7B_v2",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "cpu",
+              "dtype": "float32",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "cpu",
+              "dtype": "float32",
+              "n_threads": null
+            },
+            "revision_status": "unavailable-content-addressed",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 1,
+            "source_kind": "fairseq2-card",
+            "source_locator": "omniASR_LLM_Unlimited_7B_v2",
+            "upstream_revision": null,
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "14755840805814218163",
+          "resources": {
+            "cpu_s": 43.5476,
+            "cpu_utilization": 1.86,
+            "ended_ns": 162296376827083,
+            "gpu_mb": 0.4,
+            "peak_rss_mb": 31806.5,
+            "phase": "repeat-1",
+            "process_peak_rss_mb": 31806.5,
+            "rss_peak_mb": 31713.1,
+            "started_ns": 162272924360375,
+            "wall_s": 23.4525
+          },
+          "rtf": 1.8350756912371429,
+          "segments": null,
+          "source_path": "data/fleurs/audio/14755840805814218163.wav",
+          "source_sha256": "8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28",
+          "text": "လွန်ခဲ့သောနှစ် ထောင်ပေါင်းများစွာက အရီစတာချက်ဇ် ဟုခေါ်သော အမျိုးသားတစ်ဦးသည် နေပတ်လည်တွင် ဆိုလာစနစ်သည် ရွေ့လျားလျက်ရှိသည်ဟု ပြောဆိုခဲ့သည်",
+          "trust_issues": [],
+          "trusted": true
+        }
+      ],
+      "trust_issues": []
+    },
+    {
+      "complete": true,
+      "expected_audio_s": 12.78,
+      "index": 2,
+      "phase": {
+        "ended_ns": 162319657621750,
+        "error": null,
+        "name": "repeat-2",
+        "repeat_index": 2,
+        "started_ns": 162296382031958,
+        "status": "ok"
+      },
+      "resources": {
+        "cpu_s": 43.3567,
+        "cpu_utilization": 1.86,
+        "ended_ns": 162319657621750,
+        "gpu_mb": 0.4,
+        "peak_rss_mb": 31806.5,
+        "phase": "repeat-2",
+        "process_peak_rss_mb": 31806.5,
+        "rss_peak_mb": 31713.1,
+        "started_ns": 162296382031958,
+        "wall_s": 23.2756
+      },
+      "results": [
+        {
+          "audio_duration_s": 12.78,
+          "audio_id": "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28.wav",
+          "backend": "omniasr-torch",
+          "elapsed_s": 23.27538470897707,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_elapsed_s": 23.27538470897707,
+            "batch_items": 1,
+            "batch_size": 1,
+            "corpus_index": 0,
+            "corpus_size": 1,
+            "corpus_wall_s": 23.275589792,
+            "device": "cpu",
+            "dtype": "float32",
+            "elapsed_s_source": "batch_proportional",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "requested_batch_size": 1,
+            "resource_scope": "corpus"
+          },
+          "model": "omniASR_LLM_Unlimited_7B_v2",
+          "model_provenance": {
+            "adapter_git_commit": "85cc56a24d5357e7a9ee46f8e162b3fe9d9dbf65",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "omniASR-LLM-Unlimited-7B-v2.pt",
+                "path": ".cache/fairseq2/assets/be8b45a4444380016fa2f991/omniASR-LLM-Unlimited-7B-v2.pt",
+                "role": "weights",
+                "sha256": "600199f8be430aed4e43b6b1c7cf70fd83d471fac574c61c95b6bce90c47b68e",
+                "size_bytes": 31220520831,
+                "stat": {
+                  "ctime_ns": 1787159223984645852,
+                  "device": 16777235,
+                  "inode": 5984141,
+                  "mtime_ns": 1787087265633906879,
+                  "size": 31220520831
+                }
+              },
+              {
+                "name": "omniASR_tokenizer_written_v2.model",
+                "path": ".cache/fairseq2/assets/e7be1a6acb8f76fdbca19dce/omniASR_tokenizer_written_v2.model",
+                "role": "tokenizer",
+                "sha256": "8aa11a1092142ef472537476ef6e76541123e2f0d789b79f3ebd119008240b1e",
+                "size_bytes": 91481,
+                "stat": {
+                  "ctime_ns": 1787159200848561084,
+                  "device": 16777235,
+                  "inode": 5984130,
+                  "mtime_ns": 1787060037638994009,
+                  "size": 91481
+                }
+              },
+              {
+                "name": "omniASR_LLM_Unlimited_7B_v2.card.json",
+                "path": null,
+                "role": "card-metadata",
+                "sha256": "7c355b28c11a521c875d344a31d00dda3f152c3bf42b57a8cee0afde491b3e53",
+                "size_bytes": 349,
+                "stat": {}
+              }
+            ],
+            "backend": "omniasr-torch",
+            "content_sha256": "bed4307b49fe3162ff3f980d744831c81a262bffd3b1f2df79c3c6e3c53ee154",
+            "execution_sha256": "fcdfa693cd19a281e02ac3a57405fd158205f30c47d201c99a7894ed45239a10",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "omniASR_LLM_Unlimited_7B_v2",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "cpu",
+              "dtype": "float32",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "cpu",
+              "dtype": "float32",
+              "n_threads": null
+            },
+            "revision_status": "unavailable-content-addressed",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 1,
+            "source_kind": "fairseq2-card",
+            "source_locator": "omniASR_LLM_Unlimited_7B_v2",
+            "upstream_revision": null,
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "14755840805814218163",
+          "resources": {
+            "cpu_s": 43.3567,
+            "cpu_utilization": 1.86,
+            "ended_ns": 162319657621750,
+            "gpu_mb": 0.4,
+            "peak_rss_mb": 31806.5,
+            "phase": "repeat-2",
+            "process_peak_rss_mb": 31806.5,
+            "rss_peak_mb": 31713.1,
+            "started_ns": 162296382031958,
+            "wall_s": 23.2756
+          },
+          "rtf": 1.8212351102485973,
+          "segments": null,
+          "source_path": "data/fleurs/audio/14755840805814218163.wav",
+          "source_sha256": "8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28",
+          "text": "လွန်ခဲ့သောနှစ် ထောင်ပေါင်းများစွာက အရီစတာချက်ဇ် ဟုခေါ်သော အမျိုးသားတစ်ဦးသည် နေပတ်လည်တွင် ဆိုလာစနစ်သည် ရွေ့လျားလျက်ရှိသည်ဟု ပြောဆိုခဲ့သည်",
+          "trust_issues": [],
+          "trusted": true
+        }
+      ],
+      "trust_issues": []
+    }
+  ],
+  "request_key": "omniasr-torch/omniASR_LLM_Unlimited_7B_v2:6fc404dbf80ee465",
+  "request_sha256": "f90302f830331d88c1572c3f05ccfde151134c103c7c7862c1cfa6e8a45d2b7d",
+  "resolved_device": "cpu",
+  "resolved_dtype": "float32",
+  "resolved_model": "omniASR_LLM_Unlimited_7B_v2",
+  "run_id": "observer-calibration-v3",
+  "runtime": {
+    "device": "cpu",
+    "dtype": "float32",
+    "model": "omniASR_LLM_Unlimited_7B_v2",
+    "n_threads": null,
+    "revision": null
+  },
+  "schedule_seed": 20260823,
+  "session_id": "observer-calibration-v3:session-3",
+  "session_index": 3,
+  "subject": {
+    "backend": "omniasr-torch",
+    "batch_size": 1,
+    "language": "mya_Mymr",
+    "model": "omniASR_LLM_Unlimited_7B_v2",
+    "options": {
+      "batch_size": 1,
+      "device": "cpu",
+      "dtype": "float32",
+      "language": "mya_Mymr"
+    }
+  },
+  "termination": null,
+  "worker_index": 3
+}
