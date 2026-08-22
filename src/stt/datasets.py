@@ -12,6 +12,7 @@ from __future__ import annotations
 import csv
 import json
 import tarfile
+from collections.abc import Iterator
 from pathlib import Path
 
 FLEURS_REPO = "google/fleurs"
@@ -27,6 +28,35 @@ _COLUMNS = [
     "num_samples",
     "gender",
 ]
+
+
+def _read_fleurs_rows(tsv_path: Path) -> Iterator[list[str]]:
+    """Read FLEURS rows without treating transcript quotes as CSV syntax.
+
+    FLEURS is a tab-separated file, but some Burmese transcripts contain
+    unescaped double quotes.  The normal CSV parser therefore keeps reading
+    past the physical row and can put ``char_split`` in the selected text.
+    Quote-neutral parsing preserves the seven physical columns and lets the
+    caller clean the selected field explicitly.
+    """
+    with tsv_path.open(encoding="utf-8", newline="") as f:
+        reader = csv.reader(f, delimiter="\t", quoting=csv.QUOTE_NONE)
+        for line_number, row in enumerate(reader, 1):
+            if not row or row == _COLUMNS:
+                continue
+            if len(row) != len(_COLUMNS):
+                raise ValueError(
+                    f"FLEURS row {line_number} has {len(row)} columns; expected {len(_COLUMNS)}"
+                )
+            yield row
+
+
+def _clean_fleurs_field(value: str) -> str:
+    """Remove one TSV field wrapper and decode doubled quote characters."""
+    value = value.strip()
+    if len(value) >= 2 and value[0] == value[-1] == '"':
+        value = value[1:-1].replace('""', '"')
+    return value
 
 
 def fetch_fleurs(
@@ -76,13 +106,10 @@ def fetch_fleurs(
 
     wanted: dict[str, str] = {}
     text_index = _COLUMNS.index(transcript_column)
-    with tsv_path.open(encoding="utf-8", newline="") as f:
-        for row in csv.reader(f, delimiter="\t"):
-            if len(row) <= text_index:
-                continue
-            wanted[row[1]] = row[text_index].strip().strip('"')
-            if limit is not None and len(wanted) >= limit:
-                break
+    for row in _read_fleurs_rows(tsv_path):
+        wanted[_clean_fleurs_field(row[1])] = _clean_fleurs_field(row[text_index])
+        if limit is not None and len(wanted) >= limit:
+            break
 
     tar_path = Path(
         hf_hub_download(

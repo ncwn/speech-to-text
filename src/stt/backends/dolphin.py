@@ -143,6 +143,17 @@ class DolphinBackend(ASRBackend):
         # docs/findings.md#device-defaults
         return "cpu"
 
+    def _resolve_dtype(self, device: str) -> str:
+        """Return Dolphin's native precision for provenance preflight.
+
+        Dolphin's checkpoint parameters are float32 on every device.  MPS may
+        additionally demote its float64 CMVN buffers at load time; that change
+        is recorded as a fallback there, while the resolved model dtype remains
+        the same value reported by preflight.
+        """
+        del device
+        return "float32"
+
     def estimated_download_mb(self) -> int | None:
         return self.spec.approx_mb
 
@@ -163,7 +174,7 @@ class DolphinBackend(ASRBackend):
             directory = cache_dir(self.spec.size)
         directory.mkdir(parents=True, exist_ok=True)
         self.resolved_device = self._resolve_device()
-        self.resolved_dtype = "float32"
+        self.resolved_dtype = self._resolve_dtype(self.resolved_device)
 
         with suppress_native_output(not self.options.get("verbose")):
             if self.resolved_device == "mps":

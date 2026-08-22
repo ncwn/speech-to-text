@@ -388,3 +388,59 @@ def test_completeness_is_recomputed_rather_than_read_from_stored_issues():
     stored["issues"] = []
 
     assert ModelProvenance.from_dict(stored).complete is False
+
+
+def test_bound_dolphin_cpu_provenance_keeps_resolved_dtype_after_load(tmp_path, monkeypatch):
+    """Dolphin's bound worker state must match its preflight dtype."""
+    import sys
+    from types import SimpleNamespace
+
+    from stt.backends.dolphin import DolphinBackend
+
+    calls: list[tuple[str, str, str]] = []
+
+    def load_model(size: str, directory: str, device: str) -> object:
+        calls.append((size, directory, device))
+        return object()
+
+    monkeypatch.setitem(sys.modules, "dolphin", SimpleNamespace(load_model=load_model))
+
+    preflight_backend = DolphinBackend("small", device="cpu")
+    assert preflight_backend._resolve_dtype("cpu") == "float32"
+
+    artifact_path = tmp_path / "small.pt"
+    artifact_path.write_bytes(b"weights")
+    binding_provenance = _pinned_provenance(
+        backend="dolphin",
+        requested_model="small",
+        source_kind="modelscope",
+        source_locator="DataoceanAI/dolphin-small",
+        artifacts=(
+            ArtifactDigest(
+                "weights",
+                "small.pt",
+                artifact_path.stat().st_size,
+                hashlib.sha256(artifact_path.read_bytes()).hexdigest(),
+                path=str(artifact_path),
+            ),
+        ),
+        requested_settings={"device": "cpu"},
+        resolved_settings={
+            "device": "cpu",
+            "dtype": "float32",
+            "n_threads": None,
+            "chunk_seconds": None,
+            "size": "small",
+        },
+    )
+    backend = DolphinBackend("small", device="cpu")
+    backend.bind_model(ModelBinding(binding_provenance, binding_provenance.artifacts))
+
+    backend.load()
+    current = backend.model_provenance()
+
+    assert calls == [("small", str(tmp_path), "cpu")]
+    assert backend.resolved_dtype == "float32"
+    assert current.resolved_settings["dtype"] == "float32"
+    assert not any("resolved setting 'dtype' changed" in issue for issue in current.issues)
+    assert current.complete is True
