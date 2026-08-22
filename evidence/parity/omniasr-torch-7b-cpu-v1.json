@@ -1,0 +1,279 @@
+{
+  "metadata": {
+    "entrypoint_order": [
+      "adapter",
+      "reference"
+    ]
+  },
+  "schema": "parity-v1",
+  "schema_version": 1,
+  "subjects": {
+    "omniasr-torch+omniASR_LLM_Unlimited_7B_v2": {
+      "backend": "omniasr-torch",
+      "binding_stable": true,
+      "cases": [
+        {
+          "adapter_metadata": {
+            "decoder": "fairseq2 AudioDecoder + add_waveform_processing",
+            "entrypoint": "repository-pipeline-transcribe",
+            "feature_stage": "Wav2Vec2LlamaModel.embed_audio",
+            "logit_stage": "Wav2Vec2LlamaModel.final_proj during beam search",
+            "torch_inference_mode": true
+          },
+          "audio": {
+            "audio_id": "pcm16:16000:1:2280cdc39e304efaf2bdb84fb6a344b8aef5c3f4b027be54ad9830e73d328416",
+            "channels": 1,
+            "duration_s": 14.04,
+            "frames": 224640,
+            "pcm_sha256": "f67afe6025b3f9c07d19f809cf3a035ccea7ba482a32ed5fd30a1474a3155dd8",
+            "representation": {
+              "byte_order": "little",
+              "dtype": "int16",
+              "kind": "pcm16",
+              "shape": [
+                224640,
+                1
+              ]
+            },
+            "sample_rate": 16000,
+            "sha256": "f67afe6025b3f9c07d19f809cf3a035ccea7ba482a32ed5fd30a1474a3155dd8"
+          },
+          "contract_issues": [],
+          "first_divergent_stage": null,
+          "parity_eligible": true,
+          "reference_metadata": {
+            "decoder": "fairseq2 AudioDecoder + add_waveform_processing",
+            "entrypoint": "fairseq2-batch-model-beam-search",
+            "feature_stage": "Wav2Vec2LlamaModel.embed_audio",
+            "logit_stage": "Wav2Vec2LlamaModel.final_proj during beam search",
+            "torch_inference_mode": true
+          },
+          "stages": [
+            {
+              "adapter": {
+                "digest": "ef811989baf8bc37dfa4ff399e2505e710a5cb4988eda32419edc0abea475d7e",
+                "reachable": true,
+                "representation": {
+                  "dtype": "float32",
+                  "kind": "array",
+                  "shape": [
+                    224640
+                  ]
+                }
+              },
+              "max_abs": null,
+              "max_rel": null,
+              "name": "decoded_pcm",
+              "reason": null,
+              "reference": {
+                "digest": "ef811989baf8bc37dfa4ff399e2505e710a5cb4988eda32419edc0abea475d7e",
+                "reachable": true,
+                "representation": {
+                  "dtype": "float32",
+                  "kind": "array",
+                  "shape": [
+                    224640
+                  ]
+                }
+              },
+              "status": "match",
+              "tolerance": null
+            },
+            {
+              "adapter": {
+                "digest": "a234a1e4fe2fd730e43fed75d1ecda1e1ab090aeaa9f904cd3ad035114fecdaf",
+                "reachable": true,
+                "representation": {
+                  "dtype": "float32",
+                  "kind": "array",
+                  "shape": [
+                    1,
+                    701,
+                    4096
+                  ]
+                }
+              },
+              "max_abs": 0.0,
+              "max_rel": 0.0,
+              "name": "features",
+              "reason": null,
+              "reference": {
+                "digest": "a234a1e4fe2fd730e43fed75d1ecda1e1ab090aeaa9f904cd3ad035114fecdaf",
+                "reachable": true,
+                "representation": {
+                  "dtype": "float32",
+                  "kind": "array",
+                  "shape": [
+                    1,
+                    701,
+                    4096
+                  ]
+                }
+              },
+              "status": "match",
+              "tolerance": {
+                "atol": 1e-05,
+                "rtol": 0.0001
+              }
+            },
+            {
+              "adapter": {
+                "digest": "b7cabe6df144aa74de27ed8b7c225c7067bc44ad2877553a241185c3e279d811",
+                "reachable": true,
+                "representation": {
+                  "dtype": "float32",
+                  "kind": "array",
+                  "shape": [
+                    1,
+                    105,
+                    10288
+                  ]
+                }
+              },
+              "max_abs": 0.0,
+              "max_rel": 0.0,
+              "name": "logits_or_encoder",
+              "reason": null,
+              "reference": {
+                "digest": "b7cabe6df144aa74de27ed8b7c225c7067bc44ad2877553a241185c3e279d811",
+                "reachable": true,
+                "representation": {
+                  "dtype": "float32",
+                  "kind": "array",
+                  "shape": [
+                    1,
+                    105,
+                    10288
+                  ]
+                }
+              },
+              "status": "match",
+              "tolerance": {
+                "atol": 1e-05,
+                "rtol": 0.0001
+              }
+            },
+            {
+              "adapter": {
+                "digest": "eba4b58753e14c52567e0c5c9ef9f8b82d5299e6067a9036cccc0c0254c50dd4",
+                "reachable": true,
+                "representation": {
+                  "dtype": "int64",
+                  "kind": "array",
+                  "shape": [
+                    104
+                  ]
+                }
+              },
+              "max_abs": null,
+              "max_rel": null,
+              "name": "token_ids",
+              "reason": null,
+              "reference": {
+                "digest": "eba4b58753e14c52567e0c5c9ef9f8b82d5299e6067a9036cccc0c0254c50dd4",
+                "reachable": true,
+                "representation": {
+                  "dtype": "int64",
+                  "kind": "array",
+                  "shape": [
+                    104
+                  ]
+                }
+              },
+              "status": "match",
+              "tolerance": null
+            },
+            {
+              "adapter": {
+                "digest": "8d39de5dea1a8342ac85eafaed2893382b76684bf49497f540792f242076f86e",
+                "reachable": true,
+                "representation": {
+                  "encoding": "utf-8",
+                  "kind": "text"
+                }
+              },
+              "max_abs": null,
+              "max_rel": null,
+              "name": "raw_transcript",
+              "reason": null,
+              "reference": {
+                "digest": "8d39de5dea1a8342ac85eafaed2893382b76684bf49497f540792f242076f86e",
+                "reachable": true,
+                "representation": {
+                  "encoding": "utf-8",
+                  "kind": "text"
+                }
+              },
+              "status": "match",
+              "tolerance": null
+            },
+            {
+              "adapter": {
+                "digest": "8d39de5dea1a8342ac85eafaed2893382b76684bf49497f540792f242076f86e",
+                "reachable": true,
+                "representation": {
+                  "encoding": "utf-8",
+                  "kind": "text"
+                }
+              },
+              "max_abs": null,
+              "max_rel": null,
+              "name": "final_transcript",
+              "reason": null,
+              "reference": {
+                "digest": "8d39de5dea1a8342ac85eafaed2893382b76684bf49497f540792f242076f86e",
+                "reachable": true,
+                "representation": {
+                  "encoding": "utf-8",
+                  "kind": "text"
+                }
+              },
+              "status": "match",
+              "tolerance": null
+            }
+          ]
+        }
+      ],
+      "key": "omniasr-torch+omniASR_LLM_Unlimited_7B_v2",
+      "language": "mya_Mymr",
+      "loaded_instance_id": null,
+      "metadata": {
+        "content_sha256": "bed4307b49fe3162ff3f980d744831c81a262bffd3b1f2df79c3c6e3c53ee154",
+        "contract": {
+          "backend": "omniasr-torch",
+          "expected_reachability": {
+            "decoded_pcm": true,
+            "features": true,
+            "final_transcript": true,
+            "logits_or_encoder": true,
+            "raw_transcript": true,
+            "token_ids": true
+          },
+          "model": "omniASR_LLM_Unlimited_7B_v2",
+          "tolerances": {
+            "features": {
+              "atol": 1e-05,
+              "rtol": 0.0001
+            },
+            "logits_or_encoder": {
+              "atol": 1e-05,
+              "rtol": 0.0001
+            }
+          }
+        },
+        "entrypoint_order": [
+          "adapter",
+          "reference"
+        ],
+        "execution_sha256": "fcdfa693cd19a281e02ac3a57405fd158205f30c47d201c99a7894ed45239a10",
+        "source_sha256": "8229fc9cd459cdf9b4efb48a5cfc2e639ccbd2dfad347f436e5c760d0ccdfc40"
+      },
+      "model": "omniASR_LLM_Unlimited_7B_v2",
+      "parity_eligible": true,
+      "settings": {
+        "device": "cpu",
+        "dtype": "float32"
+      }
+    }
+  }
+}
