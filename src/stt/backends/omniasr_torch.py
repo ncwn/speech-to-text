@@ -254,6 +254,111 @@ class OmniASRTorchBackend(ASRBackend):
 
         gc.collect()
 
+    def _parity_trace(self, path: Path, *, language: str | None, adapter: bool):
+        """Compare the repository pipeline call with its direct fairseq2 path."""
+        if self.pipeline is None:
+            raise RuntimeError("omniASR parity requires a loaded pipeline")
+        if "Unlimited" not in self.model:
+            raise RuntimeError("omniASR parity currently covers unlimited LLM cards only")
+
+        import numpy as np
+        import torch
+
+        from stt.parity import ParityTrace
+
+        pipeline = self.pipeline
+        model = pipeline.model
+        if not hasattr(model, "embed_audio") or pipeline.beam_search_generator is None:
+            raise RuntimeError("omniASR parity requires the Wav2Vec2Llama model path")
+
+        waveforms: list[np.ndarray] = []
+        embeddings: list[np.ndarray] = []
+        logits: list[np.ndarray] = []
+        generated: list[tuple[np.ndarray, list[int]]] = []
+
+        original_build = pipeline._build_audio_wavform_pipeline
+        original_embed = model.embed_audio
+        original_generate = pipeline.beam_search_generator.generate_hypotheses
+
+        def capture_waveform(value):
+            detached = value.detach().cpu()
+            waveforms.append(detached.numpy().copy())
+            return value
+
+        def capture_build(inp):
+            return original_build(inp).map(capture_waveform)
+
+        def capture_embed(*args, **kwargs):
+            result = original_embed(*args, **kwargs)
+            embeddings.append(result[0].detach().cpu().numpy().copy())
+            return result
+
+        def capture_generate(*args, **kwargs):
+            tokens, lengths = original_generate(*args, **kwargs)
+            generated.append((tokens.detach().cpu().numpy().copy(), list(lengths)))
+            return tokens, lengths
+
+        def capture_logits(module, args, output):
+            del module, args
+            value = output[0] if isinstance(output, tuple) else output
+            logits.append(value.detach().cpu().numpy().copy())
+
+        projection_hook = model.final_proj.register_forward_hook(capture_logits)
+        pipeline._build_audio_wavform_pipeline = capture_build
+        model.embed_audio = capture_embed
+        pipeline.beam_search_generator.generate_hypotheses = capture_generate
+        try:
+            if adapter:
+                texts = pipeline.transcribe([path], lang=[language], batch_size=1)
+                entrypoint = "repository-pipeline-transcribe"
+            else:
+                prepared = list(pipeline._build_audio_wavform_pipeline([path]).and_return())
+                if len(prepared) != 1:
+                    raise RuntimeError("omniASR parity expected one prepared waveform")
+                batch = pipeline._create_batch_simple([(prepared[0], language)])
+                texts = pipeline._apply_model(batch)
+                entrypoint = "fairseq2-batch-model-beam-search"
+        finally:
+            pipeline._build_audio_wavform_pipeline = original_build
+            model.embed_audio = original_embed
+            pipeline.beam_search_generator.generate_hypotheses = original_generate
+            projection_hook.remove()
+
+        if len(waveforms) != 1 or len(embeddings) != 1:
+            raise RuntimeError("omniASR parity expected one prepared waveform and audio embedding")
+        if len(generated) != 1 or not logits:
+            raise RuntimeError("omniASR parity expected one generation trace")
+        token_array, token_lengths = generated[0]
+        token_count = int(token_lengths[0])
+        token_row = token_array[0, :token_count]
+        logit_array = np.concatenate(logits, axis=1)
+        raw_decoder = pipeline.tokenizer.create_decoder(skip_special_tokens=False)
+        raw = str(raw_decoder(torch.from_numpy(token_row)))
+        final = str(pipeline.token_decoder(torch.from_numpy(token_row))).strip()
+        if not texts or str(texts[0]).strip() != final:
+            raise RuntimeError("omniASR parity direct and pipeline transcript decoders disagree")
+        return ParityTrace(
+            decoded_pcm=waveforms[0],
+            features=embeddings[0],
+            logits_or_encoder=logit_array,
+            token_ids=token_row,
+            raw_transcript=raw,
+            final_transcript=final,
+            metadata={
+                "entrypoint": entrypoint,
+                "decoder": "fairseq2 AudioDecoder + add_waveform_processing",
+                "feature_stage": "Wav2Vec2LlamaModel.embed_audio",
+                "logit_stage": "Wav2Vec2LlamaModel.final_proj during beam search",
+                "torch_inference_mode": True,
+            },
+        )
+
+    def parity_adapter_trace(self, path: Path, *, language: str | None = None):
+        return self._parity_trace(path, language=language, adapter=True)
+
+    def parity_reference_trace(self, path: Path, *, language: str | None = None):
+        return self._parity_trace(path, language=language, adapter=False)
+
     @staticmethod
     def supported_languages() -> list[str]:
         from omnilingual_asr.models.wav2vec2_llama.lang_ids import supported_langs

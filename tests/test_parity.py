@@ -200,3 +200,9 @@ def test_dolphin_contract_requires_all_observed_stages():
     contract = contract_for("dolphin", "small")
     assert contract.expected_reachability == {stage: True for stage in STAGE_NAMES}
     assert set(contract.tolerances) == {"features", "logits_or_encoder"}
+
+
+def test_omniasr_contract_requires_all_observed_stages():
+    contract = contract_for("omniasr-torch", "omniASR_LLM_Unlimited_7B_v2")
+    assert contract.expected_reachability == {stage: True for stage in STAGE_NAMES}
+    assert set(contract.tolerances) == {"features", "logits_or_encoder"}
