@@ -7,9 +7,24 @@ model is verified separately by aligning real audio.
 
 from __future__ import annotations
 
+import sys
+from dataclasses import replace
+from types import ModuleType
+
 import pytest
 
-from stt.align import AlignedChar, build_targets, group_segments, splits_a_cluster
+from stt.align import (
+    AlignedChar,
+    LoadedAligner,
+    _alignment_load_kwargs,
+    _alignment_load_source,
+    _load_aligner_components,
+    alignment_metadata,
+    build_targets,
+    group_segments,
+    splits_a_cluster,
+)
+from stt.provenance import ModelBinding, ModelProvenance, digest_file
 
 # A stand-in for MMS's Burmese vocabulary: blank, word delimiter, a few
 # Myanmar characters, and the lowercase Latin subset MMS actually ships.
@@ -25,6 +40,150 @@ VOCAB = {
     "a": 20,
     "b": 21,
 }
+
+
+def _provenance(*, revision_status: str, revision: str | None) -> ModelProvenance:
+    return ModelProvenance(
+        backend="hf",
+        requested_model="mms-1b-all",
+        source_kind="huggingface",
+        source_locator="facebook/mms-1b-all",
+        upstream_revision=revision,
+        revision_status=revision_status,
+    )
+
+
+def test_aligner_load_kwargs_are_local_only_and_commit_pinned():
+    revision = "a" * 40
+    binding = ModelBinding(_provenance(revision_status="pinned", revision=revision))
+    assert _alignment_load_kwargs(binding) == {
+        "local_files_only": True,
+        "revision": revision,
+    }
+
+    mutable = ModelBinding(_provenance(revision_status="unknown", revision=None))
+    assert _alignment_load_kwargs(mutable) == {"local_files_only": True}
+
+
+def test_bound_aligner_loads_components_from_exact_local_snapshot(monkeypatch, tmp_path):
+    root = tmp_path / "snapshot"
+    files = {
+        "config.json": b"{}",
+        "model.safetensors": b"weights",
+        "adapter.mya.safetensors": b"adapter",
+        "vocabs/mya.txt": b"vocab",
+    }
+    artifacts = []
+    for name, content in files.items():
+        path = root / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(content)
+        artifacts.append(digest_file(path, role="model-or-processor", name=name))
+    provenance = replace(
+        _provenance(revision_status="pinned", revision="a" * 40),
+        artifacts=tuple(artifacts),
+    )
+    binding = ModelBinding(provenance=provenance, paths=tuple(artifacts))
+    binding.validate()
+
+    source, kwargs = _alignment_load_source(binding)
+    assert source == str(root)
+    assert kwargs == {"local_files_only": True}
+
+    calls: list[tuple[str, str, dict]] = []
+
+    class FakeModel:
+        def to(self, device):
+            return self
+
+        def eval(self):
+            return self
+
+    class AutoProcessor:
+        @staticmethod
+        def from_pretrained(source, **kwargs):
+            calls.append(("processor", source, kwargs))
+            return object()
+
+    class AutoModelForCTC:
+        @staticmethod
+        def from_pretrained(source, **kwargs):
+            calls.append(("model", source, kwargs))
+            return FakeModel()
+
+    class Logging:
+        @staticmethod
+        def get_verbosity():
+            return 0
+
+        @staticmethod
+        def set_verbosity_error():
+            return None
+
+        @staticmethod
+        def set_verbosity(value):
+            return None
+
+    transformers = ModuleType("transformers")
+    transformers.AutoProcessor = AutoProcessor
+    transformers.AutoModelForCTC = AutoModelForCTC
+    transformers.logging = Logging
+    monkeypatch.setitem(sys.modules, "transformers", transformers)
+
+    _load_aligner_components("cpu", binding)
+
+    assert calls[0] == (
+        "processor",
+        str(root),
+        {"target_lang": "mya", "local_files_only": True},
+    )
+    assert calls[1] == (
+        "model",
+        str(root),
+        {"target_lang": "mya", "ignore_mismatched_sizes": True, "local_files_only": True},
+    )
+    assert all(call[1] != "facebook/mms-1b-all" for call in calls)
+
+
+def test_aligner_rejects_binding_for_a_different_consumer(monkeypatch, tmp_path):
+    artifact_path = tmp_path / "config.json"
+    artifact_path.write_bytes(b"{}")
+    artifact = digest_file(artifact_path, role="model-or-processor", name="config.json")
+    provenance = replace(
+        _provenance(revision_status="pinned", revision="a" * 40),
+        backend="other",
+        requested_model="other-model",
+        artifacts=(artifact,),
+        runtime_packages={"transformers": "4.57.6"},
+        adapter_git_commit="c" * 40,
+        uv_lock_sha256="d" * 64,
+    ).finalized()
+    binding = ModelBinding(provenance=provenance, paths=(artifact,))
+    binding.validate()
+    aligner = LoadedAligner(object(), object(), binding=binding)
+
+    metadata = alignment_metadata(aligner, status="completed")
+
+    assert metadata["trusted"] is False
+    assert any("backend mismatch" in issue for issue in metadata["trust_issues"])
+    assert any("model mismatch" in issue for issue in metadata["trust_issues"])
+    monkeypatch.setattr(
+        "stt.backends.transformers_asr._bound_hf_snapshot",
+        lambda binding: pytest.fail("wrong-consumer binding reached snapshot resolution"),
+    )
+    with pytest.raises(RuntimeError, match="consumer mismatch"):
+        _alignment_load_source(binding)
+
+
+def test_alignment_metadata_is_fail_closed_without_binding():
+    metadata = alignment_metadata(
+        LoadedAligner(object(), object(), provenance_issues=("missing binding",)),
+        status="completed",
+    )
+    assert metadata["backend"] == "hf"
+    assert metadata["model"] == "mms-1b-all"
+    assert metadata["trusted"] is False
+    assert "missing binding" in metadata["trust_issues"]
 
 
 def _chars(spec: str, start: float = 0.0, step: float = 0.1, score: float = 0.9):

@@ -1,32 +1,34 @@
 """Recover timestamps and confidence for a transcript by forced alignment.
 
-Our most accurate model is also our most opaque: fairseq2's ``ASRInferencePipeline``
-returns a bare ``List[str]``, with no timings and no per-token scores. That
-makes subtitles impossible and, worse, leaves us unable to say *which part* of a
-long transcript to distrust.
+Our most accurate model is also our most opaque: fairseq2's
+``ASRInferencePipeline`` returns a bare ``List[str]`` — no timings, no scores,
+so no subtitles and no way to say *which part* to distrust.
 
-Forced alignment fixes this without touching the decoder. Given audio and a
-transcript, a CTC acoustic model can be constrained to the one path through its
-output lattice that spells exactly that transcript; where that path places each
-character is where the character was spoken, and how much probability mass sits
-on it is how well the audio supports it.
+Given audio and a transcript, a CTC acoustic model can be constrained to the one
+path through its output lattice that spells exactly that transcript; where that
+path places each character is where it was spoken, and the probability mass on
+it is how well the audio supports it. MMS-1B is the natural aligner: already a
+dependency, character-level Burmese adapter, and cheap enough to be an
+afterthought on a 7B run. See ``docs/findings.md#confidence``.
 
-MMS-1B is the natural aligner here. It is already a dependency, its Burmese
-adapter is **character-level** (75 Myanmar characters), and it runs at RTF 0.04
-— so timing a 7B transcript costs about 2.5% on top of producing it.
-
-The alignment is over characters, not words, because Burmese is written without
-word delimiters. See :mod:`stt.burmese`.
+Alignment is over characters, not words, because Burmese is written without word
+delimiters. See :mod:`stt.burmese`.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from stt.provenance import (
+    ModelBinding,
+    ModelProvenance,
+    preflight_model_binding,
+    validate_binding,
+)
 from stt.results import Segment
 
 if TYPE_CHECKING:
@@ -36,6 +38,10 @@ if TYPE_CHECKING:
 #: Burmese text directly instead of going through a pronunciation lexicon.
 MMS_REPO = "facebook/mms-1b-all"
 MMS_LANG = "mya"
+ALIGNMENT_BACKEND = "hf"
+ALIGNMENT_MODEL = "mms-1b-all"
+ALIGNMENT_LANGUAGE = "mya_Mymr"
+ALIGNMENT_DTYPE = "float32"
 
 #: Seconds of audio per forward pass. Bounds peak memory; alignment itself is
 #: done over the whole file at once, so this does not affect the result.
@@ -68,16 +74,158 @@ class AlignmentError(RuntimeError):
     """Raised when the transcript cannot be aligned to the audio."""
 
 
-# --------------------------------------------------------------------- model
+def _aligner_binding_issues(binding: ModelBinding | None) -> tuple[str, ...]:
+    """Ensure a binding belongs to this MMS aligner consumer."""
+    if binding is None:
+        return ()
+    provenance = binding.provenance
+    issues: list[str] = []
+    if provenance.backend != ALIGNMENT_BACKEND:
+        issues.append(
+            f"aligner binding backend mismatch: expected {ALIGNMENT_BACKEND!r}, "
+            f"got {provenance.backend!r}"
+        )
+    if provenance.requested_model != ALIGNMENT_MODEL:
+        issues.append(
+            f"aligner binding model mismatch: expected {ALIGNMENT_MODEL!r}, "
+            f"got {provenance.requested_model!r}"
+        )
+    return tuple(issues)
 
 
-def load_aligner(device: str = "cpu") -> tuple[Any, Any]:
-    """Load the MMS acoustic model and its Burmese tokenizer."""
+@dataclass(frozen=True)
+class LoadedAligner:
+    """An MMS aligner plus the immutable identity of the artifacts it loaded."""
+
+    processor: Any
+    model: Any
+    binding: ModelBinding | None = None
+    provenance_issues: tuple[str, ...] = ()
+    device: str = "cpu"
+
+    def __iter__(self):
+        """Keep the historical ``processor, model = load_aligner()`` API working."""
+        yield self.processor
+        yield self.model
+
+    @property
+    def provenance(self) -> ModelProvenance | None:
+        return self.binding.provenance if self.binding is not None else None
+
+    @property
+    def trust_issues(self) -> tuple[str, ...]:
+        issues = list(self.provenance_issues)
+        provenance = self.provenance
+        if provenance is None:
+            issues.append("aligner provenance is unavailable")
+        else:
+            issues.extend(provenance.issues)
+            if not provenance.complete:
+                issues.append("aligner provenance is incomplete or ineligible")
+        issues.extend(_aligner_binding_issues(self.binding))
+        return tuple(dict.fromkeys(issues))
+
+    @property
+    def trusted(self) -> bool:
+        provenance = self.provenance
+        return bool(provenance is not None and provenance.complete and not self.trust_issues)
+
+    @property
+    def result_provenance(self) -> ModelProvenance | None:
+        """Return provenance whose backend matches a standalone alignment result."""
+        provenance = self.provenance
+        if provenance is None:
+            return None
+        return replace(provenance, backend="align").finalized()
+
+
+def _coerce_aligner(value: LoadedAligner | tuple[Any, Any], device: str) -> LoadedAligner:
+    if isinstance(value, LoadedAligner):
+        return value
+    processor, model = value
+    return LoadedAligner(
+        processor=processor,
+        model=model,
+        device=device,
+        provenance_issues=("caller-supplied aligner has no immutable provenance",),
+    )
+
+
+def alignment_metadata(
+    aligner: LoadedAligner | tuple[Any, Any] | None,
+    *,
+    device: str = "cpu",
+    status: str = "loaded",
+    error: str | None = None,
+) -> dict[str, Any]:
+    """Serialize one consistent, fail-closed alignment provenance block."""
+    loaded = _coerce_aligner(aligner, device) if aligner is not None else None
+    provenance = loaded.provenance if loaded is not None else None
+    issues = list(loaded.trust_issues) if loaded is not None else ["aligner was not loaded"]
+    serialized_provenance: dict[str, Any] | None = None
+    if provenance is not None:
+        try:
+            serialized_provenance = provenance.to_dict()
+        except Exception as exc:  # noqa: BLE001 - preserve an explicit untrusted artifact
+            issues.append(f"aligner provenance serialization failed: {type(exc).__name__}: {exc}")
+    if status != "completed":
+        issues.append(f"alignment status is {status}")
+    metadata: dict[str, Any] = {
+        "backend": ALIGNMENT_BACKEND,
+        "model": ALIGNMENT_MODEL,
+        "language": ALIGNMENT_LANGUAGE,
+        "device": loaded.device if loaded is not None else device,
+        "revision": provenance.upstream_revision if provenance is not None else None,
+        "status": status,
+        "trusted": bool(loaded is not None and loaded.trusted and status == "completed"),
+        "trust_issues": list(dict.fromkeys(issues)),
+        "provenance": serialized_provenance,
+    }
+    if error is not None:
+        metadata["error"] = error
+    return metadata
+
+
+def _capture_environment() -> dict[str, Any]:
+    from stt.measurement import capture_environment
+
+    return capture_environment()
+
+
+def _preflight_aligner(device: str) -> tuple[ModelBinding | None, tuple[str, ...]]:
+    """Resolve the same pinned MMS snapshot and artifact set as the HF backend."""
+    options = {
+        "device": device,
+        "dtype": ALIGNMENT_DTYPE,
+        "language": ALIGNMENT_LANGUAGE,
+        "batch_size": 1,
+    }
+    try:
+        binding = preflight_model_binding(
+            ALIGNMENT_BACKEND,
+            ALIGNMENT_MODEL,
+            options,
+            environment=_capture_environment(),
+        )
+    except Exception as exc:  # noqa: BLE001 - diagnostic alignment may use a local cache
+        return None, (f"aligner provenance preflight failed: {type(exc).__name__}: {exc}",)
+
+    try:
+        issues = list(validate_binding(binding))
+    except Exception as exc:  # noqa: BLE001 - keep the output explicitly untrusted
+        issues = [f"aligner provenance validation failed: {type(exc).__name__}: {exc}"]
+    return binding, tuple(dict.fromkeys(issues))
+
+
+def _load_aligner_components(device: str, binding: ModelBinding | None) -> tuple[Any, Any]:
+    """Load MMS from a commit-addressed local snapshot when one is available."""
     import torch
     import transformers
     from transformers import AutoModelForCTC, AutoProcessor
 
-    processor = AutoProcessor.from_pretrained(MMS_REPO, target_lang=MMS_LANG)
+    source, load_kwargs = _alignment_load_source(binding)
+
+    processor = AutoProcessor.from_pretrained(source, target_lang=MMS_LANG, **load_kwargs)
 
     # MMS ships one checkpoint plus a per-language adapter. Loading it warns
     # that `lm_head` was "newly initialised because the shapes did not match" —
@@ -88,13 +236,69 @@ def load_aligner(device: str = "cpu") -> tuple[Any, Any]:
     transformers.logging.set_verbosity_error()
     try:
         model = AutoModelForCTC.from_pretrained(
-            MMS_REPO, target_lang=MMS_LANG, ignore_mismatched_sizes=True
+            source,
+            target_lang=MMS_LANG,
+            ignore_mismatched_sizes=True,
+            **load_kwargs,
         )
     finally:
         transformers.logging.set_verbosity(verbosity)
 
     model = model.to(torch.device(device)).eval()
     return processor, model
+
+
+def _alignment_load_kwargs(binding: ModelBinding | None) -> dict[str, Any]:
+    """Build the Transformers kwargs that keep alignment loads offline and pinned."""
+    provenance = binding.provenance if binding is not None else None
+    load_kwargs: dict[str, Any] = {"local_files_only": True}
+    if (
+        provenance is not None
+        and provenance.revision_status == "pinned"
+        and provenance.upstream_revision
+    ):
+        load_kwargs["revision"] = provenance.upstream_revision
+    return load_kwargs
+
+
+def _alignment_load_source(binding: ModelBinding | None) -> tuple[str, dict[str, Any]]:
+    """Use the validated worker snapshot for bound loads and cache-only fallback otherwise."""
+    consumer_issues = _aligner_binding_issues(binding)
+    if consumer_issues:
+        raise RuntimeError("aligner binding consumer mismatch: " + "; ".join(consumer_issues))
+    load_kwargs = _alignment_load_kwargs(binding)
+    if binding is None:
+        return MMS_REPO, load_kwargs
+
+    from stt.backends.transformers_asr import _bound_hf_snapshot
+
+    # The local snapshot is already commit-addressed. Dropping ``revision`` is
+    # deliberate: Transformers must resolve every file relative to this exact
+    # worker path rather than consulting another Hub cache entry.
+    source = str(_bound_hf_snapshot(binding))
+    load_kwargs.pop("revision", None)
+    return source, load_kwargs
+
+
+def load_aligner(device: str = "cpu") -> LoadedAligner:
+    """Load MMS with immutable provenance, or a local-only diagnostic fallback."""
+    binding, issues = _preflight_aligner(device)
+    processor, model = _load_aligner_components(device, binding)
+
+    if binding is not None:
+        try:
+            issues = tuple(dict.fromkeys((*issues, *validate_binding(binding))))
+        except Exception as exc:  # noqa: BLE001 - trust remains fail-closed
+            issues = tuple(
+                dict.fromkeys((*issues, f"post-load aligner provenance validation failed: {exc}"))
+            )
+    return LoadedAligner(
+        processor=processor,
+        model=model,
+        binding=binding,
+        provenance_issues=issues,
+        device=device,
+    )
 
 
 def emissions(pcm: np.ndarray, rate: int, processor: Any, model: Any) -> np.ndarray:
@@ -123,9 +327,6 @@ def emissions(pcm: np.ndarray, rate: int, processor: Any, model: Any) -> np.ndar
     if not chunks:
         raise AlignmentError("audio produced no frames to align against")
     return np.concatenate(chunks, axis=0)
-
-
-# -------------------------------------------------------------------- targets
 
 
 def build_targets(text: str, vocab: dict[str, int]) -> tuple[list[int], list[int], str]:
@@ -163,9 +364,6 @@ def build_targets(text: str, vocab: dict[str, int]) -> tuple[list[int], list[int
         ids.append(token)
         sources.append(i)
     return ids, sources, prepared
-
-
-# ------------------------------------------------------------------ alignment
 
 
 def _forced_align(
@@ -248,9 +446,6 @@ def align_chars(
     return out
 
 
-# ------------------------------------------------------------------ grouping
-
-
 def splits_a_cluster(chars: list[AlignedChar], i: int) -> bool:
     """Whether cutting after ``chars[i]`` would break a Burmese syllable.
 
@@ -311,7 +506,6 @@ def group_segments(
     start_i = 0  # index into `chars` of the current cue's first character
 
     def flush(end_i: int) -> None:
-        """Emit chars[start_i:end_i] as one cue."""
         group = chars[start_i:end_i]
         if not group:
             return
@@ -362,14 +556,11 @@ def group_segments(
     return segments
 
 
-# ----------------------------------------------------------------- public API
-
-
 def align(
     text: str,
     audio: Path,
     device: str = "cpu",
-    aligner: tuple[Any, Any] | None = None,
+    aligner: LoadedAligner | tuple[Any, Any] | None = None,
     **grouping: Any,
 ) -> list[Segment]:
     """Time ``text`` against ``audio`` and return readable segments.
@@ -381,7 +572,8 @@ def align(
     if not text.strip():
         return []
 
-    processor, model = aligner if aligner is not None else load_aligner(device)
+    loaded = load_aligner(device) if aligner is None else _coerce_aligner(aligner, device)
+    processor, model = loaded
     pcm, rate = sf.read(str(audio), dtype="float32", always_2d=False)
     if pcm.ndim > 1:
         pcm = pcm.mean(axis=1)
