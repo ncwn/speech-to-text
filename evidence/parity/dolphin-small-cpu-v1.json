@@ -1,0 +1,281 @@
+{
+  "metadata": {
+    "entrypoint_order": [
+      "adapter",
+      "reference"
+    ]
+  },
+  "schema": "parity-v1",
+  "schema_version": 1,
+  "subjects": {
+    "dolphin+small": {
+      "backend": "dolphin",
+      "binding_stable": true,
+      "cases": [
+        {
+          "adapter_metadata": {
+            "ctc_stage": "ctc_logprobs",
+            "decoder": "dolphin.transcribe",
+            "encoder_observed": true,
+            "entrypoint": "repository-windowed-upstream",
+            "feature_extractor": "dolphin.processor.extract_feats",
+            "torch_inference_mode": false
+          },
+          "audio": {
+            "audio_id": "pcm16:16000:1:2280cdc39e304efaf2bdb84fb6a344b8aef5c3f4b027be54ad9830e73d328416",
+            "channels": 1,
+            "duration_s": 14.04,
+            "frames": 224640,
+            "pcm_sha256": "f67afe6025b3f9c07d19f809cf3a035ccea7ba482a32ed5fd30a1474a3155dd8",
+            "representation": {
+              "byte_order": "little",
+              "dtype": "int16",
+              "kind": "pcm16",
+              "shape": [
+                224640,
+                1
+              ]
+            },
+            "sample_rate": 16000,
+            "sha256": "f67afe6025b3f9c07d19f809cf3a035ccea7ba482a32ed5fd30a1474a3155dd8"
+          },
+          "contract_issues": [],
+          "first_divergent_stage": null,
+          "parity_eligible": true,
+          "reference_metadata": {
+            "ctc_stage": "ctc_logprobs",
+            "decoder": "dolphin.transcribe",
+            "encoder_observed": true,
+            "entrypoint": "dolphin-transcribe-direct",
+            "feature_extractor": "dolphin.processor.extract_feats",
+            "torch_inference_mode": false
+          },
+          "stages": [
+            {
+              "adapter": {
+                "digest": "9e7645825a2c756f88e2c257a2a0afce4e9e319c67a0336699bb39583c03a7da",
+                "reachable": true,
+                "representation": {
+                  "dtype": "float32",
+                  "kind": "array",
+                  "shape": [
+                    224640
+                  ]
+                }
+              },
+              "max_abs": null,
+              "max_rel": null,
+              "name": "decoded_pcm",
+              "reason": null,
+              "reference": {
+                "digest": "9e7645825a2c756f88e2c257a2a0afce4e9e319c67a0336699bb39583c03a7da",
+                "reachable": true,
+                "representation": {
+                  "dtype": "float32",
+                  "kind": "array",
+                  "shape": [
+                    224640
+                  ]
+                }
+              },
+              "status": "match",
+              "tolerance": null
+            },
+            {
+              "adapter": {
+                "digest": "aec6d0570180085b745bd56cf065f6f723821666e508bef2f4508db90507447c",
+                "reachable": true,
+                "representation": {
+                  "dtype": "float32",
+                  "kind": "array",
+                  "shape": [
+                    1,
+                    1405,
+                    80
+                  ]
+                }
+              },
+              "max_abs": 0.0,
+              "max_rel": 0.0,
+              "name": "features",
+              "reason": null,
+              "reference": {
+                "digest": "aec6d0570180085b745bd56cf065f6f723821666e508bef2f4508db90507447c",
+                "reachable": true,
+                "representation": {
+                  "dtype": "float32",
+                  "kind": "array",
+                  "shape": [
+                    1,
+                    1405,
+                    80
+                  ]
+                }
+              },
+              "status": "match",
+              "tolerance": {
+                "atol": 1e-05,
+                "rtol": 0.0001
+              }
+            },
+            {
+              "adapter": {
+                "digest": "0f1b2d7f05c4145297c0c9cf669ca94f2756ce35925bcff1d935f04d1736bb67",
+                "reachable": true,
+                "representation": {
+                  "dtype": "float32",
+                  "kind": "array",
+                  "shape": [
+                    1,
+                    350,
+                    40002
+                  ]
+                }
+              },
+              "max_abs": 0.0,
+              "max_rel": 0.0,
+              "name": "logits_or_encoder",
+              "reason": null,
+              "reference": {
+                "digest": "0f1b2d7f05c4145297c0c9cf669ca94f2756ce35925bcff1d935f04d1736bb67",
+                "reachable": true,
+                "representation": {
+                  "dtype": "float32",
+                  "kind": "array",
+                  "shape": [
+                    1,
+                    350,
+                    40002
+                  ]
+                }
+              },
+              "status": "match",
+              "tolerance": {
+                "atol": 1e-05,
+                "rtol": 0.0001
+              }
+            },
+            {
+              "adapter": {
+                "digest": "c9cbf0ccba3404fb1a74d4506c5617904dcb42c550c139c397071d0831b2fe65",
+                "reachable": true,
+                "representation": {
+                  "dtype": "int64",
+                  "kind": "array",
+                  "shape": [
+                    66
+                  ]
+                }
+              },
+              "max_abs": null,
+              "max_rel": null,
+              "name": "token_ids",
+              "reason": null,
+              "reference": {
+                "digest": "c9cbf0ccba3404fb1a74d4506c5617904dcb42c550c139c397071d0831b2fe65",
+                "reachable": true,
+                "representation": {
+                  "dtype": "int64",
+                  "kind": "array",
+                  "shape": [
+                    66
+                  ]
+                }
+              },
+              "status": "match",
+              "tolerance": null
+            },
+            {
+              "adapter": {
+                "digest": "31efd1c90720303bfacba2f02c4e5f77dddddf5b26a47a5313ca0966c7b5f9d9",
+                "reachable": true,
+                "representation": {
+                  "encoding": "utf-8",
+                  "kind": "text"
+                }
+              },
+              "max_abs": null,
+              "max_rel": null,
+              "name": "raw_transcript",
+              "reason": null,
+              "reference": {
+                "digest": "31efd1c90720303bfacba2f02c4e5f77dddddf5b26a47a5313ca0966c7b5f9d9",
+                "reachable": true,
+                "representation": {
+                  "encoding": "utf-8",
+                  "kind": "text"
+                }
+              },
+              "status": "match",
+              "tolerance": null
+            },
+            {
+              "adapter": {
+                "digest": "ecd225648ed5cf9b05c2bc0aab382825e3260fa4cebf71be12432f5f4760efb3",
+                "reachable": true,
+                "representation": {
+                  "encoding": "utf-8",
+                  "kind": "text"
+                }
+              },
+              "max_abs": null,
+              "max_rel": null,
+              "name": "final_transcript",
+              "reason": null,
+              "reference": {
+                "digest": "ecd225648ed5cf9b05c2bc0aab382825e3260fa4cebf71be12432f5f4760efb3",
+                "reachable": true,
+                "representation": {
+                  "encoding": "utf-8",
+                  "kind": "text"
+                }
+              },
+              "status": "match",
+              "tolerance": null
+            }
+          ]
+        }
+      ],
+      "key": "dolphin+small",
+      "language": "mya_Mymr",
+      "loaded_instance_id": null,
+      "metadata": {
+        "content_sha256": "776703a61334d150a55670b408e23ee76944f0f16958e8d5c079eb81035fc324",
+        "contract": {
+          "backend": "dolphin",
+          "expected_reachability": {
+            "decoded_pcm": true,
+            "features": true,
+            "final_transcript": true,
+            "logits_or_encoder": true,
+            "raw_transcript": true,
+            "token_ids": true
+          },
+          "model": "small",
+          "tolerances": {
+            "features": {
+              "atol": 1e-05,
+              "rtol": 0.0001
+            },
+            "logits_or_encoder": {
+              "atol": 1e-05,
+              "rtol": 0.0001
+            }
+          }
+        },
+        "entrypoint_order": [
+          "adapter",
+          "reference"
+        ],
+        "execution_sha256": "1eaa134ac4c13ebd67c652c8c51106bfb99e3a6cb58f413ea0caf2c73a255b23",
+        "source_sha256": "8229fc9cd459cdf9b4efb48a5cfc2e639ccbd2dfad347f436e5c760d0ccdfc40"
+      },
+      "model": "small",
+      "parity_eligible": true,
+      "settings": {
+        "device": "cpu",
+        "dtype": "float32"
+      }
+    }
+  }
+}
