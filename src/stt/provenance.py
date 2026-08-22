@@ -11,7 +11,7 @@ import hashlib
 import json
 import os
 import tempfile
-from collections.abc import Iterator
+from collections.abc import Iterator, Mapping
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass, field
 from fnmatch import fnmatch
@@ -229,6 +229,10 @@ class ModelProvenance:
             not self.issues
             and not self.adapter_git_dirty
             and not self.fallback_history
+            # Checked here rather than trusting a recorded issue, because this
+            # property is also consulted on provenance read back from JSONL,
+            # which may have been written before the check existed.
+            and not unresolved_execution_issues(self.resolved_settings)
             and self.revision_status in {"pinned", "unavailable-content-addressed"}
             and bool(self.artifacts)
             and bool(self.runtime_packages)
@@ -557,6 +561,29 @@ def preflight_model_binding(
     return binding
 
 
+def unresolved_execution_issues(resolved_settings: Mapping[str, Any]) -> tuple[str, ...]:
+    """Return issues for execution settings a run could not actually observe.
+
+    A device is required because it is the one resolved setting that changes
+    the numbers without changing anything the manifest would otherwise record.
+    Two runs of the same checkpoint on CPU and on Metal produce the same
+    execution hash when the device is unknown, so an unresolved device does not
+    merely leave a label blank — it makes the execution identity non-unique,
+    which is the property every downstream join relies on.
+
+    Only the device is checked. Requiring a dtype here would sweep in runtimes
+    whose precision is a property of the checkpoint rather than a runtime
+    choice, and reporting those as incomplete would say something false.
+    """
+    device = resolved_settings.get("device")
+    if not isinstance(device, str) or not device.strip():
+        return (
+            "resolved compute device is unavailable, so this run cannot carry a "
+            "unique execution identity",
+        )
+    return ()
+
+
 def _digest_with_role(path: Path, role: str, name: str) -> ArtifactDigest:
     return digest_file(path, role=role, name=name)
 
@@ -830,6 +857,7 @@ def collect_runtime_provenance(
     fallback_history = tuple(getattr(instance, "_fallback_history", ()))
     if fallback_history:
         issues.append("runtime fallback occurred")
+    issues.extend(unresolved_execution_issues(resolved))
     provenance = ModelProvenance(
         backend=backend,
         requested_model=model,

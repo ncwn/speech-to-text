@@ -17,6 +17,7 @@ from stt.provenance import (
     ModelProvenance,
     ProvenanceError,
     digest_file,
+    unresolved_execution_issues,
 )
 
 
@@ -330,3 +331,60 @@ def test_cached_record_with_extra_field_forces_a_fresh_hash(tmp_path, monkeypatc
     digest_file(artifact, cache_root=cache_root)
 
     assert any(value == b"" for value in calls)
+
+
+def _pinned_provenance(**overrides: object) -> ModelProvenance:
+    """A manifest that is complete apart from whatever the caller overrides."""
+    fields: dict[str, object] = {
+        "backend": "omniasr-gguf",
+        "requested_model": "llm-unlimited-300m-v2",
+        "source_kind": "huggingface-gguf",
+        "source_locator": f"https://huggingface.co/x/y/resolve/{'a' * 40}/m.gguf",
+        "upstream_revision": "a" * 40,
+        "revision_status": "pinned",
+        "artifacts": (ArtifactDigest("weights", "m.gguf", 7, "1" * 64),),
+        "runtime_packages": {"crispasr": "0.8.29"},
+        "requested_settings": {},
+        "resolved_settings": {"device": "cpu", "dtype": None, "n_threads": 4},
+        "adapter_git_commit": "b" * 40,
+        "adapter_git_dirty": False,
+        "uv_lock_sha256": "c" * 64,
+    }
+    fields.update(overrides)
+    return ModelProvenance(**fields).finalized()  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize("device", [None, "", "   "])
+def test_an_unresolved_device_cannot_be_complete(device):
+    """CrispASR picks CUDA/Metal/Vulkan/CPU internally and never says which.
+
+    Without a device the execution hash is the same whichever one it chose, so
+    two runs that are not comparable become indistinguishable in provenance.
+    That is why this is refused outright rather than recorded as a blank label.
+    """
+    provenance = _pinned_provenance(
+        resolved_settings={"device": device, "dtype": None, "n_threads": 4}
+    )
+
+    assert provenance.complete is False
+    assert unresolved_execution_issues(provenance.resolved_settings)
+
+
+def test_a_resolved_device_stays_complete():
+    """The check must not make every backend ineligible along the way."""
+    assert _pinned_provenance().complete is True
+    assert unresolved_execution_issues({"device": "mps"}) == ()
+
+
+def test_completeness_is_recomputed_rather_than_read_from_stored_issues():
+    """Provenance written before the check existed must not be trusted now.
+
+    `complete` is consulted on manifests loaded back out of JSONL, where the
+    recorded issue list is whatever the writer happened to know at the time.
+    """
+    stored = _pinned_provenance(
+        resolved_settings={"device": None, "dtype": None, "n_threads": 4}
+    ).to_dict()
+    stored["issues"] = []
+
+    assert ModelProvenance.from_dict(stored).complete is False

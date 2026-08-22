@@ -116,6 +116,11 @@ class DolphinBackend(ASRBackend):
         self.device_arg = device
         self.engine: Any = None
         self.resolved_device: str | None = None
+        #: Dolphin's checkpoint is float32 throughout; the only precision
+        #: decision this adapter makes is the float64 compatibility cast in
+        #: `_demote_float64`, which is recorded as a fallback rather than
+        #: folded into this value.
+        self.resolved_dtype: str | None = None
 
     @classmethod
     def is_available(cls) -> tuple[bool, str]:
@@ -158,13 +163,23 @@ class DolphinBackend(ASRBackend):
             directory = cache_dir(self.spec.size)
         directory.mkdir(parents=True, exist_ok=True)
         self.resolved_device = self._resolve_device()
+        self.resolved_dtype = "float32"
 
         with suppress_native_output(not self.options.get("verbose")):
             if self.resolved_device == "mps":
                 # Metal has no float64 at all, and `load_model` moves the model
                 # to the device itself, so the cast has to happen in between.
                 self.engine = dolphin.load_model(self.spec.size, str(directory), "cpu")
-                _demote_float64(self.engine)
+                demoted = _demote_float64(self.engine)
+                if demoted:
+                    # A change to the numbers, so it is provenance, not a
+                    # detail: the run is comparable only to other runs that
+                    # made the same cast.
+                    self.record_fallback(
+                        reason="metal has no float64",
+                        cast="float64->float32",
+                        tensors=demoted,
+                    )
                 self.engine = self.engine.to("mps")
                 # `dolphin.transcribe` places its inputs with `model.device`,
                 # a plain string set when the model was built. Moving the

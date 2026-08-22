@@ -27,6 +27,10 @@ def _result(reference_id: str, *, model: str = "model-a", trusted: bool = True):
         revision_status="pinned",
         artifacts=(ArtifactDigest("weights", "weights.bin", 1, "1" * 64),),
         runtime_packages={"test": "1"},
+        # A complete manifest has to name the device it actually ran on:
+        # without one, a CPU run and a Metal run of the same checkpoint hash
+        # to the same execution identity.
+        resolved_settings={"device": "cpu", "dtype": "float32"},
         adapter_git_commit="b" * 40,
         uv_lock_sha256="2" * 64,
     ).finalized()

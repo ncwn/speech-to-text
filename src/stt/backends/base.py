@@ -21,6 +21,7 @@ from stt.provenance import (
     ModelProvenance,
     ProvenanceError,
     collect_runtime_provenance,
+    unresolved_execution_issues,
 )
 from stt.results import TranscriptionResult
 
@@ -230,6 +231,7 @@ class ASRBackend(ABC):
             )
             if self._fallback_history:
                 issues.append("runtime fallback occurred")
+            issues.extend(unresolved_execution_issues(resolved_settings))
             return replace(
                 provenance,
                 requested_settings=requested_settings,
