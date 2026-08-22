@@ -651,8 +651,10 @@ def collect_runtime_provenance(
             "tokenizer.model",
             "*.py",
             "model.safetensors",
+            "model.safetensors.index.json",
             "model-*.safetensors",
             "pytorch_model.bin",
+            "pytorch_model.bin.index.json",
             "pytorch_model-*.bin",
         )
         if getattr(spec, "family", None) == "mms" and getattr(spec, "lang", None):
