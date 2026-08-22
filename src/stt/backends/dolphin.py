@@ -25,6 +25,7 @@ from typing import Any, ClassVar
 from stt.audio import join_segments
 from stt.backends.base import ASRBackend
 from stt.native import suppress_native_output
+from stt.paths import cache_dir
 from stt.registry import register
 from stt.results import Segment, TranscriptionResult
 
@@ -50,13 +51,12 @@ MODELS: dict[str, DolphinModel] = {
 
 DEFAULT_MODEL = "small"
 
-#: Weights land here rather than in the repo, matching the other backends.
 #: Dolphin writes ``config.yaml`` and ``train.yaml`` alongside the ``.pt`` under
 #: whatever directory it is handed, and skips files that already exist. Sharing
 #: one directory across sizes therefore leaves the *first* model's config next to
 #: a later model's weights, and the load fails with a shape mismatch. Give each
 #: size its own directory.
-CACHE_ROOT = Path.home() / ".cache" / "dolphin"
+CACHE_ROOT = cache_dir("dolphin", create=False)
 
 
 def cache_dir(size: str) -> Path:
@@ -117,8 +117,6 @@ class DolphinBackend(ASRBackend):
         self.engine: Any = None
         self.resolved_device: str | None = None
 
-    # ------------------------------------------------------------------ setup
-
     @classmethod
     def is_available(cls) -> tuple[bool, str]:
         try:
@@ -134,17 +132,10 @@ class DolphinBackend(ASRBackend):
             return self.device_arg
         if torch.cuda.is_available():
             return "cuda"
-        # Metal works here — see `_demote_float64` for what it took — but it is
-        # slower for this model, so it is not the default. Measured on three
-        # FLEURS clips, identical text either way:
-        #
-        #   cpu   RTF 0.18   1.89 cores
-        #   mps   RTF 0.25   0.27 cores, 5.0 GB GPU
-        #
-        # Dolphin is small and runs 20-second windows one at a time, so kernel
-        # launch overhead outweighs what the GPU wins back. `--device mps` is
-        # still worth having: it frees the CPU almost entirely, which is what
-        # matters when something else needs those cores.
+        # Metal works here — see `_demote_float64` for what it took — but is
+        # slower for this model, so CPU is the default. `--device mps` is still
+        # worth having: it frees the CPU almost entirely.
+        # docs/findings.md#device-defaults
         return "cpu"
 
     def estimated_download_mb(self) -> int | None:
@@ -156,7 +147,15 @@ class DolphinBackend(ASRBackend):
     def load(self) -> None:
         import dolphin
 
-        directory = cache_dir(self.spec.size)
+        binding = self.model_binding
+        if binding is not None:
+            bound_files = [Path(str(item.path)) for item in binding.paths if item.path]
+            directories = {path.resolve().parent for path in bound_files}
+            if len(directories) != 1:
+                raise RuntimeError("Dolphin binding artifacts must share one loader directory")
+            directory = next(iter(directories))
+        else:
+            directory = cache_dir(self.spec.size)
         directory.mkdir(parents=True, exist_ok=True)
         self.resolved_device = self._resolve_device()
 
@@ -184,8 +183,6 @@ class DolphinBackend(ASRBackend):
         import gc
 
         gc.collect()
-
-    # ------------------------------------------------------------- inference
 
     def _check_language(self, language: str | None) -> None:
         if language is None:

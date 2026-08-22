@@ -231,6 +231,28 @@ def test_hf_defaults_to_float32():
     assert cls("whisper-my-small")._resolve_dtype("mps") is torch.float32
 
 
+@pytest.mark.parametrize(
+    ("version", "dtype_key", "audio_key"),
+    [
+        ("4.45.0", "torch_dtype", "audios"),
+        ("4.56.0", "dtype", "audios"),
+        ("4.57.6", "dtype", "audio"),
+    ],
+)
+def test_hf_uses_version_appropriate_transformers_kwargs(
+    monkeypatch, version, dtype_key, audio_key
+):
+    """Keep the declared Transformers 4.45+ range warning-free and usable."""
+    import sys
+    from types import SimpleNamespace
+
+    from stt.backends import transformers_asr
+
+    monkeypatch.setitem(sys.modules, "transformers", SimpleNamespace(__version__=version))
+    assert transformers_asr._dtype_kwargs("sentinel") == {dtype_key: "sentinel"}
+    assert transformers_asr._audio_kwarg("sentinel") == {audio_key: "sentinel"}
+
+
 def test_hf_rejects_non_burmese_language():
     cls = get_backend("hf")
     backend = cls("whisper-my-small")

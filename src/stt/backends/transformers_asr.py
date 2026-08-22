@@ -20,6 +20,8 @@ not for a commercial product.
 
 from __future__ import annotations
 
+import os
+import re
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -103,10 +105,94 @@ MODELS: dict[str, HFModel] = {
     ),
 }
 
-# Chosen on measured CER over FLEURS Burmese (see README), not on reputation:
-# Seamless beat every Whisper fine-tune by a factor of six. Note its weights
-# are CC-BY-NC-4.0 -- fine for evaluation, not for a commercial product.
+# Chosen on measured CER over FLEURS Burmese, not on reputation: Seamless beat
+# every Whisper fine-tune by a factor of six. docs/findings.md#baseline
+# Its weights are CC-BY-NC-4.0 -- evaluation only, never a product.
 DEFAULT_MODEL = "seamless-m4t-v2"
+
+
+def _transformers_version() -> tuple[int, int]:
+    """Return the major/minor Transformers version for API feature checks.
+
+    The HF extra intentionally supports a range of Transformers releases.  A
+    tiny local parser avoids importing another package merely to compare
+    versions, and treats an unrecognised version conservatively as the oldest
+    supported API.
+    """
+    import transformers
+
+    match = re.match(r"(\d+)\.(\d+)", getattr(transformers, "__version__", ""))
+    return (int(match.group(1)), int(match.group(2))) if match else (0, 0)
+
+
+def _dtype_kwargs(dtype: Any) -> dict[str, Any]:
+    """Build model/pipeline dtype kwargs across Transformers API versions.
+
+    ``torch_dtype`` was renamed to ``dtype`` in Transformers 4.56.  Keep the
+    old spelling for the project's declared 4.45+ compatibility range while
+    using the non-deprecated spelling everywhere it is supported.
+    """
+    key = "dtype" if _transformers_version() >= (4, 56) else "torch_dtype"
+    return {key: dtype}
+
+
+def _audio_kwarg(audio: Any) -> dict[str, Any]:
+    """Build the Seamless processor audio kwarg across API versions.
+
+    The processor accepted ``audios`` through 4.56; ``audio`` was added in
+    4.57 and the former spelling is scheduled for removal in 4.59.
+    """
+    key = "audio" if _transformers_version() >= (4, 57) else "audios"
+    return {key: audio}
+
+
+def _bound_hf_snapshot(binding: Any) -> Path:
+    """Return the exact local directory containing a validated HF binding.
+
+    The provenance preflight records paths for every file selected from the
+    commit-addressed snapshot. Passing the Hub repo id plus a revision here
+    would still let ``transformers`` consult another cache entry, so bound
+    workers must use the worker-local paths themselves. A common parent keeps
+    nested artifacts (for example ``vocabs/mya.txt``) in the same snapshot
+    while preserving their individual digest validation.
+    """
+    from stt.provenance import validate_binding
+
+    issues = validate_binding(binding)
+    if issues:
+        raise RuntimeError("bound Hugging Face artifacts are invalid: " + "; ".join(issues))
+
+    declared = tuple(binding.provenance.artifacts)
+    by_name = {item.name: item for item in binding.paths}
+    if len(by_name) != len(declared) or any(
+        artifact.name not in by_name or not by_name[artifact.name].path for artifact in declared
+    ):
+        missing = sorted({artifact.name for artifact in declared} - set(by_name))
+        raise RuntimeError("bound Hugging Face artifacts have no local path: " + ", ".join(missing))
+
+    # ``ModelBinding.validate`` guarantees this one-to-one lookup has the same
+    # descriptor identity that ``validate_binding`` hashed above; do not select
+    # a second path by iterating an untrusted list.
+    paths = [by_name[artifact.name] for artifact in declared]
+    files = [Path(item.path).expanduser().resolve(strict=True) for item in paths]
+    try:
+        root = Path(os.path.commonpath([str(path.parent) for path in files]))
+    except ValueError as exc:
+        raise RuntimeError("bound Hugging Face artifacts are not on one local snapshot") from exc
+    if not root.is_dir():
+        raise RuntimeError(f"bound Hugging Face snapshot directory is unavailable: {root}")
+    for path, item in zip(files, paths, strict=True):
+        try:
+            relative = path.relative_to(root).as_posix()
+        except ValueError as exc:
+            raise RuntimeError(
+                "bound Hugging Face artifacts are not contained by one local snapshot"
+            ) from exc
+        if relative != item.name:
+            raise RuntimeError(
+                f"bound Hugging Face artifact path does not match its manifest name: {item.name}"
+            )
+    return root
 
 
 @register
@@ -137,8 +223,7 @@ class TransformersASRBackend(ASRBackend):
         self._seamless: tuple[Any, Any] | None = None
         self.resolved_device: str | None = None
         self.resolved_dtype: str | None = None
-
-    # ------------------------------------------------------------------ setup
+        self.resolved_revision: str | None = None
 
     @classmethod
     def is_available(cls) -> tuple[bool, str]:
@@ -178,18 +263,11 @@ class TransformersASRBackend(ASRBackend):
             if self.dtype_arg not in named:
                 raise ValueError(f"Unknown dtype {self.dtype_arg!r}. Choose from {sorted(named)}")
             return named[self.dtype_arg]
-        # float32 everywhere by default, and measurement backs this up rather
-        # than mere caution. On five FLEURS clips with SeamlessM4T v2 on Metal:
-        #
-        #   float32   RTF 0.16   CER 0.0420
-        #   float16   RTF 0.26   CER 0.0455   (4/5 transcripts differ)
-        #   bfloat16  RTF 0.26   CER 0.0420   (4/5 transcripts differ)
-        #
-        # Half precision is both slower *and* no more accurate here, so it buys
-        # nothing but GPU memory. That is the opposite of omniASR's LLM decoder,
-        # which is matmul-bound and gains from float16 — the best dtype is a
-        # property of the model as much as of the chip, so this backend does not
-        # share omniASR's probe.
+        # Half precision is both slower *and* no more accurate for Seamless, so
+        # it buys nothing but GPU memory — the opposite of omniASR's LLM
+        # decoder. The best dtype is a property of the model as much as of the
+        # chip, so this backend does not share omniASR's probe.
+        # docs/findings.md#precision
         return torch.float32
 
     def estimated_download_mb(self) -> int | None:
@@ -213,13 +291,22 @@ class TransformersASRBackend(ASRBackend):
         self.resolved_device = device
         self.resolved_dtype = str(dtype).replace("torch.", "")
 
-        repo = self.spec.repo
+        binding = self.model_binding
+        revision = binding.provenance.upstream_revision if binding else None
+        self.resolved_revision = revision
+        snapshot = _bound_hf_snapshot(binding) if binding is not None else None
+        source = str(snapshot) if snapshot is not None else self.spec.repo
+
+        def load_kwargs() -> dict[str, Any]:
+            return {"local_files_only": True} if snapshot is not None else {}
 
         if self.spec.family == "seamless":
             from transformers import SeamlessM4Tv2ForSpeechToText
 
-            processor = AutoProcessor.from_pretrained(repo)
-            model = SeamlessM4Tv2ForSpeechToText.from_pretrained(repo, torch_dtype=dtype)
+            processor = AutoProcessor.from_pretrained(source, **load_kwargs())
+            model = SeamlessM4Tv2ForSpeechToText.from_pretrained(
+                source, **load_kwargs(), **_dtype_kwargs(dtype)
+            )
             model.to(device).eval()
             self._seamless = (processor, model)
             self._loaded = True
@@ -228,31 +315,38 @@ class TransformersASRBackend(ASRBackend):
         if self.spec.family == "mms":
             from transformers import Wav2Vec2ForCTC
 
-            processor = AutoProcessor.from_pretrained(repo)
-            model = Wav2Vec2ForCTC.from_pretrained(repo, torch_dtype=dtype)
+            processor = AutoProcessor.from_pretrained(source, **load_kwargs())
+            model = Wav2Vec2ForCTC.from_pretrained(source, **load_kwargs(), **_dtype_kwargs(dtype))
             # MMS is one shared encoder plus a tiny per-language adapter; both
             # the tokenizer and the model have to be switched to Burmese or you
             # silently decode with the previous language's vocabulary.
             processor.tokenizer.set_target_lang(self.spec.lang)
-            model.load_adapter(self.spec.lang)
+            model.load_adapter(self.spec.lang, **load_kwargs())
             model.to(device).eval()
             self.pipe = pipeline(
                 "automatic-speech-recognition",
                 model=model,
                 tokenizer=processor.tokenizer,
                 feature_extractor=processor.feature_extractor,
-                torch_dtype=dtype,
+                **_dtype_kwargs(dtype),
                 device=device,
             )
             self._loaded = True
             return
 
-        self.pipe = pipeline(
-            "automatic-speech-recognition",
-            model=repo,
-            torch_dtype=dtype,
-            device=device,
-        )
+        pipeline_kwargs: dict[str, Any] = {
+            "model": source,
+            **_dtype_kwargs(dtype),
+            "device": device,
+        }
+        if snapshot is not None:
+            pipeline_kwargs["model_kwargs"] = load_kwargs()
+            # Keep tokenizer/feature-extractor resolution on the same pinned,
+            # offline snapshot as the model weights. Pipeline forwards
+            # ``model_kwargs`` to these Auto* loaders on supported versions.
+            pipeline_kwargs["tokenizer"] = source
+            pipeline_kwargs["feature_extractor"] = source
+        self.pipe = pipeline("automatic-speech-recognition", **pipeline_kwargs)
         self._loaded = True
 
     def unload(self) -> None:
@@ -269,8 +363,6 @@ class TransformersASRBackend(ASRBackend):
                 torch.mps.empty_cache()
         except Exception:  # noqa: BLE001 - cache clearing is best-effort
             pass
-
-    # ------------------------------------------------------------- inference
 
     def _transcribe_seamless(self, path: Path) -> list[Segment]:
         """SeamlessM4T has no ASR pipeline, so window the audio by hand."""
@@ -290,7 +382,7 @@ class TransformersASRBackend(ASRBackend):
 
         def decode(chunk: np.ndarray) -> str:
             inputs = processor(
-                audios=np.asarray(chunk), sampling_rate=rate, return_tensors="pt"
+                **_audio_kwarg(np.asarray(chunk)), sampling_rate=rate, return_tensors="pt"
             ).to(model.device, model.dtype)
             with torch.inference_mode():
                 tokens = model.generate(**inputs, tgt_lang=self.spec.lang)
@@ -298,35 +390,121 @@ class TransformersASRBackend(ASRBackend):
 
         return windowed(pcm, rate, window, decode)
 
-    def _transcribe_pipeline(self, path: Path) -> tuple[str, list[Segment]]:
-        kwargs: dict[str, Any]
+    def _transcribe_seamless_batch(self, paths: list[Path], batch_size: int) -> list[list[Segment]]:
+        """Decode Seamless windows in batches while preserving file order."""
+        import numpy as np
+        import soundfile as sf
+        import torch
+
+        from stt.audio import split_on_quiet
+
+        assert self._seamless is not None
+        processor, model = self._seamless
+        window, _ = _CHUNKING["seamless"]
+        loaded: list[tuple[np.ndarray, int]] = []
+        for path in paths:
+            pcm, rate = sf.read(str(path), dtype="float32", always_2d=False)
+            if pcm.ndim > 1:
+                pcm = pcm.mean(axis=1)
+            loaded.append((pcm, rate))
+
+        # The normal CLI path converts everything to 16 kHz. If a caller uses
+        # the backend directly with mixed rates, retain the old per-file path.
+        if len({rate for _, rate in loaded}) != 1:
+            return [self._transcribe_seamless(path) for path in paths]
+
+        rate = loaded[0][1]
+        pending: list[tuple[int, int, int, np.ndarray]] = []
+        segments: list[list[Segment]] = [[] for _ in paths]
+        for file_index, (pcm, _) in enumerate(loaded):
+            for start, end in split_on_quiet(pcm, rate, window):
+                if end - start < rate * 0.2:
+                    continue
+                pending.append((file_index, start, end, pcm[start:end]))
+
+        def decode_single(chunk: np.ndarray) -> str:
+            inputs = processor(
+                **_audio_kwarg(np.asarray(chunk)),
+                sampling_rate=rate,
+                return_tensors="pt",
+            ).to(model.device, model.dtype)
+            with torch.inference_mode():
+                tokens = model.generate(**inputs, tgt_lang=self.spec.lang)
+            return processor.decode(tokens[0].tolist(), skip_special_tokens=True).strip()
+
+        # Padding a very short tail changes its decoder context on some Metal
+        # kernels. Keep those tails on the exact serial path; full windows still
+        # carry the throughput gain from list batching.
+        batchable = []
+        for item in pending:
+            file_index, start, end, chunk = item
+            if len(chunk) < rate * 2.0:
+                text = decode_single(chunk)
+                if text:
+                    segments[file_index].append(
+                        Segment(
+                            text=text,
+                            start=start / rate,
+                            end=end / rate,
+                            source="chunk",
+                        )
+                    )
+            else:
+                batchable.append(item)
+
+        for offset in range(0, len(batchable), max(1, batch_size)):
+            group = batchable[offset : offset + max(1, batch_size)]
+            chunks = [item[3] for item in group]
+            inputs = processor(
+                **_audio_kwarg(chunks),
+                sampling_rate=rate,
+                return_tensors="pt",
+                padding=True,
+            ).to(model.device, model.dtype)
+            with torch.inference_mode():
+                tokens = model.generate(**inputs, tgt_lang=self.spec.lang)
+            texts = [
+                processor.decode(row.tolist(), skip_special_tokens=True).strip() for row in tokens
+            ]
+            if len(texts) != len(group):
+                raise RuntimeError(
+                    f"Seamless returned {len(texts)} transcript(s) for {len(group)} windows"
+                )
+            for (file_index, start, end, _), text in zip(group, texts, strict=True):
+                if text:
+                    segments[file_index].append(
+                        Segment(
+                            text=text,
+                            start=start / rate,
+                            end=end / rate,
+                            source="chunk",
+                        )
+                    )
+        for items in segments:
+            items.sort(key=lambda item: (item.start, item.end))
+        return segments
+
+    def _pipeline_kwargs(self) -> dict[str, Any]:
         if self.spec.family == "whisper":
-            # Deliberately no chunk_length_s. Whisper carries its own sequential
-            # long-form algorithm that conditions each 30 s window on the
-            # previous one; the pipeline's naive chunking discards that context
-            # and transformers warns it is less accurate. return_timestamps is
-            # what switches the sequential path on.
-            kwargs = {
+            # Whisper's sequential long-form path conditions each window on the
+            # previous one; keep this path serial and let the caller preserve
+            # that state rather than using naive list batching.
+            return {
                 "return_timestamps": True,
                 "generate_kwargs": {"language": self.spec.lang, "task": "transcribe"},
             }
-        else:
-            # CTC models have no cross-window state, so fixed windows with an
-            # overlapping stride are the correct approach here.
-            window, stride = _CHUNKING[self.spec.family]
-            kwargs = {"chunk_length_s": window, "stride_length_s": stride}
-        out = self.pipe(str(path), **kwargs)
+        window, stride = _CHUNKING[self.spec.family]
+        return {"chunk_length_s": window, "stride_length_s": stride}
+
+    @staticmethod
+    def _decode_pipeline_output(out: Any) -> tuple[str, list[Segment]]:
         if not isinstance(out, dict):
             return str(out).strip(), []
         text = str(out.get("text", "")).strip()
-
-        # Whisper's sequential long-form path returns per-window timestamps.
-        # CTC families run without them, so `chunks` is simply absent there.
         segments: list[Segment] = []
         for chunk in out.get("chunks") or []:
             stamp = chunk.get("timestamp") or (None, None)
             piece = str(chunk.get("text", "")).strip()
-            # The final chunk's end is None when the decoder hit the audio end.
             if not piece or stamp[0] is None:
                 continue
             segments.append(
@@ -339,6 +517,28 @@ class TransformersASRBackend(ASRBackend):
             )
         return text, segments
 
+    def _transcribe_pipeline(self, path: Path) -> tuple[str, list[Segment]]:
+        out = self.pipe(str(path), **self._pipeline_kwargs())
+        return self._decode_pipeline_output(out)
+
+    def _transcribe_pipeline_batch(
+        self, paths: list[Path], batch_size: int
+    ) -> list[tuple[str, list[Segment]]]:
+        """Use Transformers' list-input batching for non-Whisper pipelines."""
+        if self.spec.family == "whisper":
+            return [self._transcribe_pipeline(path) for path in paths]
+        out = self.pipe(
+            [str(path) for path in paths],
+            batch_size=max(1, batch_size),
+            **self._pipeline_kwargs(),
+        )
+        if not isinstance(out, list) or len(out) != len(paths):
+            raise RuntimeError(
+                f"Transformers returned {len(out) if isinstance(out, list) else 1} "
+                f"transcript(s) for {len(paths)} input(s)"
+            )
+        return [self._decode_pipeline_output(item) for item in out]
+
     def transcribe(
         self,
         audio_paths: list[Path],
@@ -348,9 +548,14 @@ class TransformersASRBackend(ASRBackend):
         if not self._loaded:
             self.load()
 
+        if batch_size < 1:
+            raise ValueError("batch_size must be at least 1")
+
+        self._check_language(language)
+
         from stt.audio import duration_of
 
-        results: list[TranscriptionResult] = []
+        slots: list[TranscriptionResult | None] = [None] * len(audio_paths)
         meta = {
             "repo": self.spec.repo,
             "family": self.spec.family,
@@ -358,47 +563,126 @@ class TransformersASRBackend(ASRBackend):
             "dtype": self.resolved_dtype,
         }
 
-        for path in audio_paths:
-            duration = None
-            try:
-                self._check_language(language)
-                duration = duration_of(path)
-                started = time.perf_counter()
-                if self.spec.family == "seamless":
-                    segments = self._transcribe_seamless(path)
-                    text = join_segments(segments)
-                else:
-                    text, segments = self._transcribe_pipeline(path)
-                elapsed = time.perf_counter() - started
+        def failed(path: Path, duration: float | None, exc: Exception) -> TranscriptionResult:
+            return TranscriptionResult(
+                audio_path=str(path),
+                text="",
+                backend=self.name,
+                model=self.model,
+                language=language,
+                audio_duration_s=duration,
+                error=f"{type(exc).__name__}: {exc}",
+                metadata=dict(meta),
+            )
 
-                results.append(
-                    TranscriptionResult(
+        for offset in range(0, len(audio_paths), batch_size):
+            chunk = audio_paths[offset : offset + batch_size]
+            valid: list[tuple[int, Path, float]] = []
+            for relative, path in enumerate(chunk):
+                index = offset + relative
+                duration: float | None = None
+                try:
+                    duration = duration_of(path)
+                    valid.append((index, path, duration))
+                except Exception as exc:  # noqa: BLE001 - preserve one-result-per-input
+                    slots[index] = failed(path, duration, exc)
+
+            if not valid:
+                continue
+
+            paths = [path for _, path, _ in valid]
+            can_batch = batch_size > 1 and len(paths) > 1 and self.spec.family != "whisper"
+            started = time.perf_counter()
+            try:
+                if can_batch and self.spec.family == "seamless":
+                    decoded = [
+                        (join_segments(items), items)
+                        for items in self._transcribe_seamless_batch(paths, batch_size)
+                    ]
+                elif can_batch:
+                    decoded = self._transcribe_pipeline_batch(paths, batch_size)
+                else:
+                    decoded = []
+                    for path in paths:
+                        if self.spec.family == "seamless":
+                            items = self._transcribe_seamless(path)
+                            decoded.append((join_segments(items), items))
+                        else:
+                            decoded.append(self._transcribe_pipeline(path))
+                elapsed = time.perf_counter() - started
+                total_duration = sum(duration for _, _, duration in valid)
+                weights = (
+                    [duration / total_duration for _, _, duration in valid]
+                    if can_batch and total_duration > 0
+                    else [1.0] * len(valid)
+                )
+                for (index, path, duration), (text, segments), weight in zip(
+                    valid, decoded, weights, strict=True
+                ):
+                    slots[index] = TranscriptionResult(
                         audio_path=str(path),
                         text=text,
                         backend=self.name,
                         model=self.model,
                         language=language,
-                        elapsed_s=elapsed,
+                        elapsed_s=elapsed * weight,
                         audio_duration_s=duration,
-                        metadata=dict(meta),
+                        metadata={
+                            **meta,
+                            **(
+                                {
+                                    "batch_size": batch_size,
+                                    "batch_items": len(paths),
+                                    "batch_elapsed_s": elapsed,
+                                    "elapsed_s_source": "batch_proportional",
+                                }
+                                if can_batch
+                                else {}
+                            ),
+                        },
                         segments=segments or None,
                     )
-                )
-            except Exception as exc:  # noqa: BLE001 - one bad clip must not abort the sweep
-                results.append(
-                    TranscriptionResult(
-                        audio_path=str(path),
-                        text="",
-                        backend=self.name,
-                        model=self.model,
-                        language=language,
-                        audio_duration_s=duration,
-                        error=f"{type(exc).__name__}: {exc}",
-                        metadata=dict(meta),
-                    )
-                )
+            except Exception as batch_exc:  # noqa: BLE001 - retry individually
+                import logging
 
-        return results
+                if can_batch:
+                    logging.getLogger(__name__).warning(
+                        "HF batch of %d file(s) failed (%s: %s); retrying individually.",
+                        len(paths),
+                        type(batch_exc).__name__,
+                        batch_exc,
+                    )
+                for index, path, duration in valid:
+                    single_started = time.perf_counter()
+                    try:
+                        if self.spec.family == "seamless":
+                            segments = self._transcribe_seamless(path)
+                            text = join_segments(segments)
+                        else:
+                            text, segments = self._transcribe_pipeline(path)
+                        single_elapsed = time.perf_counter() - single_started
+                        slots[index] = TranscriptionResult(
+                            audio_path=str(path),
+                            text=text,
+                            backend=self.name,
+                            model=self.model,
+                            language=language,
+                            elapsed_s=single_elapsed,
+                            audio_duration_s=duration,
+                            metadata={
+                                **meta,
+                                "batch_size": batch_size,
+                                "batch_items": len(paths),
+                                "batch_fallback": can_batch,
+                                "elapsed_s_source": "measured",
+                            },
+                            segments=segments or None,
+                        )
+                    except Exception as exc:  # noqa: BLE001 - preserve one-result contract
+                        slots[index] = failed(path, duration, exc)
+
+        assert all(result is not None for result in slots)
+        return [result for result in slots if result is not None]
 
     def _check_language(self, language: str | None) -> None:
         """These models are Burmese-only here; reject anything else loudly.
