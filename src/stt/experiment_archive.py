@@ -29,8 +29,12 @@ from stt.measurement import (
     read_journal,
     read_request,
     read_response,
+    write_journal,
     write_json_atomic,
+    write_request,
+    write_response,
 )
+from stt.paths import checkout_root
 
 DEFAULT_EXPERIMENT_ROOT = Path("evidence/experiments")
 MANIFEST_VERSION = "experiment-manifest-v1"
@@ -38,6 +42,13 @@ REQUIRED_WORKER_KINDS = frozenset({"request", "response", "journal", "stdout", "
 _ARTIFACT_RE = re.compile(
     r"^(?P<stem>.+)\.(?P<kind>request|response|journal|stdout|stderr)\.(?:json|txt)$"
 )
+_PATH_FIELDS = {
+    "audio_path",
+    "source_path",
+    "prepared_path",
+    "path",
+    "python_executable",
+}
 
 
 def _canonical_json(value: object) -> str:
@@ -124,6 +135,94 @@ def _read_worker_group(
     return request, response, journal
 
 
+def _portable_path(value: str) -> str:
+    """Return a checkout-relative path or reject an external local path."""
+    path = Path(value)
+    if not path.is_absolute():
+        return value
+    root = checkout_root()
+    if root is None:
+        raise ValueError(f"cannot publish an absolute local path outside a checkout: {value}")
+    try:
+        relative = path.relative_to(root.resolve())
+        if ".." in relative.parts:
+            raise ValueError
+        return relative.as_posix()
+    except ValueError as exc:
+        raise ValueError(f"experiment artifact exposes an external local path: {value}") from exc
+
+
+def _portable_json(value: Any, *, field_name: str | None = None) -> Any:
+    """Canonicalize structured path fields without touching transcript text."""
+    if isinstance(value, dict):
+        return {str(key): _portable_json(item, field_name=str(key)) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_portable_json(item, field_name=field_name) for item in value]
+    if isinstance(value, str) and (
+        field_name in _PATH_FIELDS or bool(field_name and field_name.endswith(("_path", "_dir")))
+    ):
+        return _portable_path(value)
+    return value
+
+
+def _reject_local_absolute_strings(value: Any, *, location: str = "root") -> None:
+    """Prove no user-local absolute path escaped structured canonicalization."""
+    if isinstance(value, dict):
+        for key, item in value.items():
+            _reject_local_absolute_strings(item, location=f"{location}.{key}")
+        return
+    if isinstance(value, (list, tuple)):
+        for index, item in enumerate(value):
+            _reject_local_absolute_strings(item, location=f"{location}[{index}]")
+        return
+    if not isinstance(value, str):
+        return
+    root = checkout_root()
+    local_prefixes = tuple(
+        prefix
+        for prefix in (
+            str(root.resolve()) if root is not None else None,
+            "/Users/",
+            "/Volumes/",
+        )
+        if prefix
+    )
+    if value.startswith(local_prefixes):
+        raise ValueError(f"experiment artifact retains a local path at {location}")
+
+
+def _portable_worker_group(
+    request: WorkerRequest,
+    response: WorkerResponse,
+    journal: WorkerJournal,
+) -> tuple[WorkerRequest, WorkerResponse, WorkerJournal]:
+    """Canonicalize archived copies and consistently rebind their request hash."""
+    request_raw = _portable_json(request.to_dict())
+    _reject_local_absolute_strings(request_raw, location="request")
+    portable_request = WorkerRequest.from_dict(request_raw)
+    request_sha256 = portable_request.identity_sha256
+
+    response_raw = _portable_json(response.to_dict())
+    response_raw["request_sha256"] = request_sha256
+    _reject_local_absolute_strings(response_raw, location="response")
+    portable_response = WorkerResponse.from_dict(response_raw)
+
+    journal_raw = _portable_json(journal.to_dict())
+    journal_raw["request_sha256"] = request_sha256
+    _reject_local_absolute_strings(journal_raw, location="journal")
+    portable_journal = WorkerJournal.from_dict(journal_raw)
+    return portable_request, portable_response, portable_journal
+
+
+def _portable_log_text(value: str) -> str:
+    root = checkout_root()
+    if root is not None:
+        value = value.replace(str(root.resolve()), ".")
+    if "/Users/" in value or "/Volumes/" in value:
+        raise ValueError("experiment worker log retains an external local path")
+    return value
+
+
 def publish_experiment(
     summary: Mapping[str, Any],
     raw_artifacts: Mapping[str, Sequence[str | Path]],
@@ -176,6 +275,7 @@ def publish_experiment(
         seen_request_sha256: set[str] = set()
         for (condition_id, _), files in sorted(groups.items()):
             request, response, journal = _read_worker_group(condition_id, files)
+            request, response, journal = _portable_worker_group(request, response, journal)
             request_sha256 = request.identity_sha256
             if request_sha256 in seen_request_sha256:
                 raise ValueError(f"duplicate worker request identity: {request_sha256}")
@@ -187,7 +287,15 @@ def publish_experiment(
                 relative = worker_dir / f"{kind}.{extension}"
                 destination = _path_safe(relative, staging)
                 destination.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(files[kind], destination)
+                if kind == "request":
+                    write_request(request, destination)
+                elif kind == "response":
+                    write_response(response, destination)
+                elif kind == "journal":
+                    write_journal(journal, destination)
+                else:
+                    value = files[kind].read_text(encoding="utf-8")
+                    destination.write_text(_portable_log_text(value), encoding="utf-8")
                 manifest.append(
                     {
                         "path": relative.as_posix(),

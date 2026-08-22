@@ -38,8 +38,8 @@ from stt.provenance import ArtifactDigest, ModelBinding, ModelProvenance
 
 def _audio(*, suffix: str = "1", source: str = "2") -> AudioInput:
     return AudioInput(
-        source_path=f"/source/{suffix}.wav",
-        prepared_path=f"/prepared/{suffix}.wav",
+        source_path=f"data/source/{suffix}.wav",
+        prepared_path=f"data/prepared/{suffix}.wav",
         reference_id=f"clip-{suffix}",
         source_sha256=source * 64,
         audio_id=f"pcm16:16000:1:{suffix * 64}",
@@ -60,7 +60,7 @@ def _provenance(subject: SubjectSpec, *, device: str = "cpu") -> ModelProvenance
         "model.bin",
         7,
         "a" * 64,
-        path="/models/model.bin",
+        path=str(Path.cwd() / ".cache/test-model.bin"),
     )
     return ModelProvenance(
         backend=subject.backend,
@@ -154,6 +154,8 @@ def _responses(
                     {
                         "audio_id": item.audio_id,
                         "reference_id": item.reference_id,
+                        "audio_path": str(Path.cwd() / item.prepared_path),
+                        "source_path": str(Path.cwd() / item.source_path),
                         "text": text.get(condition.condition_id, "stable"),
                         "trusted": True,
                         "error": None,
@@ -209,6 +211,7 @@ def _responses(
                     host={"chip": "test", "platform": "test-os", "machine": "arm64"},
                     environment={
                         "python": "3.12",
+                        "python_executable": str(Path.cwd() / ".venv/bin/python3"),
                         "platform": "test-os",
                         "machine": "arm64",
                         "packages": {"runtime": "1"},
@@ -465,10 +468,20 @@ def test_experiment_archive_round_trip_and_raw_tamper_detection(tmp_path):
     raw_dir.mkdir()
     raw = _raw_artifacts(raw_dir, spec, responses)
     summary = summarize_experiment(spec, responses)
+    raw_request = next(path for paths in raw.values() for path in paths if ".request." in path.name)
+    raw_request_before = raw_request.read_text(encoding="utf-8")
+    assert str(Path.cwd()) in raw_request_before
 
     descriptor = publish_experiment(summary, raw, root=tmp_path / "experiments")
 
     assert verify_experiment(descriptor) == []
+    assert raw_request.read_text(encoding="utf-8") == raw_request_before
+    for path in descriptor.parent.rglob("*"):
+        if path.is_file():
+            content = path.read_text(encoding="utf-8")
+            assert str(Path.cwd()) not in content
+            assert "/Users/" not in content
+            assert "/Volumes/" not in content
     archived_response = next(descriptor.parent.glob("workers/**/response.json"))
     archived_response.write_text("tampered\n", encoding="utf-8")
     assert any("checksum mismatch" in issue for issue in verify_experiment(descriptor))
