@@ -687,6 +687,40 @@ def _same_audio(recorded: str, source: Path, prepared: Path) -> bool:
     return recorded_path in {_normalized_path(source), _normalized_path(prepared)}
 
 
+def _refuse_to_clobber_another_run(path: Path, result: TranscriptionResult) -> None:
+    """Refuse to overwrite a JSONL that belongs to a different run.
+
+    `stt align -o` writes a record whose backend is "align" and whose model is
+    the aligner. Pointed at a name a transcription run already owns, it
+    replaces that run's identity in place: the file keeps the transcript but
+    loses the backend, model and timings that said where it came from. That is
+    exactly how outputs/eternity-7b.jsonl stopped being a 7B run, and nothing
+    reported it until the manifest was audited months later.
+    """
+    if not path.is_file():
+        return
+    try:
+        existing = read_jsonl(path)
+    except (OSError, ValueError):
+        return  # Unreadable: not something to protect.
+    conflicting = sorted(
+        {
+            (record.backend, record.model)
+            for record in existing
+            if (record.backend, record.model) != (result.backend, result.model)
+        }
+    )
+    if not conflicting:
+        return
+    owners = ", ".join(f"{backend}/{model}" for backend, model in conflicting)
+    raise typer.BadParameter(
+        f"{path} already holds a run from {owners}, and this command would "
+        f"replace it with {result.backend}/{result.model}. Pass --output with a "
+        "different name; the transcription run's provenance is not recoverable "
+        "once overwritten."
+    )
+
+
 @app.command("align")
 def align_cmd(
     audio: Annotated[Path, typer.Argument(help="Audio file to align against")],
@@ -813,6 +847,7 @@ def align_cmd(
             model_provenance=model_provenance,
         )
     stem = output or DEFAULT_OUTPUT_DIR / f"{audio.stem}"
+    _refuse_to_clobber_another_run(stem.with_suffix(".jsonl"), result)
     if srt:
         console.print(f"{write_srt(result, stem.with_suffix('.srt'))} cues → {stem}.srt")
     if vtt:
@@ -1185,7 +1220,11 @@ def compare(
                 result.trusted = False
                 if issue not in result.trust_issues:
                     result.trust_issues.append(issue)
-        write_jsonl(results, output_dir / f"{name}.jsonl")
+        # Keyed on backend *and* model, for the same reason `stt transcribe`
+        # is: keying on the backend alone silently overwrote one run with
+        # another, and this command is the one the docs print under Reproduce.
+        model_slug = _slug(results[0].model) if results else name
+        write_jsonl(results, output_dir / f"{name}-{model_slug}.jsonl")
 
         score = scores.get(name)
         cer_value = None

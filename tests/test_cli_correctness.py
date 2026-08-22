@@ -612,7 +612,9 @@ def test_compare_without_reference_fails_closed_on_untrusted_results(
 
     assert strict.exit_code == 1, strict.output
     assert "untrusted" in strict.output
-    (strict_result,) = read_jsonl(output_dir / "fake.jsonl")
+    # Keyed on backend and model, so two models behind one backend
+    # cannot overwrite each other.
+    (strict_result,) = read_jsonl(output_dir / "fake-fake.jsonl")
     assert not strict_result.trusted
 
     partial = runner.invoke(
@@ -631,5 +633,30 @@ def test_compare_without_reference_fails_closed_on_untrusted_results(
 
     assert partial.exit_code == 0, partial.output
     assert "partial diagnostic artifacts" in partial.output
-    (partial_result,) = read_jsonl(output_dir / "fake.jsonl")
+    (partial_result,) = read_jsonl(output_dir / "fake-fake.jsonl")
     assert not partial_result.trusted
+
+
+def test_align_refuses_to_overwrite_a_transcription_run(tmp_path):
+    """The exact defect that turned a 7B run into an alignment record.
+
+    `stt align -o` writes backend="align", model="mms-1b-all". Pointed at a
+    name a transcription run owns, it replaced that run's identity in place:
+    the transcript survived but the backend, model and timings that said where
+    it came from did not, and nothing reported it.
+    """
+    from stt.cli import _refuse_to_clobber_another_run
+
+    path = tmp_path / "eternity.jsonl"
+    write_jsonl([_result("clip", model="omniASR_LLM_Unlimited_7B_v2")], path)
+    aligned = TranscriptionResult(
+        audio_path="clip.wav", text="စာ", backend="align", model="mms-1b-all"
+    )
+
+    with pytest.raises(Exception) as caught:
+        _refuse_to_clobber_another_run(path, aligned)
+    assert "already holds a run from" in str(caught.value)
+
+    # Rewriting a run with its own identity is ordinary, and a new name is fine.
+    _refuse_to_clobber_another_run(path, _result("clip", model="omniASR_LLM_Unlimited_7B_v2"))
+    _refuse_to_clobber_another_run(tmp_path / "fresh.jsonl", aligned)
