@@ -63,14 +63,17 @@ coverage rather than trusting the tags.
 
 ### Confirmed to support Burmese
 
+Measured here where a row says "benchmarked" — those numbers live in
+[Baseline](findings.md#baseline), not in this table.
+
 | Model | Params | Licence | Runtime | Burmese evidence |
 |---|---:|---|---|---|
-| `omniASR_LLM_Unlimited_7B_v2` | 7B | Apache-2.0 | fairseq2, **CPU** | Meta claims CER 4.4; **measured 0.1017** here |
-| `omniASR_LLM_*_3B/1B/300M_v2` | 3B–300M | Apache-2.0 | fairseq2 CPU; 300M/1B also GGUF/Metal | measured here: 3B 0.1196, 300M 0.1298 |
-| `DataoceanAI/dolphin-small` | 372M | Apache-2.0 | funasr | **measured 0.1722** here; no published Burmese score |
+| `omniASR_LLM_Unlimited_7B_v2` | 7B | Apache-2.0 | fairseq2, Metal | Meta claims CER 4.4; benchmarked |
+| `omniASR_LLM_*_3B/1B/300M_v2` | 3B–300M | Apache-2.0 | fairseq2 Metal; 300M/1B also GGUF | benchmarked |
+| `DataoceanAI/dolphin-small` | 372M | Apache-2.0 | funasr | benchmarked; no published Burmese score |
 | `DataoceanAI/dolphin-base` | 140M | Apache-2.0 | funasr | same |
-| `facebook/mms-1b-all` | 1B | **CC-BY-NC** | transformers, MPS | **measured 0.1796** here |
-| `facebook/seamless-m4t-v2-large` | 2.3B | **CC-BY-NC** | transformers, MPS | **measured 0.1301** here; ASR-only for Burmese |
+| `facebook/mms-1b-all` | 1B | **CC-BY-NC** | transformers, MPS | benchmarked |
+| `facebook/seamless-m4t-v2-large` | 2.3B | **CC-BY-NC** | transformers, MPS | benchmarked; ASR-only for Burmese |
 | `chuuhtetnaing/whisper-large-v3-myanmar` | 1.55B | Apache-2.0 | transformers/MLX | **54.9 % WER on its own eval** |
 | `chuuhtetnaing/whisper-{medium,small,tiny}-myanmar` | 769M–39M | Apache-2.0 | transformers/MLX | same corpus, smaller |
 | `YonaKhine/finetuned-w2v2-bert-burmese-asr` | ~600M | MIT | transformers | no published score |
@@ -93,32 +96,26 @@ only `base` and `small` are public — `medium` (910M) and `large` (1.68B) are n
 ### Notes on the omniASR checkpoints
 
 `facebook/omniASR-LLM-{300M,1B,3B,7B}` on Hugging Face are raw fairseq2 `.pt` files, not
-`transformers` ports, so they do **not** open an MPS path. The Metal ceiling is still the
-1B GGUF that CrispASR ships (0.8.29 is current; no larger conversion exists).
+`transformers` ports. That does not block Metal: fairseq2's own MPS path runs every card,
+including the 7B ([Device defaults](findings.md#device-defaults)). What the GGUF ladder
+still caps is *quantised* inference — CrispASR converts up to 1B and no further
+(0.8.29 is current).
 
 Burmese CER by size is not published — Meta's
 [`per_language_results_table_7B_llm_asr.csv`](https://raw.githubusercontent.com/facebookresearch/omnilingual-asr/main/per_language_results_table_7B_llm_asr.csv)
-covers the 7B only, across 1,683 languages. Measured here on 120 FLEURS test
-clips the curve is 300M 0.1298 → 3B 0.1196 → 7B 0.1017: real but shallow
-returns, about one CER point per 10x parameters.
+covers the 7B only. Measured here, the scaling curve is real but shallow, about
+one CER point per 10× parameters — see [Methodology](findings.md#methodology).
 
 ## Practical ranking for general-domain Burmese audio
 
-Superseded by measurement — see the benchmark table in the README, which scores
+Superseded by measurement — see [Baseline](findings.md#baseline), which scores
 these on 120 FLEURS Burmese **test** clips rather than reasoning from vendor
-claims. Two things that survey work got wrong are worth recording:
+claims.
 
-**Published Burmese numbers are not comparable to each other.** Meta's CER 4.4,
-the 54.9 % WER on the `whisper-large-v3-myanmar` card, and myMediWhisper's
-23.44 % are measured on three different corpora with three different
-normalisation rules, one of which is clinical dialogue. Ordering models by them
-produces the wrong answer.
-
-**A 12-clip screen is not a benchmark.** On 12 FLEURS *dev* clips SeamlessM4T
-scored 0.0594 and omniASR 300M 0.0959 — a 38 % gap. On 120 FLEURS *test* clips
-the same two models score 0.1301 and 0.1298, which is a tie. Every model also
-scored roughly twice as badly on the larger sample. Small-sample results here
-were not merely noisy, they inverted.
+Two things this survey work got wrong are recorded in
+[Methodology](findings.md#methodology): published Burmese numbers are not
+comparable across papers, and a 12-clip screen inverted the ranking rather than
+merely adding noise to it.
 
 ## Licensing
 

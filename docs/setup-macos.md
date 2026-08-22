@@ -17,15 +17,17 @@ brew install ffmpeg libsndfile
 ```
 
 `bootstrap.sh` verifies the prerequisites, creates a Python 3.12 virtualenv, and
-installs both runtimes.
+installs the runtimes.
 
 To install selectively:
 
 ```bash
 uv sync                                    # core CLI + evaluation only
-uv sync --extra gguf                       # + Metal runtime  (small)
-uv sync --extra omniasr                    # + PyTorch stack  (~3 GB of wheels)
-uv sync --extra gguf --extra omniasr       # both
+uv sync --extra gguf                       # + Metal/GGUF runtime  (small)
+uv sync --extra omniasr                    # + PyTorch/fairseq2    (~3 GB of wheels)
+uv sync --extra hf                         # + transformers        (Seamless, MMS, Whisper)
+uv sync --extra dolphin                    # + Dolphin             (pulls funasr + modelscope)
+uv sync --extra gguf --extra omniasr       # any combination
 ```
 
 Verify with `uv run stt backends`.
@@ -55,27 +57,43 @@ Python running under Rosetta is the other usual culprit.
 
 ## Disk
 
-Model weights are cached outside the repo:
+Weights are cached in `.cache/` inside the checkout, so a clone stays
+self-contained:
 
 ```
-~/.cache/fairseq2/assets/     PyTorch checkpoints — up to 31 GB each
-~/.cache/crispasr/            GGUF checkpoints — around 1 GB each
+.cache/fairseq2/     omniASR PyTorch checkpoints — up to 31 GB each
+.cache/crispasr/     omniASR GGUF checkpoints — around 1 GB each
+.cache/dolphin/<size>/   Dolphin checkpoints — 570 MB / 1.5 GB
+.cache/huggingface/  transformers models (Seamless, MMS, Whisper)
+.cache/stt/          the hardware probe — 4 KB
 ```
+
+`.cache/` is gitignored. Set `STT_CACHE_DIR` to put the weights somewhere else
+— `STT_CACHE_DIR=~/.cache` restores the conventional per-user location. Run
+`uv run stt doctor` to see where everything currently is.
 
 Downloading every PyTorch card would need well over 60 GB. Check free space
 before pulling the 7B, and delete cards you are done with rather than letting
 them accumulate.
 
+**One exception: fairseq2.** It reads `~/.cache/fairseq2` directly and exposes
+no environment variable, so its checkpoints are only repo-local if that path is
+a symlink into `.cache/fairseq2`. `stt doctor` reports which arrangement is in
+place and `stt doctor --migrate` offers to relink it.
+
+**The Hugging Face cache is normally shared** with every other Python project on
+the machine. `--migrate` therefore moves only the model repos this project
+names, and leaves anything else where it is.
+
 ## GPU status
 
-`torch.backends.mps.is_available()` returns True, but that only says Metal
-exists — fairseq2 has no validated MPS path, so `omniasr-torch` defaults to CPU
-and will not silently pick MPS. `--device mps` is available to experiment with;
-expect unimplemented-operator errors or wrong output rather than a clean
-speedup.
+All four backends run on Metal. Three default to it; Dolphin defaults to CPU,
+where it is measurably faster. Each default was measured rather than assumed —
+see [Device defaults](findings.md#device-defaults).
 
-For actual GPU acceleration use `omniasr-gguf`, which reaches roughly RTF 0.2
-on an M2 Max with the 300M model — about five times faster than real time.
+`--device` overrides it per run (`auto`, `cpu`, `mps`, `cuda`), and
+`omniasr-torch` falls back to CPU automatically if a Metal kernel fails
+mid-run.
 
 ## Troubleshooting
 
@@ -91,7 +109,7 @@ the 300M card, 31.2 GB for the 7B. fairseq2 prints a progress bar to stderr; if
 you have redirected it, watch the cache directory instead:
 
 ```bash
-du -sh ~/.cache/fairseq2/assets/
+du -sh "$(uv run python -c 'from stt.paths import cache_root; print(cache_root())')/fairseq2"
 ```
 
 **fairseq2 does not resume interrupted downloads.** It writes to
@@ -130,97 +148,20 @@ loads and emits silent garbage rather than raising.
 two sizes at one directory leaves the first model's config next to the second
 model's weights, and the load dies with `size mismatch for
 decoder.decoders.5.norm3.bias`. This backend gives each size its own directory
-under `~/.cache/dolphin/<size>/`; delete any older flat cache.
+under `.cache/dolphin/<size>/`; delete any older flat cache.
 
-## Apple Silicon: which precision, which cores
+## Precision and cores
 
-Two hardware-dependent choices matter, and both are measured rather than
-assumed — the repo probes the machine once and caches the answer under
-`~/.cache/stt/hardware.json`.
+Two hardware-dependent choices matter — which 16-bit format this GPU actually
+accelerates, and how many threads to use — and both are measured rather than
+assumed. The repo probes the machine once and caches the answer under
+`.cache/stt/hardware.json`.
 
-### bfloat16 is not the safe default on Apple GPUs
+`stt hardware` prints what it found. The measurements and what they changed are
+in [Precision](findings.md#precision) and [Threads](findings.md#threads).
 
-Apple's GPUs are built around float16. bfloat16 is *accepted* everywhere but is
-not equally *accelerated*. A 4096² matmul on an M2 Max:
-
-| dtype | GFLOP/s |
-|---|---:|
-| float16 | **12,306** |
-| float32 | 11,253 |
-| bfloat16 | 5,797 |
-
-bfloat16 is 2.1× slower than float16 and slower than float32 — it is being
-emulated. Metal exposes the `bfloat` type broadly, but the simdgroup matrix
-intrinsics that make it fast arrived with Metal 3.1 and the M3-era GPUs, and
-whether *any* shipped Apple GPU has true hardware bfloat16 matrix units is
-disputed. Since that answer changes per generation, `stt.hardware.fastest_dtype`
-times both formats on the actual device instead of consulting a table.
-
-End to end on the omniASR 7B, five FLEURS clips, all producing identical text
-and identical corpus CER (0.0280):
-
-| config | RTF | GPU |
-|---|---:|---:|
-| Metal float16 | **0.61** | 17.1 GB |
-| Metal bfloat16 | 0.70 | 17.1 GB |
-| CPU float32 | 2.14 | — |
-| CPU bfloat16 | 8.85 | — |
-
-### …but the best dtype belongs to the model, not just the chip
-
-SeamlessM4T v2 on the same GPU goes the other way — float32 is both faster and
-more accurate, so half precision buys only memory:
-
-| dtype | RTF | CER |
-|---|---:|---:|
-| float32 | **0.16** | **0.0420** |
-| float16 | 0.26 | 0.0455 |
-| bfloat16 | 0.26 | 0.0420 |
-
-omniASR's LLM decoder is matmul-bound and gains from float16; Seamless is not
-and does not. So the probe drives `omniasr-torch` only, and the `hf` backend
-keeps float32.
-
-### Thread counts are left to macOS
-
-macOS places threads across performance and efficiency cores itself, and
-nothing here overrides it. That is a measured decision, not a stylistic one:
-
-* the GGUF backend runs at **RTF 0.182 on 4, 8 and 12 threads alike** — the
-  work is on the GPU and the CPU sits at 0.05 cores;
-* a torch matmul scales **1.09× from 1 thread to 12**, because Accelerate does
-  its own threading through the AMX unit;
-* torch already derives its default from the system — it picks 8 on an M2 Max,
-  matching `hw.perflevel0.physicalcpu`, without being told.
-
-An earlier version of this repo set thread counts from a detected performance-
-core count and hardcoded `n_threads=8` for the GGUF backend. Both are gone:
-neither changed any measurement, and both could only be wrong on hardware that
-has not been tested.
-
-The core split *is* still detected, for reporting — a benchmark number is not
-interpretable without knowing the machine. `stt hardware` shows it, and it is
-stamped on every result record. Reading macOS's level *names*
-(`hw.perflevel<N>.name`) rather than assuming level 0 is what keeps that correct
-across chips:
-
-| chip | levels |
-|---|---|
-| M2 Max | Performance 8 + Efficiency 4 |
-| M5 Pro | Super 6 + Performance 12 — no efficiency tier at all |
-
-### Nothing about a chip is written down here
-
-Precision, memory headroom and core layout are all read or timed from the
-machine at runtime and cached:
-
-* the float16-versus-bfloat16 choice is **timed on the device**, not looked up,
-  because which one is fast changes by generation and the public accounts
-  disagree;
-* whether a card can afford float32 on CPU is computed from **its checkpoint
-  size against detected RAM**, not from a fixed threshold — the same model is
-  comfortable on a 64 GB machine and impossible on a 16 GB one;
-* core counts and names come from `sysctl`.
-
-`stt hardware` prints the lot. On an untested chip it should need no code
-change to do the right thing.
+Nothing about a chip is written down in this repo: the float16-versus-bfloat16
+choice is timed on the device, whether a card can afford float32 on CPU is
+computed from its checkpoint size against detected RAM, and core counts and
+names come from `sysctl`. On an untested chip it should need no code change to
+do the right thing.

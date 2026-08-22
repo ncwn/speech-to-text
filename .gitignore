@@ -31,6 +31,26 @@ data/.converted/
 data/.slices/
 outputs/**
 !outputs/.gitkeep
+!outputs/README.md
+# The runs behind every number in docs/findings.md. 1.3 MB, and the only way to
+# audit a published figure without re-running 88 GB of models for hours --
+# which is the same reason data/reference/ is tracked. Scratch runs stay out.
+!outputs/t120-*.jsonl
+# ...except a vote or route artifact, which `stt vote` and `stt route` write
+# with trusted=False and no model provenance by construction. Such a file can
+# never back a published number; the evidence renderer recomputes the vote from
+# its constituent runs instead, so tracking one would only invite it to be cited.
+outputs/t120-voted.jsonl
+# The held-out eternity-*.jsonl runs stay out: they are complete transcripts of
+# copyrighted third-party audio, and the audio itself is deliberately not in the
+# repo either (see data/reference/README.md). They cannot back a published
+# number today in any case -- their reference join is broken and they carry no
+# canonical audio_id -- so nothing is lost by keeping them local.
+
+# A hand-authored architecture page nothing links to. Deliberately not adopted:
+# CLAUDE.md is the one home for that description, and a second unlinked copy no
+# guard covers would drift out of agreement with it. Kept on disk, out of git.
+docs/architecture.html
 
 # Third-party sources built from scratch
 vendor/

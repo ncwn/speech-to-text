@@ -15,19 +15,9 @@ The audio itself is **not** in the repo — it is third-party copyrighted
 material. `references.tsv` keys on the audio stem, so drop the source file into
 `data/audio/` and the harness will find it.
 
-Measured on this clip:
-
-| Model | CER |
-|---|---:|
-| omniASR 7B fp32 | 0.0857 |
-| SeamlessM4T v2 | 0.0887 |
-| Dolphin small | 0.1366 |
-| omniASR 300M Q4_K | 0.2245 |
-
-**Read those with the proper-noun caveat.** The protagonist's name occurs 99
-times (2.9 % of the text). omniASR 7B spells it `ဂျုံး` as the reference does;
-SeamlessM4T spells it `ဂျွန်` every time. Correct that one name and Seamless
-(0.0725) overtakes omniASR 7B (0.0831). See the README's held-out section.
+What every model scores on this clip, and why the top two are separated
+entirely by one proper noun, is in
+[`docs/findings.md`](../../docs/findings.md#held-out).
 
 ## Adding another
 
