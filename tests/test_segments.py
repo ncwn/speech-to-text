@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import json
 
+import pytest
+
 from stt.results import (
     Segment,
     TranscriptionResult,
@@ -64,6 +66,63 @@ def test_old_results_without_segments_still_load(tmp_path):
     assert back.segments is None
     assert back.text == "ကမ္ဘာ"
     assert back.rtf == 0.5
+    assert back.audio_id is None
+    assert back.reference_id is None
+    assert back.trusted is False
+    assert back.trust_issues == []
+
+
+def test_identity_and_trust_fields_survive_a_jsonl_round_trip(tmp_path):
+    result = _result(
+        audio_id="pcm16:16000:1:abc",
+        source_path="source/a.flac",
+        source_sha256="def",
+        reference_id="a",
+        trusted=False,
+        trust_issues=["partial voter set"],
+    )
+    path = tmp_path / "trusted-schema.jsonl"
+    write_jsonl([result], path)
+
+    back = read_jsonl(path)[0]
+    assert back.audio_id == "pcm16:16000:1:abc"
+    assert back.source_path == "source/a.flac"
+    assert back.source_sha256 == "def"
+    assert back.reference_id == "a"
+    assert not back.trusted
+    assert back.trust_issues == ["partial voter set"]
+
+
+@pytest.mark.parametrize("raw_trusted", ["false", "true", 0, 1, None])
+def test_non_boolean_trusted_values_are_readable_but_untrusted(tmp_path, raw_trusted):
+    record = _result(trusted=False).to_dict()
+    record["trusted"] = raw_trusted
+    record["trust_issues"] = []
+    path = tmp_path / "malformed-trust.jsonl"
+    path.write_text(json.dumps(record, ensure_ascii=False) + "\n", encoding="utf-8")
+
+    (back,) = read_jsonl(path)
+
+    assert back.trusted is False
+    assert "trusted field must be a JSON boolean" in back.trust_issues
+
+
+def test_malformed_trust_issues_are_readable_but_untrusted(tmp_path):
+    record = _result(trusted=True).to_dict()
+    record["trust_issues"] = "stale provenance"
+    path = tmp_path / "malformed-trust-issues.jsonl"
+    path.write_text(json.dumps(record, ensure_ascii=False) + "\n", encoding="utf-8")
+
+    (back,) = read_jsonl(path)
+
+    assert back.trusted is False
+    assert "stale provenance" in back.trust_issues
+    assert "trust_issues field must be a list of strings" in back.trust_issues
+
+
+def test_zero_elapsed_time_has_a_real_rtf():
+    result = _result(elapsed_s=0.0, audio_duration_s=2.0)
+    assert result.rtf == 0.0
 
 
 def test_no_segments_is_distinct_from_empty_segments(tmp_path):
