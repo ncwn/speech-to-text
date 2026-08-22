@@ -25,7 +25,13 @@ data/audio/**
 # ground truth we have for audio the models cannot have trained on, and
 # unlike the FLEURS sets they cannot be re-fetched.
 !data/reference/**
-data/fleurs*/
+# FLEURS audio is re-fetchable, but its reference transcripts and corpus
+# identity are the other half of every published CER -- without them a
+# clone can audit nothing. `/**` rather than the bare directory because a
+# negation cannot re-include a file whose parent directory is excluded.
+data/fleurs*/**
+!data/fleurs*/references.tsv
+!data/fleurs*/corpus.json
 # Resampled 16 kHz mono copies produced by stt.audio, and ad-hoc slices
 data/.converted/
 data/.slices/

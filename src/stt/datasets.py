@@ -10,6 +10,7 @@ Downloads land in ``data/fleurs/`` and are gitignored.
 from __future__ import annotations
 
 import csv
+import json
 import tarfile
 from pathlib import Path
 
@@ -48,7 +49,7 @@ def fetch_fleurs(
     Returns:
         ``(audio_dir, references_tsv)``.
     """
-    from huggingface_hub import hf_hub_download
+    from huggingface_hub import HfApi, hf_hub_download
 
     if transcript_column not in {"transcription", "raw_transcription"}:
         raise ValueError(f"Unknown transcript column: {transcript_column!r}")
@@ -57,11 +58,19 @@ def fetch_fleurs(
     audio_dir = dest / "audio"
     audio_dir.mkdir(exist_ok=True)
 
+    # Resolve the mutable branch to one commit before downloading anything, so
+    # both files come from the same revision and the corpus can be named later.
+    # Re-fetching without this proves nothing: `main` moves, and a reference set
+    # that quietly changed underneath a published CER is the failure this whole
+    # harness exists to prevent.
+    revision = HfApi().dataset_info(FLEURS_REPO, revision="main").sha
+
     tsv_path = Path(
         hf_hub_download(
             repo_id=FLEURS_REPO,
             filename=f"data/{config}/{split}.tsv",
             repo_type="dataset",
+            revision=revision,
         )
     )
 
@@ -80,6 +89,7 @@ def fetch_fleurs(
             repo_id=FLEURS_REPO,
             filename=f"data/{config}/audio/{split}.tar.gz",
             repo_type="dataset",
+            revision=revision,
         )
     )
 
@@ -98,6 +108,24 @@ def fetch_fleurs(
             extracted.add(name)
             if len(extracted) == len(wanted):
                 break
+
+    # The corpus identity travels with the corpus. Without it a clone can
+    # re-fetch "the same" split and have no way to show that it matched.
+    (dest / "corpus.json").write_text(
+        json.dumps(
+            {
+                "repo": FLEURS_REPO,
+                "revision": revision,
+                "config": config,
+                "split": split,
+                "clips": len(extracted),
+            },
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
 
     refs_path = dest / "references.tsv"
     with refs_path.open("w", encoding="utf-8", newline="") as f:
