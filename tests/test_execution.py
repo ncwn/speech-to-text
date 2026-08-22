@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import time
 from pathlib import Path
 
 import numpy as np
@@ -103,6 +104,7 @@ def test_complete_corpus_is_passed_to_backend_once(tmp_path):
 def test_all_failed_corpus_keeps_common_wall_and_identity(tmp_path):
     class Broken(FakeBackend):
         def transcribe(self, paths, language=None, batch_size=1):
+            time.sleep(0.01)
             raise RuntimeError("boom")
 
     inputs = _inputs(tmp_path, count=1)
@@ -115,6 +117,9 @@ def test_all_failed_corpus_keeps_common_wall_and_identity(tmp_path):
     assert results[0].resources is usage
     assert results[0].metadata["corpus_exception"] is True
     assert not results[0].trusted
+    assert usage.wall_s >= 0.008
+    assert usage.started_ns is not None and usage.ended_ns is not None
+    assert usage.ended_ns > usage.started_ns
 
 
 def test_out_of_order_results_fail_the_corpus_contract(tmp_path):

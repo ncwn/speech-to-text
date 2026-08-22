@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import time
 from pathlib import Path
 
 import pytest
@@ -81,9 +82,12 @@ def test_batch_exception_retries_each_file_and_preserves_errors(monkeypatch, tmp
             paths = list(paths)
             self.calls.append(paths)
             if len(paths) > 1:
+                time.sleep(0.01)
                 raise RuntimeError("batch unsupported")
             if Path(paths[0]).name == "bad.wav":
+                time.sleep(0.005)
                 raise ValueError("bad audio")
+            time.sleep(0.005)
             return [Path(paths[0]).stem]
 
     pipeline = BatchFails()
@@ -99,6 +103,8 @@ def test_batch_exception_retries_each_file_and_preserves_errors(monkeypatch, tmp
         for result in results
         if not result.error
     )
+    assert results[0].elapsed_s is not None and results[0].elapsed_s >= 0.004
+    assert results[2].elapsed_s is not None and results[2].elapsed_s >= 0.004
 
 
 def test_batch_size_must_be_positive(monkeypatch, tmp_path):
