@@ -10,6 +10,7 @@ from dataclasses import replace
 import numpy as np
 import soundfile as sf
 
+import stt.bench_worker as bench_worker_mod
 from stt.audio import prepare_audio
 from stt.bench import run_subject_worker, summarize_workers
 from stt.bench_worker import execute_request
@@ -91,6 +92,31 @@ def test_worker_loads_once_and_records_warmups_and_repeats(tmp_path):
         "fake/fake-model", [incomplete], list(_request(tmp_path).inputs)
     )
     assert incomplete_summary["error"] == "worker response is incomplete"
+
+
+def test_worker_passes_archived_uss_choice_to_corpus_measurement(monkeypatch, tmp_path):
+    seen: list[bool] = []
+    original = bench_worker_mod.transcribe_corpus
+
+    def recording_transcribe_corpus(*args, **kwargs):
+        seen.append(bool(kwargs.get("sample_uss")))
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(bench_worker_mod, "transcribe_corpus", recording_transcribe_corpus)
+    request = replace(
+        _request(tmp_path, warmups=0, repeats=1),
+        profile=True,
+        sample_uss=True,
+    )
+
+    response = execute_request(
+        request,
+        backend_factory=lambda backend_name, model, options: FakeBackend(),
+        root=tmp_path,
+    )
+
+    assert response.repeats
+    assert seen == [True]
 
 
 def test_worker_rejects_prepared_audio_changed_after_request(tmp_path):

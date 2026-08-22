@@ -20,7 +20,7 @@ import soundfile as sf
 from stt.audio import PreparedAudio, is_valid_audio_id
 from stt.provenance import ModelBinding
 
-PROTOCOL_VERSION = 2
+PROTOCOL_VERSION = 3
 RUNTIME_PACKAGES = (
     "torch",
     "torchaudio",
@@ -50,6 +50,13 @@ def _is_sha256(value: str) -> bool:
 
 def _canonical_json(value: object) -> str:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+
+
+def _bool_field(data: dict[str, Any], name: str, default: bool = False) -> bool:
+    value = data.get(name, default)
+    if not isinstance(value, bool):
+        raise MeasurementError(f"{name} must be a boolean")
+    return value
 
 
 def _sha256_file(path: Path) -> str | None:
@@ -160,6 +167,7 @@ class WorkerRequest:
     warmups: int = 1
     repeats: int = 1
     profile: bool = False
+    sample_uss: bool = False
     worker_index: int = 0
     experiment_id: str | None = None
     session_id: str | None = None
@@ -183,6 +191,8 @@ class WorkerRequest:
             raise MeasurementError("at least one input is required")
         if self.warmups < 0 or self.repeats < 1 or self.worker_index < 0:
             raise MeasurementError("invalid warmup, repeat, or worker count")
+        if self.sample_uss and not self.profile:
+            raise MeasurementError("USS sampling requires profiling")
         if self.session_index is not None and self.session_index < 0:
             raise MeasurementError("session_index must be non-negative")
         if self.launch_position is not None and self.launch_position < 0:
@@ -221,7 +231,8 @@ class WorkerRequest:
                 inputs=inputs,
                 warmups=int(data.get("warmups", 1)),
                 repeats=int(data.get("repeats", 1)),
-                profile=bool(data.get("profile", False)),
+                profile=_bool_field(data, "profile"),
+                sample_uss=_bool_field(data, "sample_uss"),
                 worker_index=int(data.get("worker_index", 0)),
                 experiment_id=data.get("experiment_id"),
                 session_id=data.get("session_id"),
@@ -399,7 +410,7 @@ class WorkerJournal:
                         expected_audio_s=float(item["expected_audio_s"]),
                         results=tuple(item.get("results", [])),
                         resources=dict(item.get("resources", {})),
-                        complete=bool(item.get("complete", False)),
+                        complete=_bool_field(item, "complete"),
                         trust_issues=tuple(item.get("trust_issues", [])),
                     )
                     for item in data.get("repeats", [])
@@ -413,7 +424,7 @@ class WorkerJournal:
                     else None
                 ),
                 updated_ns=int(data.get("updated_ns", 0)),
-                complete=bool(data.get("complete", False)),
+                complete=_bool_field(data, "complete"),
                 error=data.get("error"),
                 experiment_id=data.get("experiment_id"),
                 session_id=data.get("session_id"),
@@ -595,7 +606,7 @@ class WorkerResponse:
                     expected_audio_s=float(item["expected_audio_s"]),
                     results=tuple(item.get("results", [])),
                     resources=dict(item.get("resources", {})),
-                    complete=bool(item.get("complete", False)),
+                    complete=_bool_field(item, "complete"),
                     trust_issues=tuple(item.get("trust_issues", [])),
                 )
                 for item in data.get("repeats", [])
@@ -616,7 +627,7 @@ class WorkerResponse:
                 resolved_device=data.get("resolved_device"),
                 resolved_dtype=data.get("resolved_dtype"),
                 model_provenance=data.get("model_provenance"),
-                complete=bool(data.get("complete", False)),
+                complete=_bool_field(data, "complete"),
                 error=data.get("error"),
                 provenance_issues=tuple(data.get("provenance_issues", [])),
                 experiment_id=data.get("experiment_id"),
@@ -633,7 +644,7 @@ class WorkerResponse:
                 schedule_seed=(
                     int(data["schedule_seed"]) if data.get("schedule_seed") is not None else None
                 ),
-                journal_recovered=bool(data.get("journal_recovered", False)),
+                journal_recovered=_bool_field(data, "journal_recovered"),
                 termination=data.get("termination"),
                 protocol_version=int(data.get("protocol_version", 0)),
             )

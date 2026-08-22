@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 
 import numpy as np
 import pytest
@@ -49,6 +50,33 @@ def test_worker_request_round_trip_keeps_canonical_audio_facts(tmp_path):
     assert restored.inputs[0].duration_s == pytest.approx(0.1)
     assert restored.inputs[0].prepared() == request.inputs[0].prepared()
     assert restored.subject.request_key.startswith("fake/model:")
+
+
+def test_worker_request_round_trip_keeps_uss_observer_choice(tmp_path):
+    request = replace(_request(tmp_path), profile=True, sample_uss=True)
+    path = tmp_path / "request.json"
+
+    write_request(request, path)
+    restored = read_request(path)
+
+    assert restored.sample_uss is True
+    assert restored.identity_sha256 == request.identity_sha256
+
+
+def test_worker_request_rejects_uss_without_profiler(tmp_path):
+    request = replace(_request(tmp_path), sample_uss=True)
+
+    with pytest.raises(MeasurementError, match="USS sampling requires profiling"):
+        request.validate()
+
+
+@pytest.mark.parametrize("field", ["profile", "sample_uss"])
+def test_worker_request_rejects_string_booleans(tmp_path, field):
+    raw = _request(tmp_path).to_dict()
+    raw[field] = "false"
+
+    with pytest.raises(MeasurementError, match=f"{field} must be a boolean"):
+        WorkerRequest.from_dict(raw)
 
 
 def test_request_rejects_duplicate_waveform_identity(tmp_path):

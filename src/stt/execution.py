@@ -344,6 +344,7 @@ def transcribe_corpus(
     batch_size: int,
     *,
     profile: bool,
+    sample_uss: bool = False,
     load_usage: ResourceUsage | None = None,
     host: dict[str, Any] | None = None,
     phase: str = "corpus",
@@ -382,6 +383,7 @@ def transcribe_corpus(
         profile=profile,
         device=device,
         phase=phase,
+        sample_uss=sample_uss,
     ) as measured:
         try:
             batch = instance.transcribe(paths, language=language, batch_size=batch_size)

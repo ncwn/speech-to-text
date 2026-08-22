@@ -1070,7 +1070,12 @@ def bootstrap_paired_ratio(
             return None
         old = np.asarray([old_repeats[index] for index in sorted(old_repeats)], dtype=float)
         new = np.asarray([new_repeats[index] for index in sorted(new_repeats)], dtype=float)
-        if np.any(old <= 0) or np.any(new <= 0):
+        if (
+            np.any(~np.isfinite(old))
+            or np.any(~np.isfinite(new))
+            or np.any(old <= 0)
+            or np.any(new <= 0)
+        ):
             return None
         session_deltas.append(float(np.median(np.log(new) - np.log(old))))
     rng = np.random.default_rng(seed)
@@ -1080,6 +1085,8 @@ def bootstrap_paired_ratio(
     point = math.exp(float(np.median(deltas)))
     low = math.exp(float(np.quantile(medians, 0.025, method="linear")))
     high = math.exp(float(np.quantile(medians, 0.975, method="linear")))
+    if not all(math.isfinite(value) for value in (point, low, high)):
+        return None
     return point, low, high
 
 

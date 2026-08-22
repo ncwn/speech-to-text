@@ -118,6 +118,137 @@ def test_paired_bootstrap_requires_matching_sessions_and_repeat_indices():
         )
         is None
     )
+    for invalid in (float("nan"), float("inf"), float("-inf"), 0.0, -1.0):
+        assert (
+            bootstrap_paired_ratio(
+                before,
+                {**after, "s1": {0: invalid, 1: 8.0}},
+                seed=7,
+            )
+            is None
+        )
+
+
+def test_reordered_launch_positions_do_not_move_current_rss_between_subjects(tmp_path):
+    """Current RSS follows the isolated subject, not its position in a session."""
+    weight = tmp_path / "model.bin"
+    weight.write_bytes(b"weights")
+    base_provenance, _ = _provenance(weight)
+    audio = AudioInput(
+        source_path=str(tmp_path / "source.wav"),
+        prepared_path=str(tmp_path / "prepared.wav"),
+        reference_id="clip",
+        source_sha256="3" * 64,
+        audio_id="pcm16:16000:1:" + "4" * 64,
+        duration_s=1.0,
+        sample_rate=16_000,
+        channels=1,
+        frames=16_000,
+    )
+    schedule = [
+        {"model-a": 0, "model-b": 1},
+        {"model-a": 1, "model-b": 0},
+        {"model-a": 0, "model-b": 1},
+    ]
+
+    def response(model: str, session_index: int, rss_mb: float) -> WorkerResponse:
+        provenance = replace(
+            base_provenance,
+            requested_model=model,
+            source_locator=f"test/{model}",
+            content_sha256=None,
+            execution_sha256=None,
+        ).finalized()
+        subject = SubjectSpec("fake", model, "mya_Mymr", 1)
+        repeat_phase = PhaseEvent("repeat-0", 2, 3, repeat_index=0)
+        return WorkerResponse(
+            run_id="rss-reorder",
+            request_key=subject.request_key,
+            request_sha256=hashlib.sha256(f"{model}:{session_index}".encode("ascii")).hexdigest(),
+            worker_index=session_index,
+            subject=subject,
+            host={"chip": "test-chip", "platform": "test-os", "machine": "arm64"},
+            environment={
+                "python": "3.12",
+                "platform": "test-os",
+                "machine": "arm64",
+                "packages": {"runtime": "1"},
+                "git_commit": "b" * 40,
+                "git_dirty": False,
+                "uv_lock_sha256": "2" * 64,
+                "pid": 10_000 + session_index + (100 if model == "model-b" else 0),
+            },
+            runtime={"model": model, "device": "cpu", "dtype": "float32"},
+            phases=(
+                PhaseEvent("process-start", 0, 1),
+                PhaseEvent("load", 1, 2),
+                repeat_phase,
+                PhaseEvent("unload", 3, 4),
+            ),
+            repeats=(
+                RepeatRecord(
+                    index=0,
+                    phase=repeat_phase,
+                    expected_audio_s=1.0,
+                    results=(
+                        {
+                            "audio_id": audio.audio_id,
+                            "reference_id": audio.reference_id,
+                            "text": "stable",
+                            "trusted": True,
+                            "error": None,
+                            "model_provenance": provenance.to_dict(),
+                        },
+                    ),
+                    resources={
+                        "wall_s": 1.0,
+                        "cpu_s": 0.5,
+                        "rss_peak_mb": rss_mb,
+                        "process_peak_rss_mb": rss_mb + 5.0,
+                    },
+                    complete=True,
+                ),
+            ),
+            load_resources={"wall_s": 1.0},
+            resolved_model=model,
+            resolved_device="cpu",
+            resolved_dtype="float32",
+            model_provenance=provenance.to_dict(),
+            complete=True,
+            experiment_id="rss-reorder",
+            session_id=f"rss-reorder:session-{session_index}",
+            session_index=session_index,
+            launch_position=schedule[session_index][model],
+            schedule_seed=17,
+        )
+
+    responses = {
+        "model-a": [response("model-a", index, 40.0 + index) for index in range(3)],
+        "model-b": [response("model-b", index, 140.0 + index) for index in range(3)],
+    }
+    summaries = {}
+    for model, model_responses in responses.items():
+        coordinates = [
+            (index, schedule[index][model], f"rss-reorder:session-{index}") for index in range(3)
+        ]
+        summaries[model] = summarize_workers(
+            f"fake/{model}",
+            list(reversed(model_responses)),
+            [audio],
+            expected_workers=3,
+            expected_warmups=0,
+            expected_repeats=1,
+            expected_launch_positions=[item[1] for item in coordinates],
+            expected_session_coordinates=coordinates,
+            experiment_id="rss-reorder",
+        )
+
+    assert summaries["model-a"]["endpoint_rss_mb"] == 42.0
+    assert summaries["model-b"]["endpoint_rss_mb"] == 142.0
+    assert summaries["model-a"]["worker_lifetime_peak_rss_mb"] == 47.0
+    assert summaries["model-b"]["worker_lifetime_peak_rss_mb"] == 147.0
+    assert summaries["model-a"]["baseline_eligible"]
+    assert summaries["model-b"]["baseline_eligible"]
 
 
 def test_transcript_change_is_not_hidden_by_provenance_change():

@@ -169,6 +169,7 @@ def execute_request(
             profile=request.profile,
             device=load_device,
             phase="load",
+            sample_uss=request.sample_uss,
         ) as measured_load:
             instance.load()
         load_usage = measured_load[0]
@@ -264,6 +265,7 @@ def execute_request(
                 request.subject.language,
                 request.subject.batch_size,
                 profile=request.profile,
+                sample_uss=request.sample_uss,
                 host=host,
                 phase=f"repeat-{index}",
                 require_provenance=request.experiment_id is not None,

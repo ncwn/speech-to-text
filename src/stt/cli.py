@@ -10,10 +10,13 @@ stt align AUDIO --text FILE      time an existing transcript (subtitles)
 stt compare AUDIO...             run every installed backend and compare
 stt vote RUNS...                 combine runs by per-character vote
 stt route BASE STRONG            re-transcribe only the least-confident spans
+stt experiment run SPEC.json     run and archive an explicit paired experiment
+stt experiment verify ARTIFACT   recompute an archived experiment offline
 """
 
 from __future__ import annotations
 
+import json
 import os
 import re
 import sys
@@ -32,14 +35,36 @@ from stt.cascade import DEFAULT_BLOCK, DEFAULT_ESCALATE
 from stt.evaluate import corpus_rtf, load_references, score_results
 from stt.evidence import EvidenceError, check_evidence, update_evidence
 from stt.execution import mark_run_trust, transcribe_corpus
+from stt.experiment import (
+    ConditionSpec,
+    ContrastSpec,
+    ExperimentSpec,
+    InputSetSpec,
+    summarize_experiment,
+)
+from stt.experiment import (
+    build_schedule as build_experiment_schedule,
+)
+from stt.experiment_archive import (
+    DEFAULT_EXPERIMENT_ROOT,
+    publish_experiment,
+    verify_experiment,
+)
 from stt.measurement import (
     AudioInput,
+    MeasurementError,
     SubjectSpec,
     WorkerRequest,
+    WorkerResponse,
     new_run_id,
     write_json_atomic,
 )
-from stt.provenance import ProvenanceError, preflight_model_binding, validate_binding
+from stt.provenance import (
+    ModelBinding,
+    ProvenanceError,
+    preflight_model_binding,
+    validate_binding,
+)
 from stt.registry import all_backends, get_backend
 from stt.results import (
     TranscriptionResult,
@@ -58,6 +83,12 @@ app = typer.Typer(
     no_args_is_help=True,
     add_completion=False,
 )
+experiment_app = typer.Typer(
+    name="experiment",
+    help="Run and verify explicit counterbalanced experiments.",
+    no_args_is_help=True,
+)
+app.add_typer(experiment_app, name="experiment")
 console = Console()
 
 #: omniASR's code for Burmese.
@@ -697,12 +728,16 @@ def _refuse_to_clobber_another_run(path: Path, result: TranscriptionResult) -> N
     exactly how outputs/eternity-7b.jsonl stopped being a 7B run, and nothing
     reported it until the manifest was audited months later.
     """
-    if not path.is_file():
+    if not path.exists():
         return
     try:
         existing = read_jsonl(path)
-    except (OSError, ValueError):
-        return  # Unreadable: not something to protect.
+    except Exception as exc:  # noqa: BLE001 - refusing an unsafe overwrite is fail-closed
+        raise typer.BadParameter(
+            f"Cannot safely overwrite {path}: the existing JSONL could not be "
+            f"read or validated ({type(exc).__name__}: {exc}). Pass --output "
+            "with a different name."
+        ) from exc
     conflicting = sorted(
         {
             (record.backend, record.model)
@@ -1528,6 +1563,239 @@ def doctor(
             console.print("[dim]fairseq2 left where it is.[/dim]")
 
     console.print(f"\n[green]{moved} cache(s) migrated.[/green]" if moved else "\nNothing to move.")
+
+
+def _read_experiment_spec(path: Path) -> ExperimentSpec:
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(raw, dict):
+            raise ValueError("the specification root must be an object")
+        return ExperimentSpec.from_dict(raw)
+    except (OSError, ValueError, json.JSONDecodeError, MeasurementError) as exc:
+        raise typer.BadParameter(f"Cannot read experiment specification {path}: {exc}") from exc
+
+
+@experiment_app.command("observer-spec")
+def experiment_observer_spec(
+    audio: Annotated[list[Path], typer.Argument(help="Canonical observer corpus")],
+    output: Annotated[Path, typer.Option("--output", "-o", help="Specification JSON path")],
+    experiment_id: Annotated[
+        str, typer.Option("--id", help="Immutable experiment archive id")
+    ] = "observer",
+    limit: Annotated[int, typer.Option(help="Only the first N files; 0 for all")] = 0,
+    batch_size: Annotated[int, typer.Option(help="Corpus batch size")] = 1,
+    sessions: Annotated[int, typer.Option(help="Fresh counterbalanced sessions")] = 6,
+    warmups: Annotated[int, typer.Option(help="Untimed corpus warmups per worker")] = 3,
+    repeats: Annotated[int, typer.Option(help="Measured corpus repeats per worker")] = 3,
+    seed: Annotated[int, typer.Option(help="Counterbalanced schedule seed")] = 0,
+) -> None:
+    """Write the pinned fast/slow three-arm observer experiment."""
+    if batch_size < 1:
+        raise typer.BadParameter("batch_size must be at least 1")
+    if sessions < 6 or warmups < 3 or repeats < 3:
+        raise typer.BadParameter(
+            "observer calibration requires at least 6 sessions, 3 warmups, and 3 repeats"
+        )
+    prepared = _prepare(audio, limit, convert=True)
+    inputs = tuple(AudioInput.from_prepared(item) for item in prepared)
+
+    def subject(backend: str, model: str, device: str, dtype: str) -> SubjectSpec:
+        return SubjectSpec(
+            backend,
+            model,
+            BURMESE,
+            batch_size,
+            {
+                "device": device,
+                "dtype": dtype,
+                "language": BURMESE,
+                "batch_size": batch_size,
+            },
+        )
+
+    fast = subject("hf", "mms-1b-all", "mps", "float32")
+    slow = subject(
+        "omniasr-torch",
+        "omniASR_LLM_Unlimited_7B_v2",
+        "cpu",
+        "float32",
+    )
+    conditions = tuple(
+        ConditionSpec(
+            condition_id=f"{prefix}-{arm}",
+            subject=execution,
+            input_set_id="canonical",
+            profile=arm != "off",
+            sample_uss=arm == "profile-uss",
+        )
+        for prefix, execution in (("fast", fast), ("slow", slow))
+        for arm in ("off", "profile", "profile-uss")
+    )
+    contrasts = tuple(
+        ContrastSpec(
+            contrast_id=f"{prefix}-{suffix}-overhead",
+            control_condition_id=f"{prefix}-off",
+            treatment_condition_id=f"{prefix}-{treatment}",
+        )
+        for prefix in ("fast", "slow")
+        for suffix, treatment in (("profile", "profile"), ("uss", "profile-uss"))
+    )
+    spec = ExperimentSpec(
+        experiment_id=experiment_id,
+        input_sets=(InputSetSpec("canonical", inputs),),
+        conditions=conditions,
+        contrasts=contrasts,
+        sessions=sessions,
+        warmups=warmups,
+        repeats=repeats,
+        schedule_seed=seed,
+    )
+    spec.validate()
+    write_json_atomic(spec.to_dict(), output)
+    console.print(f"[green]observer specification written[/green] → {output}")
+
+
+@experiment_app.command("verify")
+def experiment_verify(
+    artifact: Annotated[Path, typer.Argument(help="Experiment directory or experiment.json")],
+) -> None:
+    """Recompute an experiment from its archived worker artifacts."""
+    issues = verify_experiment(artifact)
+    if issues:
+        for issue in issues:
+            console.print(f"[red]{issue}[/red]")
+        raise typer.Exit(1)
+    console.print(f"[green]experiment verified[/green] → {artifact}")
+
+
+@experiment_app.command("run")
+def experiment_run(
+    spec_path: Annotated[Path, typer.Argument(help="Experiment specification JSON")],
+    artifact_dir: Annotated[
+        Path, typer.Option("--artifacts", help="Raw worker artifact directory")
+    ] = Path("outputs/experiments"),
+    archive_root: Annotated[
+        Path, typer.Option("--archive-root", help="Verified experiment archive root")
+    ] = DEFAULT_EXPERIMENT_ROOT,
+    timeout_s: Annotated[
+        float, typer.Option("--timeout", help="Maximum seconds for one worker")
+    ] = 7_200,
+) -> None:
+    """Run every declared condition in its counterbalanced sessions."""
+    if timeout_s <= 0:
+        raise typer.BadParameter("timeout must be positive")
+    spec = _read_experiment_spec(spec_path)
+    archive_path = archive_root / spec.experiment_id
+    raw_run_path = artifact_dir / spec.experiment_id
+    if archive_path.exists():
+        raise typer.BadParameter(f"experiment archive already exists: {archive_path}")
+    if raw_run_path.exists():
+        raise typer.BadParameter(
+            f"raw experiment artifact directory already exists: {raw_run_path}"
+        )
+    schedule = build_experiment_schedule(spec)
+    preflight_environment = bench_mod.capture_environment()
+    if any(contrast.gating for contrast in spec.contrasts) and preflight_environment.get(
+        "git_dirty"
+    ):
+        raise typer.BadParameter(
+            "gating experiments require a clean source worktree so adapter identity is immutable"
+        )
+    bindings: dict[str, ModelBinding | None] = {}
+    for condition in spec.conditions:
+        if condition.request_key in bindings:
+            continue
+        try:
+            bindings[condition.request_key] = preflight_model_binding(
+                condition.subject.backend,
+                condition.subject.model,
+                dict(condition.subject.options),
+                environment=preflight_environment,
+            )
+        except (KeyError, OSError, ProvenanceError, RuntimeError, TypeError, ValueError) as exc:
+            bindings[condition.request_key] = None
+            console.print(
+                f"[yellow]{condition.condition_id} preflight unavailable[/yellow] — {exc}"
+            )
+    missing_bindings = sorted(
+        condition.condition_id
+        for condition in spec.conditions
+        if bindings[condition.request_key] is None
+    )
+    if missing_bindings:
+        raise typer.BadParameter(
+            "experiment model preflight failed for condition(s): " + ", ".join(missing_bindings)
+        )
+
+    responses: dict[str, list[WorkerResponse]] = {
+        condition.condition_id: [] for condition in spec.conditions
+    }
+    raw_artifacts: dict[str, list[Path]] = {
+        condition.condition_id: [] for condition in spec.conditions
+    }
+    conditions = spec.condition_map
+    input_sets = spec.input_map
+    for session_index, session in enumerate(schedule):
+        for entry in session:
+            condition = conditions[entry.condition_id]
+            request = WorkerRequest(
+                run_id=spec.experiment_id,
+                subject=condition.subject,
+                inputs=input_sets[condition.input_set_id].inputs,
+                warmups=spec.warmups,
+                repeats=spec.repeats,
+                profile=condition.profile,
+                sample_uss=condition.sample_uss,
+                worker_index=session_index,
+                experiment_id=spec.experiment_id,
+                session_id=f"{spec.experiment_id}:session-{session_index}",
+                session_index=session_index,
+                launch_position=entry.launch_position,
+                condition_id=condition.condition_id,
+                schedule_seed=spec.schedule_seed,
+                model_binding=bindings[condition.request_key],
+            )
+            console.print(
+                f"[bold]{condition.condition_id}[/bold] · session "
+                f"{session_index + 1}/{spec.sessions} · position "
+                f"{entry.launch_position + 1}/{len(spec.conditions)}"
+            )
+            response, response_path = bench_mod.run_subject_worker(
+                request,
+                artifact_dir,
+                timeout_s=timeout_s,
+            )
+            responses[condition.condition_id].append(response)
+            stem = response_path.name.removesuffix(".response.json")
+            raw_artifacts[condition.condition_id].extend(
+                path for path in sorted(response_path.parent.glob(f"{stem}.*")) if path.is_file()
+            )
+
+    summary = summarize_experiment(spec, responses)
+    descriptor = publish_experiment(summary, raw_artifacts, root=archive_root)
+    table = Table(title=f"Experiment {spec.experiment_id}")
+    table.add_column("Contrast", style="bold")
+    table.add_column("Treatment / control", justify="right")
+    table.add_column("95% interval", justify="right")
+    table.add_column("Status")
+    for contrast in summary["contrasts"]:
+        ratio = contrast.get("paired_ratio") or {}
+        point = ratio.get("point")
+        low = ratio.get("low")
+        high = ratio.get("high")
+        status = "gate" if contrast.get("gating_eligible") else "descriptive"
+        table.add_row(
+            str(contrast["contrast_id"]),
+            _fmt(point, ".4f"),
+            f"[{_fmt(low, '.4f')}, {_fmt(high, '.4f')}]",
+            status,
+        )
+    console.print(table)
+    console.print(f"[green]verified experiment archived[/green] → {descriptor}")
+    if any(contrast.gating for contrast in spec.contrasts) and not summary.get(
+        "gate_eligible", False
+    ):
+        raise typer.Exit(1)
 
 
 @app.command()

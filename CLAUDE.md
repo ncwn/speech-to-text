@@ -27,6 +27,7 @@ make bench-update               # intentionally blocked until provenance gates p
 make hooks                      # enable the tracked pre-commit hook
 
 uv run stt doctor               # runtimes, prerequisites, and where weights live
+uv run stt experiment --help    # explicit paired experiments and offline verification
 uv run pytest tests/test_vote.py::test_name -x
 ```
 
@@ -34,8 +35,9 @@ uv run pytest tests/test_vote.py::test_name -x
 bench is deliberately *not* in the hook — it loads five models. Tests needing
 real weights carry `@pytest.mark.weights` and are deselected by default.
 
-CLI: `doctor`, `bench` (including `--verify`), `backends`, `models`, `hardware`, `fetch-fleurs`, `transcribe`,
-`align`, `eval`, `compare`, `vote`, `route`, `check-encoding`.
+CLI: `doctor`, `bench` (including `--verify`), `experiment`, `backends`, `models`,
+`hardware`, `fetch-fleurs`, `transcribe`, `align`, `eval`, `compare`, `vote`, `route`,
+`check-encoding`.
 `evidence` checks or updates the artifact-backed measured blocks in `docs/findings.md`.
 
 `tests/test_docs_consistency.py` fails if a command is missing from that list, an

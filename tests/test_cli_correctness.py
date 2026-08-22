@@ -660,3 +660,25 @@ def test_align_refuses_to_overwrite_a_transcription_run(tmp_path):
     # Rewriting a run with its own identity is ordinary, and a new name is fine.
     _refuse_to_clobber_another_run(path, _result("clip", model="omniASR_LLM_Unlimited_7B_v2"))
     _refuse_to_clobber_another_run(tmp_path / "fresh.jsonl", aligned)
+
+
+def test_align_refuses_to_overwrite_partially_malformed_jsonl(tmp_path):
+    """An unreadable existing target must not be treated as an empty run."""
+    from stt.cli import _refuse_to_clobber_another_run
+
+    path = tmp_path / "partially-written.jsonl"
+    path.write_text(
+        '{"audio_path":"clip.wav","text":"စာ","backend":"test","model":"old"}\n'
+        '{"audio_path":"broken"\n',
+        encoding="utf-8",
+    )
+    aligned = TranscriptionResult(
+        audio_path="clip.wav", text="စာ", backend="align", model="mms-1b-all"
+    )
+
+    with pytest.raises(Exception) as caught:
+        _refuse_to_clobber_another_run(path, aligned)
+
+    message = str(caught.value)
+    assert "could not be read or validated" in message
+    assert "Pass --output with a different name" in message
