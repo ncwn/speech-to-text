@@ -8,14 +8,21 @@ from pathlib import Path
 from stt.parity import STAGE_NAMES, ParityReport
 
 ROOT = Path(__file__).resolve().parents[1]
-REPORTS = (
-    ROOT / "evidence/parity/hf-mms-1b-all-cpu-v1.json",
-    ROOT / "evidence/parity/hf-mms-1b-all-cpu-v1-reference-first.json",
-)
+REPORT_PAIRS = {
+    "hf+mms-1b-all": (
+        ROOT / "evidence/parity/hf-mms-1b-all-cpu-v1.json",
+        ROOT / "evidence/parity/hf-mms-1b-all-cpu-v1-reference-first.json",
+    ),
+    "hf+seamless-m4t-v2": (
+        ROOT / "evidence/parity/hf-seamless-m4t-v2-cpu-v1.json",
+        ROOT / "evidence/parity/hf-seamless-m4t-v2-cpu-v1-reference-first.json",
+    ),
+}
 
 
-def test_mms_parity_passes_in_both_entrypoint_orders():
-    raw = [json.loads(path.read_text(encoding="utf-8")) for path in REPORTS]
+def _assert_parity_pair(subject_key: str) -> None:
+    paths = REPORT_PAIRS[subject_key]
+    raw = [json.loads(path.read_text(encoding="utf-8")) for path in paths]
     reports = [ParityReport.from_dict(item) for item in raw]
     assert [item.metadata["entrypoint_order"] for item in reports] == [
         ["adapter", "reference"],
@@ -24,7 +31,7 @@ def test_mms_parity_passes_in_both_entrypoint_orders():
 
     cases = []
     for report in reports:
-        subject = report.subjects["hf+mms-1b-all"]
+        subject = report.subjects[subject_key]
         assert subject.parity_eligible
         assert subject.settings == {"device": "cpu", "dtype": "float32"}
         assert len(subject.cases) == 1
@@ -38,7 +45,15 @@ def test_mms_parity_passes_in_both_entrypoint_orders():
     first_digests = [(stage.adapter_digest, stage.reference_digest) for stage in cases[0].stages]
     second_digests = [(stage.adapter_digest, stage.reference_digest) for stage in cases[1].stages]
     assert first_digests == second_digests
-    for path in REPORTS:
+    for path in paths:
         text = path.read_text(encoding="utf-8")
         assert "/Users/" not in text
         assert "/Volumes/" not in text
+
+
+def test_mms_parity_passes_in_both_entrypoint_orders():
+    _assert_parity_pair("hf+mms-1b-all")
+
+
+def test_seamless_parity_passes_in_both_entrypoint_orders():
+    _assert_parity_pair("hf+seamless-m4t-v2")
