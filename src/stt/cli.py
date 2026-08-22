@@ -12,6 +12,7 @@ stt vote RUNS...                 combine runs by per-character vote
 stt route BASE STRONG            re-transcribe only the least-confident spans
 stt experiment run SPEC.json     run and archive an explicit paired experiment
 stt experiment verify ARTIFACT   recompute an archived experiment offline
+stt parity AUDIO                 compare an adapter with its official entry point
 """
 
 from __future__ import annotations
@@ -59,6 +60,8 @@ from stt.measurement import (
     new_run_id,
     write_json_atomic,
 )
+from stt.parity import contract_for, run_parity
+from stt.parity import write_report as write_parity_report
 from stt.paths import checkout_root
 from stt.provenance import (
     ModelBinding,
@@ -1820,6 +1823,79 @@ def experiment_run(
     console.print(table)
     console.print(f"[green]verified experiment archived[/green] → {descriptor}")
     if gating_run and not summary.get("gate_eligible", False):
+        raise typer.Exit(1)
+
+
+@app.command()
+def parity(
+    audio: Annotated[Path, typer.Argument(help="Canonical audio file")],
+    backend: Annotated[str, typer.Option("--backend", "-b", help="Backend family")] = "hf",
+    model: Annotated[str, typer.Option("--model", "-m", help="Exact model name")] = "mms-1b-all",
+    language: Annotated[str, typer.Option("--language", "-l")] = BURMESE,
+    device: Annotated[str, typer.Option(help="Resolved parity device")] = "cpu",
+    dtype: Annotated[str, typer.Option(help="Resolved parity dtype")] = "float32",
+    output: Annotated[Path, typer.Option("--output", "-o", help="Parity report JSON")] = Path(
+        "evidence/parity/hf-mms-1b-all.json"
+    ),
+    reference_first: Annotated[
+        bool,
+        typer.Option("--reference-first", help="Run the official entry point before the adapter"),
+    ] = False,
+) -> None:
+    """Compare one implemented adapter lane with its official direct path."""
+    contract = contract_for(backend, model)
+    environment = bench_mod.capture_environment()
+    if environment.get("git_dirty"):
+        raise typer.BadParameter("parity requires a clean source worktree")
+    prepared = audio_mod.prepare_audio(audio, DEFAULT_CACHE, convert=True)
+    options = {
+        "device": device,
+        "dtype": dtype,
+        "language": language,
+        "batch_size": 1,
+    }
+    binding = preflight_model_binding(
+        backend,
+        model,
+        options,
+        environment=environment,
+    )
+    cls = get_backend(backend)
+
+    def instance():
+        value = cls(model, **options)
+        value.bind_model(ModelBinding.from_dict(binding.to_dict()))
+        value._provenance_environment = environment
+        value.set_execution_settings(language=language, batch_size=1)
+        return value
+
+    order = ("reference", "adapter") if reference_first else ("adapter", "reference")
+    report = run_parity(
+        instance(),
+        prepared.prepared_path,
+        language,
+        reference_backend=instance(),
+        contract=contract,
+        entrypoint_order=order,
+        metadata={"source_sha256": prepared.source_sha256},
+    )
+    write_parity_report(report, output)
+    subject = report.subjects[f"{backend}+{model}"]
+    table = Table(title=f"Parity · {backend}/{model}")
+    table.add_column("Stage", style="bold")
+    table.add_column("Status")
+    table.add_column("Max abs", justify="right")
+    table.add_column("Max rel", justify="right")
+    for stage in subject.cases[0].stages:
+        table.add_row(
+            stage.name,
+            stage.status,
+            _fmt(stage.max_abs, ".3g"),
+            _fmt(stage.max_rel, ".3g"),
+        )
+    console.print(table)
+    console.print(f"parity report → {output}")
+    if not subject.parity_eligible:
         raise typer.Exit(1)
 
 

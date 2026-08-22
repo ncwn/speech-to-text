@@ -338,3 +338,81 @@ def test_serial_decode_times_each_file_instead_of_copying_the_loop(monkeypatch, 
     # The slow file must be visibly the slow one.
     assert elapsed[1] > elapsed[0]
     assert elapsed[1] > elapsed[2]
+
+
+def test_mms_parity_hooks_capture_pipeline_and_direct_tensors(tmp_path):
+    import types
+
+    import numpy as np
+    import soundfile as sf
+    import torch
+    from transformers.pipelines.audio_utils import ffmpeg_read
+
+    from stt.parity import compare_traces, contract_for
+
+    path = tmp_path / "clip.wav"
+    sf.write(path, np.linspace(-0.5, 0.5, 1600), 16_000, subtype="PCM_16")
+
+    class Batch(dict):
+        def to(self, device=None, dtype=None):
+            for key, value in tuple(self.items()):
+                if isinstance(value, torch.Tensor):
+                    value = value.to(device=device)
+                    if dtype is not None and value.is_floating_point():
+                        value = value.to(dtype=dtype)
+                    self[key] = value
+            return self
+
+    class FeatureExtractor:
+        sampling_rate = 16_000
+
+        def __call__(self, audio, **kwargs):
+            del kwargs
+            values = torch.from_numpy(np.array(audio, dtype=np.float32, copy=True)).unsqueeze(0)
+            return Batch(
+                input_values=values,
+                attention_mask=torch.ones_like(values, dtype=torch.long),
+            )
+
+    class Model(torch.nn.Module):
+        main_input_name = "input_values"
+        dtype = torch.float32
+
+        def forward(self, input_values, attention_mask=None):
+            del attention_mask
+            return types.SimpleNamespace(logits=torch.stack((-input_values, input_values), dim=-1))
+
+    class Tokenizer:
+        @staticmethod
+        def decode(tokens, skip_special_tokens=False):
+            del skip_special_tokens
+            return "".join("က" if token else " " for token in tokens)
+
+    class Pipe:
+        feature_extractor = FeatureExtractor()
+        model = Model()
+        tokenizer = Tokenizer()
+        device = torch.device("cpu")
+
+        def __call__(self, audio_path, **kwargs):
+            del kwargs
+            pcm = ffmpeg_read(Path(audio_path).read_bytes(), self.feature_extractor.sampling_rate)
+            inputs = self.feature_extractor(pcm).to(device=self.device, dtype=self.model.dtype)
+            output = self.model(**inputs)
+            tokens = output.logits.argmax(dim=-1)
+            return {"text": self.tokenizer.decode(tokens[0].tolist())}
+
+    backend = TransformersASRBackend("mms-1b-all", device="cpu", dtype="float32")
+    backend.pipe = Pipe()
+    backend._loaded = True
+    backend.resolved_device = "cpu"
+    backend.resolved_dtype = "float32"
+
+    adapter = backend.parity_adapter_trace(path, language="mya_Mymr")
+    reference = backend.parity_reference_trace(path, language="mya_Mymr")
+    contract = contract_for("hf", "mms-1b-all")
+    comparisons = compare_traces(adapter, reference, tolerances=contract.tolerances)
+
+    assert all(item.status == "match" for item in comparisons)
+    assert adapter.metadata["entrypoint"] == "transformers-pipeline"
+    assert reference.metadata["entrypoint"] == "feature-extractor-model-tokenizer"

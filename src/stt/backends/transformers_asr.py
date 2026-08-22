@@ -602,6 +602,105 @@ class TransformersASRBackend(ASRBackend):
         out = self.pipe(str(path), **self._pipeline_kwargs())
         return self._decode_pipeline_output(out)
 
+    def parity_adapter_trace(self, path: Path, *, language: str | None = None):
+        """Observe the tensors used by the real Transformers pipeline path."""
+        if self.spec.family != "mms" or self.pipe is None:
+            raise RuntimeError(f"adapter parity is not implemented for {self.model}")
+        self._check_language(language)
+        import numpy as np
+        from transformers.pipelines.audio_utils import ffmpeg_read
+
+        from stt.parity import ParityTrace
+
+        decoded_pcm = ffmpeg_read(path.read_bytes(), self.pipe.feature_extractor.sampling_rate)
+        model_inputs: list[np.ndarray] = []
+        logits: list[np.ndarray] = []
+
+        def capture_inputs(module, args, kwargs):
+            del module, args
+            value = kwargs.get(self.pipe.model.main_input_name)
+            if value is None:
+                raise RuntimeError("pipeline parity could not observe model input values")
+            model_inputs.append(value.detach().cpu().numpy())
+
+        def capture_logits(module, args, kwargs, output):
+            del module, args, kwargs
+            logits.append(output.logits.detach().cpu().numpy())
+
+        before = self.pipe.model.register_forward_pre_hook(capture_inputs, with_kwargs=True)
+        after = self.pipe.model.register_forward_hook(capture_logits, with_kwargs=True)
+        try:
+            output = self.pipe(str(path), **self._pipeline_kwargs())
+        finally:
+            before.remove()
+            after.remove()
+        if len(model_inputs) != 1 or len(logits) != 1:
+            raise RuntimeError(
+                "MMS parity expects one pipeline forward; use audio shorter than its chunk window"
+            )
+        tokens = np.asarray(logits[0]).argmax(axis=-1)
+        raw = str(output.get("text", "")) if isinstance(output, dict) else str(output)
+        return ParityTrace(
+            decoded_pcm=decoded_pcm,
+            features=model_inputs[0],
+            logits_or_encoder=logits[0],
+            token_ids=tokens,
+            raw_transcript=raw,
+            final_transcript=raw.strip(),
+            metadata={
+                "entrypoint": "transformers-pipeline",
+                "decoder": "transformers.pipelines.audio_utils.ffmpeg_read",
+                "pipeline_manages_inference_mode": True,
+            },
+        )
+
+    def parity_reference_trace(self, path: Path, *, language: str | None = None):
+        """Run the official processor/model/tokenizer components directly."""
+        if self.spec.family != "mms" or self.pipe is None:
+            raise RuntimeError(f"reference parity is not implemented for {self.model}")
+        self._check_language(language)
+        import numpy as np
+        import soundfile as sf
+        import torch
+
+        from stt.parity import ParityTrace
+
+        decoded_pcm, sample_rate = sf.read(str(path), dtype="float32", always_2d=False)
+        if decoded_pcm.ndim > 1:
+            decoded_pcm = decoded_pcm.mean(axis=1)
+        processed = self.pipe.feature_extractor(
+            decoded_pcm,
+            sampling_rate=sample_rate,
+            return_tensors="pt",
+            return_attention_mask=True,
+        )
+        processed = processed.to(device=self.pipe.device)
+        input_values = processed[self.pipe.model.main_input_name].to(dtype=self.pipe.model.dtype)
+        attention_mask = processed.get("attention_mask")
+        with torch.inference_mode():
+            output = self.pipe.model(
+                **{
+                    self.pipe.model.main_input_name: input_values,
+                    "attention_mask": attention_mask,
+                }
+            )
+        logits = output.logits
+        tokens = logits.argmax(dim=-1)
+        raw = self.pipe.tokenizer.decode(tokens[0].tolist(), skip_special_tokens=False)
+        return ParityTrace(
+            decoded_pcm=np.asarray(decoded_pcm),
+            features=input_values.detach().cpu().numpy(),
+            logits_or_encoder=logits.detach().cpu().numpy(),
+            token_ids=tokens.detach().cpu().numpy(),
+            raw_transcript=raw,
+            final_transcript=raw.strip(),
+            metadata={
+                "entrypoint": "feature-extractor-model-tokenizer",
+                "decoder": "soundfile",
+                "torch_inference_mode": True,
+            },
+        )
+
     def _transcribe_pipeline_batch(
         self, paths: list[Path], batch_size: int
     ) -> list[tuple[str, list[Segment]]]:

@@ -35,7 +35,7 @@ uv run pytest tests/test_vote.py::test_name -x
 bench is deliberately *not* in the hook — it loads five models. Tests needing
 real weights carry `@pytest.mark.weights` and are deselected by default.
 
-CLI: `doctor`, `bench` (including `--verify`), `experiment`, `backends`, `models`,
+CLI: `doctor`, `bench` (including `--verify`), `experiment`, `parity`, `backends`, `models`,
 `hardware`, `fetch-fleurs`, `transcribe`, `align`, `eval`, `compare`, `vote`, `route`,
 `check-encoding`.
 `evidence` checks or updates the artifact-backed measured blocks in `docs/findings.md`.
