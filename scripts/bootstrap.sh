@@ -1,16 +1,19 @@
 #!/usr/bin/env bash
 #
 # Set up the environment on macOS (Apple Silicon).
-# Verifies prerequisites, then installs both ASR runtimes.
+# Verifies prerequisites, then installs the ASR runtimes.
 #
-# Usage: ./scripts/bootstrap.sh [--gguf-only | --torch-only]
+# Usage: ./scripts/bootstrap.sh [--minimal | --gguf-only | --torch-only]
 
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-EXTRAS=(--extra gguf --extra omniasr)
+# Every runtime by default. Installing a subset leaves `stt backends` showing
+# the rest as missing, which is a worse first experience than a longer install.
+EXTRAS=(--extra gguf --extra omniasr --extra hf --extra dolphin)
 case "${1:-}" in
+    --minimal)    EXTRAS=() ;;
     --gguf-only)  EXTRAS=(--extra gguf) ;;
     --torch-only) EXTRAS=(--extra omniasr) ;;
     "")           ;;
@@ -49,22 +52,37 @@ ok "libsndfile present"
 xcode-select -p >/dev/null 2>&1 || fail "Xcode Command Line Tools missing. Install: xcode-select --install"
 ok "C++ toolchain present"
 
-avail=$(df -g "$HOME" | awk 'NR==2 {print $4}')
+# Weights land in the repo-local cache by default, so check that volume rather
+# than $HOME. See src/stt/paths.py.
+CACHE_DIR="${STT_CACHE_DIR:-$PWD/.cache}"
+mkdir -p "$CACHE_DIR"
+avail=$(df -g "$CACHE_DIR" | awk 'NR==2 {print $4}')
 if (( avail < 40 )); then
-    warn "${avail} GB free in \$HOME. The 7B checkpoint alone is 31.2 GB."
+    warn "${avail} GB free on the volume holding ${CACHE_DIR}. The 7B checkpoint alone is 31.2 GB."
 else
-    ok "${avail} GB free for model caches"
+    ok "${avail} GB free for model caches at ${CACHE_DIR}"
+fi
+
+if [[ ! -f .env && -f .env.example ]]; then
+    cp .env.example .env
+    ok "created .env from .env.example"
 fi
 
 # --- install --------------------------------------------------------------
 
 echo
-echo "Installing: uv sync ${EXTRAS[*]}"
+echo "Installing: uv sync ${EXTRAS[*]:-(core only)}"
 uv python install 3.12
-uv sync "${EXTRAS[@]}"
+uv sync ${EXTRAS[@]+"${EXTRAS[@]}"}
+
+# Tracked hooks, so a fresh clone gets the guards without remembering to.
+if [[ -d .githooks ]] && git rev-parse --git-dir >/dev/null 2>&1; then
+    git config core.hooksPath .githooks
+    ok "pre-commit hook enabled (make check)"
+fi
 
 echo
-uv run stt backends
+uv run stt doctor
 
 cat <<'EOF'
 
@@ -72,6 +90,12 @@ Next steps:
 
   uv run stt fetch-fleurs --limit 20        # Burmese audio + references
   uv run stt transcribe data/fleurs/audio -b omniasr-gguf
-  uv run stt eval outputs/omniasr-gguf.jsonl -r data/fleurs/references.tsv
+  uv run stt eval outputs/omniasr-gguf-*.jsonl -r data/fleurs/references.tsv
+
+Weights download into ./.cache on first use. `uv run stt doctor` shows where
+they are; set STT_CACHE_DIR to put them somewhere else.
+
+  make check          # ruff + tests, ~6 s (also runs on every commit)
+  make bench          # regression gate against baselines/bench.json, minutes
 
 EOF

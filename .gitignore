@@ -6,8 +6,12 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
+.firecrawl/
 
 # Model weights and caches — never commit, these are 1-31 GB each
+# .cache/ is the repo-local cache root (see src/stt/paths.py); it holds tens of
+# gigabytes of downloaded weights.
+.cache/
 models/
 *.pt
 *.gguf
