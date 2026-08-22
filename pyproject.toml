@@ -16,6 +16,7 @@ dependencies = [
     "tqdm>=4.67",
     "jiwer>=4.0",
     "myanmartools>=1.2.1",
+    "psutil>=5.9,<6.dev0",
 ]
 
 [project.optional-dependencies]
