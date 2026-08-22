@@ -1707,6 +1707,7 @@ def experiment_run(
     if timeout_s <= 0:
         raise typer.BadParameter("timeout must be positive")
     spec = _read_experiment_spec(spec_path)
+    gating_run = any(contrast.gating for contrast in spec.contrasts)
     archive_path = archive_root / spec.experiment_id
     raw_run_path = artifact_dir / spec.experiment_id
     if archive_path.exists():
@@ -1717,9 +1718,7 @@ def experiment_run(
         )
     schedule = build_experiment_schedule(spec)
     preflight_environment = bench_mod.capture_environment()
-    if any(contrast.gating for contrast in spec.contrasts) and preflight_environment.get(
-        "git_dirty"
-    ):
+    if gating_run and preflight_environment.get("git_dirty"):
         raise typer.BadParameter(
             "gating experiments require a clean source worktree so adapter identity is immutable"
         )
@@ -1792,6 +1791,12 @@ def experiment_run(
             raw_artifacts[condition.condition_id].extend(
                 path for path in sorted(response_path.parent.glob(f"{stem}.*")) if path.is_file()
             )
+            if gating_run and not response.complete:
+                console.print(
+                    f"[red]gating experiment stopped after {condition.condition_id} failed: "
+                    f"{response.error or 'worker response is incomplete'}[/red]"
+                )
+                raise typer.Exit(1)
 
     summary = summarize_experiment(spec, responses)
     descriptor = publish_experiment(summary, raw_artifacts, root=archive_root)
@@ -1814,9 +1819,7 @@ def experiment_run(
         )
     console.print(table)
     console.print(f"[green]verified experiment archived[/green] → {descriptor}")
-    if any(contrast.gating for contrast in spec.contrasts) and not summary.get(
-        "gate_eligible", False
-    ):
+    if gating_run and not summary.get("gate_eligible", False):
         raise typer.Exit(1)
 
 

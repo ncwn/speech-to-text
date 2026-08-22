@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -11,6 +12,8 @@ from typer.testing import CliRunner
 
 from stt.cli import app
 from stt.experiment import ExperimentSpec, build_schedule
+from stt.measurement import WorkerResponse
+from stt.provenance import ArtifactDigest, ModelBinding, ModelProvenance
 
 runner = CliRunner()
 
@@ -118,3 +121,85 @@ def test_observer_spec_refuses_an_unbalanced_five_session_gate(tmp_path):
 
     assert result.exit_code != 0
     assert "requires at least 6 sessions" in result.output
+
+
+def test_gating_run_stops_after_the_first_incomplete_worker(monkeypatch, tmp_path):
+    audio = tmp_path / "clip.wav"
+    sf.write(audio, np.zeros(16_000), 16_000, subtype="PCM_16")
+    spec_path = tmp_path / "observer.json"
+    generated = runner.invoke(
+        app,
+        ["experiment", "observer-spec", str(audio), "--output", str(spec_path)],
+    )
+    assert generated.exit_code == 0, generated.output
+
+    artifact_path = tmp_path / "model.bin"
+    artifact_path.write_bytes(b"weights")
+    artifact = ArtifactDigest(
+        "weights",
+        "model.bin",
+        artifact_path.stat().st_size,
+        hashlib.sha256(artifact_path.read_bytes()).hexdigest(),
+        path=str(artifact_path),
+    )
+    provenance = ModelProvenance(
+        backend="fake",
+        requested_model="model",
+        source_kind="test",
+        source_locator="test/model",
+        upstream_revision="a" * 40,
+        revision_status="pinned",
+        artifacts=(artifact,),
+        runtime_packages={"runtime": "1"},
+        resolved_settings={"device": "cpu", "dtype": "float32"},
+        adapter_git_commit="b" * 40,
+        uv_lock_sha256="c" * 64,
+    ).finalized()
+    binding = ModelBinding(provenance, (artifact,))
+    monkeypatch.setattr("stt.cli.preflight_model_binding", lambda *args, **kwargs: binding)
+    monkeypatch.setattr("stt.cli.bench_mod.capture_environment", lambda: {"git_dirty": False})
+    calls = []
+
+    def fail_worker(request, artifact_dir, timeout_s):
+        calls.append(request.condition_id)
+        response = WorkerResponse(
+            run_id=request.run_id,
+            request_key=request.subject.request_key,
+            request_sha256=request.identity_sha256,
+            worker_index=request.worker_index,
+            subject=request.subject,
+            host={},
+            environment={},
+            runtime={},
+            phases=(),
+            repeats=(),
+            load_resources=None,
+            complete=False,
+            error="forced worker failure",
+            experiment_id=request.experiment_id,
+            session_id=request.session_id,
+            session_index=request.session_index,
+            launch_position=request.launch_position,
+            condition_id=request.condition_id,
+            schedule_seed=request.schedule_seed,
+        )
+        return response, artifact_dir / request.run_id / "worker.response.json"
+
+    monkeypatch.setattr("stt.cli.bench_mod.run_subject_worker", fail_worker)
+
+    result = runner.invoke(
+        app,
+        [
+            "experiment",
+            "run",
+            str(spec_path),
+            "--artifacts",
+            str(tmp_path / "raw"),
+            "--archive-root",
+            str(tmp_path / "archive"),
+        ],
+    )
+
+    assert result.exit_code == 1
+    assert len(calls) == 1
+    assert f"stopped after {calls[0]} failed" in result.output
