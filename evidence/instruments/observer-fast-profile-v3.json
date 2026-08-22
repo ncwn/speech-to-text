@@ -1,0 +1,68 @@
+{
+  "schema": "instruments-corroboration-v1",
+  "subject": {
+    "backend": "hf",
+    "model": "mms-1b-all",
+    "device": "mps",
+    "dtype": "float32",
+    "reference_id": "14755840805814218163",
+    "audio_id": "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a"
+  },
+  "adapter": {
+    "git_commit": "a69da3d98eb51834f58bff732255a7a559fb9751",
+    "content_sha256": "b6bf21929e857519387e3994e47a10f6530f7bbcb9427c87ebc3ca064b573cd6",
+    "execution_sha256": "6d359e472ec895c95c80621b4d36aa76462dc4259978978826688fed6044bcac",
+    "trusted": true,
+    "text_sha256": "1e3a9b024c6a03a88639652d5c4d6fe790711c0551a6b4556de87c3a24d26fb2"
+  },
+  "corpus_phase": {
+    "perf_counter_started_ns": 164682533456166,
+    "perf_counter_ended_ns": 164682972068458,
+    "wall_s": 0.438612292,
+    "trace_relative_start_s": 6.253356207666667,
+    "trace_relative_end_s": 6.691968499666666,
+    "ioreg_whole_gpu": {
+      "p50_pct": 79.0,
+      "sample_count": 1,
+      "sample_offset_ns": 287923459
+    }
+  },
+  "metal_system_trace": {
+    "template": "Metal System Trace",
+    "xctrace_version": "16.0 (17F113)",
+    "recording_start": "2026-08-23T04:10:16.852+07:00",
+    "recording_duration_s": 7.126268,
+    "command": ".venv/bin/python -m stt.cli transcribe data/fleurs/audio/14755840805814218163.wav --backend hf --model mms-1b-all --device mps --dtype float32 --batch-size 1 --output outputs/instruments/observer-fast-profile-v3.jsonl --no-show",
+    "full_trace": {
+      "committed": false,
+      "local_path": "outputs/instruments/observer-fast-profile-v3.trace",
+      "file_count": 663,
+      "size_bytes": 36679092,
+      "manifest_sha256": "23f090668be6c1b8bd0dead8168c5e62a196fb7b62017c6dfabd787fe70d3580"
+    },
+    "time_info_export": {
+      "path": "evidence/instruments/observer-fast-profile-v3-time-info.xml",
+      "sha256": "249698319fb640bc6e545657fa80056d5331716df9381aeb1ee83479336d8cda",
+      "mach_absolute_epoch": 3952230722399,
+      "timebase_numer": 125,
+      "timebase_denom": 3
+    },
+    "mps_hw_export": {
+      "path": "evidence/instruments/observer-fast-profile-v3-mps-hw.xml",
+      "sha256": "2a5664c35c8e2b8ccb8e98048f17b7a70062995ba8bf70a99f4181cae9239bb4",
+      "row_count": 159,
+      "distinct_intervals": 13,
+      "first_start_s": 6.394698333,
+      "last_end_s": 6.690541166,
+      "active_union_s": 0.224297875,
+      "device": "M2 Max",
+      "state": "Active"
+    }
+  },
+  "correlation": {
+    "method": "Convert perf_counter_ns to trace-relative time using the exported mach-absolute epoch and 125/3 timebase.",
+    "mps_first_after_corpus_start_s": 0.1413421253333329,
+    "corpus_end_after_mps_last_s": 0.0014273336666664,
+    "conclusion": "The target process executed MPSGraph work on the M2 Max entirely inside the measured corpus wall. The single ioreg whole-GPU sample corroborates activity but is not treated as model occupancy."
+  }
+}
