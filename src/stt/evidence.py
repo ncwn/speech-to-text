@@ -360,6 +360,42 @@ def _metric_value(
     return f"{float(value):.{metric.digits}f}"
 
 
+#: A measured-looking figure: a decimal carrying enough places to be a score, or
+#: a ratio or percentage. Deliberately loose — the point is to notice numbers,
+#: not to judge which ones matter.
+_MEASURED_NUMBER_RE = re.compile(r"(?<![\w.])\d+\.\d{3,}(?![\w])|(?<![\w.])\d+(?:\.\d+)?\s*(?:×|%)")
+
+
+def unowned_measured_numbers(document: str) -> list[tuple[int, str]]:
+    """Return measured-looking figures outside every evidence block.
+
+    `_validate_document_ownership` rejects an unowned Markdown *table*, but a
+    number in a sentence was never checked — and that is where most of this
+    document's figures live. Such a number cannot be regenerated, cannot be
+    invalidated when its artifact changes, and `stt evidence --update` cannot
+    correct it. It is the same defect as a stale table, spread thinner.
+
+    This reports rather than raises, because the existing backlog has to be
+    migrated into derived blocks before it can become a hard gate. The tests
+    ratchet on it so the backlog cannot grow in the meantime.
+    """
+    found: list[tuple[int, str]] = []
+    inside = False
+    fenced = False
+    for line_number, line in enumerate(document.splitlines(), start=1):
+        marker = _MARKER_RE.fullmatch(line.strip())
+        if marker:
+            inside = marker.group(2) == "start"
+            continue
+        if line.lstrip().startswith(("```", "~~~")):
+            fenced = not fenced
+            continue
+        if inside or fenced:
+            continue
+        found.extend((line_number, match.strip()) for match in _MEASURED_NUMBER_RE.findall(line))
+    return found
+
+
 def _validate_document_ownership(document: str, blocks: tuple[BlockSpec, ...]) -> None:
     """Reject evidence markers and Markdown tables outside the manifest."""
     declared = {block.id for block in blocks}
