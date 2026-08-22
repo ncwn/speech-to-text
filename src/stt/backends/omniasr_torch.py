@@ -174,9 +174,16 @@ class OmniASRTorchBackend(ASRBackend):
         if binding is None:
             self.pipeline = ASRInferencePipeline(model_card=self.model, device=device, dtype=dtype)
         else:
+            import torch
             from fairseq2.assets import AssetCard, get_asset_store
             from fairseq2.data.tokenizers.hub import load_tokenizer
             from fairseq2.models.hub import load_model
+
+            # fairseq2's loader expects the torch device API (it reads
+            # ``device.type``), while provenance keeps the resolved name as a
+            # string.  ASRInferencePipeline forwards this device to the
+            # already-bound model as well.
+            runtime_device = torch.device(device)
 
             weights = [item for item in binding.paths if item.role == "weights" and item.path]
             tokenizers = [item for item in binding.paths if item.role == "tokenizer" and item.path]
@@ -223,7 +230,7 @@ class OmniASRTorchBackend(ASRBackend):
             }
             bound_model = load_model(
                 AssetCard(f"{self.model}.stt-bound", model_metadata),
-                device=device,
+                device=runtime_device,
                 dtype=dtype,
                 progress=False,
             )
@@ -235,7 +242,7 @@ class OmniASRTorchBackend(ASRBackend):
                 model_card=None,
                 model=bound_model,
                 tokenizer=bound_tokenizer,
-                device=device,
+                device=runtime_device,
                 dtype=dtype,
             )
         self._loaded = True

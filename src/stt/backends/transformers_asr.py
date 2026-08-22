@@ -20,11 +20,14 @@ not for a commercial product.
 
 from __future__ import annotations
 
+import hashlib
 import os
 import re
+import shutil
+import tempfile
 import time
 from dataclasses import dataclass
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Any, ClassVar
 
 from stt.audio import join_segments
@@ -156,7 +159,8 @@ def _bound_hf_snapshot(binding: Any) -> Path:
     nested artifacts (for example ``vocabs/mya.txt``) in the same snapshot
     while preserving their individual digest validation.
     """
-    from stt.provenance import validate_binding
+    from stt.paths import cache_dir
+    from stt.provenance import _cache_lock, artifact_manifest_sha256, validate_binding
 
     issues = validate_binding(binding)
     if issues:
@@ -175,24 +179,101 @@ def _bound_hf_snapshot(binding: Any) -> Path:
     # a second path by iterating an untrusted list.
     paths = [by_name[artifact.name] for artifact in declared]
     files = [Path(item.path).expanduser().resolve(strict=True) for item in paths]
-    try:
-        root = Path(os.path.commonpath([str(path.parent) for path in files]))
-    except ValueError as exc:
-        raise RuntimeError("bound Hugging Face artifacts are not on one local snapshot") from exc
-    if not root.is_dir():
-        raise RuntimeError(f"bound Hugging Face snapshot directory is unavailable: {root}")
-    for path, item in zip(files, paths, strict=True):
+    if not declared:
+        raise RuntimeError("bound Hugging Face provenance declares no artifacts")
+
+    # Hub snapshots normally expose these names through symlinks into a
+    # content-addressed ``blobs`` directory.  A worker binding deliberately
+    # records the resolved blob path, while Transformers expects the
+    # snapshot-relative names (especially for adapters and vocabularies).  Do
+    # not infer names from the blob parent; materialize the declared view.
+    relative_names: list[PurePosixPath] = []
+    for artifact in declared:
+        name = artifact.name
+        if (
+            not name
+            or "\x00" in name
+            or "\\" in name
+            or PurePosixPath(name).is_absolute()
+            or PureWindowsPath(name).drive
+            or any(part in {"", ".", ".."} for part in name.split("/"))
+        ):
+            raise RuntimeError(f"bound Hugging Face artifact name escapes its snapshot: {name!r}")
+        relative_names.append(PurePosixPath(name))
+
+    # Include the source paths in the key because worker-local bindings may
+    # point at different copies of the same validated blobs.  This keeps each
+    # immutable view self-contained instead of racing to retarget a shared
+    # symlink tree, while repeated calls for one binding reuse the same view.
+    manifest_key = artifact_manifest_sha256(tuple(declared))
+    source_key = hashlib.sha256(
+        "\n".join(
+            f"{name.as_posix()}\0{path}" for name, path in zip(relative_names, files, strict=True)
+        ).encode("utf-8")
+    ).hexdigest()
+    cache_parent = cache_dir("huggingface") / "bound-snapshots"
+    cache_parent.mkdir(parents=True, exist_ok=True)
+    snapshot = cache_parent / f"{manifest_key}-{source_key}"
+    lock_path = cache_parent / f".{snapshot.name}.lock"
+
+    def valid_view() -> bool:
+        if not snapshot.is_dir() or snapshot.is_symlink():
+            return False
+        expected_files = {Path(relative) for relative in relative_names}
+        expected_dirs = {Path(".")}
+        for relative in expected_files:
+            expected_dirs.update(Path(parent) for parent in relative.parents)
+        for relative, source in zip(relative_names, files, strict=True):
+            destination = snapshot / relative
+            if not destination.is_symlink():
+                return False
+            try:
+                if destination.resolve(strict=True) != source:
+                    return False
+            except OSError:
+                return False
         try:
-            relative = path.relative_to(root).as_posix()
-        except ValueError as exc:
-            raise RuntimeError(
-                "bound Hugging Face artifacts are not contained by one local snapshot"
-            ) from exc
-        if relative != item.name:
-            raise RuntimeError(
-                f"bound Hugging Face artifact path does not match its manifest name: {item.name}"
-            )
-    return root
+            entries = snapshot.rglob("*")
+        except OSError:
+            return False
+        for entry in entries:
+            relative = entry.relative_to(snapshot)
+            if relative in expected_files:
+                if not entry.is_symlink():
+                    return False
+            elif relative in expected_dirs:
+                if entry.is_symlink() or not entry.is_dir():
+                    return False
+            else:
+                return False
+        return all((snapshot / relative).is_symlink() for relative in expected_files)
+
+    with _cache_lock(lock_path):
+        if valid_view():
+            return snapshot
+        if snapshot.exists() or snapshot.is_symlink():
+            raise RuntimeError(f"bound Hugging Face snapshot cache is invalid: {snapshot}")
+
+        staging = Path(tempfile.mkdtemp(prefix=f".{snapshot.name}.", dir=cache_parent))
+        try:
+            for relative, source in zip(relative_names, files, strict=True):
+                destination = staging / relative
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                destination.symlink_to(source)
+            os.replace(staging, snapshot)
+        except FileExistsError:
+            # A non-POSIX worker may not honour flock.  If another creator won
+            # the race, accept its complete view; otherwise fail closed.
+            if not valid_view():
+                raise RuntimeError(
+                    f"bound Hugging Face snapshot cache is invalid: {snapshot}"
+                ) from None
+        finally:
+            if staging.exists():
+                shutil.rmtree(staging)
+        if not valid_view():
+            raise RuntimeError(f"bound Hugging Face snapshot cache is invalid: {snapshot}")
+        return snapshot
 
 
 @register

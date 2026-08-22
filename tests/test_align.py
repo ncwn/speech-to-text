@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import sys
 from dataclasses import replace
+from pathlib import Path
 from types import ModuleType
 
 import pytest
@@ -87,7 +88,13 @@ def test_bound_aligner_loads_components_from_exact_local_snapshot(monkeypatch, t
     binding.validate()
 
     source, kwargs = _alignment_load_source(binding)
-    assert source == str(root)
+    snapshot = Path(source)
+    assert snapshot.is_dir()
+    assert all((snapshot / artifact.name).is_symlink() for artifact in artifacts)
+    assert all(
+        (snapshot / artifact.name).resolve() == Path(artifact.path).resolve()
+        for artifact in artifacts
+    )
     assert kwargs == {"local_files_only": True}
 
     calls: list[tuple[str, str, dict]] = []
@@ -134,12 +141,12 @@ def test_bound_aligner_loads_components_from_exact_local_snapshot(monkeypatch, t
 
     assert calls[0] == (
         "processor",
-        str(root),
+        str(snapshot),
         {"target_lang": "mya", "local_files_only": True},
     )
     assert calls[1] == (
         "model",
-        str(root),
+        str(snapshot),
         {"target_lang": "mya", "ignore_mismatched_sizes": True, "local_files_only": True},
     )
     assert all(call[1] != "facebook/mms-1b-all" for call in calls)

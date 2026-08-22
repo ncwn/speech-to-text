@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import hashlib
+import json
 from pathlib import Path
 
 import pytest
 
 from stt.backends.omniasr_torch import OmniASRTorchBackend
+from stt.provenance import ArtifactDigest, ModelBinding, ModelProvenance, digest_file
 
 
 class RecordingPipeline:
@@ -104,3 +107,103 @@ def test_batch_size_must_be_positive(monkeypatch, tmp_path):
     backend = _backend(RecordingPipeline())
     with pytest.raises(ValueError, match="batch_size must be at least 1"):
         backend.transcribe([path], batch_size=0)
+
+
+def test_bound_load_passes_torch_device_to_fairseq2(monkeypatch, tmp_path):
+    """Bound fairseq2 APIs receive a device object, not its provenance label."""
+    import torch
+    from fairseq2.assets import AssetCard
+    from fairseq2.data.tokenizers import hub as tokenizer_hub
+    from fairseq2.models import hub as model_hub
+    from omnilingual_asr.models.inference import pipeline as pipeline_module
+
+    model = "omniASR_LLM_Unlimited_300M_v2"
+    tokenizer_name = "omniASR_tokenizer_v2"
+    checkpoint = tmp_path / "checkpoint.pt"
+    tokenizer = tmp_path / "tokenizer.model"
+    checkpoint.write_bytes(b"checkpoint")
+    tokenizer.write_bytes(b"tokenizer")
+    checkpoint_uri = checkpoint.resolve().as_uri()
+    tokenizer_uri = tokenizer.resolve().as_uri()
+
+    source_card = AssetCard(
+        model,
+        {
+            "model_family": "wav2vec2_llama",
+            "model_arch": "wav2vec2_llama",
+            "checkpoint": checkpoint_uri,
+            "tokenizer_ref": tokenizer_name,
+        },
+    )
+    source_tokenizer = AssetCard(
+        tokenizer_name,
+        {
+            "tokenizer_family": "sentencepiece",
+            "tokenizer": tokenizer_uri,
+        },
+    )
+    card_semantics = {
+        "name": source_card.name,
+        "model_family": source_card.field("model_family").as_(str),
+        "model_arch": source_card.field("model_arch").as_(str),
+        "checkpoint": str(source_card.field("checkpoint").as_uri()),
+        "tokenizer_ref": tokenizer_name,
+        "tokenizer_family": source_tokenizer.field("tokenizer_family").as_(str),
+        "tokenizer": str(source_tokenizer.field("tokenizer").as_uri()),
+    }
+    card_json = json.dumps(
+        card_semantics, sort_keys=True, separators=(",", ":"), ensure_ascii=True
+    ).encode("ascii")
+    card_digest = hashlib.sha256(card_json).hexdigest()
+    artifacts = (
+        digest_file(checkpoint, role="weights", name=checkpoint.name),
+        digest_file(tokenizer, role="tokenizer", name=tokenizer.name),
+        ArtifactDigest("card-metadata", f"{model}.card.json", len(card_json), card_digest),
+    )
+    provenance = ModelProvenance(
+        backend="omniasr-torch",
+        requested_model=model,
+        source_kind="fairseq2-card",
+        source_locator=model,
+        upstream_revision=None,
+        revision_status="unavailable-content-addressed",
+        artifacts=artifacts,
+        resolved_settings={"device": "cpu", "dtype": "float32"},
+    ).finalized()
+    binding = ModelBinding(provenance, artifacts)
+
+    class Store:
+        def retrieve_card(self, name):
+            return {model: source_card, tokenizer_name: source_tokenizer}[name]
+
+    load_model_devices: list[object] = []
+    pipeline_devices: list[object] = []
+
+    def fake_load_model(card, *, device, dtype, progress):
+        del card, dtype, progress
+        load_model_devices.append(device)
+        return object()
+
+    def fake_load_tokenizer(card, *, progress):
+        del card, progress
+        return object()
+
+    class FakePipeline:
+        def __init__(self, model_card, *, model, tokenizer, device, dtype):
+            del model_card, model, tokenizer, dtype
+            pipeline_devices.append(device)
+
+    monkeypatch.setattr("fairseq2.assets.get_asset_store", lambda: Store())
+    monkeypatch.setattr(model_hub, "load_model", fake_load_model)
+    monkeypatch.setattr(tokenizer_hub, "load_tokenizer", fake_load_tokenizer)
+    monkeypatch.setattr(pipeline_module, "ASRInferencePipeline", FakePipeline)
+
+    backend = OmniASRTorchBackend(model, device="cpu", dtype="float32")
+    backend.bind_model(binding)
+    backend.load()
+
+    assert backend.resolved_device == "cpu"
+    assert all(isinstance(device, torch.device) for device in load_model_devices)
+    assert all(isinstance(device, torch.device) for device in pipeline_devices)
+    assert load_model_devices[0].type == "cpu"
+    assert pipeline_devices[0].type == "cpu"

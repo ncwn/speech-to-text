@@ -10,7 +10,7 @@ from stt.provenance import ArtifactDigest, ModelBinding, ModelProvenance, digest
 
 
 def _hf_binding(tmp_path, model: str) -> tuple[ModelBinding, Path]:
-    root = tmp_path / "snapshot"
+    root = tmp_path / "blobs"
     files = {
         "config.json": b"{}",
         "model.safetensors": b"weights",
@@ -21,8 +21,11 @@ def _hf_binding(tmp_path, model: str) -> tuple[ModelBinding, Path]:
         files["adapter.mya.safetensors"] = b"adapter"
         files["vocabs/mya.txt"] = b"vocab"
     artifacts: list[ArtifactDigest] = []
-    for name, content in files.items():
-        path = root / name
+    for index, (name, content) in enumerate(files.items()):
+        # Hugging Face snapshots expose logical names through symlinks into
+        # flat content-addressed blobs.  The worker binding records the blob
+        # path while provenance retains the snapshot-relative loader name.
+        path = root / f"{index:064x}"
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(content)
         artifacts.append(digest_file(path, role="model-or-processor", name=name))
@@ -102,7 +105,7 @@ def test_hf_batch_failure_retries_individually(monkeypatch, tmp_path):
 
 
 def test_hf_bound_pipeline_uses_exact_snapshot_for_all_components(monkeypatch, tmp_path):
-    binding, root = _hf_binding(tmp_path, "whisper-my-small")
+    binding, _ = _hf_binding(tmp_path, "whisper-my-small")
     calls: list[tuple[str, dict]] = []
 
     def fake_pipeline(task, **kwargs):
@@ -123,15 +126,22 @@ def test_hf_bound_pipeline_uses_exact_snapshot_for_all_components(monkeypatch, t
 
     task, kwargs = calls[0]
     assert task == "automatic-speech-recognition"
-    assert kwargs["model"] == str(root)
-    assert kwargs["tokenizer"] == str(root)
-    assert kwargs["feature_extractor"] == str(root)
+    snapshot = Path(kwargs["model"])
+    assert snapshot.is_dir()
+    assert kwargs["tokenizer"] == str(snapshot)
+    assert kwargs["feature_extractor"] == str(snapshot)
     assert kwargs["model_kwargs"] == {"local_files_only": True}
     assert "revision" not in kwargs
+    for artifact in binding.provenance.artifacts:
+        target = snapshot / artifact.name
+        assert target.is_symlink()
+        assert target.resolve() == Path(
+            next(item.path for item in binding.paths if item.name == artifact.name)
+        )
 
 
 def test_hf_bound_processor_and_model_load_from_exact_snapshot(monkeypatch, tmp_path):
-    binding, root = _hf_binding(tmp_path, "seamless-m4t-v2")
+    binding, _ = _hf_binding(tmp_path, "seamless-m4t-v2")
     calls: list[tuple[str, str, dict]] = []
 
     class FakeModel:
@@ -178,14 +188,16 @@ def test_hf_bound_processor_and_model_load_from_exact_snapshot(monkeypatch, tmp_
     backend.bind_model(binding)
     backend.load()
 
+    snapshot = Path(calls[0][1])
     assert calls == [
-        ("processor", str(root), {"local_files_only": True}),
-        ("model", str(root), {"local_files_only": True, "dtype": "float32"}),
+        ("processor", str(snapshot), {"local_files_only": True}),
+        ("model", str(snapshot), {"local_files_only": True, "dtype": "float32"}),
     ]
+    assert all((snapshot / artifact.name).is_symlink() for artifact in binding.provenance.artifacts)
 
 
 def test_hf_bound_mms_adapter_stays_on_local_snapshot(monkeypatch, tmp_path):
-    binding, root = _hf_binding(tmp_path, "mms-1b-all")
+    binding, _ = _hf_binding(tmp_path, "mms-1b-all")
     calls: list[tuple[str, object, dict]] = []
 
     class Tokenizer:
@@ -238,9 +250,11 @@ def test_hf_bound_mms_adapter_stays_on_local_snapshot(monkeypatch, tmp_path):
     backend.bind_model(binding)
     backend.load()
 
-    assert ("processor", str(root), {"local_files_only": True}) in calls
-    assert ("model", str(root), {"local_files_only": True, "dtype": "float32"}) in calls
+    snapshot = Path(next(call[1] for call in calls if call[0] == "processor"))
+    assert ("processor", str(snapshot), {"local_files_only": True}) in calls
+    assert ("model", str(snapshot), {"local_files_only": True, "dtype": "float32"}) in calls
     assert ("adapter", "mya", {"local_files_only": True}) in calls
+    assert (snapshot / "vocabs/mya.txt").is_symlink()
 
 
 def test_hf_bound_snapshot_rejects_duplicate_path_selection(tmp_path):
@@ -250,6 +264,31 @@ def test_hf_bound_snapshot_rejects_duplicate_path_selection(tmp_path):
 
     with pytest.raises(RuntimeError, match="duplicate path names"):
         _bound_hf_snapshot(malformed)
+
+
+def test_hf_bound_snapshot_rejects_artifact_name_escape(tmp_path):
+    binding, _ = _hf_binding(tmp_path, "whisper-my-small")
+    escaped_name = "../outside/config.json"
+    artifact = replace(binding.provenance.artifacts[0], name=escaped_name)
+    path = replace(binding.paths[0], name=escaped_name)
+    malformed = ModelBinding(
+        replace(binding.provenance, artifacts=(artifact, *binding.provenance.artifacts[1:])),
+        (path, *binding.paths[1:]),
+    )
+
+    with pytest.raises(RuntimeError, match="escapes its snapshot"):
+        _bound_hf_snapshot(malformed)
+
+
+def test_hf_bound_snapshot_reuses_materialized_blob_view(tmp_path):
+    binding, _ = _hf_binding(tmp_path, "mms-1b-all")
+
+    first = _bound_hf_snapshot(binding)
+    second = _bound_hf_snapshot(binding)
+
+    assert second == first
+    assert all((first / artifact.name).is_symlink() for artifact in binding.provenance.artifacts)
+    assert (first / "vocabs/mya.txt").read_bytes() == b"vocab"
 
 
 class SleepingPipeline:
