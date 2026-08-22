@@ -21,6 +21,10 @@ REPORT_PAIRS = {
         ROOT / "evidence/parity/dolphin-small-cpu-v1.json",
         ROOT / "evidence/parity/dolphin-small-cpu-v1-reference-first.json",
     ),
+    "omniasr-torch+omniASR_LLM_Unlimited_7B_v2": (
+        ROOT / "evidence/parity/omniasr-torch-7b-cpu-v1.json",
+        ROOT / "evidence/parity/omniasr-torch-7b-cpu-v1-reference-first.json",
+    ),
 }
 
 
@@ -65,3 +69,7 @@ def test_seamless_parity_passes_in_both_entrypoint_orders():
 
 def test_dolphin_parity_passes_in_both_entrypoint_orders():
     _assert_parity_pair("dolphin+small")
+
+
+def test_omniasr_torch_parity_passes_in_both_entrypoint_orders():
+    _assert_parity_pair("omniasr-torch+omniASR_LLM_Unlimited_7B_v2")
