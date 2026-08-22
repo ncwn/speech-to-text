@@ -1,0 +1,188 @@
+{
+  "conditions": [
+    {
+      "condition_id": "fast-off",
+      "input_set_id": "canonical",
+      "profile": false,
+      "runner_id": "adapter",
+      "sample_uss": false,
+      "subject": {
+        "backend": "hf",
+        "batch_size": 1,
+        "language": "mya_Mymr",
+        "model": "mms-1b-all",
+        "options": {
+          "batch_size": 1,
+          "device": "mps",
+          "dtype": "float32",
+          "language": "mya_Mymr"
+        }
+      }
+    },
+    {
+      "condition_id": "fast-profile",
+      "input_set_id": "canonical",
+      "profile": true,
+      "runner_id": "adapter",
+      "sample_uss": false,
+      "subject": {
+        "backend": "hf",
+        "batch_size": 1,
+        "language": "mya_Mymr",
+        "model": "mms-1b-all",
+        "options": {
+          "batch_size": 1,
+          "device": "mps",
+          "dtype": "float32",
+          "language": "mya_Mymr"
+        }
+      }
+    },
+    {
+      "condition_id": "fast-profile-uss",
+      "input_set_id": "canonical",
+      "profile": true,
+      "runner_id": "adapter",
+      "sample_uss": true,
+      "subject": {
+        "backend": "hf",
+        "batch_size": 1,
+        "language": "mya_Mymr",
+        "model": "mms-1b-all",
+        "options": {
+          "batch_size": 1,
+          "device": "mps",
+          "dtype": "float32",
+          "language": "mya_Mymr"
+        }
+      }
+    },
+    {
+      "condition_id": "slow-off",
+      "input_set_id": "canonical",
+      "profile": false,
+      "runner_id": "adapter",
+      "sample_uss": false,
+      "subject": {
+        "backend": "omniasr-torch",
+        "batch_size": 1,
+        "language": "mya_Mymr",
+        "model": "omniASR_LLM_Unlimited_7B_v2",
+        "options": {
+          "batch_size": 1,
+          "device": "cpu",
+          "dtype": "float32",
+          "language": "mya_Mymr"
+        }
+      }
+    },
+    {
+      "condition_id": "slow-profile",
+      "input_set_id": "canonical",
+      "profile": true,
+      "runner_id": "adapter",
+      "sample_uss": false,
+      "subject": {
+        "backend": "omniasr-torch",
+        "batch_size": 1,
+        "language": "mya_Mymr",
+        "model": "omniASR_LLM_Unlimited_7B_v2",
+        "options": {
+          "batch_size": 1,
+          "device": "cpu",
+          "dtype": "float32",
+          "language": "mya_Mymr"
+        }
+      }
+    },
+    {
+      "condition_id": "slow-profile-uss",
+      "input_set_id": "canonical",
+      "profile": true,
+      "runner_id": "adapter",
+      "sample_uss": true,
+      "subject": {
+        "backend": "omniasr-torch",
+        "batch_size": 1,
+        "language": "mya_Mymr",
+        "model": "omniASR_LLM_Unlimited_7B_v2",
+        "options": {
+          "batch_size": 1,
+          "device": "cpu",
+          "dtype": "float32",
+          "language": "mya_Mymr"
+        }
+      }
+    }
+  ],
+  "contrasts": [
+    {
+      "contrast_id": "fast-profile-overhead",
+      "control_condition_id": "fast-off",
+      "gating": true,
+      "join_on": "audio_id",
+      "require_same_execution": true,
+      "threshold": 0.02,
+      "treatment_condition_id": "fast-profile"
+    },
+    {
+      "contrast_id": "fast-uss-overhead",
+      "control_condition_id": "fast-off",
+      "gating": true,
+      "join_on": "audio_id",
+      "require_same_execution": true,
+      "threshold": 0.02,
+      "treatment_condition_id": "fast-profile-uss"
+    },
+    {
+      "contrast_id": "slow-profile-overhead",
+      "control_condition_id": "slow-off",
+      "gating": true,
+      "join_on": "audio_id",
+      "require_same_execution": true,
+      "threshold": 0.02,
+      "treatment_condition_id": "slow-profile"
+    },
+    {
+      "contrast_id": "slow-uss-overhead",
+      "control_condition_id": "slow-off",
+      "gating": true,
+      "join_on": "audio_id",
+      "require_same_execution": true,
+      "threshold": 0.02,
+      "treatment_condition_id": "slow-profile-uss"
+    }
+  ],
+  "experiment_id": "observer-calibration-v3",
+  "input_sets": [
+    {
+      "input_set_id": "canonical",
+      "inputs": [
+        {
+          "audio_id": "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a",
+          "channels": 1,
+          "duration_s": 12.78,
+          "frames": 204480,
+          "prepared_path": "data/.converted/pcm16-mono-16000-v1__8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28.wav",
+          "reference_id": "14755840805814218163",
+          "sample_rate": 16000,
+          "source_path": "data/fleurs/audio/14755840805814218163.wav",
+          "source_sha256": "8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28"
+        }
+      ]
+    }
+  ],
+  "repeats": 3,
+  "schedule_seed": 20260823,
+  "sessions": 6,
+  "statistics": {
+    "draws": 20000,
+    "estimator": "paired-session-median-log-ratio",
+    "min_repeats": 3,
+    "min_sessions": 5,
+    "min_warmups": 3,
+    "quantile_method": "linear",
+    "version": 1
+  },
+  "warmups": 3
+}
