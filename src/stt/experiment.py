@@ -99,11 +99,21 @@ class InputSetSpec:
     input_set_id: str
     inputs: tuple[AudioInput, ...]
     input_mode: str = "prepared"
+    preparation_wall_s: float | None = None
+    preparation_kind: str | None = None
 
     def validate(self) -> None:
         _simple_id(self.input_set_id, "input_set_id")
         if self.input_mode not in {"prepared", "source"}:
             raise MeasurementError(f"unsupported experiment input mode: {self.input_mode}")
+        if (self.preparation_wall_s is None) != (self.preparation_kind is None):
+            raise MeasurementError("input preparation wall and kind must be declared together")
+        if self.preparation_wall_s is not None and (
+            not math.isfinite(self.preparation_wall_s) or self.preparation_wall_s < 0
+        ):
+            raise MeasurementError("input preparation wall must be finite and non-negative")
+        if self.preparation_kind is not None:
+            _simple_id(self.preparation_kind, "preparation_kind")
         if not self.inputs:
             raise MeasurementError("an experiment input set cannot be empty")
         for item in self.inputs:
@@ -132,11 +142,15 @@ class InputSetSpec:
 
     def to_dict(self) -> dict[str, Any]:
         self.validate()
-        return {
+        result = {
             "input_set_id": self.input_set_id,
             "inputs": [asdict(item) for item in self.inputs],
             "input_mode": self.input_mode,
         }
+        if self.preparation_wall_s is not None:
+            result["preparation_wall_s"] = self.preparation_wall_s
+            result["preparation_kind"] = self.preparation_kind
+        return result
 
     @classmethod
     def from_dict(cls, value: Mapping[str, Any]) -> InputSetSpec:
@@ -145,6 +159,16 @@ class InputSetSpec:
                 input_set_id=str(value["input_set_id"]),
                 inputs=tuple(_audio_from_dict(item) for item in value["inputs"]),
                 input_mode=str(value.get("input_mode", "prepared")),
+                preparation_wall_s=(
+                    float(value["preparation_wall_s"])
+                    if value.get("preparation_wall_s") is not None
+                    else None
+                ),
+                preparation_kind=(
+                    str(value["preparation_kind"])
+                    if value.get("preparation_kind") is not None
+                    else None
+                ),
             )
         except (KeyError, TypeError, ValueError) as exc:
             raise MeasurementError(f"invalid input set specification: {exc}") from exc

@@ -21,6 +21,7 @@ import json
 import os
 import re
 import sys
+import time
 from dataclasses import replace
 from pathlib import Path
 from typing import Annotated, Any
@@ -1744,6 +1745,99 @@ def experiment_candidate_spec(
     spec.validate()
     write_json_atomic(spec.to_dict(), output)
     console.print(f"[green]candidate specification written[/green] → {output}")
+
+
+@experiment_app.command("input-spec")
+def experiment_input_spec(
+    audio: Annotated[list[Path], typer.Argument(help="PCM WAV input-control corpus")],
+    output: Annotated[Path, typer.Option("--output", "-o", help="Specification JSON path")],
+    backend: Annotated[str, typer.Option("--backend", "-b")] = "hf",
+    model: Annotated[str, typer.Option("--model", "-m")] = "mms-1b-all",
+    device: Annotated[str, typer.Option(help="Pinned execution device")] = "mps",
+    dtype: Annotated[str, typer.Option(help="Pinned execution dtype")] = "float32",
+    experiment_id: Annotated[
+        str, typer.Option("--id", help="Immutable experiment archive id")
+    ] = "input-control",
+    limit: Annotated[int, typer.Option(help="Only the first N files; 0 for all")] = 0,
+    batch_size: Annotated[int, typer.Option(help="Corpus batch size")] = 1,
+    sessions: Annotated[int, typer.Option(help="Fresh paired sessions")] = 5,
+    warmups: Annotated[int, typer.Option(help="Untimed warmups per condition")] = 3,
+    repeats: Annotated[int, typer.Option(help="Measured repeats per condition")] = 3,
+    seed: Annotated[int, typer.Option(help="Counterbalanced schedule seed")] = 0,
+) -> None:
+    """Write a canonical-prepared versus native-source input experiment."""
+    if batch_size < 1 or sessions < 1 or warmups < 0 or repeats < 1:
+        raise typer.BadParameter("batch size, sessions, and repeats must be positive")
+    files, skipped = audio_mod.find_audio(audio)
+    if skipped or any(path.suffix.lower() != ".wav" for path in files):
+        raise typer.BadParameter("input controls currently require PCM-readable WAV files")
+    files = files[:limit] if limit else files
+    if not files:
+        raise typer.BadParameter("input control needs at least one WAV file")
+    control_cache = DEFAULT_CACHE / experiment_id
+    if control_cache.exists():
+        raise typer.BadParameter(
+            f"input-control conversion cache already exists; choose a new --id: {control_cache}"
+        )
+
+    canonical_started = time.perf_counter()
+    canonical_prepared = [
+        audio_mod.prepare_audio(path, control_cache, convert=True) for path in files
+    ]
+    canonical_wall = time.perf_counter() - canonical_started
+    native_started = time.perf_counter()
+    native_prepared = [
+        audio_mod.prepare_audio(path, control_cache, convert=False) for path in files
+    ]
+    native_wall = time.perf_counter() - native_started
+    canonical_inputs = tuple(_portable_audio_input(item) for item in canonical_prepared)
+    native_inputs = tuple(_portable_audio_input(item) for item in native_prepared)
+    options = {
+        "device": device,
+        "dtype": dtype,
+        "language": BURMESE,
+        "batch_size": batch_size,
+    }
+    subject = SubjectSpec(backend, model, BURMESE, batch_size, options)
+    spec = ExperimentSpec(
+        experiment_id=experiment_id,
+        input_sets=(
+            InputSetSpec(
+                "canonical",
+                canonical_inputs,
+                input_mode="prepared",
+                preparation_wall_s=canonical_wall,
+                preparation_kind="canonical-decode-resample",
+            ),
+            InputSetSpec(
+                "native",
+                native_inputs,
+                input_mode="source",
+                preparation_wall_s=native_wall,
+                preparation_kind="native-identity-probe",
+            ),
+        ),
+        conditions=(
+            ConditionSpec("canonical", subject, "canonical"),
+            ConditionSpec("native", subject, "native", runner_id="source"),
+        ),
+        contrasts=(
+            ContrastSpec(
+                "native-over-canonical",
+                "canonical",
+                "native",
+                gating=False,
+                join_on="source_sha256",
+            ),
+        ),
+        sessions=sessions,
+        warmups=warmups,
+        repeats=repeats,
+        schedule_seed=seed,
+    )
+    spec.validate()
+    write_json_atomic(spec.to_dict(), output)
+    console.print(f"[green]input-control specification written[/green] → {output}")
 
 
 @experiment_app.command("verify")

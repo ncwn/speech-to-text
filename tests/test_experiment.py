@@ -331,6 +331,18 @@ def test_spec_round_trip_keeps_explicit_observer_topology():
     assert all(sorted(values) == [0, 0, 1, 1, 2, 2] for values in positions.values())
 
 
+def test_input_preparation_metadata_round_trips_only_when_declared():
+    input_set = InputSetSpec(
+        "canonical",
+        (_audio(),),
+        preparation_wall_s=0.25,
+        preparation_kind="canonical-decode-resample",
+    )
+
+    assert InputSetSpec.from_dict(input_set.to_dict()) == input_set
+    assert "preparation_wall_s" not in InputSetSpec("plain", (_audio(),)).to_dict()
+
+
 def test_explicit_contrast_direction_survives_reversed_condition_declaration():
     control = ConditionSpec(
         "control",

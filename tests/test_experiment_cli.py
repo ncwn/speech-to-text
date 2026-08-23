@@ -101,6 +101,38 @@ def test_candidate_spec_declares_cartesian_device_dtype_matrix(tmp_path):
     assert not spec.contrasts
 
 
+def test_input_spec_records_preparation_outside_paired_inference(monkeypatch, tmp_path):
+    monkeypatch.setattr("stt.cli.checkout_root", lambda: tmp_path)
+    monkeypatch.setattr("stt.cli.DEFAULT_CACHE", tmp_path / "cache")
+    audio = tmp_path / "float.wav"
+    sf.write(audio, np.linspace(-0.5, 0.5, 16_000), 16_000, subtype="FLOAT")
+    output = tmp_path / "input.json"
+
+    result = runner.invoke(
+        app,
+        [
+            "experiment",
+            "input-spec",
+            str(audio),
+            "--output",
+            str(output),
+            "--id",
+            "input-fixture",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    spec = ExperimentSpec.from_dict(json.loads(output.read_text(encoding="utf-8")))
+    by_id = spec.input_map
+    assert by_id["canonical"].input_mode == "prepared"
+    assert by_id["native"].input_mode == "source"
+    assert by_id["canonical"].preparation_kind == "canonical-decode-resample"
+    assert by_id["native"].preparation_kind == "native-identity-probe"
+    assert by_id["canonical"].inputs[0].source_sha256 == by_id["native"].inputs[0].source_sha256
+    assert by_id["canonical"].inputs[0].audio_id != by_id["native"].inputs[0].audio_id
+    assert spec.contrasts[0].join_on == "source_sha256"
+
+
 def test_experiment_verify_reports_a_malformed_archive(tmp_path):
     descriptor = tmp_path / "experiment.json"
     descriptor.write_text('{"artifact_kind":"experiment-v1","spec":null}\n', encoding="utf-8")
