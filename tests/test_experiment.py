@@ -599,3 +599,16 @@ def test_archive_verifier_returns_issues_for_malformed_descriptor(tmp_path):
 
     assert issues
     assert any("specification" in issue for issue in issues)
+
+
+def test_all_committed_experiment_archives_verify():
+    root = Path(__file__).parents[1] / "evidence" / "experiments"
+    descriptors = sorted(root.glob("*/experiment.json"))
+
+    assert descriptors
+    failures = {}
+    for descriptor in descriptors:
+        issues = verify_experiment(descriptor)
+        if issues:
+            failures[str(descriptor.relative_to(root))] = issues
+    assert failures == {}

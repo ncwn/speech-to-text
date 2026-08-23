@@ -21,6 +21,7 @@ from stt.derive import (
     Requirements,
     baseline_table,
     experiment_table,
+    observer_table,
     validate_settings,
 )
 from stt.derive import derive as run_deriver
@@ -549,7 +550,12 @@ def _render_block(block: BlockSpec) -> tuple[str, list[str], bool]:
             return _render_derived_table(baseline_table(block.source)), issues, True
         if block.source_kind == "experiment-v1":
             assert block.source is not None
-            return _render_derived_table(experiment_table(block.source)), issues, True
+            table = (
+                observer_table(block.source)
+                if block.deriver == "observer:v1"
+                else experiment_table(block.source)
+            )
+            return _render_derived_table(table), issues, True
         references = load_references(block.reference)
         if not references:
             raise EvidenceError(f"empty reference corpus: {block.reference}")

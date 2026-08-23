@@ -59,6 +59,18 @@ def _canonical_bytes(value: object) -> bytes:
     return _canonical_json(value).encode("utf-8")
 
 
+def _request_identity_candidates(request: WorkerRequest) -> set[str]:
+    """Return current and compatible pre-runner-field request identities."""
+    values = request.to_dict()
+    candidates = {hashlib.sha256(_canonical_bytes(values)).hexdigest()}
+    if request.runner_id == "adapter" and request.input_mode == "prepared":
+        legacy = dict(values)
+        legacy.pop("runner_id", None)
+        legacy.pop("input_mode", None)
+        candidates.add(hashlib.sha256(_canonical_bytes(legacy)).hexdigest())
+    return candidates
+
+
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -92,6 +104,19 @@ def _summary_projection(value: Mapping[str, Any]) -> dict[str, Any]:
         "summary_artifact",
     }
     return {key: deepcopy(item) for key, item in value.items() if key not in excluded}
+
+
+def _compatible_recomputed_summary(
+    recomputed: Mapping[str, Any], stored: Mapping[str, Any]
+) -> dict[str, Any]:
+    """Omit known default fields absent from a pre-field descriptor."""
+    value = deepcopy(dict(recomputed))
+    stored_sets = stored.get("spec", {}).get("input_sets", [])
+    recomputed_sets = value.get("spec", {}).get("input_sets", [])
+    for stored_set, recomputed_set in zip(stored_sets, recomputed_sets, strict=False):
+        if "input_mode" not in stored_set and recomputed_set.get("input_mode") == "prepared":
+            recomputed_set.pop("input_mode")
+    return value
 
 
 def _source_groups(
@@ -431,7 +456,7 @@ def _request_issues(
     condition = spec.condition_map.get(condition_id)
     if condition is None:
         return [f"archived request has undeclared condition {condition_id}"]
-    if request.identity_sha256 != request_sha256:
+    if request_sha256 not in _request_identity_candidates(request):
         issues.append(f"archived request digest differs for {condition_id}")
     if request.run_id != spec.experiment_id or request.experiment_id != spec.experiment_id:
         issues.append(f"archived request experiment identity differs for {condition_id}")
@@ -489,7 +514,7 @@ def _response_matches_request(
         (
             response.run_id == request.run_id,
             response.request_key == request.subject.request_key,
-            response.request_sha256 == request.identity_sha256,
+            response.request_sha256 in _request_identity_candidates(request),
             response.worker_index == request.worker_index,
             response.subject == request.subject,
             response.experiment_id == request.experiment_id,
@@ -654,10 +679,11 @@ def verify_experiment(path: Path) -> list[str]:
         recomputed = summarize_experiment(spec, response_groups)
     except (MeasurementError, TypeError, ValueError, KeyError) as exc:
         issues.append(f"cannot recompute experiment summary: {exc}")
-    if recomputed is not None and _canonical_json(
-        _summary_projection(descriptor)
-    ) != _canonical_json(recomputed):
-        issues.append("derived experiment summary differs from archived workers")
+    stored_projection = _summary_projection(descriptor)
+    if recomputed is not None:
+        compatible = _compatible_recomputed_summary(recomputed, stored_projection)
+        if _canonical_json(stored_projection) != _canonical_json(compatible):
+            issues.append("derived experiment summary differs from archived workers")
 
     if summary_entry is None:
         issues.append("experiment summary artifact is missing")

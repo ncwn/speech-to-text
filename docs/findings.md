@@ -454,13 +454,7 @@ source, scope, and phase; time-weighted summaries reject observations that finis
 outside the work interval. Telemetry ticks describe shape and are never treated
 as independent statistical replicates.
 
-The older one-file snapshot below is retained as historical context:
-
-<!-- stt-evidence:telemetry-snapshot:start -->
-CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity.
-<!-- stt-evidence:telemetry-snapshot:end -->
-
-These observations originally suggested three hypotheses to retest:
+The retired one-file snapshot originally suggested three hypotheses to retest:
 
 * apparent machine idleness may be an integration/batching constraint rather
   than a model limit;
@@ -476,10 +470,8 @@ in-window psutil RSS peak separately from the lifetime high-water.
 ### What the measurement itself costs
 
 GPU utilisation is not available from `torch.mps`, and `powermetrics` needs
-root, so it is read from `ioreg`. On this host, `getrusage` costs about 0.40 us,
-current RSS through `psutil` about 1.5 us, and one `ioreg` read about 17--19 ms
-wall time / 15--18 ms child CPU. The primitive counters are sound; the sampling
-cadence and aggregation are the important part.
+root, so it is read from `ioreg`. The primitive microbenchmarks are retired;
+paired whole-run observer calibration is the authoritative perturbation test.
 
 The profiler currently samples CPU/RSS at 50 ms and whole-GPU `ioreg` activity at
 250 ms, but neither cadence is ground truth. The forced post-work tail read has
@@ -492,12 +484,19 @@ and subtracted after it joins, so an in-flight observer cannot be omitted from
 the correction:
 
 <!-- stt-evidence:telemetry-cost:start -->
-CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity.
+| Condition | RTF | Observer CPU s | Repeat wall s | USS samples |
+| --- | ---: | ---: | ---: | ---: |
+| fast-off | 0.0230 | 0.0000 | 5.395 | 0 |
+| fast-profile | 0.0229 | 0.4914 | 5.319 | 0 |
+| fast-profile-uss | 0.0233 | 0.6037 | 5.426 | 94 |
+| slow-off | 1.7512 | 0.0000 | 405.863 | 0 |
+| slow-profile | 1.7965 | 0.6807 | 410.986 | 0 |
+| slow-profile-uss | 1.8411 | 24.0619 | 426.992 | 8527 |
 <!-- stt-evidence:telemetry-cost:end -->
 
-The historical cost table above is not yet regenerated under the timestamped
-observer. The implementation records sampler child CPU and profiler thread CPU,
-but the next iteration still needs paired observer-off/on worker sessions.
+The calibration keeps unprofiled timings authoritative. Profiled timing and USS
+remain descriptive because their paired intervals did not prove overhead below
+the declared materiality boundary.
 
 Two caveats on the number itself. `Device Utilization %` is the **whole GPU** —
 there is one accelerator entry, so anything else drawing on it inflates the

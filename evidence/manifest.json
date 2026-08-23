@@ -745,67 +745,11 @@
       "status_reason": "CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity."
     },
     {
-      "id": "telemetry-snapshot",
-      "corpus": "fleurs-test-5",
-      "reference": "data/fleurs-test/references.tsv",
-      "status_only": true,
-      "runs": [
-        {
-          "artifact": "outputs/bench-hf-mms-1b-all.jsonl",
-          "label": "MMS-1B",
-          "backend": "hf",
-          "model": "mms-1b-all"
-        },
-        {
-          "artifact": "outputs/bench-hf-seamless-m4t-v2.jsonl",
-          "label": "SeamlessM4T v2",
-          "backend": "hf",
-          "model": "seamless-m4t-v2"
-        },
-        {
-          "artifact": "outputs/bench-omniasr-gguf-.jsonl",
-          "label": "omniASR 300M GGUF",
-          "backend": "omniasr-gguf",
-          "model": "llm-unlimited-300m-v2"
-        },
-        {
-          "artifact": "outputs/bench-dolphin-.jsonl",
-          "label": "Dolphin small",
-          "backend": "dolphin",
-          "model": "small"
-        }
-      ],
-      "metrics": [
-        {
-          "name": "rtf",
-          "label": "RTF",
-          "digits": 2
-        }
-      ],
-      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
-      "expected_reference_count": 120,
-      "normalization": {
-        "nfc": true,
-        "strip_whitespace": true,
-        "strip_punctuation": true,
-        "normalize_digits": true,
-        "lowercase": true
-      },
-      "status_reason": "CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity."
-    },
-    {
       "id": "telemetry-cost",
       "corpus": "fleurs-test-5",
       "reference": "data/fleurs-test/references.tsv",
-      "status_only": true,
-      "runs": [
-        {
-          "artifact": "outputs/telemetry-test.jsonl",
-          "label": "observer cost probe",
-          "backend": "omniasr-gguf",
-          "model": "llm-unlimited-300m-v2"
-        }
-      ],
+      "status_only": false,
+      "runs": [],
       "metrics": [],
       "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
       "expected_reference_count": 120,
@@ -816,7 +760,10 @@
         "normalize_digits": true,
         "lowercase": true
       },
-      "status_reason": "CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity."
+      "status_reason": "CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity.",
+      "source_kind": "experiment-v1",
+      "source": "evidence/experiments/observer-calibration-v3/experiment.json",
+      "deriver": "observer:v1"
     },
     {
       "id": "batching",

@@ -14,6 +14,7 @@ from stt.derive import (
     baseline_table,
     derive,
     experiment_table,
+    observer_table,
     reference_sha256,
 )
 from stt.measurement import MeasurementError
@@ -139,3 +140,10 @@ def test_committed_experiment_deriver_uses_verified_condition_summaries():
     table = experiment_table(Path("evidence/experiments/mms-batch-smoke/experiment.json"))
 
     assert [row["condition"] for row in table.rows] == ["batch-1", "batch-2", "batch-4"]
+
+
+def test_committed_observer_deriver_uses_verified_accounting():
+    table = observer_table(Path("evidence/experiments/observer-calibration-v3/experiment.json"))
+
+    assert len(table.rows) == 6
+    assert table.rows[0]["observer_cpu_s"] == 0.0

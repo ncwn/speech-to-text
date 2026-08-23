@@ -504,6 +504,56 @@ def experiment_table(path: Path) -> DerivedTable:
     return table
 
 
+def observer_table(path: Path) -> DerivedTable:
+    """Derive observer accounting from a verified calibration experiment."""
+    from stt.experiment_archive import verify_experiment
+
+    issues = verify_experiment(path)
+    if issues:
+        raise MeasurementError("observer experiment verification failed: " + "; ".join(issues))
+    descriptor = path / "experiment.json" if path.is_dir() else path
+    value = json.loads(descriptor.read_text(encoding="utf-8"))
+    rows: list[dict[str, Any]] = []
+    for index, summary in enumerate(value.get("condition_summaries", [])):
+        observer = summary.get("observer")
+        if (
+            not summary.get("baseline_eligible")
+            or summary.get("error")
+            or not isinstance(observer, dict)
+        ):
+            raise MeasurementError(f"observer condition {index} is not publishable")
+        rows.append(
+            {
+                "condition": str(summary["condition_id"]),
+                "rtf": _finite(summary.get("rtf"), f"observer condition {index}.rtf"),
+                "observer_cpu_s": _finite(
+                    observer.get("observer_cpu_s"), f"observer condition {index}.cpu"
+                ),
+                "repeat_wall_s": _finite(
+                    observer.get("repeat_wall_s"), f"observer condition {index}.wall"
+                ),
+                "uss_samples": _finite(
+                    observer.get("uss_sample_count"), f"observer condition {index}.uss"
+                ),
+            }
+        )
+    table = DerivedTable(
+        deriver="observer:v1",
+        columns=(
+            DerivedColumn("condition", "Condition"),
+            DerivedColumn("rtf", "RTF", 4),
+            DerivedColumn("observer_cpu_s", "Observer CPU s", 4),
+            DerivedColumn("repeat_wall_s", "Repeat wall s", 3),
+            DerivedColumn("uss_samples", "USS samples", 0),
+        ),
+        rows=tuple(rows),
+        row_key="condition",
+        metadata={"experiment_id": value.get("experiment_id")},
+    )
+    table.validate()
+    return table
+
+
 __all__ = [
     "DERIVER_SCHEMA_VERSION",
     "DeriveContext",
@@ -522,4 +572,5 @@ __all__ = [
     "validate_settings",
     "baseline_table",
     "experiment_table",
+    "observer_table",
 ]
