@@ -175,6 +175,49 @@
       }
     },
     {
+      "id": "accuracy-fleurs-dev-12",
+      "corpus": "fleurs-dev-12",
+      "reference": "data/fleurs/references.tsv",
+      "reference_sha256": "3542fb7c5da470b54ff54e4e0ff7a328ae8e187acbcec06ea3af549e22e92f16",
+      "expected_reference_count": 12,
+      "runs": [
+        {
+          "artifact": "outputs/evidence-fleurs-dev-seamless.jsonl",
+          "label": "SeamlessM4T v2 (verified accuracy)",
+          "backend": "hf",
+          "model": "seamless-m4t-v2",
+          "settings": {
+            "device": "mps",
+            "dtype": "float32"
+          }
+        }
+      ],
+      "metrics": [
+        {
+          "name": "cer",
+          "label": "CER",
+          "digits": 4
+        },
+        {
+          "name": "n_total",
+          "label": "N",
+          "digits": 0
+        },
+        {
+          "name": "n_scored",
+          "label": "Scored",
+          "digits": 0
+        }
+      ],
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      }
+    },
+    {
       "id": "tails",
       "corpus": "fleurs-test-120",
       "reference": "data/fleurs-test/references.tsv",

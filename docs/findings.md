@@ -43,6 +43,12 @@ baseline-v2 artifacts.
 | Dolphin small (verified accuracy) | `dolphin` | 0.1480 | 120 | 120 |
 <!-- stt-evidence:accuracy-fleurs-test-120:end -->
 
+<!-- stt-evidence:accuracy-fleurs-dev-12:start -->
+| Model | Backend | CER | N | Scored |
+| --- | --- | ---: | ---: | ---: |
+| SeamlessM4T v2 (verified accuracy) | `hf` | 0.0594 | 12 | 12 |
+<!-- stt-evidence:accuracy-fleurs-dev-12:end -->
+
 **The entire table is historical.** Its RTF values sum backend-provided
 `elapsed_s` fields whose work boundaries differ by runtime, so they are not valid
 cross-backend performance rankings. The JSONL also predates trusted audio
