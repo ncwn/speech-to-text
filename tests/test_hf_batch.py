@@ -133,11 +133,13 @@ def test_seamless_mps_batches_by_duration_and_releases_cache(monkeypatch, tmp_pa
 
     backend._transcribe_seamless_batch = transcribe_batch
     backend._transcribe_seamless = transcribe_one
-    results = backend.transcribe(paths, language="mya_Mymr", batch_size=2)
+    results = backend.transcribe(paths, language="mya_Mymr", batch_size=4)
 
     assert calls == [[paths[1], paths[3]], [paths[4], paths[2]], [paths[0]]]
     assert [result.text for result in results] == list("abcde")
     assert [result.metadata["batch_group"] for result in results] == [2, 0, 1, 0, 1]
+    assert all(result.metadata["batch_size"] == 4 for result in results)
+    assert all(result.metadata["effective_batch_size"] == 2 for result in results)
     assert synchronized == ["sync"] * 3
     assert emptied == ["empty"] * 3
 

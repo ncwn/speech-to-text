@@ -860,23 +860,30 @@ class TransformersASRBackend(ASRBackend):
         # Seamless padding cost follows the longest item. Duration ordering
         # keeps each group homogeneous without changing the positional result
         # contract. Other families retain caller order.
+        effective_batch_size = (
+            min(batch_size, 2)
+            if self.spec.family == "seamless" and self.resolved_device == "mps"
+            else batch_size
+        )
         processing_order = (
             sorted(valid_inputs, key=lambda item: (item[2], item[0]))
             if self.spec.family == "seamless" and batch_size > 1
             else valid_inputs
         )
-        for batch_group, offset in enumerate(range(0, len(processing_order), batch_size)):
-            valid = processing_order[offset : offset + batch_size]
+        for batch_group, offset in enumerate(range(0, len(processing_order), effective_batch_size)):
+            valid = processing_order[offset : offset + effective_batch_size]
 
             paths = [path for _, path, _ in valid]
-            can_batch = batch_size > 1 and len(paths) > 1 and self.spec.family != "whisper"
+            can_batch = (
+                effective_batch_size > 1 and len(paths) > 1 and self.spec.family != "whisper"
+            )
             measured: list[float] = []
             started = time.perf_counter()
             try:
                 if can_batch and self.spec.family == "seamless":
                     decoded = [
                         (join_segments(items), items)
-                        for items in self._transcribe_seamless_batch(paths, batch_size)
+                        for items in self._transcribe_seamless_batch(paths, effective_batch_size)
                     ]
                 elif can_batch:
                     decoded = self._transcribe_pipeline_batch(paths, batch_size)
@@ -922,6 +929,7 @@ class TransformersASRBackend(ASRBackend):
                             **(
                                 {
                                     "batch_size": batch_size,
+                                    "effective_batch_size": effective_batch_size,
                                     "batch_items": len(paths),
                                     "batch_group": batch_group,
                                     "batch_elapsed_s": elapsed,
@@ -930,6 +938,7 @@ class TransformersASRBackend(ASRBackend):
                                 if can_batch
                                 else {
                                     "batch_size": batch_size,
+                                    "effective_batch_size": effective_batch_size,
                                     "batch_items": len(paths),
                                     "batch_group": batch_group,
                                     "elapsed_s_source": (
@@ -970,6 +979,7 @@ class TransformersASRBackend(ASRBackend):
                             metadata={
                                 **meta,
                                 "batch_size": batch_size,
+                                "effective_batch_size": effective_batch_size,
                                 "batch_items": len(paths),
                                 "batch_group": batch_group,
                                 "batch_fallback": can_batch,
