@@ -20,6 +20,13 @@ Numeric = int | float
 DERIVER_SCHEMA_VERSION = 1
 
 
+def _percentile(values: Sequence[float], fraction: float) -> float:
+    position = (len(values) - 1) * fraction
+    lower = int(position)
+    upper = min(lower + 1, len(values) - 1)
+    return values[lower] + (values[upper] - values[lower]) * (position - lower)
+
+
 def _finite(value: object, name: str) -> Numeric:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise MeasurementError(f"{name} must be numeric")
@@ -95,6 +102,7 @@ class Requirements:
     reference_sha256: str | None = None
     expected_reference_count: int | None = None
     settings: dict[str, Any] = field(default_factory=dict)
+    aligned_segments: bool = False
 
     def validate(self) -> None:
         if self.reference_sha256 is not None and (
@@ -220,6 +228,40 @@ def validate_context(context: DeriveContext, *, reference_path: Path | None = No
         validate_same_waveform(runs)
     if requirements.settings:
         validate_settings(runs, requirements.settings)
+    if requirements.aligned_segments:
+        validate_aligned_segments(runs)
+
+
+def validate_aligned_segments(runs: Sequence[Sequence[TranscriptionResult]]) -> None:
+    """Require ordered, bounded aligned speech spans; silence gaps are valid."""
+    for results in runs:
+        for result in results:
+            duration = result.audio_duration_s
+            if duration is None or not math.isfinite(duration) or duration <= 0:
+                raise MeasurementError("aligned segment validation needs audio duration")
+            segments = result.segments
+            if not segments:
+                raise MeasurementError("aligned segment validation needs segments")
+            previous_end = 0.0
+            for segment in segments:
+                if segment.source != "aligned":
+                    raise MeasurementError("confidence derivers require source='aligned' segments")
+                if (
+                    not math.isfinite(segment.start)
+                    or not math.isfinite(segment.end)
+                    or segment.start < 0
+                    or segment.end <= segment.start
+                    or segment.end > duration
+                    or segment.start < previous_end
+                ):
+                    raise MeasurementError("aligned segments must be ordered and bounded")
+                if (
+                    segment.confidence is None
+                    or not math.isfinite(segment.confidence)
+                    or not 0 <= segment.confidence <= 1
+                ):
+                    raise MeasurementError("aligned segment confidence must be in [0, 1]")
+                previous_end = segment.end
 
 
 def derive(
@@ -252,6 +294,88 @@ def transcript_table(context: DeriveContext) -> DerivedTable:
     )
 
 
+@register("confidence:v1")
+def confidence_table(context: DeriveContext) -> DerivedTable:
+    values: list[dict[str, Any]] = []
+    for label, results in context.runs:
+        confidences = sorted(
+            float(segment.confidence)
+            for result in results
+            for segment in result.segments or ()
+            if segment.confidence is not None
+        )
+        if not confidences:
+            raise MeasurementError("confidence deriver found no confidence values")
+
+        values.append(
+            {
+                "run": label,
+                "p25": _percentile(confidences, 0.25),
+                "p50": _percentile(confidences, 0.50),
+                "p75": _percentile(confidences, 0.75),
+                "n_segments": len(confidences),
+            }
+        )
+    return DerivedTable(
+        deriver="confidence:v1",
+        columns=(
+            DerivedColumn("run", "Run"),
+            DerivedColumn("p25", "P25"),
+            DerivedColumn("p50", "P50"),
+            DerivedColumn("p75", "P75"),
+            DerivedColumn("n_segments", "Segments", 0),
+        ),
+        rows=tuple(values),
+        row_key="run",
+    )
+
+
+@register("vote:v1")
+def vote_table(context: DeriveContext) -> DerivedTable:
+    from stt.vote import prepare_vote_groups
+
+    runs = {label: list(results) for label, results in context.runs}
+    labels = tuple(runs)
+    groups = prepare_vote_groups(runs, labels[0], allow_partial=False)
+    return DerivedTable(
+        deriver="vote:v1",
+        columns=(
+            DerivedColumn("audio_id", "Audio"),
+            DerivedColumn("n_voters", "Voters", 0),
+        ),
+        rows=tuple(
+            {
+                "audio_id": group.audio_id,
+                "n_voters": len(group.usable_results),
+            }
+            for group in groups
+        ),
+        row_key="audio_id",
+    )
+
+
+@register("route:v1")
+def route_table(context: DeriveContext) -> DerivedTable:
+    from stt.cascade import prepare_route_pairs
+
+    if len(context.runs) != 2:
+        raise MeasurementError("route deriver needs exactly base and strong runs")
+    pairs = prepare_route_pairs(
+        list(context.runs[0][1]),
+        list(context.runs[1][1]),
+        allow_partial=False,
+    )
+    return DerivedTable(
+        deriver="route:v1",
+        columns=(DerivedColumn("audio_id", "Audio"), DerivedColumn("duration_s", "Duration")),
+        rows=tuple(
+            {"audio_id": pair.audio_id, "duration_s": float(pair.base.audio_duration_s or 0.0)}
+            for pair in pairs.pairs
+        ),
+        row_key="audio_id",
+    )
+
+
 __all__ = [
     "DERIVER_SCHEMA_VERSION",
     "DeriveContext",
@@ -264,6 +388,7 @@ __all__ = [
     "register",
     "transcript_table",
     "validate_context",
+    "validate_aligned_segments",
     "validate_reference_identity",
     "validate_same_waveform",
     "validate_settings",

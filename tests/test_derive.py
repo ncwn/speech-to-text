@@ -11,7 +11,7 @@ import pytest
 from stt.derive import DeriveContext, Requirements, derive, reference_sha256
 from stt.measurement import MeasurementError
 from stt.provenance import ArtifactDigest, ModelProvenance
-from stt.results import TranscriptionResult
+from stt.results import Segment, TranscriptionResult
 
 
 def _result(reference: str, digest: str = "a" * 64) -> TranscriptionResult:
@@ -79,3 +79,43 @@ def test_deriver_rejects_declared_setting_drift(tmp_path):
 
     with pytest.raises(MeasurementError, match="declared setting"):
         derive(invalid, "transcripts:v1", reference_path=reference)
+
+
+def test_confidence_deriver_requires_aligned_segments_and_allows_silence_gaps(tmp_path):
+    context, reference = _context(tmp_path)
+    result = replace(
+        _result("clip"),
+        audio_duration_s=2.0,
+        segments=[
+            Segment("a", 0.0, 0.5, confidence=0.25, source="aligned"),
+            Segment("b", 1.0, 1.5, confidence=0.75, source="aligned"),
+        ],
+    )
+    context = replace(
+        context,
+        runs=(("fake", (result,)),),
+        requirements=replace(context.requirements, aligned_segments=True),
+    )
+
+    table = derive(context, "confidence:v1", reference_path=reference)
+
+    assert table.rows[0]["p50"] == pytest.approx(0.5)
+
+
+def test_vote_and_route_derivers_reuse_production_joins(tmp_path):
+    context, reference = _context(tmp_path)
+    base = replace(
+        _result("clip"),
+        audio_duration_s=1.0,
+        segments=[Segment("a", 0.0, 1.0, confidence=0.5, source="aligned")],
+    )
+    strong = replace(base, model="strong")
+    paired = replace(context, runs=(("base", (base,)), ("strong", (strong,))))
+    requirements = replace(paired.requirements, aligned_segments=True)
+    paired = replace(paired, requirements=requirements)
+
+    vote = derive(paired, "vote:v1", reference_path=reference)
+    route = derive(paired, "route:v1", reference_path=reference)
+
+    assert vote.rows[0]["n_voters"] == 2
+    assert route.rows[0]["duration_s"] == 1.0

@@ -64,6 +64,7 @@ class BlockSpec:
     reference_sha256: str | None = None
     expected_reference_count: int | None = None
     normalization: dict[str, Any] = field(default_factory=dict)
+    aligned_segments: bool = False
 
 
 @dataclass(frozen=True)
@@ -144,6 +145,7 @@ def load_manifest(path: Path) -> EvidenceManifest:
             "reference_sha256",
             "expected_reference_count",
             "normalization",
+            "aligned_segments",
         }
         if unknown:
             raise EvidenceError(f"{context} has unknown field(s): {', '.join(sorted(unknown))}")
@@ -205,6 +207,9 @@ def load_manifest(path: Path) -> EvidenceManifest:
         status_only = item.get("status_only", False)
         if not isinstance(status_only, bool):
             raise EvidenceError(f"{context}.status_only must be a boolean")
+        aligned_segments = item.get("aligned_segments", False)
+        if not isinstance(aligned_segments, bool):
+            raise EvidenceError(f"{context}.aligned_segments must be a boolean")
         if not metrics and not status_only and item.get("deriver") is None:
             raise EvidenceError(f"{context} needs metrics or status_only=true")
         blocks.append(
@@ -232,6 +237,7 @@ def load_manifest(path: Path) -> EvidenceManifest:
                     else None
                 ),
                 normalization=dict(item.get("normalization", {})),
+                aligned_segments=aligned_segments,
             )
         )
     return EvidenceManifest(path=path, document=document, blocks=tuple(blocks))
@@ -513,7 +519,7 @@ def _render_block(block: BlockSpec) -> tuple[str, list[str], bool]:
                     for run, results in zip(block.runs, results_by_run, strict=True)
                 ),
                 references,
-                Requirements(settings={}),
+                Requirements(settings={}, aligned_segments=block.aligned_segments),
             )
             table = run_deriver(context, block.deriver, reference_path=block.reference)
             header = [column.label for column in table.columns]
