@@ -44,7 +44,7 @@ baseline-v2 artifacts.
 <!-- stt-evidence:accuracy-fleurs-test-120:end -->
 
 <!-- stt-evidence:accuracy-fleurs-test-seamless:start -->
-Seamless 120-clip accuracy was attempted serially for one hour and with batch size 4 for thirty minutes; neither run published a complete artifact, so no CER is promoted.
+Seamless 120-clip accuracy was attempted serially for one hour, with batch size 4 for thirty minutes, and in four parallel 30-clip shards; none published a complete artifact, so no CER is promoted.
 <!-- stt-evidence:accuracy-fleurs-test-seamless:end -->
 
 <!-- stt-evidence:accuracy-fleurs-dev-12:start -->

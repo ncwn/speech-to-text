@@ -196,7 +196,7 @@
         }
       ],
       "status_only": true,
-      "status_reason": "Seamless 120-clip accuracy was attempted serially for one hour and with batch size 4 for thirty minutes; neither run published a complete artifact, so no CER is promoted.",
+      "status_reason": "Seamless 120-clip accuracy was attempted serially for one hour, with batch size 4 for thirty minutes, and in four parallel 30-clip shards; none published a complete artifact, so no CER is promoted.",
       "normalization": {
         "nfc": true,
         "strip_whitespace": true,
