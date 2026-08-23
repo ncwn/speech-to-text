@@ -523,13 +523,15 @@ def test_save_baseline_refuses_a_legacy_file_at_the_target(monkeypatch, tmp_path
         save_baseline(measurement, baseline_path)
 
 
-def test_committed_migration_record_matches_published_baseline():
+def test_committed_migration_record_matches_its_archived_baseline():
     migration = json.loads(Path("baselines/migration-v1-to-v2.json").read_text(encoding="utf-8"))
-    baseline = json.loads(Path("baselines/bench.json").read_text(encoding="utf-8"))
+    archived = json.loads(Path(migration["artifact_path"]).read_text(encoding="utf-8"))
+    current = json.loads(Path("baselines/bench.json").read_text(encoding="utf-8"))
 
-    assert migration["baseline_id"] == baseline["baseline_id"]
-    assert migration["transcript_changes"] == baseline["legacy_migration"]["transcript_changes"]
-    assert migration["approval_note"] == baseline["legacy_migration"]["approval_note"]
+    assert Path(migration["artifact_path"]).parent.name == migration["baseline_id"]
+    assert migration["transcript_changes"] == archived["legacy_migration"]["transcript_changes"]
+    assert migration["approval_note"] == archived["legacy_migration"]["approval_note"]
+    assert current["artifact_kind"] == "baseline-v2"
 
 
 def test_verify_rejects_unsupported_baseline_schema(monkeypatch, tmp_path):

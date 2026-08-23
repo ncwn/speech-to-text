@@ -1,0 +1,275 @@
+{
+  "condition_id": "default",
+  "experiment_id": "8bdadfd1433049dbb08e84226cf0aaaf",
+  "input_mode": "prepared",
+  "inputs": [
+    {
+      "audio_id": "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0",
+      "channels": 1,
+      "duration_s": 27.6,
+      "frames": 441600,
+      "prepared_path": "data/.converted/pcm16-mono-16000-v1__36c25f8b1db4ba5ddab8b3edd0bbd8f2b2af1aeb466863f77cfacad95197ee61.wav",
+      "reference_id": "10207165333468320061",
+      "sample_rate": 16000,
+      "source_path": "data/fleurs/audio/10207165333468320061.wav",
+      "source_sha256": "36c25f8b1db4ba5ddab8b3edd0bbd8f2b2af1aeb466863f77cfacad95197ee61"
+    },
+    {
+      "audio_id": "pcm16:16000:1:fe0efa457ae9f7f11a5483e78adaa5795f11b3bf0d5882d7a670ca05ee6ec0e4",
+      "channels": 1,
+      "duration_s": 9.18,
+      "frames": 146880,
+      "prepared_path": "data/.converted/pcm16-mono-16000-v1__0f5596159ca1e135211cef735e90b32a3ca6fade92c6508f9f1d8b1b8a7a0979.wav",
+      "reference_id": "10406743972683477081",
+      "sample_rate": 16000,
+      "source_path": "data/fleurs/audio/10406743972683477081.wav",
+      "source_sha256": "0f5596159ca1e135211cef735e90b32a3ca6fade92c6508f9f1d8b1b8a7a0979"
+    },
+    {
+      "audio_id": "pcm16:16000:1:71a3b3b9e7886757e59ac908a3e9edb5188a430b50690285b250583008660f24",
+      "channels": 1,
+      "duration_s": 7.5,
+      "frames": 120000,
+      "prepared_path": "data/.converted/pcm16-mono-16000-v1__fc22a3c0a78d1c25a94274cc87c2fda6b7a668ca72913cd1fc928470c9790607.wav",
+      "reference_id": "12011678642037122936",
+      "sample_rate": 16000,
+      "source_path": "data/fleurs/audio/12011678642037122936.wav",
+      "source_sha256": "fc22a3c0a78d1c25a94274cc87c2fda6b7a668ca72913cd1fc928470c9790607"
+    },
+    {
+      "audio_id": "pcm16:16000:1:57d0567a6d1c2c3b6a64ff09fd774af475b077840c117d443a07a07dc94832a1",
+      "channels": 1,
+      "duration_s": 14.16,
+      "frames": 226560,
+      "prepared_path": "data/.converted/pcm16-mono-16000-v1__122b1a2eaf5afbf4081a308f4cfc74a164fa3d42d4f3080c96ddce05d2f7333c.wav",
+      "reference_id": "12202394788954760188",
+      "sample_rate": 16000,
+      "source_path": "data/fleurs/audio/12202394788954760188.wav",
+      "source_sha256": "122b1a2eaf5afbf4081a308f4cfc74a164fa3d42d4f3080c96ddce05d2f7333c"
+    },
+    {
+      "audio_id": "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a",
+      "channels": 1,
+      "duration_s": 12.78,
+      "frames": 204480,
+      "prepared_path": "data/.converted/pcm16-mono-16000-v1__8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28.wav",
+      "reference_id": "14755840805814218163",
+      "sample_rate": 16000,
+      "source_path": "data/fleurs/audio/14755840805814218163.wav",
+      "source_sha256": "8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28"
+    }
+  ],
+  "launch_position": 1,
+  "model_binding": {
+    "paths": [
+      {
+        "name": "small.pt",
+        "path": ".cache/dolphin/small/small.pt",
+        "role": "weights",
+        "sha256": "4a0c6c636657121ec2a2b656e97e45b29a8b29c92fa3998006e02ab146d8ac51",
+        "size_bytes": 1489609208,
+        "stat": {
+          "ctime_ns": 1787158429793938946,
+          "device": 16777235,
+          "inode": 5983882,
+          "mtime_ns": 1787084295424142343,
+          "size": 1489609208
+        }
+      },
+      {
+        "name": "train.yaml",
+        "path": ".cache/dolphin/small/train.yaml",
+        "role": "config",
+        "sha256": "e2765fc748f683710546fc61a840f49dda7b2189afaa6aed38ec09df5a1a7f08",
+        "size_bytes": 2337,
+        "stat": {
+          "ctime_ns": 1787158429799144379,
+          "device": 16777235,
+          "inode": 5983889,
+          "mtime_ns": 1787085063574519308,
+          "size": 2337
+        }
+      },
+      {
+        "name": "feats_stats.npz",
+        "path": ".cache/dolphin/small/feats_stats.npz",
+        "role": "cmvn",
+        "sha256": "5a37d00c07d595dbc2479b31be42b3c75de422469a947ce4b7bda193c3b1de7f",
+        "size_bytes": 1402,
+        "stat": {
+          "ctime_ns": 1787158429797212998,
+          "device": 16777235,
+          "inode": 5983886,
+          "mtime_ns": 1787084898325056615,
+          "size": 1402
+        }
+      },
+      {
+        "name": "units.txt",
+        "path": ".cache/dolphin/small/units.txt",
+        "role": "tokenizer",
+        "sha256": "c3788261a51df1899ea4b210b552cd42139204de72c0ad60f6cebb199078872e",
+        "size_bytes": 504662,
+        "stat": {
+          "ctime_ns": 1787158429798572544,
+          "device": 16777235,
+          "inode": 5983888,
+          "mtime_ns": 1787084898322091235,
+          "size": 504662
+        }
+      },
+      {
+        "name": "bpe.model",
+        "path": ".cache/dolphin/small/bpe.model",
+        "role": "tokenizer",
+        "sha256": "4b9102181ef1a2a3c42ce8fbca8a545ea4a55bce47ba7a5222951ab5bb21bb3c",
+        "size_bytes": 854022,
+        "stat": {
+          "ctime_ns": 1787158429795934619,
+          "device": 16777235,
+          "inode": 5983884,
+          "mtime_ns": 1787084898319362730,
+          "size": 854022
+        }
+      }
+    ],
+    "provenance": {
+      "adapter_git_commit": "09350e20f5f173d67e1dc6d547c616f5f4920bcb",
+      "adapter_git_dirty": false,
+      "artifacts": [
+        {
+          "name": "small.pt",
+          "path": ".cache/dolphin/small/small.pt",
+          "role": "weights",
+          "sha256": "4a0c6c636657121ec2a2b656e97e45b29a8b29c92fa3998006e02ab146d8ac51",
+          "size_bytes": 1489609208,
+          "stat": {
+            "ctime_ns": 1787158429793938946,
+            "device": 16777235,
+            "inode": 5983882,
+            "mtime_ns": 1787084295424142343,
+            "size": 1489609208
+          }
+        },
+        {
+          "name": "train.yaml",
+          "path": ".cache/dolphin/small/train.yaml",
+          "role": "config",
+          "sha256": "e2765fc748f683710546fc61a840f49dda7b2189afaa6aed38ec09df5a1a7f08",
+          "size_bytes": 2337,
+          "stat": {
+            "ctime_ns": 1787158429799144379,
+            "device": 16777235,
+            "inode": 5983889,
+            "mtime_ns": 1787085063574519308,
+            "size": 2337
+          }
+        },
+        {
+          "name": "feats_stats.npz",
+          "path": ".cache/dolphin/small/feats_stats.npz",
+          "role": "cmvn",
+          "sha256": "5a37d00c07d595dbc2479b31be42b3c75de422469a947ce4b7bda193c3b1de7f",
+          "size_bytes": 1402,
+          "stat": {
+            "ctime_ns": 1787158429797212998,
+            "device": 16777235,
+            "inode": 5983886,
+            "mtime_ns": 1787084898325056615,
+            "size": 1402
+          }
+        },
+        {
+          "name": "units.txt",
+          "path": ".cache/dolphin/small/units.txt",
+          "role": "tokenizer",
+          "sha256": "c3788261a51df1899ea4b210b552cd42139204de72c0ad60f6cebb199078872e",
+          "size_bytes": 504662,
+          "stat": {
+            "ctime_ns": 1787158429798572544,
+            "device": 16777235,
+            "inode": 5983888,
+            "mtime_ns": 1787084898322091235,
+            "size": 504662
+          }
+        },
+        {
+          "name": "bpe.model",
+          "path": ".cache/dolphin/small/bpe.model",
+          "role": "tokenizer",
+          "sha256": "4b9102181ef1a2a3c42ce8fbca8a545ea4a55bce47ba7a5222951ab5bb21bb3c",
+          "size_bytes": 854022,
+          "stat": {
+            "ctime_ns": 1787158429795934619,
+            "device": 16777235,
+            "inode": 5983884,
+            "mtime_ns": 1787084898319362730,
+            "size": 854022
+          }
+        }
+      ],
+      "backend": "dolphin",
+      "content_sha256": "c3acd310fcf4f70eaae1d93eb77fa59c2dff00f179606af9063dc7082bb95ccb",
+      "execution_sha256": "91501359c5b1e1683bf5fcabaa65f54c20c4aad7b09a7c910b5a6a3202a8b05b",
+      "fallback_history": [],
+      "issues": [],
+      "requested_model": "small",
+      "requested_settings": {
+        "batch_size": 1,
+        "device": "auto",
+        "language": "mya_Mymr"
+      },
+      "resolved_settings": {
+        "chunk_seconds": null,
+        "device": "cpu",
+        "dtype": "float32",
+        "n_threads": null,
+        "size": "small"
+      },
+      "revision_status": "unavailable-content-addressed",
+      "runtime_packages": {
+        "accelerate": "1.14.0",
+        "crispasr": "0.8.29",
+        "dataoceanai-dolphin": "20260513",
+        "fairseq2": "0.6",
+        "funasr": "1.4.2",
+        "huggingface-hub": "0.36.2",
+        "modelscope": "1.39.1",
+        "omnilingual-asr": "0.2.0",
+        "psutil": "5.9.8",
+        "sentencepiece": "0.2.2",
+        "soundfile": "0.14.0",
+        "tokenizers": "0.22.2",
+        "torch": "2.8.0",
+        "torchaudio": "2.8.0",
+        "transformers": "4.57.6"
+      },
+      "schema_version": 2,
+      "source_kind": "modelscope",
+      "source_locator": "DataoceanAI/dolphin-small",
+      "upstream_revision": null,
+      "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+    }
+  },
+  "profile": false,
+  "protocol_version": 3,
+  "repeats": 3,
+  "run_id": "8bdadfd1433049dbb08e84226cf0aaaf",
+  "runner_id": "adapter",
+  "sample_uss": false,
+  "schedule_seed": 0,
+  "session_id": "8bdadfd1433049dbb08e84226cf0aaaf:session-3",
+  "session_index": 3,
+  "subject": {
+    "backend": "dolphin",
+    "batch_size": 1,
+    "language": "mya_Mymr",
+    "model": "small",
+    "options": {
+      "batch_size": 1,
+      "language": "mya_Mymr"
+    }
+  },
+  "warmups": 3,
+  "worker_index": 3
+}

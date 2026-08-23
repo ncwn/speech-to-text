@@ -42,5 +42,5 @@
   ],
   "approval_note": "baseline-v2 migration: retire schema-v1 hashes, trust four provenance-complete subjects, retain GGUF as unresolved-device diagnostic",
   "baseline_id": "743f1d189c254ba1b1bb5b5a789d5899-portable3",
-  "artifact_path": "baselines/bench.json"
+  "artifact_path": "baselines/artifacts/743f1d189c254ba1b1bb5b5a789d5899-portable3/summary.json"
 }

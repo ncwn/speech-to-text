@@ -1,0 +1,4026 @@
+{
+  "complete": true,
+  "condition_id": "default",
+  "environment": {
+    "git_commit": "09350e20f5f173d67e1dc6d547c616f5f4920bcb",
+    "git_dirty": false,
+    "machine": "arm64",
+    "packages": {
+      "accelerate": "1.14.0",
+      "crispasr": "0.8.29",
+      "dataoceanai-dolphin": "20260513",
+      "fairseq2": "0.6",
+      "funasr": "1.4.2",
+      "huggingface-hub": "0.36.2",
+      "modelscope": "1.39.1",
+      "omnilingual-asr": "0.2.0",
+      "psutil": "5.9.8",
+      "sentencepiece": "0.2.2",
+      "soundfile": "0.14.0",
+      "tokenizers": "0.22.2",
+      "torch": "2.8.0",
+      "torchaudio": "2.8.0",
+      "transformers": "4.57.6"
+    },
+    "pid": 66450,
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "power": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=24641635)\t80%; AC attached; not charging present: true",
+    "python": "3.12.13",
+    "python_executable": ".venv/bin/python3",
+    "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+    "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+  },
+  "error": null,
+  "experiment_id": "8bdadfd1433049dbb08e84226cf0aaaf",
+  "host": {
+    "chip": "Apple M2 Max",
+    "compute_threads": 8,
+    "cores": {
+      "Efficiency": 4,
+      "Performance": 8
+    },
+    "cpu_count": 12,
+    "machine": "arm64",
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "ram_mb": 65536
+  },
+  "journal_recovered": false,
+  "launch_position": 2,
+  "load_resources": {
+    "cpu_s": 2.1936,
+    "cpu_utilization": 0.62,
+    "ended_ns": 226694049992625,
+    "gpu_mb": 4240.4,
+    "peak_rss_mb": 443.1,
+    "phase": "load",
+    "process_peak_rss_mb": 443.1,
+    "rss_peak_mb": 420.7,
+    "started_ns": 226690511356875,
+    "wall_s": 3.5386
+  },
+  "model_provenance": {
+    "adapter_git_commit": "09350e20f5f173d67e1dc6d547c616f5f4920bcb",
+    "adapter_git_dirty": false,
+    "artifacts": [
+      {
+        "name": "adapter.mya.safetensors",
+        "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+        "role": "model-or-processor",
+        "sha256": "c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+        "size_bytes": 9357088,
+        "stat": {
+          "ctime_ns": 1787158435149503713,
+          "device": 16777235,
+          "inode": 5984066,
+          "mtime_ns": 1787079596406661677,
+          "size": 9357088
+        }
+      },
+      {
+        "name": "config.json",
+        "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/dd547cc1b61ca6edfefb2f0cf65e3d8f81eceb6a",
+        "role": "model-or-processor",
+        "sha256": "ee172ef39a0e40c55403fb811fa0f56c6198c7ed21a2bdf5bd0e72e52c07a41c",
+        "size_bytes": 2040,
+        "stat": {
+          "ctime_ns": 1787158435152482514,
+          "device": 16777235,
+          "inode": 5984069,
+          "mtime_ns": 1787079452518242432,
+          "size": 2040
+        }
+      },
+      {
+        "name": "create_adapters.py",
+        "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b2e99c339dafb630e1b02c44f5c267927979106f",
+        "role": "model-or-processor",
+        "sha256": "b5f11c4e55342e718fa90697f34f82664fbff16a421d8fae206d997045f73921",
+        "size_bytes": 10188,
+        "stat": {
+          "ctime_ns": 1787235792760670739,
+          "device": 16777235,
+          "inode": 5986586,
+          "mtime_ns": 1787235792759124152,
+          "size": 10188
+        }
+      },
+      {
+        "name": "create_vocab.py",
+        "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b36fe95573033e2a2742aaeed8d3078946b7a320",
+        "role": "model-or-processor",
+        "sha256": "a6e7e16a54f0b09f46045b9135483776393267d0d8a6b3e86072906e61be46f5",
+        "size_bytes": 878,
+        "stat": {
+          "ctime_ns": 1787235792684531696,
+          "device": 16777235,
+          "inode": 5986580,
+          "mtime_ns": 1787235792683967611,
+          "size": 878
+        }
+      },
+      {
+        "name": "model.safetensors",
+        "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+        "role": "model-or-processor",
+        "sha256": "0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+        "size_bytes": 3859521128,
+        "stat": {
+          "ctime_ns": 1787158436530154511,
+          "device": 16777235,
+          "inode": 5984070,
+          "mtime_ns": 1787079592306092277,
+          "size": 3859521128
+        }
+      },
+      {
+        "name": "preprocessor_config.json",
+        "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/e7d53bd058c34639e2dec1357537a3d013bcda63",
+        "role": "model-or-processor",
+        "sha256": "f724fdad65341e79bd9741888fe4e8ce1bb2e7b44fc8216c28c591afb1e202f4",
+        "size_bytes": 254,
+        "stat": {
+          "ctime_ns": 1787158435150048006,
+          "device": 16777235,
+          "inode": 5984067,
+          "mtime_ns": 1787079443378807804,
+          "size": 254
+        }
+      },
+      {
+        "name": "special_tokens_map.json",
+        "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/fdafe480f024ff444c7492147536765ce5d55a2d",
+        "role": "model-or-processor",
+        "sha256": "9046da57c270c8e74d0f38832b4adce269c9d914ef21d2a0925e7772152dd793",
+        "size_bytes": 96,
+        "stat": {
+          "ctime_ns": 1787158435143879487,
+          "device": 16777235,
+          "inode": 5984065,
+          "mtime_ns": 1787079449792831686,
+          "size": 96
+        }
+      },
+      {
+        "name": "tokenizer_config.json",
+        "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/8119434548d4a82fbe4e5e53c95d186bca037257",
+        "role": "model-or-processor",
+        "sha256": "42a65547cf0654d12263ece7c909c4b0c574b660c78658f806c772cc223bc01b",
+        "size_bytes": 397,
+        "stat": {
+          "ctime_ns": 1787158435143238985,
+          "device": 16777235,
+          "inode": 5984064,
+          "mtime_ns": 1787079445299892278,
+          "size": 397
+        }
+      },
+      {
+        "name": "vocab.json",
+        "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/5c1626173fb1db1da574d16b6e924e8efc1ade4c",
+        "role": "model-or-processor",
+        "sha256": "0375a07a977a599040a7ff333b6974996965cd93754020619518c15db7691f01",
+        "size_bytes": 1340148,
+        "stat": {
+          "ctime_ns": 1787158435151871262,
+          "device": 16777235,
+          "inode": 5984068,
+          "mtime_ns": 1787079449054862750,
+          "size": 1340148
+        }
+      },
+      {
+        "name": "vocabs/mya.txt",
+        "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/49191e00b11ea3281db39a6b8022d0b003bae2da",
+        "role": "model-or-processor",
+        "sha256": "d01af8e834039592efc79902675773d7ef622a4ce07cccd46fb2644785cc0734",
+        "size_bytes": 1005,
+        "stat": {
+          "ctime_ns": 1787235938363752533,
+          "device": 16777235,
+          "inode": 5987135,
+          "mtime_ns": 1787235938362249071,
+          "size": 1005
+        }
+      }
+    ],
+    "backend": "hf",
+    "content_sha256": "9c7c2b2e8bbe8d6179207d8936a7ccd150a37878ef3229827ed8a07af85f3482",
+    "execution_sha256": "8cfde146682665b6526e0ccaf24c3138e5dc26f74b3af1812f44454ff2f0f514",
+    "fallback_history": [],
+    "issues": [],
+    "requested_model": "mms-1b-all",
+    "requested_settings": {
+      "batch_size": 1,
+      "device": "auto",
+      "dtype": "auto",
+      "language": "mya_Mymr"
+    },
+    "resolved_settings": {
+      "chunk_seconds": null,
+      "device": "mps",
+      "dtype": "float32",
+      "family": "mms",
+      "lang": "mya",
+      "n_threads": null
+    },
+    "revision_status": "pinned",
+    "runtime_packages": {
+      "accelerate": "1.14.0",
+      "crispasr": "0.8.29",
+      "dataoceanai-dolphin": "20260513",
+      "fairseq2": "0.6",
+      "funasr": "1.4.2",
+      "huggingface-hub": "0.36.2",
+      "modelscope": "1.39.1",
+      "omnilingual-asr": "0.2.0",
+      "psutil": "5.9.8",
+      "sentencepiece": "0.2.2",
+      "soundfile": "0.14.0",
+      "tokenizers": "0.22.2",
+      "torch": "2.8.0",
+      "torchaudio": "2.8.0",
+      "transformers": "4.57.6"
+    },
+    "schema_version": 2,
+    "source_kind": "huggingface",
+    "source_locator": "facebook/mms-1b-all",
+    "upstream_revision": "3d33597edbdaaba14a8e858e2c8caa76e3cec0cd",
+    "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+  },
+  "phases": [
+    {
+      "ended_ns": 226690510359458,
+      "error": null,
+      "name": "process-start",
+      "repeat_index": null,
+      "started_ns": 226689629266166,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 226694049992625,
+      "error": null,
+      "name": "load",
+      "repeat_index": null,
+      "started_ns": 226690511356875,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 226694053040166,
+      "error": null,
+      "name": "load-validation",
+      "repeat_index": null,
+      "started_ns": 226694050040000,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 226696140355708,
+      "error": null,
+      "name": "warmup-0",
+      "repeat_index": null,
+      "started_ns": 226694055640083,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 226697866116500,
+      "error": null,
+      "name": "warmup-1",
+      "repeat_index": null,
+      "started_ns": 226696149630833,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 226699595513166,
+      "error": null,
+      "name": "warmup-2",
+      "repeat_index": null,
+      "started_ns": 226697875477291,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 226701328442375,
+      "error": null,
+      "name": "repeat-0",
+      "repeat_index": 0,
+      "started_ns": 226699605036833,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 226703065402125,
+      "error": null,
+      "name": "repeat-1",
+      "repeat_index": 1,
+      "started_ns": 226701340456666,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 226704794783000,
+      "error": null,
+      "name": "repeat-2",
+      "repeat_index": 2,
+      "started_ns": 226703080020958,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 226704901934791,
+      "error": null,
+      "name": "unload",
+      "repeat_index": null,
+      "started_ns": 226704810971041,
+      "status": "ok"
+    }
+  ],
+  "protocol_version": 3,
+  "provenance_issues": [],
+  "repeats": [
+    {
+      "complete": true,
+      "expected_audio_s": 71.22,
+      "index": 0,
+      "phase": {
+        "ended_ns": 226701328442375,
+        "error": null,
+        "name": "repeat-0",
+        "repeat_index": 0,
+        "started_ns": 226699605036833,
+        "status": "ok"
+      },
+      "resources": {
+        "cpu_s": 0.4303,
+        "cpu_utilization": 0.25,
+        "ended_ns": 226701328442375,
+        "gpu_mb": 4696.2,
+        "peak_rss_mb": 616.9,
+        "phase": "repeat-0",
+        "process_peak_rss_mb": 616.9,
+        "rss_peak_mb": 616.9,
+        "started_ns": 226699605036833,
+        "wall_s": 1.7234
+      },
+      "results": [
+        {
+          "audio_duration_s": 27.6,
+          "audio_id": "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__36c25f8b1db4ba5ddab8b3edd0bbd8f2b2af1aeb466863f77cfacad95197ee61.wav",
+          "backend": "hf",
+          "elapsed_s": 0.6534204169875011,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_group": 0,
+            "batch_internal_serial": false,
+            "batch_items": 1,
+            "batch_size": 1,
+            "corpus_index": 0,
+            "corpus_size": 5,
+            "corpus_wall_s": 1.723405542,
+            "device": "mps",
+            "dtype": "float32",
+            "effective_batch_size": 1,
+            "elapsed_s_source": "measured",
+            "family": "mms",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "repo": "facebook/mms-1b-all",
+            "requested_batch_size": 1,
+            "resource_scope": "corpus"
+          },
+          "model": "mms-1b-all",
+          "model_provenance": {
+            "adapter_git_commit": "09350e20f5f173d67e1dc6d547c616f5f4920bcb",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "adapter.mya.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "role": "model-or-processor",
+                "sha256": "c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "size_bytes": 9357088,
+                "stat": {
+                  "ctime_ns": 1787158435149503713,
+                  "device": 16777235,
+                  "inode": 5984066,
+                  "mtime_ns": 1787079596406661677,
+                  "size": 9357088
+                }
+              },
+              {
+                "name": "config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/dd547cc1b61ca6edfefb2f0cf65e3d8f81eceb6a",
+                "role": "model-or-processor",
+                "sha256": "ee172ef39a0e40c55403fb811fa0f56c6198c7ed21a2bdf5bd0e72e52c07a41c",
+                "size_bytes": 2040,
+                "stat": {
+                  "ctime_ns": 1787158435152482514,
+                  "device": 16777235,
+                  "inode": 5984069,
+                  "mtime_ns": 1787079452518242432,
+                  "size": 2040
+                }
+              },
+              {
+                "name": "create_adapters.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b2e99c339dafb630e1b02c44f5c267927979106f",
+                "role": "model-or-processor",
+                "sha256": "b5f11c4e55342e718fa90697f34f82664fbff16a421d8fae206d997045f73921",
+                "size_bytes": 10188,
+                "stat": {
+                  "ctime_ns": 1787235792760670739,
+                  "device": 16777235,
+                  "inode": 5986586,
+                  "mtime_ns": 1787235792759124152,
+                  "size": 10188
+                }
+              },
+              {
+                "name": "create_vocab.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b36fe95573033e2a2742aaeed8d3078946b7a320",
+                "role": "model-or-processor",
+                "sha256": "a6e7e16a54f0b09f46045b9135483776393267d0d8a6b3e86072906e61be46f5",
+                "size_bytes": 878,
+                "stat": {
+                  "ctime_ns": 1787235792684531696,
+                  "device": 16777235,
+                  "inode": 5986580,
+                  "mtime_ns": 1787235792683967611,
+                  "size": 878
+                }
+              },
+              {
+                "name": "model.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "role": "model-or-processor",
+                "sha256": "0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "size_bytes": 3859521128,
+                "stat": {
+                  "ctime_ns": 1787158436530154511,
+                  "device": 16777235,
+                  "inode": 5984070,
+                  "mtime_ns": 1787079592306092277,
+                  "size": 3859521128
+                }
+              },
+              {
+                "name": "preprocessor_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/e7d53bd058c34639e2dec1357537a3d013bcda63",
+                "role": "model-or-processor",
+                "sha256": "f724fdad65341e79bd9741888fe4e8ce1bb2e7b44fc8216c28c591afb1e202f4",
+                "size_bytes": 254,
+                "stat": {
+                  "ctime_ns": 1787158435150048006,
+                  "device": 16777235,
+                  "inode": 5984067,
+                  "mtime_ns": 1787079443378807804,
+                  "size": 254
+                }
+              },
+              {
+                "name": "special_tokens_map.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/fdafe480f024ff444c7492147536765ce5d55a2d",
+                "role": "model-or-processor",
+                "sha256": "9046da57c270c8e74d0f38832b4adce269c9d914ef21d2a0925e7772152dd793",
+                "size_bytes": 96,
+                "stat": {
+                  "ctime_ns": 1787158435143879487,
+                  "device": 16777235,
+                  "inode": 5984065,
+                  "mtime_ns": 1787079449792831686,
+                  "size": 96
+                }
+              },
+              {
+                "name": "tokenizer_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/8119434548d4a82fbe4e5e53c95d186bca037257",
+                "role": "model-or-processor",
+                "sha256": "42a65547cf0654d12263ece7c909c4b0c574b660c78658f806c772cc223bc01b",
+                "size_bytes": 397,
+                "stat": {
+                  "ctime_ns": 1787158435143238985,
+                  "device": 16777235,
+                  "inode": 5984064,
+                  "mtime_ns": 1787079445299892278,
+                  "size": 397
+                }
+              },
+              {
+                "name": "vocab.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/5c1626173fb1db1da574d16b6e924e8efc1ade4c",
+                "role": "model-or-processor",
+                "sha256": "0375a07a977a599040a7ff333b6974996965cd93754020619518c15db7691f01",
+                "size_bytes": 1340148,
+                "stat": {
+                  "ctime_ns": 1787158435151871262,
+                  "device": 16777235,
+                  "inode": 5984068,
+                  "mtime_ns": 1787079449054862750,
+                  "size": 1340148
+                }
+              },
+              {
+                "name": "vocabs/mya.txt",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/49191e00b11ea3281db39a6b8022d0b003bae2da",
+                "role": "model-or-processor",
+                "sha256": "d01af8e834039592efc79902675773d7ef622a4ce07cccd46fb2644785cc0734",
+                "size_bytes": 1005,
+                "stat": {
+                  "ctime_ns": 1787235938363752533,
+                  "device": 16777235,
+                  "inode": 5987135,
+                  "mtime_ns": 1787235938362249071,
+                  "size": 1005
+                }
+              }
+            ],
+            "backend": "hf",
+            "content_sha256": "9c7c2b2e8bbe8d6179207d8936a7ccd150a37878ef3229827ed8a07af85f3482",
+            "execution_sha256": "8cfde146682665b6526e0ccaf24c3138e5dc26f74b3af1812f44454ff2f0f514",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "mms-1b-all",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "auto",
+              "dtype": "auto",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float32",
+              "family": "mms",
+              "lang": "mya",
+              "n_threads": null
+            },
+            "revision_status": "pinned",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 2,
+            "source_kind": "huggingface",
+            "source_locator": "facebook/mms-1b-all",
+            "upstream_revision": "3d33597edbdaaba14a8e858e2c8caa76e3cec0cd",
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "10207165333468320061",
+          "resources": {
+            "cpu_s": 0.4303,
+            "cpu_utilization": 0.25,
+            "ended_ns": 226701328442375,
+            "gpu_mb": 4696.2,
+            "peak_rss_mb": 616.9,
+            "phase": "repeat-0",
+            "process_peak_rss_mb": 616.9,
+            "rss_peak_mb": 616.9,
+            "started_ns": 226699605036833,
+            "wall_s": 1.7234
+          },
+          "rtf": 0.02367465278940221,
+          "segments": null,
+          "source_path": "data/fleurs/audio/10207165333468320061.wav",
+          "source_sha256": "36c25f8b1db4ba5ddab8b3edd0bbd8f2b2af1aeb466863f77cfacad95197ee61",
+          "text": "ဘူရှ်၏ပြော၍ေးဆိုခွင့်းရှိသူဂျောဒန်ဂျော်ဒရို့ကမြောက်ကိုရီးယားနိုင်ငံ၏ကဓိကဝတ်သည်ကိုကိုရီးယားကျွန်းစွယ်အားအတည်ပြုနိုင်သည်နျူကလီးယားစစ်ဆဉ်ရေးဒေသားဖြစ်စေရေးစွမ်းဆောင်မှုယီမန်ဂျက်ကိုလျှောက်လဲ်ရာတွင်အဓိကကျသောလေကထစ်တစ်ခုဖြစ်သည်ဟုတုံးသုနးပြောဆိုခဲ့သည်",
+          "trust_issues": [],
+          "trusted": true
+        },
+        {
+          "audio_duration_s": 9.18,
+          "audio_id": "pcm16:16000:1:fe0efa457ae9f7f11a5483e78adaa5795f11b3bf0d5882d7a670ca05ee6ec0e4",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__0f5596159ca1e135211cef735e90b32a3ca6fade92c6508f9f1d8b1b8a7a0979.wav",
+          "backend": "hf",
+          "elapsed_s": 0.24993595900014043,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_group": 1,
+            "batch_internal_serial": false,
+            "batch_items": 1,
+            "batch_size": 1,
+            "corpus_index": 1,
+            "corpus_size": 5,
+            "corpus_wall_s": 1.723405542,
+            "device": "mps",
+            "dtype": "float32",
+            "effective_batch_size": 1,
+            "elapsed_s_source": "measured",
+            "family": "mms",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "repo": "facebook/mms-1b-all",
+            "requested_batch_size": 1
+          },
+          "model": "mms-1b-all",
+          "model_provenance": {
+            "adapter_git_commit": "09350e20f5f173d67e1dc6d547c616f5f4920bcb",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "adapter.mya.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "role": "model-or-processor",
+                "sha256": "c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "size_bytes": 9357088,
+                "stat": {
+                  "ctime_ns": 1787158435149503713,
+                  "device": 16777235,
+                  "inode": 5984066,
+                  "mtime_ns": 1787079596406661677,
+                  "size": 9357088
+                }
+              },
+              {
+                "name": "config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/dd547cc1b61ca6edfefb2f0cf65e3d8f81eceb6a",
+                "role": "model-or-processor",
+                "sha256": "ee172ef39a0e40c55403fb811fa0f56c6198c7ed21a2bdf5bd0e72e52c07a41c",
+                "size_bytes": 2040,
+                "stat": {
+                  "ctime_ns": 1787158435152482514,
+                  "device": 16777235,
+                  "inode": 5984069,
+                  "mtime_ns": 1787079452518242432,
+                  "size": 2040
+                }
+              },
+              {
+                "name": "create_adapters.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b2e99c339dafb630e1b02c44f5c267927979106f",
+                "role": "model-or-processor",
+                "sha256": "b5f11c4e55342e718fa90697f34f82664fbff16a421d8fae206d997045f73921",
+                "size_bytes": 10188,
+                "stat": {
+                  "ctime_ns": 1787235792760670739,
+                  "device": 16777235,
+                  "inode": 5986586,
+                  "mtime_ns": 1787235792759124152,
+                  "size": 10188
+                }
+              },
+              {
+                "name": "create_vocab.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b36fe95573033e2a2742aaeed8d3078946b7a320",
+                "role": "model-or-processor",
+                "sha256": "a6e7e16a54f0b09f46045b9135483776393267d0d8a6b3e86072906e61be46f5",
+                "size_bytes": 878,
+                "stat": {
+                  "ctime_ns": 1787235792684531696,
+                  "device": 16777235,
+                  "inode": 5986580,
+                  "mtime_ns": 1787235792683967611,
+                  "size": 878
+                }
+              },
+              {
+                "name": "model.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "role": "model-or-processor",
+                "sha256": "0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "size_bytes": 3859521128,
+                "stat": {
+                  "ctime_ns": 1787158436530154511,
+                  "device": 16777235,
+                  "inode": 5984070,
+                  "mtime_ns": 1787079592306092277,
+                  "size": 3859521128
+                }
+              },
+              {
+                "name": "preprocessor_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/e7d53bd058c34639e2dec1357537a3d013bcda63",
+                "role": "model-or-processor",
+                "sha256": "f724fdad65341e79bd9741888fe4e8ce1bb2e7b44fc8216c28c591afb1e202f4",
+                "size_bytes": 254,
+                "stat": {
+                  "ctime_ns": 1787158435150048006,
+                  "device": 16777235,
+                  "inode": 5984067,
+                  "mtime_ns": 1787079443378807804,
+                  "size": 254
+                }
+              },
+              {
+                "name": "special_tokens_map.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/fdafe480f024ff444c7492147536765ce5d55a2d",
+                "role": "model-or-processor",
+                "sha256": "9046da57c270c8e74d0f38832b4adce269c9d914ef21d2a0925e7772152dd793",
+                "size_bytes": 96,
+                "stat": {
+                  "ctime_ns": 1787158435143879487,
+                  "device": 16777235,
+                  "inode": 5984065,
+                  "mtime_ns": 1787079449792831686,
+                  "size": 96
+                }
+              },
+              {
+                "name": "tokenizer_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/8119434548d4a82fbe4e5e53c95d186bca037257",
+                "role": "model-or-processor",
+                "sha256": "42a65547cf0654d12263ece7c909c4b0c574b660c78658f806c772cc223bc01b",
+                "size_bytes": 397,
+                "stat": {
+                  "ctime_ns": 1787158435143238985,
+                  "device": 16777235,
+                  "inode": 5984064,
+                  "mtime_ns": 1787079445299892278,
+                  "size": 397
+                }
+              },
+              {
+                "name": "vocab.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/5c1626173fb1db1da574d16b6e924e8efc1ade4c",
+                "role": "model-or-processor",
+                "sha256": "0375a07a977a599040a7ff333b6974996965cd93754020619518c15db7691f01",
+                "size_bytes": 1340148,
+                "stat": {
+                  "ctime_ns": 1787158435151871262,
+                  "device": 16777235,
+                  "inode": 5984068,
+                  "mtime_ns": 1787079449054862750,
+                  "size": 1340148
+                }
+              },
+              {
+                "name": "vocabs/mya.txt",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/49191e00b11ea3281db39a6b8022d0b003bae2da",
+                "role": "model-or-processor",
+                "sha256": "d01af8e834039592efc79902675773d7ef622a4ce07cccd46fb2644785cc0734",
+                "size_bytes": 1005,
+                "stat": {
+                  "ctime_ns": 1787235938363752533,
+                  "device": 16777235,
+                  "inode": 5987135,
+                  "mtime_ns": 1787235938362249071,
+                  "size": 1005
+                }
+              }
+            ],
+            "backend": "hf",
+            "content_sha256": "9c7c2b2e8bbe8d6179207d8936a7ccd150a37878ef3229827ed8a07af85f3482",
+            "execution_sha256": "8cfde146682665b6526e0ccaf24c3138e5dc26f74b3af1812f44454ff2f0f514",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "mms-1b-all",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "auto",
+              "dtype": "auto",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float32",
+              "family": "mms",
+              "lang": "mya",
+              "n_threads": null
+            },
+            "revision_status": "pinned",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 2,
+            "source_kind": "huggingface",
+            "source_locator": "facebook/mms-1b-all",
+            "upstream_revision": "3d33597edbdaaba14a8e858e2c8caa76e3cec0cd",
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "10406743972683477081",
+          "resources": null,
+          "rtf": 0.027226139324634035,
+          "segments": null,
+          "source_path": "data/fleurs/audio/10406743972683477081.wav",
+          "source_sha256": "0f5596159ca1e135211cef735e90b32a3ca6fade92c6508f9f1d8b1b8a7a0979",
+          "text": "ငါ့အတွက်တော်ဒါကာလုံးဝါးအဓိပ်ပင်မရှိပူလုံးဝါးကိုမတရားပူ",
+          "trust_issues": [],
+          "trusted": true
+        },
+        {
+          "audio_duration_s": 7.5,
+          "audio_id": "pcm16:16000:1:71a3b3b9e7886757e59ac908a3e9edb5188a430b50690285b250583008660f24",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__fc22a3c0a78d1c25a94274cc87c2fda6b7a668ca72913cd1fc928470c9790607.wav",
+          "backend": "hf",
+          "elapsed_s": 0.19780541700311005,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_group": 2,
+            "batch_internal_serial": false,
+            "batch_items": 1,
+            "batch_size": 1,
+            "corpus_index": 2,
+            "corpus_size": 5,
+            "corpus_wall_s": 1.723405542,
+            "device": "mps",
+            "dtype": "float32",
+            "effective_batch_size": 1,
+            "elapsed_s_source": "measured",
+            "family": "mms",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "repo": "facebook/mms-1b-all",
+            "requested_batch_size": 1
+          },
+          "model": "mms-1b-all",
+          "model_provenance": {
+            "adapter_git_commit": "09350e20f5f173d67e1dc6d547c616f5f4920bcb",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "adapter.mya.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "role": "model-or-processor",
+                "sha256": "c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "size_bytes": 9357088,
+                "stat": {
+                  "ctime_ns": 1787158435149503713,
+                  "device": 16777235,
+                  "inode": 5984066,
+                  "mtime_ns": 1787079596406661677,
+                  "size": 9357088
+                }
+              },
+              {
+                "name": "config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/dd547cc1b61ca6edfefb2f0cf65e3d8f81eceb6a",
+                "role": "model-or-processor",
+                "sha256": "ee172ef39a0e40c55403fb811fa0f56c6198c7ed21a2bdf5bd0e72e52c07a41c",
+                "size_bytes": 2040,
+                "stat": {
+                  "ctime_ns": 1787158435152482514,
+                  "device": 16777235,
+                  "inode": 5984069,
+                  "mtime_ns": 1787079452518242432,
+                  "size": 2040
+                }
+              },
+              {
+                "name": "create_adapters.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b2e99c339dafb630e1b02c44f5c267927979106f",
+                "role": "model-or-processor",
+                "sha256": "b5f11c4e55342e718fa90697f34f82664fbff16a421d8fae206d997045f73921",
+                "size_bytes": 10188,
+                "stat": {
+                  "ctime_ns": 1787235792760670739,
+                  "device": 16777235,
+                  "inode": 5986586,
+                  "mtime_ns": 1787235792759124152,
+                  "size": 10188
+                }
+              },
+              {
+                "name": "create_vocab.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b36fe95573033e2a2742aaeed8d3078946b7a320",
+                "role": "model-or-processor",
+                "sha256": "a6e7e16a54f0b09f46045b9135483776393267d0d8a6b3e86072906e61be46f5",
+                "size_bytes": 878,
+                "stat": {
+                  "ctime_ns": 1787235792684531696,
+                  "device": 16777235,
+                  "inode": 5986580,
+                  "mtime_ns": 1787235792683967611,
+                  "size": 878
+                }
+              },
+              {
+                "name": "model.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "role": "model-or-processor",
+                "sha256": "0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "size_bytes": 3859521128,
+                "stat": {
+                  "ctime_ns": 1787158436530154511,
+                  "device": 16777235,
+                  "inode": 5984070,
+                  "mtime_ns": 1787079592306092277,
+                  "size": 3859521128
+                }
+              },
+              {
+                "name": "preprocessor_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/e7d53bd058c34639e2dec1357537a3d013bcda63",
+                "role": "model-or-processor",
+                "sha256": "f724fdad65341e79bd9741888fe4e8ce1bb2e7b44fc8216c28c591afb1e202f4",
+                "size_bytes": 254,
+                "stat": {
+                  "ctime_ns": 1787158435150048006,
+                  "device": 16777235,
+                  "inode": 5984067,
+                  "mtime_ns": 1787079443378807804,
+                  "size": 254
+                }
+              },
+              {
+                "name": "special_tokens_map.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/fdafe480f024ff444c7492147536765ce5d55a2d",
+                "role": "model-or-processor",
+                "sha256": "9046da57c270c8e74d0f38832b4adce269c9d914ef21d2a0925e7772152dd793",
+                "size_bytes": 96,
+                "stat": {
+                  "ctime_ns": 1787158435143879487,
+                  "device": 16777235,
+                  "inode": 5984065,
+                  "mtime_ns": 1787079449792831686,
+                  "size": 96
+                }
+              },
+              {
+                "name": "tokenizer_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/8119434548d4a82fbe4e5e53c95d186bca037257",
+                "role": "model-or-processor",
+                "sha256": "42a65547cf0654d12263ece7c909c4b0c574b660c78658f806c772cc223bc01b",
+                "size_bytes": 397,
+                "stat": {
+                  "ctime_ns": 1787158435143238985,
+                  "device": 16777235,
+                  "inode": 5984064,
+                  "mtime_ns": 1787079445299892278,
+                  "size": 397
+                }
+              },
+              {
+                "name": "vocab.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/5c1626173fb1db1da574d16b6e924e8efc1ade4c",
+                "role": "model-or-processor",
+                "sha256": "0375a07a977a599040a7ff333b6974996965cd93754020619518c15db7691f01",
+                "size_bytes": 1340148,
+                "stat": {
+                  "ctime_ns": 1787158435151871262,
+                  "device": 16777235,
+                  "inode": 5984068,
+                  "mtime_ns": 1787079449054862750,
+                  "size": 1340148
+                }
+              },
+              {
+                "name": "vocabs/mya.txt",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/49191e00b11ea3281db39a6b8022d0b003bae2da",
+                "role": "model-or-processor",
+                "sha256": "d01af8e834039592efc79902675773d7ef622a4ce07cccd46fb2644785cc0734",
+                "size_bytes": 1005,
+                "stat": {
+                  "ctime_ns": 1787235938363752533,
+                  "device": 16777235,
+                  "inode": 5987135,
+                  "mtime_ns": 1787235938362249071,
+                  "size": 1005
+                }
+              }
+            ],
+            "backend": "hf",
+            "content_sha256": "9c7c2b2e8bbe8d6179207d8936a7ccd150a37878ef3229827ed8a07af85f3482",
+            "execution_sha256": "8cfde146682665b6526e0ccaf24c3138e5dc26f74b3af1812f44454ff2f0f514",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "mms-1b-all",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "auto",
+              "dtype": "auto",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float32",
+              "family": "mms",
+              "lang": "mya",
+              "n_threads": null
+            },
+            "revision_status": "pinned",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 2,
+            "source_kind": "huggingface",
+            "source_locator": "facebook/mms-1b-all",
+            "upstream_revision": "3d33597edbdaaba14a8e858e2c8caa76e3cec0cd",
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "12011678642037122936",
+          "resources": null,
+          "rtf": 0.026374055600414673,
+          "segments": null,
+          "source_path": "data/fleurs/audio/12011678642037122936.wav",
+          "source_sha256": "fc22a3c0a78d1c25a94274cc87c2fda6b7a668ca72913cd1fc928470c9790607",
+          "text": "ကိ်ရိုင်အများစုကိုသတ်သောင့်သက်သာရှိ၍ကြန့်ခိုင်စွာကွီးဆောက်ထားသည့်ဂျapancoစကာဘတ်စကားများဖြင့်ဝန်ဆောင်မှုပေးနေသည်",
+          "trust_issues": [],
+          "trusted": true
+        },
+        {
+          "audio_duration_s": 14.16,
+          "audio_id": "pcm16:16000:1:57d0567a6d1c2c3b6a64ff09fd774af475b077840c117d443a07a07dc94832a1",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__122b1a2eaf5afbf4081a308f4cfc74a164fa3d42d4f3080c96ddce05d2f7333c.wav",
+          "backend": "hf",
+          "elapsed_s": 0.3219353750173468,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_group": 3,
+            "batch_internal_serial": false,
+            "batch_items": 1,
+            "batch_size": 1,
+            "corpus_index": 3,
+            "corpus_size": 5,
+            "corpus_wall_s": 1.723405542,
+            "device": "mps",
+            "dtype": "float32",
+            "effective_batch_size": 1,
+            "elapsed_s_source": "measured",
+            "family": "mms",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "repo": "facebook/mms-1b-all",
+            "requested_batch_size": 1
+          },
+          "model": "mms-1b-all",
+          "model_provenance": {
+            "adapter_git_commit": "09350e20f5f173d67e1dc6d547c616f5f4920bcb",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "adapter.mya.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "role": "model-or-processor",
+                "sha256": "c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "size_bytes": 9357088,
+                "stat": {
+                  "ctime_ns": 1787158435149503713,
+                  "device": 16777235,
+                  "inode": 5984066,
+                  "mtime_ns": 1787079596406661677,
+                  "size": 9357088
+                }
+              },
+              {
+                "name": "config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/dd547cc1b61ca6edfefb2f0cf65e3d8f81eceb6a",
+                "role": "model-or-processor",
+                "sha256": "ee172ef39a0e40c55403fb811fa0f56c6198c7ed21a2bdf5bd0e72e52c07a41c",
+                "size_bytes": 2040,
+                "stat": {
+                  "ctime_ns": 1787158435152482514,
+                  "device": 16777235,
+                  "inode": 5984069,
+                  "mtime_ns": 1787079452518242432,
+                  "size": 2040
+                }
+              },
+              {
+                "name": "create_adapters.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b2e99c339dafb630e1b02c44f5c267927979106f",
+                "role": "model-or-processor",
+                "sha256": "b5f11c4e55342e718fa90697f34f82664fbff16a421d8fae206d997045f73921",
+                "size_bytes": 10188,
+                "stat": {
+                  "ctime_ns": 1787235792760670739,
+                  "device": 16777235,
+                  "inode": 5986586,
+                  "mtime_ns": 1787235792759124152,
+                  "size": 10188
+                }
+              },
+              {
+                "name": "create_vocab.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b36fe95573033e2a2742aaeed8d3078946b7a320",
+                "role": "model-or-processor",
+                "sha256": "a6e7e16a54f0b09f46045b9135483776393267d0d8a6b3e86072906e61be46f5",
+                "size_bytes": 878,
+                "stat": {
+                  "ctime_ns": 1787235792684531696,
+                  "device": 16777235,
+                  "inode": 5986580,
+                  "mtime_ns": 1787235792683967611,
+                  "size": 878
+                }
+              },
+              {
+                "name": "model.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "role": "model-or-processor",
+                "sha256": "0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "size_bytes": 3859521128,
+                "stat": {
+                  "ctime_ns": 1787158436530154511,
+                  "device": 16777235,
+                  "inode": 5984070,
+                  "mtime_ns": 1787079592306092277,
+                  "size": 3859521128
+                }
+              },
+              {
+                "name": "preprocessor_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/e7d53bd058c34639e2dec1357537a3d013bcda63",
+                "role": "model-or-processor",
+                "sha256": "f724fdad65341e79bd9741888fe4e8ce1bb2e7b44fc8216c28c591afb1e202f4",
+                "size_bytes": 254,
+                "stat": {
+                  "ctime_ns": 1787158435150048006,
+                  "device": 16777235,
+                  "inode": 5984067,
+                  "mtime_ns": 1787079443378807804,
+                  "size": 254
+                }
+              },
+              {
+                "name": "special_tokens_map.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/fdafe480f024ff444c7492147536765ce5d55a2d",
+                "role": "model-or-processor",
+                "sha256": "9046da57c270c8e74d0f38832b4adce269c9d914ef21d2a0925e7772152dd793",
+                "size_bytes": 96,
+                "stat": {
+                  "ctime_ns": 1787158435143879487,
+                  "device": 16777235,
+                  "inode": 5984065,
+                  "mtime_ns": 1787079449792831686,
+                  "size": 96
+                }
+              },
+              {
+                "name": "tokenizer_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/8119434548d4a82fbe4e5e53c95d186bca037257",
+                "role": "model-or-processor",
+                "sha256": "42a65547cf0654d12263ece7c909c4b0c574b660c78658f806c772cc223bc01b",
+                "size_bytes": 397,
+                "stat": {
+                  "ctime_ns": 1787158435143238985,
+                  "device": 16777235,
+                  "inode": 5984064,
+                  "mtime_ns": 1787079445299892278,
+                  "size": 397
+                }
+              },
+              {
+                "name": "vocab.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/5c1626173fb1db1da574d16b6e924e8efc1ade4c",
+                "role": "model-or-processor",
+                "sha256": "0375a07a977a599040a7ff333b6974996965cd93754020619518c15db7691f01",
+                "size_bytes": 1340148,
+                "stat": {
+                  "ctime_ns": 1787158435151871262,
+                  "device": 16777235,
+                  "inode": 5984068,
+                  "mtime_ns": 1787079449054862750,
+                  "size": 1340148
+                }
+              },
+              {
+                "name": "vocabs/mya.txt",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/49191e00b11ea3281db39a6b8022d0b003bae2da",
+                "role": "model-or-processor",
+                "sha256": "d01af8e834039592efc79902675773d7ef622a4ce07cccd46fb2644785cc0734",
+                "size_bytes": 1005,
+                "stat": {
+                  "ctime_ns": 1787235938363752533,
+                  "device": 16777235,
+                  "inode": 5987135,
+                  "mtime_ns": 1787235938362249071,
+                  "size": 1005
+                }
+              }
+            ],
+            "backend": "hf",
+            "content_sha256": "9c7c2b2e8bbe8d6179207d8936a7ccd150a37878ef3229827ed8a07af85f3482",
+            "execution_sha256": "8cfde146682665b6526e0ccaf24c3138e5dc26f74b3af1812f44454ff2f0f514",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "mms-1b-all",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "auto",
+              "dtype": "auto",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float32",
+              "family": "mms",
+              "lang": "mya",
+              "n_threads": null
+            },
+            "revision_status": "pinned",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 2,
+            "source_kind": "huggingface",
+            "source_locator": "facebook/mms-1b-all",
+            "upstream_revision": "3d33597edbdaaba14a8e858e2c8caa76e3cec0cd",
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "12202394788954760188",
+          "resources": null,
+          "rtf": 0.02273554908314596,
+          "segments": null,
+          "source_path": "data/fleurs/audio/12202394788954760188.wav",
+          "source_sha256": "122b1a2eaf5afbf4081a308f4cfc74a164fa3d42d4f3080c96ddce05d2f7333c",
+          "text": "မြေလဲပင်လည်သေသနှင့်စုံခြင်းဆင်တူသောမကျော်ခံ၏ချက်ပျုပ်ညီသည်ပေါင်မုတ်ဟင်းသီ်းဟင်းရွက်များနှင့်အသာအထူးသဖြင့်ဝက်သားတို့ကေါ်တွင်ခြေခံထားခြင်းဖြစ်ကာသံလင်စီကိုသုံးစွဲပါသည်",
+          "trust_issues": [],
+          "trusted": true
+        },
+        {
+          "audio_duration_s": 12.78,
+          "audio_id": "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28.wav",
+          "backend": "hf",
+          "elapsed_s": 0.2985129579901695,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_group": 4,
+            "batch_internal_serial": false,
+            "batch_items": 1,
+            "batch_size": 1,
+            "corpus_index": 4,
+            "corpus_size": 5,
+            "corpus_wall_s": 1.723405542,
+            "device": "mps",
+            "dtype": "float32",
+            "effective_batch_size": 1,
+            "elapsed_s_source": "measured",
+            "family": "mms",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "repo": "facebook/mms-1b-all",
+            "requested_batch_size": 1
+          },
+          "model": "mms-1b-all",
+          "model_provenance": {
+            "adapter_git_commit": "09350e20f5f173d67e1dc6d547c616f5f4920bcb",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "adapter.mya.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "role": "model-or-processor",
+                "sha256": "c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "size_bytes": 9357088,
+                "stat": {
+                  "ctime_ns": 1787158435149503713,
+                  "device": 16777235,
+                  "inode": 5984066,
+                  "mtime_ns": 1787079596406661677,
+                  "size": 9357088
+                }
+              },
+              {
+                "name": "config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/dd547cc1b61ca6edfefb2f0cf65e3d8f81eceb6a",
+                "role": "model-or-processor",
+                "sha256": "ee172ef39a0e40c55403fb811fa0f56c6198c7ed21a2bdf5bd0e72e52c07a41c",
+                "size_bytes": 2040,
+                "stat": {
+                  "ctime_ns": 1787158435152482514,
+                  "device": 16777235,
+                  "inode": 5984069,
+                  "mtime_ns": 1787079452518242432,
+                  "size": 2040
+                }
+              },
+              {
+                "name": "create_adapters.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b2e99c339dafb630e1b02c44f5c267927979106f",
+                "role": "model-or-processor",
+                "sha256": "b5f11c4e55342e718fa90697f34f82664fbff16a421d8fae206d997045f73921",
+                "size_bytes": 10188,
+                "stat": {
+                  "ctime_ns": 1787235792760670739,
+                  "device": 16777235,
+                  "inode": 5986586,
+                  "mtime_ns": 1787235792759124152,
+                  "size": 10188
+                }
+              },
+              {
+                "name": "create_vocab.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b36fe95573033e2a2742aaeed8d3078946b7a320",
+                "role": "model-or-processor",
+                "sha256": "a6e7e16a54f0b09f46045b9135483776393267d0d8a6b3e86072906e61be46f5",
+                "size_bytes": 878,
+                "stat": {
+                  "ctime_ns": 1787235792684531696,
+                  "device": 16777235,
+                  "inode": 5986580,
+                  "mtime_ns": 1787235792683967611,
+                  "size": 878
+                }
+              },
+              {
+                "name": "model.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "role": "model-or-processor",
+                "sha256": "0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "size_bytes": 3859521128,
+                "stat": {
+                  "ctime_ns": 1787158436530154511,
+                  "device": 16777235,
+                  "inode": 5984070,
+                  "mtime_ns": 1787079592306092277,
+                  "size": 3859521128
+                }
+              },
+              {
+                "name": "preprocessor_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/e7d53bd058c34639e2dec1357537a3d013bcda63",
+                "role": "model-or-processor",
+                "sha256": "f724fdad65341e79bd9741888fe4e8ce1bb2e7b44fc8216c28c591afb1e202f4",
+                "size_bytes": 254,
+                "stat": {
+                  "ctime_ns": 1787158435150048006,
+                  "device": 16777235,
+                  "inode": 5984067,
+                  "mtime_ns": 1787079443378807804,
+                  "size": 254
+                }
+              },
+              {
+                "name": "special_tokens_map.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/fdafe480f024ff444c7492147536765ce5d55a2d",
+                "role": "model-or-processor",
+                "sha256": "9046da57c270c8e74d0f38832b4adce269c9d914ef21d2a0925e7772152dd793",
+                "size_bytes": 96,
+                "stat": {
+                  "ctime_ns": 1787158435143879487,
+                  "device": 16777235,
+                  "inode": 5984065,
+                  "mtime_ns": 1787079449792831686,
+                  "size": 96
+                }
+              },
+              {
+                "name": "tokenizer_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/8119434548d4a82fbe4e5e53c95d186bca037257",
+                "role": "model-or-processor",
+                "sha256": "42a65547cf0654d12263ece7c909c4b0c574b660c78658f806c772cc223bc01b",
+                "size_bytes": 397,
+                "stat": {
+                  "ctime_ns": 1787158435143238985,
+                  "device": 16777235,
+                  "inode": 5984064,
+                  "mtime_ns": 1787079445299892278,
+                  "size": 397
+                }
+              },
+              {
+                "name": "vocab.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/5c1626173fb1db1da574d16b6e924e8efc1ade4c",
+                "role": "model-or-processor",
+                "sha256": "0375a07a977a599040a7ff333b6974996965cd93754020619518c15db7691f01",
+                "size_bytes": 1340148,
+                "stat": {
+                  "ctime_ns": 1787158435151871262,
+                  "device": 16777235,
+                  "inode": 5984068,
+                  "mtime_ns": 1787079449054862750,
+                  "size": 1340148
+                }
+              },
+              {
+                "name": "vocabs/mya.txt",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/49191e00b11ea3281db39a6b8022d0b003bae2da",
+                "role": "model-or-processor",
+                "sha256": "d01af8e834039592efc79902675773d7ef622a4ce07cccd46fb2644785cc0734",
+                "size_bytes": 1005,
+                "stat": {
+                  "ctime_ns": 1787235938363752533,
+                  "device": 16777235,
+                  "inode": 5987135,
+                  "mtime_ns": 1787235938362249071,
+                  "size": 1005
+                }
+              }
+            ],
+            "backend": "hf",
+            "content_sha256": "9c7c2b2e8bbe8d6179207d8936a7ccd150a37878ef3229827ed8a07af85f3482",
+            "execution_sha256": "8cfde146682665b6526e0ccaf24c3138e5dc26f74b3af1812f44454ff2f0f514",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "mms-1b-all",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "auto",
+              "dtype": "auto",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float32",
+              "family": "mms",
+              "lang": "mya",
+              "n_threads": null
+            },
+            "revision_status": "pinned",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 2,
+            "source_kind": "huggingface",
+            "source_locator": "facebook/mms-1b-all",
+            "upstream_revision": "3d33597edbdaaba14a8e858e2c8caa76e3cec0cd",
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "14755840805814218163",
+          "resources": null,
+          "rtf": 0.0233578214389804,
+          "segments": null,
+          "source_path": "data/fleurs/audio/14755840805814218163.wav",
+          "source_sha256": "8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28",
+          "text": "လွန်ခဲ့သောနှင့်ထောင်ပေါင်းများစွာကအရီစတာချကခဟုကေါ်သောပြိုးသားတစ်ဦးသည်နေပတ်လည်တွင်ဆိုလာစနစ်သည်ရေရှားလျပ်ရှိသည်ဟုပြောဆိုခဲ့သည်",
+          "trust_issues": [],
+          "trusted": true
+        }
+      ],
+      "trust_issues": []
+    },
+    {
+      "complete": true,
+      "expected_audio_s": 71.22,
+      "index": 1,
+      "phase": {
+        "ended_ns": 226703065402125,
+        "error": null,
+        "name": "repeat-1",
+        "repeat_index": 1,
+        "started_ns": 226701340456666,
+        "status": "ok"
+      },
+      "resources": {
+        "cpu_s": 0.4324,
+        "cpu_utilization": 0.25,
+        "ended_ns": 226703065402125,
+        "gpu_mb": 4696.2,
+        "peak_rss_mb": 617.2,
+        "phase": "repeat-1",
+        "process_peak_rss_mb": 617.2,
+        "rss_peak_mb": 617.2,
+        "started_ns": 226701340456666,
+        "wall_s": 1.7249
+      },
+      "results": [
+        {
+          "audio_duration_s": 27.6,
+          "audio_id": "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__36c25f8b1db4ba5ddab8b3edd0bbd8f2b2af1aeb466863f77cfacad95197ee61.wav",
+          "backend": "hf",
+          "elapsed_s": 0.6511367499770131,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_group": 0,
+            "batch_internal_serial": false,
+            "batch_items": 1,
+            "batch_size": 1,
+            "corpus_index": 0,
+            "corpus_size": 5,
+            "corpus_wall_s": 1.724945459,
+            "device": "mps",
+            "dtype": "float32",
+            "effective_batch_size": 1,
+            "elapsed_s_source": "measured",
+            "family": "mms",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "repo": "facebook/mms-1b-all",
+            "requested_batch_size": 1,
+            "resource_scope": "corpus"
+          },
+          "model": "mms-1b-all",
+          "model_provenance": {
+            "adapter_git_commit": "09350e20f5f173d67e1dc6d547c616f5f4920bcb",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "adapter.mya.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "role": "model-or-processor",
+                "sha256": "c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "size_bytes": 9357088,
+                "stat": {
+                  "ctime_ns": 1787158435149503713,
+                  "device": 16777235,
+                  "inode": 5984066,
+                  "mtime_ns": 1787079596406661677,
+                  "size": 9357088
+                }
+              },
+              {
+                "name": "config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/dd547cc1b61ca6edfefb2f0cf65e3d8f81eceb6a",
+                "role": "model-or-processor",
+                "sha256": "ee172ef39a0e40c55403fb811fa0f56c6198c7ed21a2bdf5bd0e72e52c07a41c",
+                "size_bytes": 2040,
+                "stat": {
+                  "ctime_ns": 1787158435152482514,
+                  "device": 16777235,
+                  "inode": 5984069,
+                  "mtime_ns": 1787079452518242432,
+                  "size": 2040
+                }
+              },
+              {
+                "name": "create_adapters.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b2e99c339dafb630e1b02c44f5c267927979106f",
+                "role": "model-or-processor",
+                "sha256": "b5f11c4e55342e718fa90697f34f82664fbff16a421d8fae206d997045f73921",
+                "size_bytes": 10188,
+                "stat": {
+                  "ctime_ns": 1787235792760670739,
+                  "device": 16777235,
+                  "inode": 5986586,
+                  "mtime_ns": 1787235792759124152,
+                  "size": 10188
+                }
+              },
+              {
+                "name": "create_vocab.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b36fe95573033e2a2742aaeed8d3078946b7a320",
+                "role": "model-or-processor",
+                "sha256": "a6e7e16a54f0b09f46045b9135483776393267d0d8a6b3e86072906e61be46f5",
+                "size_bytes": 878,
+                "stat": {
+                  "ctime_ns": 1787235792684531696,
+                  "device": 16777235,
+                  "inode": 5986580,
+                  "mtime_ns": 1787235792683967611,
+                  "size": 878
+                }
+              },
+              {
+                "name": "model.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "role": "model-or-processor",
+                "sha256": "0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "size_bytes": 3859521128,
+                "stat": {
+                  "ctime_ns": 1787158436530154511,
+                  "device": 16777235,
+                  "inode": 5984070,
+                  "mtime_ns": 1787079592306092277,
+                  "size": 3859521128
+                }
+              },
+              {
+                "name": "preprocessor_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/e7d53bd058c34639e2dec1357537a3d013bcda63",
+                "role": "model-or-processor",
+                "sha256": "f724fdad65341e79bd9741888fe4e8ce1bb2e7b44fc8216c28c591afb1e202f4",
+                "size_bytes": 254,
+                "stat": {
+                  "ctime_ns": 1787158435150048006,
+                  "device": 16777235,
+                  "inode": 5984067,
+                  "mtime_ns": 1787079443378807804,
+                  "size": 254
+                }
+              },
+              {
+                "name": "special_tokens_map.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/fdafe480f024ff444c7492147536765ce5d55a2d",
+                "role": "model-or-processor",
+                "sha256": "9046da57c270c8e74d0f38832b4adce269c9d914ef21d2a0925e7772152dd793",
+                "size_bytes": 96,
+                "stat": {
+                  "ctime_ns": 1787158435143879487,
+                  "device": 16777235,
+                  "inode": 5984065,
+                  "mtime_ns": 1787079449792831686,
+                  "size": 96
+                }
+              },
+              {
+                "name": "tokenizer_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/8119434548d4a82fbe4e5e53c95d186bca037257",
+                "role": "model-or-processor",
+                "sha256": "42a65547cf0654d12263ece7c909c4b0c574b660c78658f806c772cc223bc01b",
+                "size_bytes": 397,
+                "stat": {
+                  "ctime_ns": 1787158435143238985,
+                  "device": 16777235,
+                  "inode": 5984064,
+                  "mtime_ns": 1787079445299892278,
+                  "size": 397
+                }
+              },
+              {
+                "name": "vocab.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/5c1626173fb1db1da574d16b6e924e8efc1ade4c",
+                "role": "model-or-processor",
+                "sha256": "0375a07a977a599040a7ff333b6974996965cd93754020619518c15db7691f01",
+                "size_bytes": 1340148,
+                "stat": {
+                  "ctime_ns": 1787158435151871262,
+                  "device": 16777235,
+                  "inode": 5984068,
+                  "mtime_ns": 1787079449054862750,
+                  "size": 1340148
+                }
+              },
+              {
+                "name": "vocabs/mya.txt",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/49191e00b11ea3281db39a6b8022d0b003bae2da",
+                "role": "model-or-processor",
+                "sha256": "d01af8e834039592efc79902675773d7ef622a4ce07cccd46fb2644785cc0734",
+                "size_bytes": 1005,
+                "stat": {
+                  "ctime_ns": 1787235938363752533,
+                  "device": 16777235,
+                  "inode": 5987135,
+                  "mtime_ns": 1787235938362249071,
+                  "size": 1005
+                }
+              }
+            ],
+            "backend": "hf",
+            "content_sha256": "9c7c2b2e8bbe8d6179207d8936a7ccd150a37878ef3229827ed8a07af85f3482",
+            "execution_sha256": "8cfde146682665b6526e0ccaf24c3138e5dc26f74b3af1812f44454ff2f0f514",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "mms-1b-all",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "auto",
+              "dtype": "auto",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float32",
+              "family": "mms",
+              "lang": "mya",
+              "n_threads": null
+            },
+            "revision_status": "pinned",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 2,
+            "source_kind": "huggingface",
+            "source_locator": "facebook/mms-1b-all",
+            "upstream_revision": "3d33597edbdaaba14a8e858e2c8caa76e3cec0cd",
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "10207165333468320061",
+          "resources": {
+            "cpu_s": 0.4324,
+            "cpu_utilization": 0.25,
+            "ended_ns": 226703065402125,
+            "gpu_mb": 4696.2,
+            "peak_rss_mb": 617.2,
+            "phase": "repeat-1",
+            "process_peak_rss_mb": 617.2,
+            "rss_peak_mb": 617.2,
+            "started_ns": 226701340456666,
+            "wall_s": 1.7249
+          },
+          "rtf": 0.0235919112310512,
+          "segments": null,
+          "source_path": "data/fleurs/audio/10207165333468320061.wav",
+          "source_sha256": "36c25f8b1db4ba5ddab8b3edd0bbd8f2b2af1aeb466863f77cfacad95197ee61",
+          "text": "ဘူရှ်၏ပြော၍ေးဆိုခွင့်းရှိသူဂျောဒန်ဂျော်ဒရို့ကမြောက်ကိုရီးယားနိုင်ငံ၏ကဓိကဝတ်သည်ကိုကိုရီးယားကျွန်းစွယ်အားအတည်ပြုနိုင်သည်နျူကလီးယားစစ်ဆဉ်ရေးဒေသားဖြစ်စေရေးစွမ်းဆောင်မှုယီမန်ဂျက်ကိုလျှောက်လဲ်ရာတွင်အဓိကကျသောလေကထစ်တစ်ခုဖြစ်သည်ဟုတုံးသုနးပြောဆိုခဲ့သည်",
+          "trust_issues": [],
+          "trusted": true
+        },
+        {
+          "audio_duration_s": 9.18,
+          "audio_id": "pcm16:16000:1:fe0efa457ae9f7f11a5483e78adaa5795f11b3bf0d5882d7a670ca05ee6ec0e4",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__0f5596159ca1e135211cef735e90b32a3ca6fade92c6508f9f1d8b1b8a7a0979.wav",
+          "backend": "hf",
+          "elapsed_s": 0.25354375000461005,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_group": 1,
+            "batch_internal_serial": false,
+            "batch_items": 1,
+            "batch_size": 1,
+            "corpus_index": 1,
+            "corpus_size": 5,
+            "corpus_wall_s": 1.724945459,
+            "device": "mps",
+            "dtype": "float32",
+            "effective_batch_size": 1,
+            "elapsed_s_source": "measured",
+            "family": "mms",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "repo": "facebook/mms-1b-all",
+            "requested_batch_size": 1
+          },
+          "model": "mms-1b-all",
+          "model_provenance": {
+            "adapter_git_commit": "09350e20f5f173d67e1dc6d547c616f5f4920bcb",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "adapter.mya.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "role": "model-or-processor",
+                "sha256": "c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "size_bytes": 9357088,
+                "stat": {
+                  "ctime_ns": 1787158435149503713,
+                  "device": 16777235,
+                  "inode": 5984066,
+                  "mtime_ns": 1787079596406661677,
+                  "size": 9357088
+                }
+              },
+              {
+                "name": "config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/dd547cc1b61ca6edfefb2f0cf65e3d8f81eceb6a",
+                "role": "model-or-processor",
+                "sha256": "ee172ef39a0e40c55403fb811fa0f56c6198c7ed21a2bdf5bd0e72e52c07a41c",
+                "size_bytes": 2040,
+                "stat": {
+                  "ctime_ns": 1787158435152482514,
+                  "device": 16777235,
+                  "inode": 5984069,
+                  "mtime_ns": 1787079452518242432,
+                  "size": 2040
+                }
+              },
+              {
+                "name": "create_adapters.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b2e99c339dafb630e1b02c44f5c267927979106f",
+                "role": "model-or-processor",
+                "sha256": "b5f11c4e55342e718fa90697f34f82664fbff16a421d8fae206d997045f73921",
+                "size_bytes": 10188,
+                "stat": {
+                  "ctime_ns": 1787235792760670739,
+                  "device": 16777235,
+                  "inode": 5986586,
+                  "mtime_ns": 1787235792759124152,
+                  "size": 10188
+                }
+              },
+              {
+                "name": "create_vocab.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b36fe95573033e2a2742aaeed8d3078946b7a320",
+                "role": "model-or-processor",
+                "sha256": "a6e7e16a54f0b09f46045b9135483776393267d0d8a6b3e86072906e61be46f5",
+                "size_bytes": 878,
+                "stat": {
+                  "ctime_ns": 1787235792684531696,
+                  "device": 16777235,
+                  "inode": 5986580,
+                  "mtime_ns": 1787235792683967611,
+                  "size": 878
+                }
+              },
+              {
+                "name": "model.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "role": "model-or-processor",
+                "sha256": "0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "size_bytes": 3859521128,
+                "stat": {
+                  "ctime_ns": 1787158436530154511,
+                  "device": 16777235,
+                  "inode": 5984070,
+                  "mtime_ns": 1787079592306092277,
+                  "size": 3859521128
+                }
+              },
+              {
+                "name": "preprocessor_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/e7d53bd058c34639e2dec1357537a3d013bcda63",
+                "role": "model-or-processor",
+                "sha256": "f724fdad65341e79bd9741888fe4e8ce1bb2e7b44fc8216c28c591afb1e202f4",
+                "size_bytes": 254,
+                "stat": {
+                  "ctime_ns": 1787158435150048006,
+                  "device": 16777235,
+                  "inode": 5984067,
+                  "mtime_ns": 1787079443378807804,
+                  "size": 254
+                }
+              },
+              {
+                "name": "special_tokens_map.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/fdafe480f024ff444c7492147536765ce5d55a2d",
+                "role": "model-or-processor",
+                "sha256": "9046da57c270c8e74d0f38832b4adce269c9d914ef21d2a0925e7772152dd793",
+                "size_bytes": 96,
+                "stat": {
+                  "ctime_ns": 1787158435143879487,
+                  "device": 16777235,
+                  "inode": 5984065,
+                  "mtime_ns": 1787079449792831686,
+                  "size": 96
+                }
+              },
+              {
+                "name": "tokenizer_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/8119434548d4a82fbe4e5e53c95d186bca037257",
+                "role": "model-or-processor",
+                "sha256": "42a65547cf0654d12263ece7c909c4b0c574b660c78658f806c772cc223bc01b",
+                "size_bytes": 397,
+                "stat": {
+                  "ctime_ns": 1787158435143238985,
+                  "device": 16777235,
+                  "inode": 5984064,
+                  "mtime_ns": 1787079445299892278,
+                  "size": 397
+                }
+              },
+              {
+                "name": "vocab.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/5c1626173fb1db1da574d16b6e924e8efc1ade4c",
+                "role": "model-or-processor",
+                "sha256": "0375a07a977a599040a7ff333b6974996965cd93754020619518c15db7691f01",
+                "size_bytes": 1340148,
+                "stat": {
+                  "ctime_ns": 1787158435151871262,
+                  "device": 16777235,
+                  "inode": 5984068,
+                  "mtime_ns": 1787079449054862750,
+                  "size": 1340148
+                }
+              },
+              {
+                "name": "vocabs/mya.txt",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/49191e00b11ea3281db39a6b8022d0b003bae2da",
+                "role": "model-or-processor",
+                "sha256": "d01af8e834039592efc79902675773d7ef622a4ce07cccd46fb2644785cc0734",
+                "size_bytes": 1005,
+                "stat": {
+                  "ctime_ns": 1787235938363752533,
+                  "device": 16777235,
+                  "inode": 5987135,
+                  "mtime_ns": 1787235938362249071,
+                  "size": 1005
+                }
+              }
+            ],
+            "backend": "hf",
+            "content_sha256": "9c7c2b2e8bbe8d6179207d8936a7ccd150a37878ef3229827ed8a07af85f3482",
+            "execution_sha256": "8cfde146682665b6526e0ccaf24c3138e5dc26f74b3af1812f44454ff2f0f514",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "mms-1b-all",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "auto",
+              "dtype": "auto",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float32",
+              "family": "mms",
+              "lang": "mya",
+              "n_threads": null
+            },
+            "revision_status": "pinned",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 2,
+            "source_kind": "huggingface",
+            "source_locator": "facebook/mms-1b-all",
+            "upstream_revision": "3d33597edbdaaba14a8e858e2c8caa76e3cec0cd",
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "10406743972683477081",
+          "resources": null,
+          "rtf": 0.027619144880676478,
+          "segments": null,
+          "source_path": "data/fleurs/audio/10406743972683477081.wav",
+          "source_sha256": "0f5596159ca1e135211cef735e90b32a3ca6fade92c6508f9f1d8b1b8a7a0979",
+          "text": "ငါ့အတွက်တော်ဒါကာလုံးဝါးအဓိပ်ပင်မရှိပူလုံးဝါးကိုမတရားပူ",
+          "trust_issues": [],
+          "trusted": true
+        },
+        {
+          "audio_duration_s": 7.5,
+          "audio_id": "pcm16:16000:1:71a3b3b9e7886757e59ac908a3e9edb5188a430b50690285b250583008660f24",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__fc22a3c0a78d1c25a94274cc87c2fda6b7a668ca72913cd1fc928470c9790607.wav",
+          "backend": "hf",
+          "elapsed_s": 0.19716116698691621,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_group": 2,
+            "batch_internal_serial": false,
+            "batch_items": 1,
+            "batch_size": 1,
+            "corpus_index": 2,
+            "corpus_size": 5,
+            "corpus_wall_s": 1.724945459,
+            "device": "mps",
+            "dtype": "float32",
+            "effective_batch_size": 1,
+            "elapsed_s_source": "measured",
+            "family": "mms",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "repo": "facebook/mms-1b-all",
+            "requested_batch_size": 1
+          },
+          "model": "mms-1b-all",
+          "model_provenance": {
+            "adapter_git_commit": "09350e20f5f173d67e1dc6d547c616f5f4920bcb",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "adapter.mya.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "role": "model-or-processor",
+                "sha256": "c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "size_bytes": 9357088,
+                "stat": {
+                  "ctime_ns": 1787158435149503713,
+                  "device": 16777235,
+                  "inode": 5984066,
+                  "mtime_ns": 1787079596406661677,
+                  "size": 9357088
+                }
+              },
+              {
+                "name": "config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/dd547cc1b61ca6edfefb2f0cf65e3d8f81eceb6a",
+                "role": "model-or-processor",
+                "sha256": "ee172ef39a0e40c55403fb811fa0f56c6198c7ed21a2bdf5bd0e72e52c07a41c",
+                "size_bytes": 2040,
+                "stat": {
+                  "ctime_ns": 1787158435152482514,
+                  "device": 16777235,
+                  "inode": 5984069,
+                  "mtime_ns": 1787079452518242432,
+                  "size": 2040
+                }
+              },
+              {
+                "name": "create_adapters.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b2e99c339dafb630e1b02c44f5c267927979106f",
+                "role": "model-or-processor",
+                "sha256": "b5f11c4e55342e718fa90697f34f82664fbff16a421d8fae206d997045f73921",
+                "size_bytes": 10188,
+                "stat": {
+                  "ctime_ns": 1787235792760670739,
+                  "device": 16777235,
+                  "inode": 5986586,
+                  "mtime_ns": 1787235792759124152,
+                  "size": 10188
+                }
+              },
+              {
+                "name": "create_vocab.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b36fe95573033e2a2742aaeed8d3078946b7a320",
+                "role": "model-or-processor",
+                "sha256": "a6e7e16a54f0b09f46045b9135483776393267d0d8a6b3e86072906e61be46f5",
+                "size_bytes": 878,
+                "stat": {
+                  "ctime_ns": 1787235792684531696,
+                  "device": 16777235,
+                  "inode": 5986580,
+                  "mtime_ns": 1787235792683967611,
+                  "size": 878
+                }
+              },
+              {
+                "name": "model.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "role": "model-or-processor",
+                "sha256": "0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "size_bytes": 3859521128,
+                "stat": {
+                  "ctime_ns": 1787158436530154511,
+                  "device": 16777235,
+                  "inode": 5984070,
+                  "mtime_ns": 1787079592306092277,
+                  "size": 3859521128
+                }
+              },
+              {
+                "name": "preprocessor_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/e7d53bd058c34639e2dec1357537a3d013bcda63",
+                "role": "model-or-processor",
+                "sha256": "f724fdad65341e79bd9741888fe4e8ce1bb2e7b44fc8216c28c591afb1e202f4",
+                "size_bytes": 254,
+                "stat": {
+                  "ctime_ns": 1787158435150048006,
+                  "device": 16777235,
+                  "inode": 5984067,
+                  "mtime_ns": 1787079443378807804,
+                  "size": 254
+                }
+              },
+              {
+                "name": "special_tokens_map.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/fdafe480f024ff444c7492147536765ce5d55a2d",
+                "role": "model-or-processor",
+                "sha256": "9046da57c270c8e74d0f38832b4adce269c9d914ef21d2a0925e7772152dd793",
+                "size_bytes": 96,
+                "stat": {
+                  "ctime_ns": 1787158435143879487,
+                  "device": 16777235,
+                  "inode": 5984065,
+                  "mtime_ns": 1787079449792831686,
+                  "size": 96
+                }
+              },
+              {
+                "name": "tokenizer_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/8119434548d4a82fbe4e5e53c95d186bca037257",
+                "role": "model-or-processor",
+                "sha256": "42a65547cf0654d12263ece7c909c4b0c574b660c78658f806c772cc223bc01b",
+                "size_bytes": 397,
+                "stat": {
+                  "ctime_ns": 1787158435143238985,
+                  "device": 16777235,
+                  "inode": 5984064,
+                  "mtime_ns": 1787079445299892278,
+                  "size": 397
+                }
+              },
+              {
+                "name": "vocab.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/5c1626173fb1db1da574d16b6e924e8efc1ade4c",
+                "role": "model-or-processor",
+                "sha256": "0375a07a977a599040a7ff333b6974996965cd93754020619518c15db7691f01",
+                "size_bytes": 1340148,
+                "stat": {
+                  "ctime_ns": 1787158435151871262,
+                  "device": 16777235,
+                  "inode": 5984068,
+                  "mtime_ns": 1787079449054862750,
+                  "size": 1340148
+                }
+              },
+              {
+                "name": "vocabs/mya.txt",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/49191e00b11ea3281db39a6b8022d0b003bae2da",
+                "role": "model-or-processor",
+                "sha256": "d01af8e834039592efc79902675773d7ef622a4ce07cccd46fb2644785cc0734",
+                "size_bytes": 1005,
+                "stat": {
+                  "ctime_ns": 1787235938363752533,
+                  "device": 16777235,
+                  "inode": 5987135,
+                  "mtime_ns": 1787235938362249071,
+                  "size": 1005
+                }
+              }
+            ],
+            "backend": "hf",
+            "content_sha256": "9c7c2b2e8bbe8d6179207d8936a7ccd150a37878ef3229827ed8a07af85f3482",
+            "execution_sha256": "8cfde146682665b6526e0ccaf24c3138e5dc26f74b3af1812f44454ff2f0f514",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "mms-1b-all",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "auto",
+              "dtype": "auto",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float32",
+              "family": "mms",
+              "lang": "mya",
+              "n_threads": null
+            },
+            "revision_status": "pinned",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 2,
+            "source_kind": "huggingface",
+            "source_locator": "facebook/mms-1b-all",
+            "upstream_revision": "3d33597edbdaaba14a8e858e2c8caa76e3cec0cd",
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "12011678642037122936",
+          "resources": null,
+          "rtf": 0.026288155598255494,
+          "segments": null,
+          "source_path": "data/fleurs/audio/12011678642037122936.wav",
+          "source_sha256": "fc22a3c0a78d1c25a94274cc87c2fda6b7a668ca72913cd1fc928470c9790607",
+          "text": "ကိ်ရိုင်အများစုကိုသတ်သောင့်သက်သာရှိ၍ကြန့်ခိုင်စွာကွီးဆောက်ထားသည့်ဂျapancoစကာဘတ်စကားများဖြင့်ဝန်ဆောင်မှုပေးနေသည်",
+          "trust_issues": [],
+          "trusted": true
+        },
+        {
+          "audio_duration_s": 14.16,
+          "audio_id": "pcm16:16000:1:57d0567a6d1c2c3b6a64ff09fd774af475b077840c117d443a07a07dc94832a1",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__122b1a2eaf5afbf4081a308f4cfc74a164fa3d42d4f3080c96ddce05d2f7333c.wav",
+          "backend": "hf",
+          "elapsed_s": 0.3218576669751201,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_group": 3,
+            "batch_internal_serial": false,
+            "batch_items": 1,
+            "batch_size": 1,
+            "corpus_index": 3,
+            "corpus_size": 5,
+            "corpus_wall_s": 1.724945459,
+            "device": "mps",
+            "dtype": "float32",
+            "effective_batch_size": 1,
+            "elapsed_s_source": "measured",
+            "family": "mms",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "repo": "facebook/mms-1b-all",
+            "requested_batch_size": 1
+          },
+          "model": "mms-1b-all",
+          "model_provenance": {
+            "adapter_git_commit": "09350e20f5f173d67e1dc6d547c616f5f4920bcb",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "adapter.mya.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "role": "model-or-processor",
+                "sha256": "c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "size_bytes": 9357088,
+                "stat": {
+                  "ctime_ns": 1787158435149503713,
+                  "device": 16777235,
+                  "inode": 5984066,
+                  "mtime_ns": 1787079596406661677,
+                  "size": 9357088
+                }
+              },
+              {
+                "name": "config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/dd547cc1b61ca6edfefb2f0cf65e3d8f81eceb6a",
+                "role": "model-or-processor",
+                "sha256": "ee172ef39a0e40c55403fb811fa0f56c6198c7ed21a2bdf5bd0e72e52c07a41c",
+                "size_bytes": 2040,
+                "stat": {
+                  "ctime_ns": 1787158435152482514,
+                  "device": 16777235,
+                  "inode": 5984069,
+                  "mtime_ns": 1787079452518242432,
+                  "size": 2040
+                }
+              },
+              {
+                "name": "create_adapters.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b2e99c339dafb630e1b02c44f5c267927979106f",
+                "role": "model-or-processor",
+                "sha256": "b5f11c4e55342e718fa90697f34f82664fbff16a421d8fae206d997045f73921",
+                "size_bytes": 10188,
+                "stat": {
+                  "ctime_ns": 1787235792760670739,
+                  "device": 16777235,
+                  "inode": 5986586,
+                  "mtime_ns": 1787235792759124152,
+                  "size": 10188
+                }
+              },
+              {
+                "name": "create_vocab.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b36fe95573033e2a2742aaeed8d3078946b7a320",
+                "role": "model-or-processor",
+                "sha256": "a6e7e16a54f0b09f46045b9135483776393267d0d8a6b3e86072906e61be46f5",
+                "size_bytes": 878,
+                "stat": {
+                  "ctime_ns": 1787235792684531696,
+                  "device": 16777235,
+                  "inode": 5986580,
+                  "mtime_ns": 1787235792683967611,
+                  "size": 878
+                }
+              },
+              {
+                "name": "model.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "role": "model-or-processor",
+                "sha256": "0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "size_bytes": 3859521128,
+                "stat": {
+                  "ctime_ns": 1787158436530154511,
+                  "device": 16777235,
+                  "inode": 5984070,
+                  "mtime_ns": 1787079592306092277,
+                  "size": 3859521128
+                }
+              },
+              {
+                "name": "preprocessor_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/e7d53bd058c34639e2dec1357537a3d013bcda63",
+                "role": "model-or-processor",
+                "sha256": "f724fdad65341e79bd9741888fe4e8ce1bb2e7b44fc8216c28c591afb1e202f4",
+                "size_bytes": 254,
+                "stat": {
+                  "ctime_ns": 1787158435150048006,
+                  "device": 16777235,
+                  "inode": 5984067,
+                  "mtime_ns": 1787079443378807804,
+                  "size": 254
+                }
+              },
+              {
+                "name": "special_tokens_map.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/fdafe480f024ff444c7492147536765ce5d55a2d",
+                "role": "model-or-processor",
+                "sha256": "9046da57c270c8e74d0f38832b4adce269c9d914ef21d2a0925e7772152dd793",
+                "size_bytes": 96,
+                "stat": {
+                  "ctime_ns": 1787158435143879487,
+                  "device": 16777235,
+                  "inode": 5984065,
+                  "mtime_ns": 1787079449792831686,
+                  "size": 96
+                }
+              },
+              {
+                "name": "tokenizer_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/8119434548d4a82fbe4e5e53c95d186bca037257",
+                "role": "model-or-processor",
+                "sha256": "42a65547cf0654d12263ece7c909c4b0c574b660c78658f806c772cc223bc01b",
+                "size_bytes": 397,
+                "stat": {
+                  "ctime_ns": 1787158435143238985,
+                  "device": 16777235,
+                  "inode": 5984064,
+                  "mtime_ns": 1787079445299892278,
+                  "size": 397
+                }
+              },
+              {
+                "name": "vocab.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/5c1626173fb1db1da574d16b6e924e8efc1ade4c",
+                "role": "model-or-processor",
+                "sha256": "0375a07a977a599040a7ff333b6974996965cd93754020619518c15db7691f01",
+                "size_bytes": 1340148,
+                "stat": {
+                  "ctime_ns": 1787158435151871262,
+                  "device": 16777235,
+                  "inode": 5984068,
+                  "mtime_ns": 1787079449054862750,
+                  "size": 1340148
+                }
+              },
+              {
+                "name": "vocabs/mya.txt",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/49191e00b11ea3281db39a6b8022d0b003bae2da",
+                "role": "model-or-processor",
+                "sha256": "d01af8e834039592efc79902675773d7ef622a4ce07cccd46fb2644785cc0734",
+                "size_bytes": 1005,
+                "stat": {
+                  "ctime_ns": 1787235938363752533,
+                  "device": 16777235,
+                  "inode": 5987135,
+                  "mtime_ns": 1787235938362249071,
+                  "size": 1005
+                }
+              }
+            ],
+            "backend": "hf",
+            "content_sha256": "9c7c2b2e8bbe8d6179207d8936a7ccd150a37878ef3229827ed8a07af85f3482",
+            "execution_sha256": "8cfde146682665b6526e0ccaf24c3138e5dc26f74b3af1812f44454ff2f0f514",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "mms-1b-all",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "auto",
+              "dtype": "auto",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float32",
+              "family": "mms",
+              "lang": "mya",
+              "n_threads": null
+            },
+            "revision_status": "pinned",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 2,
+            "source_kind": "huggingface",
+            "source_locator": "facebook/mms-1b-all",
+            "upstream_revision": "3d33597edbdaaba14a8e858e2c8caa76e3cec0cd",
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "12202394788954760188",
+          "resources": null,
+          "rtf": 0.0227300612270565,
+          "segments": null,
+          "source_path": "data/fleurs/audio/12202394788954760188.wav",
+          "source_sha256": "122b1a2eaf5afbf4081a308f4cfc74a164fa3d42d4f3080c96ddce05d2f7333c",
+          "text": "မြေလဲပင်လည်သေသနှင့်စုံခြင်းဆင်တူသောမကျော်ခံ၏ချက်ပျုပ်ညီသည်ပေါင်မုတ်ဟင်းသီ်းဟင်းရွက်များနှင့်အသာအထူးသဖြင့်ဝက်သားတို့ကေါ်တွင်ခြေခံထားခြင်းဖြစ်ကာသံလင်စီကိုသုံးစွဲပါသည်",
+          "trust_issues": [],
+          "trusted": true
+        },
+        {
+          "audio_duration_s": 12.78,
+          "audio_id": "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28.wav",
+          "backend": "hf",
+          "elapsed_s": 0.29942670799209736,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_group": 4,
+            "batch_internal_serial": false,
+            "batch_items": 1,
+            "batch_size": 1,
+            "corpus_index": 4,
+            "corpus_size": 5,
+            "corpus_wall_s": 1.724945459,
+            "device": "mps",
+            "dtype": "float32",
+            "effective_batch_size": 1,
+            "elapsed_s_source": "measured",
+            "family": "mms",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "repo": "facebook/mms-1b-all",
+            "requested_batch_size": 1
+          },
+          "model": "mms-1b-all",
+          "model_provenance": {
+            "adapter_git_commit": "09350e20f5f173d67e1dc6d547c616f5f4920bcb",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "adapter.mya.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "role": "model-or-processor",
+                "sha256": "c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "size_bytes": 9357088,
+                "stat": {
+                  "ctime_ns": 1787158435149503713,
+                  "device": 16777235,
+                  "inode": 5984066,
+                  "mtime_ns": 1787079596406661677,
+                  "size": 9357088
+                }
+              },
+              {
+                "name": "config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/dd547cc1b61ca6edfefb2f0cf65e3d8f81eceb6a",
+                "role": "model-or-processor",
+                "sha256": "ee172ef39a0e40c55403fb811fa0f56c6198c7ed21a2bdf5bd0e72e52c07a41c",
+                "size_bytes": 2040,
+                "stat": {
+                  "ctime_ns": 1787158435152482514,
+                  "device": 16777235,
+                  "inode": 5984069,
+                  "mtime_ns": 1787079452518242432,
+                  "size": 2040
+                }
+              },
+              {
+                "name": "create_adapters.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b2e99c339dafb630e1b02c44f5c267927979106f",
+                "role": "model-or-processor",
+                "sha256": "b5f11c4e55342e718fa90697f34f82664fbff16a421d8fae206d997045f73921",
+                "size_bytes": 10188,
+                "stat": {
+                  "ctime_ns": 1787235792760670739,
+                  "device": 16777235,
+                  "inode": 5986586,
+                  "mtime_ns": 1787235792759124152,
+                  "size": 10188
+                }
+              },
+              {
+                "name": "create_vocab.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b36fe95573033e2a2742aaeed8d3078946b7a320",
+                "role": "model-or-processor",
+                "sha256": "a6e7e16a54f0b09f46045b9135483776393267d0d8a6b3e86072906e61be46f5",
+                "size_bytes": 878,
+                "stat": {
+                  "ctime_ns": 1787235792684531696,
+                  "device": 16777235,
+                  "inode": 5986580,
+                  "mtime_ns": 1787235792683967611,
+                  "size": 878
+                }
+              },
+              {
+                "name": "model.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "role": "model-or-processor",
+                "sha256": "0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "size_bytes": 3859521128,
+                "stat": {
+                  "ctime_ns": 1787158436530154511,
+                  "device": 16777235,
+                  "inode": 5984070,
+                  "mtime_ns": 1787079592306092277,
+                  "size": 3859521128
+                }
+              },
+              {
+                "name": "preprocessor_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/e7d53bd058c34639e2dec1357537a3d013bcda63",
+                "role": "model-or-processor",
+                "sha256": "f724fdad65341e79bd9741888fe4e8ce1bb2e7b44fc8216c28c591afb1e202f4",
+                "size_bytes": 254,
+                "stat": {
+                  "ctime_ns": 1787158435150048006,
+                  "device": 16777235,
+                  "inode": 5984067,
+                  "mtime_ns": 1787079443378807804,
+                  "size": 254
+                }
+              },
+              {
+                "name": "special_tokens_map.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/fdafe480f024ff444c7492147536765ce5d55a2d",
+                "role": "model-or-processor",
+                "sha256": "9046da57c270c8e74d0f38832b4adce269c9d914ef21d2a0925e7772152dd793",
+                "size_bytes": 96,
+                "stat": {
+                  "ctime_ns": 1787158435143879487,
+                  "device": 16777235,
+                  "inode": 5984065,
+                  "mtime_ns": 1787079449792831686,
+                  "size": 96
+                }
+              },
+              {
+                "name": "tokenizer_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/8119434548d4a82fbe4e5e53c95d186bca037257",
+                "role": "model-or-processor",
+                "sha256": "42a65547cf0654d12263ece7c909c4b0c574b660c78658f806c772cc223bc01b",
+                "size_bytes": 397,
+                "stat": {
+                  "ctime_ns": 1787158435143238985,
+                  "device": 16777235,
+                  "inode": 5984064,
+                  "mtime_ns": 1787079445299892278,
+                  "size": 397
+                }
+              },
+              {
+                "name": "vocab.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/5c1626173fb1db1da574d16b6e924e8efc1ade4c",
+                "role": "model-or-processor",
+                "sha256": "0375a07a977a599040a7ff333b6974996965cd93754020619518c15db7691f01",
+                "size_bytes": 1340148,
+                "stat": {
+                  "ctime_ns": 1787158435151871262,
+                  "device": 16777235,
+                  "inode": 5984068,
+                  "mtime_ns": 1787079449054862750,
+                  "size": 1340148
+                }
+              },
+              {
+                "name": "vocabs/mya.txt",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/49191e00b11ea3281db39a6b8022d0b003bae2da",
+                "role": "model-or-processor",
+                "sha256": "d01af8e834039592efc79902675773d7ef622a4ce07cccd46fb2644785cc0734",
+                "size_bytes": 1005,
+                "stat": {
+                  "ctime_ns": 1787235938363752533,
+                  "device": 16777235,
+                  "inode": 5987135,
+                  "mtime_ns": 1787235938362249071,
+                  "size": 1005
+                }
+              }
+            ],
+            "backend": "hf",
+            "content_sha256": "9c7c2b2e8bbe8d6179207d8936a7ccd150a37878ef3229827ed8a07af85f3482",
+            "execution_sha256": "8cfde146682665b6526e0ccaf24c3138e5dc26f74b3af1812f44454ff2f0f514",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "mms-1b-all",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "auto",
+              "dtype": "auto",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float32",
+              "family": "mms",
+              "lang": "mya",
+              "n_threads": null
+            },
+            "revision_status": "pinned",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 2,
+            "source_kind": "huggingface",
+            "source_locator": "facebook/mms-1b-all",
+            "upstream_revision": "3d33597edbdaaba14a8e858e2c8caa76e3cec0cd",
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "14755840805814218163",
+          "resources": null,
+          "rtf": 0.023429319874186023,
+          "segments": null,
+          "source_path": "data/fleurs/audio/14755840805814218163.wav",
+          "source_sha256": "8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28",
+          "text": "လွန်ခဲ့သောနှင့်ထောင်ပေါင်းများစွာကအရီစတာချကခဟုကေါ်သောပြိုးသားတစ်ဦးသည်နေပတ်လည်တွင်ဆိုလာစနစ်သည်ရေရှားလျပ်ရှိသည်ဟုပြောဆိုခဲ့သည်",
+          "trust_issues": [],
+          "trusted": true
+        }
+      ],
+      "trust_issues": []
+    },
+    {
+      "complete": true,
+      "expected_audio_s": 71.22,
+      "index": 2,
+      "phase": {
+        "ended_ns": 226704794783000,
+        "error": null,
+        "name": "repeat-2",
+        "repeat_index": 2,
+        "started_ns": 226703080020958,
+        "status": "ok"
+      },
+      "resources": {
+        "cpu_s": 0.4324,
+        "cpu_utilization": 0.25,
+        "ended_ns": 226704794783000,
+        "gpu_mb": 4696.2,
+        "peak_rss_mb": 617.3,
+        "phase": "repeat-2",
+        "process_peak_rss_mb": 617.3,
+        "rss_peak_mb": 617.3,
+        "started_ns": 226703080020958,
+        "wall_s": 1.7148
+      },
+      "results": [
+        {
+          "audio_duration_s": 27.6,
+          "audio_id": "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__36c25f8b1db4ba5ddab8b3edd0bbd8f2b2af1aeb466863f77cfacad95197ee61.wav",
+          "backend": "hf",
+          "elapsed_s": 0.6538686669955496,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_group": 0,
+            "batch_internal_serial": false,
+            "batch_items": 1,
+            "batch_size": 1,
+            "corpus_index": 0,
+            "corpus_size": 5,
+            "corpus_wall_s": 1.714762042,
+            "device": "mps",
+            "dtype": "float32",
+            "effective_batch_size": 1,
+            "elapsed_s_source": "measured",
+            "family": "mms",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "repo": "facebook/mms-1b-all",
+            "requested_batch_size": 1,
+            "resource_scope": "corpus"
+          },
+          "model": "mms-1b-all",
+          "model_provenance": {
+            "adapter_git_commit": "09350e20f5f173d67e1dc6d547c616f5f4920bcb",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "adapter.mya.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "role": "model-or-processor",
+                "sha256": "c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "size_bytes": 9357088,
+                "stat": {
+                  "ctime_ns": 1787158435149503713,
+                  "device": 16777235,
+                  "inode": 5984066,
+                  "mtime_ns": 1787079596406661677,
+                  "size": 9357088
+                }
+              },
+              {
+                "name": "config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/dd547cc1b61ca6edfefb2f0cf65e3d8f81eceb6a",
+                "role": "model-or-processor",
+                "sha256": "ee172ef39a0e40c55403fb811fa0f56c6198c7ed21a2bdf5bd0e72e52c07a41c",
+                "size_bytes": 2040,
+                "stat": {
+                  "ctime_ns": 1787158435152482514,
+                  "device": 16777235,
+                  "inode": 5984069,
+                  "mtime_ns": 1787079452518242432,
+                  "size": 2040
+                }
+              },
+              {
+                "name": "create_adapters.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b2e99c339dafb630e1b02c44f5c267927979106f",
+                "role": "model-or-processor",
+                "sha256": "b5f11c4e55342e718fa90697f34f82664fbff16a421d8fae206d997045f73921",
+                "size_bytes": 10188,
+                "stat": {
+                  "ctime_ns": 1787235792760670739,
+                  "device": 16777235,
+                  "inode": 5986586,
+                  "mtime_ns": 1787235792759124152,
+                  "size": 10188
+                }
+              },
+              {
+                "name": "create_vocab.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b36fe95573033e2a2742aaeed8d3078946b7a320",
+                "role": "model-or-processor",
+                "sha256": "a6e7e16a54f0b09f46045b9135483776393267d0d8a6b3e86072906e61be46f5",
+                "size_bytes": 878,
+                "stat": {
+                  "ctime_ns": 1787235792684531696,
+                  "device": 16777235,
+                  "inode": 5986580,
+                  "mtime_ns": 1787235792683967611,
+                  "size": 878
+                }
+              },
+              {
+                "name": "model.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "role": "model-or-processor",
+                "sha256": "0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "size_bytes": 3859521128,
+                "stat": {
+                  "ctime_ns": 1787158436530154511,
+                  "device": 16777235,
+                  "inode": 5984070,
+                  "mtime_ns": 1787079592306092277,
+                  "size": 3859521128
+                }
+              },
+              {
+                "name": "preprocessor_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/e7d53bd058c34639e2dec1357537a3d013bcda63",
+                "role": "model-or-processor",
+                "sha256": "f724fdad65341e79bd9741888fe4e8ce1bb2e7b44fc8216c28c591afb1e202f4",
+                "size_bytes": 254,
+                "stat": {
+                  "ctime_ns": 1787158435150048006,
+                  "device": 16777235,
+                  "inode": 5984067,
+                  "mtime_ns": 1787079443378807804,
+                  "size": 254
+                }
+              },
+              {
+                "name": "special_tokens_map.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/fdafe480f024ff444c7492147536765ce5d55a2d",
+                "role": "model-or-processor",
+                "sha256": "9046da57c270c8e74d0f38832b4adce269c9d914ef21d2a0925e7772152dd793",
+                "size_bytes": 96,
+                "stat": {
+                  "ctime_ns": 1787158435143879487,
+                  "device": 16777235,
+                  "inode": 5984065,
+                  "mtime_ns": 1787079449792831686,
+                  "size": 96
+                }
+              },
+              {
+                "name": "tokenizer_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/8119434548d4a82fbe4e5e53c95d186bca037257",
+                "role": "model-or-processor",
+                "sha256": "42a65547cf0654d12263ece7c909c4b0c574b660c78658f806c772cc223bc01b",
+                "size_bytes": 397,
+                "stat": {
+                  "ctime_ns": 1787158435143238985,
+                  "device": 16777235,
+                  "inode": 5984064,
+                  "mtime_ns": 1787079445299892278,
+                  "size": 397
+                }
+              },
+              {
+                "name": "vocab.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/5c1626173fb1db1da574d16b6e924e8efc1ade4c",
+                "role": "model-or-processor",
+                "sha256": "0375a07a977a599040a7ff333b6974996965cd93754020619518c15db7691f01",
+                "size_bytes": 1340148,
+                "stat": {
+                  "ctime_ns": 1787158435151871262,
+                  "device": 16777235,
+                  "inode": 5984068,
+                  "mtime_ns": 1787079449054862750,
+                  "size": 1340148
+                }
+              },
+              {
+                "name": "vocabs/mya.txt",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/49191e00b11ea3281db39a6b8022d0b003bae2da",
+                "role": "model-or-processor",
+                "sha256": "d01af8e834039592efc79902675773d7ef622a4ce07cccd46fb2644785cc0734",
+                "size_bytes": 1005,
+                "stat": {
+                  "ctime_ns": 1787235938363752533,
+                  "device": 16777235,
+                  "inode": 5987135,
+                  "mtime_ns": 1787235938362249071,
+                  "size": 1005
+                }
+              }
+            ],
+            "backend": "hf",
+            "content_sha256": "9c7c2b2e8bbe8d6179207d8936a7ccd150a37878ef3229827ed8a07af85f3482",
+            "execution_sha256": "8cfde146682665b6526e0ccaf24c3138e5dc26f74b3af1812f44454ff2f0f514",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "mms-1b-all",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "auto",
+              "dtype": "auto",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float32",
+              "family": "mms",
+              "lang": "mya",
+              "n_threads": null
+            },
+            "revision_status": "pinned",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 2,
+            "source_kind": "huggingface",
+            "source_locator": "facebook/mms-1b-all",
+            "upstream_revision": "3d33597edbdaaba14a8e858e2c8caa76e3cec0cd",
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "10207165333468320061",
+          "resources": {
+            "cpu_s": 0.4324,
+            "cpu_utilization": 0.25,
+            "ended_ns": 226704794783000,
+            "gpu_mb": 4696.2,
+            "peak_rss_mb": 617.3,
+            "phase": "repeat-2",
+            "process_peak_rss_mb": 617.3,
+            "rss_peak_mb": 617.3,
+            "started_ns": 226703080020958,
+            "wall_s": 1.7148
+          },
+          "rtf": 0.02369089373172281,
+          "segments": null,
+          "source_path": "data/fleurs/audio/10207165333468320061.wav",
+          "source_sha256": "36c25f8b1db4ba5ddab8b3edd0bbd8f2b2af1aeb466863f77cfacad95197ee61",
+          "text": "ဘူရှ်၏ပြော၍ေးဆိုခွင့်းရှိသူဂျောဒန်ဂျော်ဒရို့ကမြောက်ကိုရီးယားနိုင်ငံ၏ကဓိကဝတ်သည်ကိုကိုရီးယားကျွန်းစွယ်အားအတည်ပြုနိုင်သည်နျူကလီးယားစစ်ဆဉ်ရေးဒေသားဖြစ်စေရေးစွမ်းဆောင်မှုယီမန်ဂျက်ကိုလျှောက်လဲ်ရာတွင်အဓိကကျသောလေကထစ်တစ်ခုဖြစ်သည်ဟုတုံးသုနးပြောဆိုခဲ့သည်",
+          "trust_issues": [],
+          "trusted": true
+        },
+        {
+          "audio_duration_s": 9.18,
+          "audio_id": "pcm16:16000:1:fe0efa457ae9f7f11a5483e78adaa5795f11b3bf0d5882d7a670ca05ee6ec0e4",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__0f5596159ca1e135211cef735e90b32a3ca6fade92c6508f9f1d8b1b8a7a0979.wav",
+          "backend": "hf",
+          "elapsed_s": 0.24428066701511852,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_group": 1,
+            "batch_internal_serial": false,
+            "batch_items": 1,
+            "batch_size": 1,
+            "corpus_index": 1,
+            "corpus_size": 5,
+            "corpus_wall_s": 1.714762042,
+            "device": "mps",
+            "dtype": "float32",
+            "effective_batch_size": 1,
+            "elapsed_s_source": "measured",
+            "family": "mms",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "repo": "facebook/mms-1b-all",
+            "requested_batch_size": 1
+          },
+          "model": "mms-1b-all",
+          "model_provenance": {
+            "adapter_git_commit": "09350e20f5f173d67e1dc6d547c616f5f4920bcb",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "adapter.mya.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "role": "model-or-processor",
+                "sha256": "c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "size_bytes": 9357088,
+                "stat": {
+                  "ctime_ns": 1787158435149503713,
+                  "device": 16777235,
+                  "inode": 5984066,
+                  "mtime_ns": 1787079596406661677,
+                  "size": 9357088
+                }
+              },
+              {
+                "name": "config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/dd547cc1b61ca6edfefb2f0cf65e3d8f81eceb6a",
+                "role": "model-or-processor",
+                "sha256": "ee172ef39a0e40c55403fb811fa0f56c6198c7ed21a2bdf5bd0e72e52c07a41c",
+                "size_bytes": 2040,
+                "stat": {
+                  "ctime_ns": 1787158435152482514,
+                  "device": 16777235,
+                  "inode": 5984069,
+                  "mtime_ns": 1787079452518242432,
+                  "size": 2040
+                }
+              },
+              {
+                "name": "create_adapters.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b2e99c339dafb630e1b02c44f5c267927979106f",
+                "role": "model-or-processor",
+                "sha256": "b5f11c4e55342e718fa90697f34f82664fbff16a421d8fae206d997045f73921",
+                "size_bytes": 10188,
+                "stat": {
+                  "ctime_ns": 1787235792760670739,
+                  "device": 16777235,
+                  "inode": 5986586,
+                  "mtime_ns": 1787235792759124152,
+                  "size": 10188
+                }
+              },
+              {
+                "name": "create_vocab.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b36fe95573033e2a2742aaeed8d3078946b7a320",
+                "role": "model-or-processor",
+                "sha256": "a6e7e16a54f0b09f46045b9135483776393267d0d8a6b3e86072906e61be46f5",
+                "size_bytes": 878,
+                "stat": {
+                  "ctime_ns": 1787235792684531696,
+                  "device": 16777235,
+                  "inode": 5986580,
+                  "mtime_ns": 1787235792683967611,
+                  "size": 878
+                }
+              },
+              {
+                "name": "model.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "role": "model-or-processor",
+                "sha256": "0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "size_bytes": 3859521128,
+                "stat": {
+                  "ctime_ns": 1787158436530154511,
+                  "device": 16777235,
+                  "inode": 5984070,
+                  "mtime_ns": 1787079592306092277,
+                  "size": 3859521128
+                }
+              },
+              {
+                "name": "preprocessor_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/e7d53bd058c34639e2dec1357537a3d013bcda63",
+                "role": "model-or-processor",
+                "sha256": "f724fdad65341e79bd9741888fe4e8ce1bb2e7b44fc8216c28c591afb1e202f4",
+                "size_bytes": 254,
+                "stat": {
+                  "ctime_ns": 1787158435150048006,
+                  "device": 16777235,
+                  "inode": 5984067,
+                  "mtime_ns": 1787079443378807804,
+                  "size": 254
+                }
+              },
+              {
+                "name": "special_tokens_map.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/fdafe480f024ff444c7492147536765ce5d55a2d",
+                "role": "model-or-processor",
+                "sha256": "9046da57c270c8e74d0f38832b4adce269c9d914ef21d2a0925e7772152dd793",
+                "size_bytes": 96,
+                "stat": {
+                  "ctime_ns": 1787158435143879487,
+                  "device": 16777235,
+                  "inode": 5984065,
+                  "mtime_ns": 1787079449792831686,
+                  "size": 96
+                }
+              },
+              {
+                "name": "tokenizer_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/8119434548d4a82fbe4e5e53c95d186bca037257",
+                "role": "model-or-processor",
+                "sha256": "42a65547cf0654d12263ece7c909c4b0c574b660c78658f806c772cc223bc01b",
+                "size_bytes": 397,
+                "stat": {
+                  "ctime_ns": 1787158435143238985,
+                  "device": 16777235,
+                  "inode": 5984064,
+                  "mtime_ns": 1787079445299892278,
+                  "size": 397
+                }
+              },
+              {
+                "name": "vocab.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/5c1626173fb1db1da574d16b6e924e8efc1ade4c",
+                "role": "model-or-processor",
+                "sha256": "0375a07a977a599040a7ff333b6974996965cd93754020619518c15db7691f01",
+                "size_bytes": 1340148,
+                "stat": {
+                  "ctime_ns": 1787158435151871262,
+                  "device": 16777235,
+                  "inode": 5984068,
+                  "mtime_ns": 1787079449054862750,
+                  "size": 1340148
+                }
+              },
+              {
+                "name": "vocabs/mya.txt",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/49191e00b11ea3281db39a6b8022d0b003bae2da",
+                "role": "model-or-processor",
+                "sha256": "d01af8e834039592efc79902675773d7ef622a4ce07cccd46fb2644785cc0734",
+                "size_bytes": 1005,
+                "stat": {
+                  "ctime_ns": 1787235938363752533,
+                  "device": 16777235,
+                  "inode": 5987135,
+                  "mtime_ns": 1787235938362249071,
+                  "size": 1005
+                }
+              }
+            ],
+            "backend": "hf",
+            "content_sha256": "9c7c2b2e8bbe8d6179207d8936a7ccd150a37878ef3229827ed8a07af85f3482",
+            "execution_sha256": "8cfde146682665b6526e0ccaf24c3138e5dc26f74b3af1812f44454ff2f0f514",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "mms-1b-all",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "auto",
+              "dtype": "auto",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float32",
+              "family": "mms",
+              "lang": "mya",
+              "n_threads": null
+            },
+            "revision_status": "pinned",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 2,
+            "source_kind": "huggingface",
+            "source_locator": "facebook/mms-1b-all",
+            "upstream_revision": "3d33597edbdaaba14a8e858e2c8caa76e3cec0cd",
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "10406743972683477081",
+          "resources": null,
+          "rtf": 0.026610094446091342,
+          "segments": null,
+          "source_path": "data/fleurs/audio/10406743972683477081.wav",
+          "source_sha256": "0f5596159ca1e135211cef735e90b32a3ca6fade92c6508f9f1d8b1b8a7a0979",
+          "text": "ငါ့အတွက်တော်ဒါကာလုံးဝါးအဓိပ်ပင်မရှိပူလုံးဝါးကိုမတရားပူ",
+          "trust_issues": [],
+          "trusted": true
+        },
+        {
+          "audio_duration_s": 7.5,
+          "audio_id": "pcm16:16000:1:71a3b3b9e7886757e59ac908a3e9edb5188a430b50690285b250583008660f24",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__fc22a3c0a78d1c25a94274cc87c2fda6b7a668ca72913cd1fc928470c9790607.wav",
+          "backend": "hf",
+          "elapsed_s": 0.19792316600796767,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_group": 2,
+            "batch_internal_serial": false,
+            "batch_items": 1,
+            "batch_size": 1,
+            "corpus_index": 2,
+            "corpus_size": 5,
+            "corpus_wall_s": 1.714762042,
+            "device": "mps",
+            "dtype": "float32",
+            "effective_batch_size": 1,
+            "elapsed_s_source": "measured",
+            "family": "mms",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "repo": "facebook/mms-1b-all",
+            "requested_batch_size": 1
+          },
+          "model": "mms-1b-all",
+          "model_provenance": {
+            "adapter_git_commit": "09350e20f5f173d67e1dc6d547c616f5f4920bcb",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "adapter.mya.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "role": "model-or-processor",
+                "sha256": "c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "size_bytes": 9357088,
+                "stat": {
+                  "ctime_ns": 1787158435149503713,
+                  "device": 16777235,
+                  "inode": 5984066,
+                  "mtime_ns": 1787079596406661677,
+                  "size": 9357088
+                }
+              },
+              {
+                "name": "config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/dd547cc1b61ca6edfefb2f0cf65e3d8f81eceb6a",
+                "role": "model-or-processor",
+                "sha256": "ee172ef39a0e40c55403fb811fa0f56c6198c7ed21a2bdf5bd0e72e52c07a41c",
+                "size_bytes": 2040,
+                "stat": {
+                  "ctime_ns": 1787158435152482514,
+                  "device": 16777235,
+                  "inode": 5984069,
+                  "mtime_ns": 1787079452518242432,
+                  "size": 2040
+                }
+              },
+              {
+                "name": "create_adapters.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b2e99c339dafb630e1b02c44f5c267927979106f",
+                "role": "model-or-processor",
+                "sha256": "b5f11c4e55342e718fa90697f34f82664fbff16a421d8fae206d997045f73921",
+                "size_bytes": 10188,
+                "stat": {
+                  "ctime_ns": 1787235792760670739,
+                  "device": 16777235,
+                  "inode": 5986586,
+                  "mtime_ns": 1787235792759124152,
+                  "size": 10188
+                }
+              },
+              {
+                "name": "create_vocab.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b36fe95573033e2a2742aaeed8d3078946b7a320",
+                "role": "model-or-processor",
+                "sha256": "a6e7e16a54f0b09f46045b9135483776393267d0d8a6b3e86072906e61be46f5",
+                "size_bytes": 878,
+                "stat": {
+                  "ctime_ns": 1787235792684531696,
+                  "device": 16777235,
+                  "inode": 5986580,
+                  "mtime_ns": 1787235792683967611,
+                  "size": 878
+                }
+              },
+              {
+                "name": "model.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "role": "model-or-processor",
+                "sha256": "0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "size_bytes": 3859521128,
+                "stat": {
+                  "ctime_ns": 1787158436530154511,
+                  "device": 16777235,
+                  "inode": 5984070,
+                  "mtime_ns": 1787079592306092277,
+                  "size": 3859521128
+                }
+              },
+              {
+                "name": "preprocessor_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/e7d53bd058c34639e2dec1357537a3d013bcda63",
+                "role": "model-or-processor",
+                "sha256": "f724fdad65341e79bd9741888fe4e8ce1bb2e7b44fc8216c28c591afb1e202f4",
+                "size_bytes": 254,
+                "stat": {
+                  "ctime_ns": 1787158435150048006,
+                  "device": 16777235,
+                  "inode": 5984067,
+                  "mtime_ns": 1787079443378807804,
+                  "size": 254
+                }
+              },
+              {
+                "name": "special_tokens_map.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/fdafe480f024ff444c7492147536765ce5d55a2d",
+                "role": "model-or-processor",
+                "sha256": "9046da57c270c8e74d0f38832b4adce269c9d914ef21d2a0925e7772152dd793",
+                "size_bytes": 96,
+                "stat": {
+                  "ctime_ns": 1787158435143879487,
+                  "device": 16777235,
+                  "inode": 5984065,
+                  "mtime_ns": 1787079449792831686,
+                  "size": 96
+                }
+              },
+              {
+                "name": "tokenizer_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/8119434548d4a82fbe4e5e53c95d186bca037257",
+                "role": "model-or-processor",
+                "sha256": "42a65547cf0654d12263ece7c909c4b0c574b660c78658f806c772cc223bc01b",
+                "size_bytes": 397,
+                "stat": {
+                  "ctime_ns": 1787158435143238985,
+                  "device": 16777235,
+                  "inode": 5984064,
+                  "mtime_ns": 1787079445299892278,
+                  "size": 397
+                }
+              },
+              {
+                "name": "vocab.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/5c1626173fb1db1da574d16b6e924e8efc1ade4c",
+                "role": "model-or-processor",
+                "sha256": "0375a07a977a599040a7ff333b6974996965cd93754020619518c15db7691f01",
+                "size_bytes": 1340148,
+                "stat": {
+                  "ctime_ns": 1787158435151871262,
+                  "device": 16777235,
+                  "inode": 5984068,
+                  "mtime_ns": 1787079449054862750,
+                  "size": 1340148
+                }
+              },
+              {
+                "name": "vocabs/mya.txt",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/49191e00b11ea3281db39a6b8022d0b003bae2da",
+                "role": "model-or-processor",
+                "sha256": "d01af8e834039592efc79902675773d7ef622a4ce07cccd46fb2644785cc0734",
+                "size_bytes": 1005,
+                "stat": {
+                  "ctime_ns": 1787235938363752533,
+                  "device": 16777235,
+                  "inode": 5987135,
+                  "mtime_ns": 1787235938362249071,
+                  "size": 1005
+                }
+              }
+            ],
+            "backend": "hf",
+            "content_sha256": "9c7c2b2e8bbe8d6179207d8936a7ccd150a37878ef3229827ed8a07af85f3482",
+            "execution_sha256": "8cfde146682665b6526e0ccaf24c3138e5dc26f74b3af1812f44454ff2f0f514",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "mms-1b-all",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "auto",
+              "dtype": "auto",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float32",
+              "family": "mms",
+              "lang": "mya",
+              "n_threads": null
+            },
+            "revision_status": "pinned",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 2,
+            "source_kind": "huggingface",
+            "source_locator": "facebook/mms-1b-all",
+            "upstream_revision": "3d33597edbdaaba14a8e858e2c8caa76e3cec0cd",
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "12011678642037122936",
+          "resources": null,
+          "rtf": 0.026389755467729023,
+          "segments": null,
+          "source_path": "data/fleurs/audio/12011678642037122936.wav",
+          "source_sha256": "fc22a3c0a78d1c25a94274cc87c2fda6b7a668ca72913cd1fc928470c9790607",
+          "text": "ကိ်ရိုင်အများစုကိုသတ်သောင့်သက်သာရှိ၍ကြန့်ခိုင်စွာကွီးဆောက်ထားသည့်ဂျapancoစကာဘတ်စကားများဖြင့်ဝန်ဆောင်မှုပေးနေသည်",
+          "trust_issues": [],
+          "trusted": true
+        },
+        {
+          "audio_duration_s": 14.16,
+          "audio_id": "pcm16:16000:1:57d0567a6d1c2c3b6a64ff09fd774af475b077840c117d443a07a07dc94832a1",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__122b1a2eaf5afbf4081a308f4cfc74a164fa3d42d4f3080c96ddce05d2f7333c.wav",
+          "backend": "hf",
+          "elapsed_s": 0.32305608299793676,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_group": 3,
+            "batch_internal_serial": false,
+            "batch_items": 1,
+            "batch_size": 1,
+            "corpus_index": 3,
+            "corpus_size": 5,
+            "corpus_wall_s": 1.714762042,
+            "device": "mps",
+            "dtype": "float32",
+            "effective_batch_size": 1,
+            "elapsed_s_source": "measured",
+            "family": "mms",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "repo": "facebook/mms-1b-all",
+            "requested_batch_size": 1
+          },
+          "model": "mms-1b-all",
+          "model_provenance": {
+            "adapter_git_commit": "09350e20f5f173d67e1dc6d547c616f5f4920bcb",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "adapter.mya.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "role": "model-or-processor",
+                "sha256": "c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "size_bytes": 9357088,
+                "stat": {
+                  "ctime_ns": 1787158435149503713,
+                  "device": 16777235,
+                  "inode": 5984066,
+                  "mtime_ns": 1787079596406661677,
+                  "size": 9357088
+                }
+              },
+              {
+                "name": "config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/dd547cc1b61ca6edfefb2f0cf65e3d8f81eceb6a",
+                "role": "model-or-processor",
+                "sha256": "ee172ef39a0e40c55403fb811fa0f56c6198c7ed21a2bdf5bd0e72e52c07a41c",
+                "size_bytes": 2040,
+                "stat": {
+                  "ctime_ns": 1787158435152482514,
+                  "device": 16777235,
+                  "inode": 5984069,
+                  "mtime_ns": 1787079452518242432,
+                  "size": 2040
+                }
+              },
+              {
+                "name": "create_adapters.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b2e99c339dafb630e1b02c44f5c267927979106f",
+                "role": "model-or-processor",
+                "sha256": "b5f11c4e55342e718fa90697f34f82664fbff16a421d8fae206d997045f73921",
+                "size_bytes": 10188,
+                "stat": {
+                  "ctime_ns": 1787235792760670739,
+                  "device": 16777235,
+                  "inode": 5986586,
+                  "mtime_ns": 1787235792759124152,
+                  "size": 10188
+                }
+              },
+              {
+                "name": "create_vocab.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b36fe95573033e2a2742aaeed8d3078946b7a320",
+                "role": "model-or-processor",
+                "sha256": "a6e7e16a54f0b09f46045b9135483776393267d0d8a6b3e86072906e61be46f5",
+                "size_bytes": 878,
+                "stat": {
+                  "ctime_ns": 1787235792684531696,
+                  "device": 16777235,
+                  "inode": 5986580,
+                  "mtime_ns": 1787235792683967611,
+                  "size": 878
+                }
+              },
+              {
+                "name": "model.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "role": "model-or-processor",
+                "sha256": "0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "size_bytes": 3859521128,
+                "stat": {
+                  "ctime_ns": 1787158436530154511,
+                  "device": 16777235,
+                  "inode": 5984070,
+                  "mtime_ns": 1787079592306092277,
+                  "size": 3859521128
+                }
+              },
+              {
+                "name": "preprocessor_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/e7d53bd058c34639e2dec1357537a3d013bcda63",
+                "role": "model-or-processor",
+                "sha256": "f724fdad65341e79bd9741888fe4e8ce1bb2e7b44fc8216c28c591afb1e202f4",
+                "size_bytes": 254,
+                "stat": {
+                  "ctime_ns": 1787158435150048006,
+                  "device": 16777235,
+                  "inode": 5984067,
+                  "mtime_ns": 1787079443378807804,
+                  "size": 254
+                }
+              },
+              {
+                "name": "special_tokens_map.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/fdafe480f024ff444c7492147536765ce5d55a2d",
+                "role": "model-or-processor",
+                "sha256": "9046da57c270c8e74d0f38832b4adce269c9d914ef21d2a0925e7772152dd793",
+                "size_bytes": 96,
+                "stat": {
+                  "ctime_ns": 1787158435143879487,
+                  "device": 16777235,
+                  "inode": 5984065,
+                  "mtime_ns": 1787079449792831686,
+                  "size": 96
+                }
+              },
+              {
+                "name": "tokenizer_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/8119434548d4a82fbe4e5e53c95d186bca037257",
+                "role": "model-or-processor",
+                "sha256": "42a65547cf0654d12263ece7c909c4b0c574b660c78658f806c772cc223bc01b",
+                "size_bytes": 397,
+                "stat": {
+                  "ctime_ns": 1787158435143238985,
+                  "device": 16777235,
+                  "inode": 5984064,
+                  "mtime_ns": 1787079445299892278,
+                  "size": 397
+                }
+              },
+              {
+                "name": "vocab.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/5c1626173fb1db1da574d16b6e924e8efc1ade4c",
+                "role": "model-or-processor",
+                "sha256": "0375a07a977a599040a7ff333b6974996965cd93754020619518c15db7691f01",
+                "size_bytes": 1340148,
+                "stat": {
+                  "ctime_ns": 1787158435151871262,
+                  "device": 16777235,
+                  "inode": 5984068,
+                  "mtime_ns": 1787079449054862750,
+                  "size": 1340148
+                }
+              },
+              {
+                "name": "vocabs/mya.txt",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/49191e00b11ea3281db39a6b8022d0b003bae2da",
+                "role": "model-or-processor",
+                "sha256": "d01af8e834039592efc79902675773d7ef622a4ce07cccd46fb2644785cc0734",
+                "size_bytes": 1005,
+                "stat": {
+                  "ctime_ns": 1787235938363752533,
+                  "device": 16777235,
+                  "inode": 5987135,
+                  "mtime_ns": 1787235938362249071,
+                  "size": 1005
+                }
+              }
+            ],
+            "backend": "hf",
+            "content_sha256": "9c7c2b2e8bbe8d6179207d8936a7ccd150a37878ef3229827ed8a07af85f3482",
+            "execution_sha256": "8cfde146682665b6526e0ccaf24c3138e5dc26f74b3af1812f44454ff2f0f514",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "mms-1b-all",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "auto",
+              "dtype": "auto",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float32",
+              "family": "mms",
+              "lang": "mya",
+              "n_threads": null
+            },
+            "revision_status": "pinned",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 2,
+            "source_kind": "huggingface",
+            "source_locator": "facebook/mms-1b-all",
+            "upstream_revision": "3d33597edbdaaba14a8e858e2c8caa76e3cec0cd",
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "12202394788954760188",
+          "resources": null,
+          "rtf": 0.022814695126972935,
+          "segments": null,
+          "source_path": "data/fleurs/audio/12202394788954760188.wav",
+          "source_sha256": "122b1a2eaf5afbf4081a308f4cfc74a164fa3d42d4f3080c96ddce05d2f7333c",
+          "text": "မြေလဲပင်လည်သေသနှင့်စုံခြင်းဆင်တူသောမကျော်ခံ၏ချက်ပျုပ်ညီသည်ပေါင်မုတ်ဟင်းသီ်းဟင်းရွက်များနှင့်အသာအထူးသဖြင့်ဝက်သားတို့ကေါ်တွင်ခြေခံထားခြင်းဖြစ်ကာသံလင်စီကိုသုံးစွဲပါသည်",
+          "trust_issues": [],
+          "trusted": true
+        },
+        {
+          "audio_duration_s": 12.78,
+          "audio_id": "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28.wav",
+          "backend": "hf",
+          "elapsed_s": 0.2937494170037098,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_group": 4,
+            "batch_internal_serial": false,
+            "batch_items": 1,
+            "batch_size": 1,
+            "corpus_index": 4,
+            "corpus_size": 5,
+            "corpus_wall_s": 1.714762042,
+            "device": "mps",
+            "dtype": "float32",
+            "effective_batch_size": 1,
+            "elapsed_s_source": "measured",
+            "family": "mms",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "repo": "facebook/mms-1b-all",
+            "requested_batch_size": 1
+          },
+          "model": "mms-1b-all",
+          "model_provenance": {
+            "adapter_git_commit": "09350e20f5f173d67e1dc6d547c616f5f4920bcb",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "adapter.mya.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "role": "model-or-processor",
+                "sha256": "c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+                "size_bytes": 9357088,
+                "stat": {
+                  "ctime_ns": 1787158435149503713,
+                  "device": 16777235,
+                  "inode": 5984066,
+                  "mtime_ns": 1787079596406661677,
+                  "size": 9357088
+                }
+              },
+              {
+                "name": "config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/dd547cc1b61ca6edfefb2f0cf65e3d8f81eceb6a",
+                "role": "model-or-processor",
+                "sha256": "ee172ef39a0e40c55403fb811fa0f56c6198c7ed21a2bdf5bd0e72e52c07a41c",
+                "size_bytes": 2040,
+                "stat": {
+                  "ctime_ns": 1787158435152482514,
+                  "device": 16777235,
+                  "inode": 5984069,
+                  "mtime_ns": 1787079452518242432,
+                  "size": 2040
+                }
+              },
+              {
+                "name": "create_adapters.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b2e99c339dafb630e1b02c44f5c267927979106f",
+                "role": "model-or-processor",
+                "sha256": "b5f11c4e55342e718fa90697f34f82664fbff16a421d8fae206d997045f73921",
+                "size_bytes": 10188,
+                "stat": {
+                  "ctime_ns": 1787235792760670739,
+                  "device": 16777235,
+                  "inode": 5986586,
+                  "mtime_ns": 1787235792759124152,
+                  "size": 10188
+                }
+              },
+              {
+                "name": "create_vocab.py",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b36fe95573033e2a2742aaeed8d3078946b7a320",
+                "role": "model-or-processor",
+                "sha256": "a6e7e16a54f0b09f46045b9135483776393267d0d8a6b3e86072906e61be46f5",
+                "size_bytes": 878,
+                "stat": {
+                  "ctime_ns": 1787235792684531696,
+                  "device": 16777235,
+                  "inode": 5986580,
+                  "mtime_ns": 1787235792683967611,
+                  "size": 878
+                }
+              },
+              {
+                "name": "model.safetensors",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "role": "model-or-processor",
+                "sha256": "0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+                "size_bytes": 3859521128,
+                "stat": {
+                  "ctime_ns": 1787158436530154511,
+                  "device": 16777235,
+                  "inode": 5984070,
+                  "mtime_ns": 1787079592306092277,
+                  "size": 3859521128
+                }
+              },
+              {
+                "name": "preprocessor_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/e7d53bd058c34639e2dec1357537a3d013bcda63",
+                "role": "model-or-processor",
+                "sha256": "f724fdad65341e79bd9741888fe4e8ce1bb2e7b44fc8216c28c591afb1e202f4",
+                "size_bytes": 254,
+                "stat": {
+                  "ctime_ns": 1787158435150048006,
+                  "device": 16777235,
+                  "inode": 5984067,
+                  "mtime_ns": 1787079443378807804,
+                  "size": 254
+                }
+              },
+              {
+                "name": "special_tokens_map.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/fdafe480f024ff444c7492147536765ce5d55a2d",
+                "role": "model-or-processor",
+                "sha256": "9046da57c270c8e74d0f38832b4adce269c9d914ef21d2a0925e7772152dd793",
+                "size_bytes": 96,
+                "stat": {
+                  "ctime_ns": 1787158435143879487,
+                  "device": 16777235,
+                  "inode": 5984065,
+                  "mtime_ns": 1787079449792831686,
+                  "size": 96
+                }
+              },
+              {
+                "name": "tokenizer_config.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/8119434548d4a82fbe4e5e53c95d186bca037257",
+                "role": "model-or-processor",
+                "sha256": "42a65547cf0654d12263ece7c909c4b0c574b660c78658f806c772cc223bc01b",
+                "size_bytes": 397,
+                "stat": {
+                  "ctime_ns": 1787158435143238985,
+                  "device": 16777235,
+                  "inode": 5984064,
+                  "mtime_ns": 1787079445299892278,
+                  "size": 397
+                }
+              },
+              {
+                "name": "vocab.json",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/5c1626173fb1db1da574d16b6e924e8efc1ade4c",
+                "role": "model-or-processor",
+                "sha256": "0375a07a977a599040a7ff333b6974996965cd93754020619518c15db7691f01",
+                "size_bytes": 1340148,
+                "stat": {
+                  "ctime_ns": 1787158435151871262,
+                  "device": 16777235,
+                  "inode": 5984068,
+                  "mtime_ns": 1787079449054862750,
+                  "size": 1340148
+                }
+              },
+              {
+                "name": "vocabs/mya.txt",
+                "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/49191e00b11ea3281db39a6b8022d0b003bae2da",
+                "role": "model-or-processor",
+                "sha256": "d01af8e834039592efc79902675773d7ef622a4ce07cccd46fb2644785cc0734",
+                "size_bytes": 1005,
+                "stat": {
+                  "ctime_ns": 1787235938363752533,
+                  "device": 16777235,
+                  "inode": 5987135,
+                  "mtime_ns": 1787235938362249071,
+                  "size": 1005
+                }
+              }
+            ],
+            "backend": "hf",
+            "content_sha256": "9c7c2b2e8bbe8d6179207d8936a7ccd150a37878ef3229827ed8a07af85f3482",
+            "execution_sha256": "8cfde146682665b6526e0ccaf24c3138e5dc26f74b3af1812f44454ff2f0f514",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "mms-1b-all",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "auto",
+              "dtype": "auto",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float32",
+              "family": "mms",
+              "lang": "mya",
+              "n_threads": null
+            },
+            "revision_status": "pinned",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 2,
+            "source_kind": "huggingface",
+            "source_locator": "facebook/mms-1b-all",
+            "upstream_revision": "3d33597edbdaaba14a8e858e2c8caa76e3cec0cd",
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "14755840805814218163",
+          "resources": null,
+          "rtf": 0.02298508740248121,
+          "segments": null,
+          "source_path": "data/fleurs/audio/14755840805814218163.wav",
+          "source_sha256": "8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28",
+          "text": "လွန်ခဲ့သောနှင့်ထောင်ပေါင်းများစွာကအရီစတာချကခဟုကေါ်သောပြိုးသားတစ်ဦးသည်နေပတ်လည်တွင်ဆိုလာစနစ်သည်ရေရှားလျပ်ရှိသည်ဟုပြောဆိုခဲ့သည်",
+          "trust_issues": [],
+          "trusted": true
+        }
+      ],
+      "trust_issues": []
+    }
+  ],
+  "request_key": "hf/mms-1b-all:e96dc93c625b9716",
+  "request_sha256": "69ea3c1dfe15431929d170fd57851e5cff6eee218c13736a9d40b31e53bbf30b",
+  "resolved_device": "mps",
+  "resolved_dtype": "float32",
+  "resolved_model": "mms-1b-all",
+  "run_id": "8bdadfd1433049dbb08e84226cf0aaaf",
+  "runtime": {
+    "device": "mps",
+    "dtype": "float32",
+    "input_mode": "prepared",
+    "model": "mms-1b-all",
+    "n_threads": null,
+    "revision": null,
+    "runner_id": "adapter"
+  },
+  "schedule_seed": 0,
+  "session_id": "8bdadfd1433049dbb08e84226cf0aaaf:session-3",
+  "session_index": 3,
+  "subject": {
+    "backend": "hf",
+    "batch_size": 1,
+    "language": "mya_Mymr",
+    "model": "mms-1b-all",
+    "options": {
+      "batch_size": 1,
+      "language": "mya_Mymr"
+    }
+  },
+  "termination": null,
+  "worker_index": 3
+}
