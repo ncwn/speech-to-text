@@ -660,67 +660,6 @@
       "status_reason": "The historical Dolphin CPU/MPS comparison predates the experiment archive contract; MPS also records a float64-to-float32 numerical fallback, so no trusted causal table is published."
     },
     {
-      "id": "precision-gflops",
-      "corpus": "m2-max-matmul",
-      "reference": "data/fleurs-test/references.tsv",
-      "status_only": true,
-      "runs": [
-        {
-          "artifact": "outputs/telemetry-test.jsonl",
-          "label": "M2 Max dtype probe",
-          "backend": "omniasr-gguf",
-          "model": "llm-unlimited-300m-v2"
-        }
-      ],
-      "metrics": [],
-      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
-      "expected_reference_count": 120,
-      "normalization": {
-        "nfc": true,
-        "strip_whitespace": true,
-        "strip_punctuation": true,
-        "normalize_digits": true,
-        "lowercase": true
-      },
-      "status_reason": "The historical synthetic GEMM scores are not archived as experiment-v1 and cannot establish model-wide dtype support."
-    },
-    {
-      "id": "seamless-dtype",
-      "corpus": "fleurs-test-5",
-      "reference": "data/fleurs-test/references.tsv",
-      "status_only": true,
-      "runs": [
-        {
-          "artifact": "outputs/bench-hf-seamless-m4t-v2.jsonl",
-          "label": "SeamlessM4T v2 dtype sweep",
-          "backend": "hf",
-          "model": "seamless-m4t-v2"
-        }
-      ],
-      "metrics": [
-        {
-          "name": "rtf",
-          "label": "RTF",
-          "digits": 2
-        },
-        {
-          "name": "cer",
-          "label": "CER",
-          "digits": 4
-        }
-      ],
-      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
-      "expected_reference_count": 120,
-      "normalization": {
-        "nfc": true,
-        "strip_whitespace": true,
-        "strip_punctuation": true,
-        "normalize_digits": true,
-        "lowercase": true
-      },
-      "status_reason": "The historical Seamless dtype sweep predates immutable experiment artifacts and has not been repeated under the trusted session protocol."
-    },
-    {
       "id": "threads",
       "corpus": "fleurs-test-5",
       "reference": "data/fleurs-test/references.tsv",

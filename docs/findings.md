@@ -380,46 +380,23 @@ those cores — but CPU stays the default.
 
 ### bfloat16 is not the safe default on Apple GPUs
 
-Apple's GPUs are built around float16. bfloat16 is *accepted* everywhere but is
-not equally *accelerated*. A 4096² matmul on an M2 Max:
-
-<!-- stt-evidence:precision-gflops:start -->
-The historical synthetic GEMM scores are not archived as experiment-v1 and cannot establish model-wide dtype support.
-<!-- stt-evidence:precision-gflops:end -->
-
-bfloat16 is 2.1× slower than float16 and slower than float32 — it is being
-emulated. Metal exposes the `bfloat` type broadly, but the simdgroup matrix
-intrinsics that make it fast arrived with Metal 3.1 and the M3-era GPUs, and
-whether *any* shipped Apple GPU has true hardware bfloat16 matrix units is
-disputed. Since that answer changes per generation, `stt.hardware.fastest_dtype`
-times both formats on the actual device and caches the result under
-`.cache/stt/hardware.json`, keyed by chip and torch version.
+Synthetic GEMM can nominate dtype candidates but cannot establish full-model
+support or throughput. The verified MMS matrix above drives the complete model
+through CPU/MPS and all three dtypes; bfloat16 is the slowest MPS condition for
+that model. `stt.hardware.fastest_dtype` remains a candidate probe, while model
+experiments decide defaults.
 
 ### On CPU, float32 is the fast path
 
-PyTorch has no native half-precision CPU kernels and emulates them. Measured on
-the 7B: bfloat16 on CPU runs at RTF 8.85 against float32's 2.14 — a **4.1×**
-penalty for identical text.
-
-The 7B is 28 GB of float32 weights and needs roughly 34 GB resident once
-activations and read buffers are counted, so `--dtype auto` falls back to
-bfloat16 on CPU only when the machine cannot hold float32. That threshold is
-computed from the card's checkpoint size against detected RAM, not from a fixed
-constant, so the same model takes the fast path on a 64 GB machine and the
-memory-safe one on a 16 GB machine.
+The verified MMS matrix shows both CPU half formats far behind CPU float32. The
+7B baseline therefore pins CPU/float32, while its optimized Metal path uses the
+separately verified MPS/float16 utilization condition.
 
 ### The best dtype belongs to the model, not just the chip
 
-SeamlessM4T v2 on the same GPU goes the other way — float32 is both faster and
-more accurate, so half precision buys only memory:
-
-<!-- stt-evidence:seamless-dtype:start -->
-The historical Seamless dtype sweep predates immutable experiment artifacts and has not been repeated under the trusted session protocol.
-<!-- stt-evidence:seamless-dtype:end -->
-
-omniASR's LLM decoder is matmul-bound and gains from float16; Seamless is not and
-does not. So the probe drives `omniasr-torch` only, and the `hf` backend keeps
-float32.
+Precision is a model property, not a chip-wide rule. Seamless remains pinned to
+float32 because no trusted dtype matrix has justified changing it; omniASR's
+MPS/float16 path is backed by its own utilization experiment.
 
 ---
 
