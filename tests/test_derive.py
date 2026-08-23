@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from stt.derive import DeriveContext, Requirements, derive, reference_sha256
+from stt.derive import DeriveContext, Requirements, baseline_table, derive, reference_sha256
 from stt.measurement import MeasurementError
 from stt.provenance import ArtifactDigest, ModelProvenance
 from stt.results import Segment, TranscriptionResult
@@ -119,3 +119,10 @@ def test_vote_and_route_derivers_reuse_production_joins(tmp_path):
 
     assert vote.rows[0]["n_voters"] == 2
     assert route.rows[0]["duration_s"] == 1.0
+
+
+def test_committed_baseline_deriver_uses_verified_common_wall_artifact():
+    table = baseline_table(Path("baselines/bench.json"))
+
+    assert len(table.rows) == 4
+    assert all(row["sessions"] == 5 and row["repeats"] == 15 for row in table.rows)

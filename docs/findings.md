@@ -23,17 +23,23 @@ bases appear below and they are not interchangeable:
 
 ## Baseline
 
-Every backend over the same 120 FLEURS Burmese `test` clips. Lower is better on
-both columns.
+The accepted baseline-v2 measures the four trusted subjects over the same five
+FLEURS Burmese `dev` clips. RTF is the synchronized complete-corpus wall divided
+by corpus duration; intervals bootstrap five isolated worker sessions.
 
 <!-- stt-evidence:baseline:start -->
-> **Unverified legacy evidence.** Numeric publication is blocked because the declared artifacts are missing trusted audio identity, complete corpus coverage, or matching provenance. Regenerate the runs before publishing measured results.
+| Subject | RTF | CI low | CI high | Peak RSS MB | Sessions | Repeats |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| hf/mms-1b-all | 0.0247 | 0.0245 | 0.0252 | 625 | 5 | 15 |
+| hf/seamless-m4t-v2 | 0.1623 | 0.1537 | 0.1657 | 1196 | 5 | 15 |
+| dolphin/small | 0.1743 | 0.1673 | 0.1779 | 6171 | 5 | 15 |
+| omniasr-torch/omniASR_LLM_Unlimited_7B_v2 | 0.4236 | 0.4138 | 0.4297 | 25433 | 5 | 15 |
 <!-- stt-evidence:baseline:end -->
 
 ### Trusted accuracy refresh
 
-The regenerated 120-clip accuracy lane is identity-verified for the two completed
-subjects below. RTF is intentionally omitted here; common-wall timing comes from
+The regenerated 120-clip accuracy lane is identity-verified for all four trusted
+subjects. RTF is intentionally omitted here; common-wall timing comes from
 baseline-v2 artifacts.
 
 <!-- stt-evidence:accuracy-fleurs-test-120:start -->
@@ -54,21 +60,15 @@ baseline-v2 artifacts.
 | Dolphin small (verified accuracy) | `dolphin` | 0.0933 | 12 | 12 |
 <!-- stt-evidence:accuracy-fleurs-dev-12:end -->
 
-**The entire table is historical.** Its RTF values sum backend-provided
-`elapsed_s` fields whose work boundaries differ by runtime, so they are not valid
-cross-backend performance rankings. The JSONL also predates trusted audio
-identity. Schema-v2 measurements instead use a synchronized whole-corpus wall in
-an isolated worker. No schema-v2 performance baseline has been accepted.
-
-Note how little separates omniASR 300M from Seamless (0.1298 vs 0.1301) despite
-a 10× parameter difference and unrelated architectures. Above roughly 300M the
-returns on this task are small.
+The timing table and accuracy tables deliberately use different corpora and source
+types. Timing comes only from the verified baseline-v2 archive; CER comes only from
+trusted transcription JSONL joined to the tracked reference identities.
 
 Reproduce:
 
 ```bash
-uv run stt fetch-fleurs --split test --limit 120 --dest data/fleurs-test
-uv run stt compare data/fleurs-test/audio -r data/fleurs-test/references.tsv
+uv run stt bench --verify
+uv run stt evidence --check
 ```
 
 ### Which to use

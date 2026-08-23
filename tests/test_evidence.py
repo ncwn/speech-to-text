@@ -277,6 +277,23 @@ def test_status_reason_is_rendered_without_opening_legacy_files(tmp_path):
     assert "specific upstream limitation" in check.document.read_text(encoding="utf-8")
 
 
+def test_baseline_v2_source_renders_only_after_offline_verification(tmp_path):
+    manifest = _fixture(tmp_path)
+    raw = json.loads(manifest.read_text(encoding="utf-8"))
+    block = raw["blocks"][0]
+    block["source_kind"] = "baseline-v2"
+    block["source"] = str((Path.cwd() / "baselines" / "bench.json").resolve())
+    block["deriver"] = "baseline:v1"
+    block["runs"] = []
+    block["metrics"] = []
+    manifest.write_text(json.dumps(raw), encoding="utf-8")
+
+    check = update_evidence(manifest)
+
+    assert check.publishable
+    assert "| Subject | RTF | CI low | CI high |" in check.document.read_text(encoding="utf-8")
+
+
 def test_check_rejects_unowned_markdown_table(tmp_path):
     manifest = _fixture(tmp_path)
     document = manifest.parent.parent / "docs" / "findings.md"

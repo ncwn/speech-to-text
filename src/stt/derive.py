@@ -7,6 +7,7 @@ never format Markdown and they cannot silently skip identity or settings checks.
 from __future__ import annotations
 
 import hashlib
+import json
 import math
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
@@ -376,6 +377,57 @@ def route_table(context: DeriveContext) -> DerivedTable:
     )
 
 
+def baseline_table(path: Path) -> DerivedTable:
+    """Derive trusted common-wall timing from a verified baseline-v2 artifact."""
+    from stt.bench import verify_baseline
+
+    issues = verify_baseline(path)
+    if issues:
+        raise MeasurementError("baseline-v2 verification failed: " + "; ".join(issues))
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        raise MeasurementError(f"cannot read baseline-v2: {exc}") from exc
+    rows: list[dict[str, Any]] = []
+    for index, run in enumerate(value.get("runs", [])):
+        interval = run.get("rtf_ci95")
+        if (
+            not run.get("baseline_eligible")
+            or run.get("error")
+            or not isinstance(interval, list)
+            or len(interval) != 2
+        ):
+            raise MeasurementError(f"baseline-v2 run {index} is not publishable")
+        rows.append(
+            {
+                "subject": str(run["subject"]),
+                "rtf": _finite(run.get("rtf"), f"baseline run {index}.rtf"),
+                "ci_low": _finite(interval[0], f"baseline run {index}.ci_low"),
+                "ci_high": _finite(interval[1], f"baseline run {index}.ci_high"),
+                "peak_rss_mb": _finite(run.get("peak_rss_mb"), f"baseline run {index}.peak_rss_mb"),
+                "sessions": _finite(run.get("workers"), f"baseline run {index}.workers"),
+                "repeats": _finite(run.get("repeats"), f"baseline run {index}.repeats"),
+            }
+        )
+    table = DerivedTable(
+        deriver="baseline:v1",
+        columns=(
+            DerivedColumn("subject", "Subject"),
+            DerivedColumn("rtf", "RTF", 4),
+            DerivedColumn("ci_low", "CI low", 4),
+            DerivedColumn("ci_high", "CI high", 4),
+            DerivedColumn("peak_rss_mb", "Peak RSS MB", 0),
+            DerivedColumn("sessions", "Sessions", 0),
+            DerivedColumn("repeats", "Repeats", 0),
+        ),
+        rows=tuple(rows),
+        row_key="subject",
+        metadata={"baseline_id": value.get("baseline_id")},
+    )
+    table.validate()
+    return table
+
+
 __all__ = [
     "DERIVER_SCHEMA_VERSION",
     "DeriveContext",
@@ -392,4 +444,5 @@ __all__ = [
     "validate_reference_identity",
     "validate_same_waveform",
     "validate_settings",
+    "baseline_table",
 ]

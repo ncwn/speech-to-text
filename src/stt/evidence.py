@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any
 
 from stt.burmese import NormalizeOptions
-from stt.derive import DeriveContext, Requirements, validate_settings
+from stt.derive import DeriveContext, DerivedTable, Requirements, baseline_table, validate_settings
 from stt.derive import derive as run_deriver
 from stt.evaluate import load_references, score_results
 from stt.measurement import MeasurementError
@@ -65,6 +65,8 @@ class BlockSpec:
     expected_reference_count: int | None = None
     normalization: dict[str, Any] = field(default_factory=dict)
     aligned_segments: bool = False
+    source_kind: str = "transcription-jsonl"
+    source: Path | None = None
 
 
 @dataclass(frozen=True)
@@ -146,6 +148,8 @@ def load_manifest(path: Path) -> EvidenceManifest:
             "expected_reference_count",
             "normalization",
             "aligned_segments",
+            "source_kind",
+            "source",
         }
         if unknown:
             raise EvidenceError(f"{context} has unknown field(s): {', '.join(sorted(unknown))}")
@@ -156,9 +160,21 @@ def load_manifest(path: Path) -> EvidenceManifest:
             raise EvidenceError(f"duplicate evidence block id {block_id!r}")
         seen_ids.add(block_id)
 
-        raw_runs = _required(item, "runs", context)
-        if not isinstance(raw_runs, list) or not raw_runs:
+        source_kind = str(item.get("source_kind", "transcription-jsonl"))
+        if source_kind not in {"transcription-jsonl", "baseline-v2"}:
+            raise EvidenceError(f"{context}.source_kind is unsupported: {source_kind!r}")
+        raw_runs = item.get("runs", [])
+        if not isinstance(raw_runs, list):
+            raise EvidenceError(f"{context}.runs must be a list")
+        if source_kind == "transcription-jsonl" and not raw_runs:
             raise EvidenceError(f"{context}.runs must be a non-empty list")
+        source = (
+            _path(root, item["source"], f"{context}.source")
+            if item.get("source") is not None
+            else None
+        )
+        if source_kind != "transcription-jsonl" and source is None:
+            raise EvidenceError(f"{context}.source is required for {source_kind}")
         runs: list[RunSpec] = []
         for run_index, run in enumerate(raw_runs):
             run_context = f"{context}.runs[{run_index}]"
@@ -238,6 +254,8 @@ def load_manifest(path: Path) -> EvidenceManifest:
                 ),
                 normalization=dict(item.get("normalization", {})),
                 aligned_segments=aligned_segments,
+                source_kind=source_kind,
+                source=source,
             )
         )
     return EvidenceManifest(path=path, document=document, blocks=tuple(blocks))
@@ -487,6 +505,31 @@ def _validate_document_ownership(document: str, blocks: tuple[BlockSpec, ...]) -
                 )
 
 
+def _render_derived_table(table: DerivedTable) -> str:
+    table.validate()
+    header = [column.label for column in table.columns]
+    rows = [
+        [
+            str(row[column.name])
+            if column.name == table.row_key
+            else (
+                str(int(row[column.name]))
+                if column.digits == 0
+                else f"{float(row[column.name]):.{column.digits}f}"
+            )
+            for column in table.columns
+        ]
+        for row in table.rows
+    ]
+    return "\n".join(
+        [
+            "| " + " | ".join(header) + " |",
+            "| " + " | ".join(["---", *["---:" for _ in table.columns[1:]]]) + " |",
+            *("| " + " | ".join(row) + " |" for row in rows),
+        ]
+    )
+
+
 def _render_block(block: BlockSpec) -> tuple[str, list[str], bool]:
     if block.status_only:
         reason = block.status_reason or UNVERIFIED_MESSAGE
@@ -494,6 +537,9 @@ def _render_block(block: BlockSpec) -> tuple[str, list[str], bool]:
 
     issues: list[str] = []
     try:
+        if block.source_kind == "baseline-v2":
+            assert block.source is not None
+            return _render_derived_table(baseline_table(block.source)), issues, True
         references = load_references(block.reference)
         if not references:
             raise EvidenceError(f"empty reference corpus: {block.reference}")
@@ -522,27 +568,7 @@ def _render_block(block: BlockSpec) -> tuple[str, list[str], bool]:
                 Requirements(settings={}, aligned_segments=block.aligned_segments),
             )
             table = run_deriver(context, block.deriver, reference_path=block.reference)
-            header = [column.label for column in table.columns]
-            rows = [
-                [
-                    str(row[column.name])
-                    if column.name == table.row_key
-                    else f"{float(row[column.name]):.{column.digits}f}"
-                    for column in table.columns
-                ]
-                for row in table.rows
-            ]
-            return (
-                "\n".join(
-                    [
-                        "| " + " | ".join(header) + " |",
-                        "| " + " | ".join(["---", *["---:" for _ in table.columns[1:]]]) + " |",
-                        *("| " + " | ".join(row) + " |" for row in rows),
-                    ]
-                ),
-                issues,
-                True,
-            )
+            return _render_derived_table(table), issues, True
         header = ["Model", "Backend", *(metric.label for metric in block.metrics)]
         rows = [
             [
@@ -561,7 +587,7 @@ def _render_block(block: BlockSpec) -> tuple[str, list[str], bool]:
             *("| " + " | ".join(row) + " |" for row in rows),
         ]
         return "\n".join(table), issues, True
-    except (EvidenceError, OSError) as exc:
+    except (EvidenceError, MeasurementError, OSError) as exc:
         issues.append(f"{block.id}: {exc}")
         return UNVERIFIED_MESSAGE, issues, False
 
