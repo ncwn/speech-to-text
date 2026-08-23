@@ -17,6 +17,30 @@
   "diagnostic_subjects": {
     "omniasr-gguf": "CrispASR does not expose the selected compute device; the run cannot carry a trusted execution identity."
   },
-  "transcript_changes": [],
-  "approval_note": null
+  "transcript_changes": [
+    {
+      "audio_id": "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0",
+      "baseline_sha256": "217d5b588da4b948",
+      "fresh_sha256": "ada0b6cde052c9e855ff9297ac4e074d74edb3946bc1a3e88cb94f0cb9bf4ddf",
+      "reference_id": "10207165333468320061",
+      "subject": "dolphin/small"
+    },
+    {
+      "audio_id": "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0",
+      "baseline_sha256": "5012ccd7fae4eeaf",
+      "fresh_sha256": "2c9bfc4460412cf8562e300d0c3f5c0d1f81b781f1de3e463a91c9b9c3f4200c",
+      "reference_id": "10207165333468320061",
+      "subject": "hf/mms-1b-all"
+    },
+    {
+      "audio_id": "pcm16:16000:1:fe0efa457ae9f7f11a5483e78adaa5795f11b3bf0d5882d7a670ca05ee6ec0e4",
+      "baseline_sha256": "7562b169f646392b",
+      "fresh_sha256": "c727dbe3cbe53922c3e9158eb9630aa7328408941eb7eb529af83056a36191f8",
+      "reference_id": "10406743972683477081",
+      "subject": "hf/mms-1b-all"
+    }
+  ],
+  "approval_note": "baseline-v2 migration: retire schema-v1 hashes, trust four provenance-complete subjects, retain GGUF as unresolved-device diagnostic",
+  "baseline_id": "743f1d189c254ba1b1bb5b5a789d5899-portable3",
+  "artifact_path": "baselines/bench.json"
 }
