@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import replace
 from pathlib import Path
@@ -100,6 +101,14 @@ def _fixture(
     path = tmp_path / "evidence" / "manifest.json"
     path.write_text(json.dumps(manifest), encoding="utf-8")
     return path
+
+
+def _bind_typed_source_reference(block: dict, *, expected_input_count: int) -> None:
+    reference = Path.cwd() / "data" / "fleurs" / "references.tsv"
+    block["reference"] = str(reference.resolve())
+    block["reference_sha256"] = hashlib.sha256(reference.read_bytes()).hexdigest()
+    block["expected_reference_count"] = 12
+    block["expected_input_count"] = expected_input_count
 
 
 def test_update_generates_metric_keyed_table_and_preserves_surrounding_prose(tmp_path):
@@ -286,6 +295,7 @@ def test_baseline_v2_source_renders_only_after_offline_verification(tmp_path):
     block["deriver"] = "baseline:v1"
     block["runs"] = []
     block["metrics"] = []
+    _bind_typed_source_reference(block, expected_input_count=5)
     manifest.write_text(json.dumps(raw), encoding="utf-8")
 
     check = update_evidence(manifest)
@@ -305,12 +315,33 @@ def test_experiment_v1_source_renders_only_after_offline_verification(tmp_path):
     block["deriver"] = "experiment:v1"
     block["runs"] = []
     block["metrics"] = []
+    _bind_typed_source_reference(block, expected_input_count=1)
     manifest.write_text(json.dumps(raw), encoding="utf-8")
 
     check = update_evidence(manifest)
 
     assert check.publishable
     assert "| Condition | RTF | Peak RSS MB |" in check.document.read_text(encoding="utf-8")
+
+
+def test_typed_source_refuses_a_manifest_input_count_mismatch(tmp_path):
+    manifest = _fixture(tmp_path)
+    raw = json.loads(manifest.read_text(encoding="utf-8"))
+    block = raw["blocks"][0]
+    block["source_kind"] = "experiment-v1"
+    block["source"] = str(
+        (Path.cwd() / "evidence" / "experiments" / "mms-batch-smoke" / "experiment.json").resolve()
+    )
+    block["deriver"] = "experiment:v1"
+    block["runs"] = []
+    block["metrics"] = []
+    _bind_typed_source_reference(block, expected_input_count=2)
+    manifest.write_text(json.dumps(raw), encoding="utf-8")
+
+    check = update_evidence(manifest)
+
+    assert not check.publishable
+    assert any("input set 'canonical' count differs (1 != 2)" in issue for issue in check.issues)
 
 
 def test_check_rejects_unowned_markdown_table(tmp_path):

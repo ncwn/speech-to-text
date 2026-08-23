@@ -72,6 +72,7 @@ class BlockSpec:
     deriver: str | None = None
     reference_sha256: str | None = None
     expected_reference_count: int | None = None
+    expected_input_count: int | None = None
     normalization: dict[str, Any] = field(default_factory=dict)
     aligned_segments: bool = False
     source_kind: str = "transcription-jsonl"
@@ -155,6 +156,7 @@ def load_manifest(path: Path) -> EvidenceManifest:
             "deriver",
             "reference_sha256",
             "expected_reference_count",
+            "expected_input_count",
             "normalization",
             "aligned_segments",
             "source_kind",
@@ -184,6 +186,20 @@ def load_manifest(path: Path) -> EvidenceManifest:
         )
         if source_kind != "transcription-jsonl" and source is None:
             raise EvidenceError(f"{context}.source is required for {source_kind}")
+        if source_kind != "transcription-jsonl" and (
+            item.get("reference_sha256") is None or item.get("expected_reference_count") is None
+        ):
+            raise EvidenceError(
+                f"{context} requires reference_sha256 and expected_reference_count "
+                f"for {source_kind}"
+            )
+        expected_input_count = item.get("expected_input_count")
+        if expected_input_count is not None and (
+            type(expected_input_count) is not int or expected_input_count < 1
+        ):
+            raise EvidenceError(f"{context}.expected_input_count must be a positive integer")
+        if source_kind != "transcription-jsonl" and expected_input_count is None:
+            raise EvidenceError(f"{context}.expected_input_count is required for {source_kind}")
         runs: list[RunSpec] = []
         for run_index, run in enumerate(raw_runs):
             run_context = f"{context}.runs[{run_index}]"
@@ -261,6 +277,7 @@ def load_manifest(path: Path) -> EvidenceManifest:
                     if item.get("expected_reference_count") is not None
                     else None
                 ),
+                expected_input_count=expected_input_count,
                 normalization=dict(item.get("normalization", {})),
                 aligned_segments=aligned_segments,
                 source_kind=source_kind,
@@ -543,6 +560,75 @@ def _render_derived_table(table: DerivedTable) -> str:
     )
 
 
+def _validate_typed_source_identity(block: BlockSpec) -> None:
+    """Bind a typed timing source to its declared reference population and inputs."""
+    assert block.source is not None
+    references = load_references(block.reference)
+    if not references:
+        raise EvidenceError(f"empty reference corpus: {block.reference}")
+    from stt.derive import validate_reference_identity
+
+    validate_reference_identity(
+        references,
+        path=block.reference,
+        requirements=Requirements(
+            reference_sha256=block.reference_sha256,
+            expected_reference_count=block.expected_reference_count,
+        ),
+    )
+    try:
+        source = json.loads(block.source.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise EvidenceError(f"cannot read typed evidence source {block.source}: {exc}") from exc
+    expected_count = block.expected_input_count
+    assert expected_count is not None
+    reference_ids = set(references)
+    if block.source_kind == "baseline-v2":
+        clips = source.get("clips")
+        corpus = source.get("corpus")
+        if not isinstance(clips, list) or not isinstance(corpus, list):
+            raise EvidenceError("baseline source is missing clips or corpus identity")
+        corpus_ids = [item.get("reference_id") for item in corpus if isinstance(item, dict)]
+        if len(clips) != expected_count or len(corpus_ids) != expected_count:
+            raise EvidenceError(
+                f"baseline source input count differs ({len(clips)}/{len(corpus_ids)} != "
+                f"{expected_count})"
+            )
+        if clips != corpus_ids or len(set(clips)) != len(clips):
+            raise EvidenceError("baseline source clip and corpus identities differ")
+        source_sets = [("baseline", clips)]
+    else:
+        spec = source.get("spec")
+        raw_sets = spec.get("input_sets") if isinstance(spec, dict) else None
+        if not isinstance(raw_sets, list) or not raw_sets:
+            raise EvidenceError("experiment source is missing input-set identity")
+        source_sets = []
+        for raw_set in raw_sets:
+            if not isinstance(raw_set, dict) or not isinstance(raw_set.get("inputs"), list):
+                raise EvidenceError("experiment source contains an invalid input set")
+            input_set_id = raw_set.get("input_set_id")
+            ids = [item.get("reference_id") for item in raw_set["inputs"] if isinstance(item, dict)]
+            if not isinstance(input_set_id, str) or not input_set_id:
+                raise EvidenceError("experiment source input set has no identity")
+            if len(ids) != expected_count:
+                raise EvidenceError(
+                    f"experiment input set {input_set_id!r} count differs "
+                    f"({len(ids)} != {expected_count})"
+                )
+            if len(set(ids)) != len(ids):
+                raise EvidenceError(
+                    f"experiment input set {input_set_id!r} has duplicate reference IDs"
+                )
+            source_sets.append((input_set_id, ids))
+    for source_id, ids in source_sets:
+        unknown = sorted(set(ids) - reference_ids)
+        if unknown:
+            raise EvidenceError(
+                f"typed source {source_id!r} contains reference IDs outside the declared corpus: "
+                f"{unknown[:3]}"
+            )
+
+
 def _render_block(block: BlockSpec) -> tuple[str, list[str], bool]:
     if block.status_only:
         reason = block.status_reason or UNVERIFIED_MESSAGE
@@ -552,9 +638,11 @@ def _render_block(block: BlockSpec) -> tuple[str, list[str], bool]:
     try:
         if block.source_kind == "baseline-v2":
             assert block.source is not None
+            _validate_typed_source_identity(block)
             return _render_derived_table(baseline_table(block.source)), issues, True
         if block.source_kind == "experiment-v1":
             assert block.source is not None
+            _validate_typed_source_identity(block)
             table = (
                 observer_table(block.source)
                 if block.deriver == "observer:v1"
