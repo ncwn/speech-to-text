@@ -2,15 +2,20 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
+
+import pytest
 
 from stt.long_audio import (
     LongAudioRunnerSpec,
     observe_segments,
     read_sentinel_spans,
     run_runner,
+    run_runner_report,
     sentinel_identity,
     verify_observation,
+    write_report,
 )
 from stt.results import Segment, TranscriptionResult
 from stt.sentinel import annotation
@@ -77,6 +82,86 @@ def test_archived_sentinel_observations_bind_the_fixture_identities():
 
     assert reports
     assert all(
-        verify_observation(report, audio_path=audio, annotation_path=annotation_path) == []
+        any(
+            "legacy" in issue
+            for issue in verify_observation(
+                report, audio_path=audio, annotation_path=annotation_path
+            )
+        )
         for report in reports
     )
+
+
+def _write_v2_report(tmp_path: Path) -> tuple[Path, Path, Path]:
+    root = Path(__file__).parents[1]
+    audio = root / "data" / "sentinels" / "long-audio-boundary-v1.wav"
+    annotation_path = root / "data" / "sentinels" / "long-audio-boundary-v1.json"
+    audio_sha, annotation_sha = sentinel_identity(annotation_path, audio)
+    spec = LongAudioRunnerSpec(
+        "adapter",
+        "fake",
+        "model",
+        "adapter.transcribe",
+        audio_sha,
+        annotation_sha,
+    )
+    report = run_runner_report(
+        spec,
+        lambda: _result(
+            [
+                Segment("before", 18.75, 19.75, source="chunk"),
+                Segment("across", 19.75, 20.75, source="chunk"),
+                Segment("after", 20.75, 21.75, source="chunk"),
+            ]
+        ),
+        read_sentinel_spans(annotation_path),
+    )
+    report_path = tmp_path / "report.json"
+    write_report(report, report_path)
+    return report_path, audio, annotation_path
+
+
+def test_v2_report_recomputes_from_raw_result_and_binds_fixture(tmp_path):
+    report_path, audio, annotation_path = _write_v2_report(tmp_path)
+
+    assert verify_observation(report_path, audio_path=audio, annotation_path=annotation_path) == []
+
+
+@pytest.mark.parametrize(
+    ("location", "mutate"),
+    [
+        ("coverage", lambda value: value["observation"].update(matched_spans=99)),
+        ("boundary", lambda value: value["observation"].update(boundary_hits=[])),
+        (
+            "ordering",
+            lambda value: value["result"]["segments"].reverse(),
+        ),
+        ("transcript", lambda value: value["result"].update(text="edited")),
+        ("error", lambda value: value["result"].update(error="edited")),
+        (
+            "segment",
+            lambda value: value["result"]["segments"][0].update(start=18.0),
+        ),
+    ],
+)
+def test_v2_report_rejects_tampered_raw_or_derived_data(tmp_path, location, mutate):
+    report_path, audio, annotation_path = _write_v2_report(tmp_path)
+    value = json.loads(report_path.read_text(encoding="utf-8"))
+    mutate(value)
+    report_path.write_text(json.dumps(value), encoding="utf-8")
+
+    issues = verify_observation(report_path, audio_path=audio, annotation_path=annotation_path)
+
+    assert issues, location
+
+
+def test_v2_report_rejects_tampered_boundaries_and_elapsed(tmp_path):
+    report_path, audio, annotation_path = _write_v2_report(tmp_path)
+    value = json.loads(report_path.read_text(encoding="utf-8"))
+    value["spec"]["boundaries_s"] = [19.0, 40.0]
+    value["elapsed_s"] += 1.0
+    report_path.write_text(json.dumps(value), encoding="utf-8")
+
+    issues = verify_observation(report_path, audio_path=audio, annotation_path=annotation_path)
+
+    assert issues
