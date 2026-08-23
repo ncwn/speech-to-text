@@ -32,8 +32,10 @@ uv run pytest tests/test_vote.py::test_name -x
 ```
 
 **Guards.** `make check` runs on every commit via `.githooks/pre-commit`. The
-bench is deliberately *not* in the hook — it loads five models. Tests needing
-real weights carry `@pytest.mark.weights` and are deselected by default.
+bench is deliberately *not* in the hook — it loads four trusted models. GGUF is
+kept as a diagnostic subject because CrispASR does not expose its selected
+compute device. Tests needing real weights carry `@pytest.mark.weights` and are
+deselected by default.
 
 CLI: `doctor`, `bench` (including `--verify`), `experiment`, `parity`, `backends`, `models`,
 `hardware`, `fetch-fleurs`, `transcribe`, `align`, `eval`, `compare`, `vote`, `route`,

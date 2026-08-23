@@ -2063,6 +2063,13 @@ def bench(
     if unknown:
         raise typer.BadParameter(f"unknown benchmark backend(s): {', '.join(unknown)}")
     existing_baseline = bench_mod.load_baseline(baseline_path)
+    legacy_baseline = None
+    if update and baseline_path == bench_mod.BASELINE and existing_baseline is None:
+        legacy_baseline = bench_mod.load_baseline(bench_mod.LEGACY_BASELINE)
+        if legacy_baseline is None:
+            raise typer.BadParameter(
+                f"retired legacy baseline is missing: {bench_mod.LEGACY_BASELINE}"
+            )
     if existing_baseline and existing_baseline.get("artifact_kind") == "baseline-v2":
         verification_issues = bench_mod.verify_baseline(baseline_path)
         if verification_issues:
@@ -2244,6 +2251,39 @@ def bench(
             run["eligibility_issues"] = protocol_issues
             run["baseline_eligible"] = False
         measurement["runs"].append(run)
+
+    if update and legacy_baseline is not None:
+        migration_changes = bench_mod.legacy_transcript_changes(legacy_baseline, measurement)
+        migration = {
+            "source": str(bench_mod.LEGACY_BASELINE),
+            "legacy_subjects": [str(run.get("subject")) for run in legacy_baseline.get("runs", [])],
+            "trusted_subjects": [str(run.get("subject")) for run in measurement["runs"]],
+            "retired_subjects": [
+                str(run.get("subject"))
+                for run in legacy_baseline.get("runs", [])
+                if str(run.get("subject"))
+                not in {str(item.get("subject")) for item in measurement["runs"]}
+            ],
+            "diagnostic_subjects": {
+                "omniasr-gguf": (
+                    "CrispASR does not expose the selected compute device; the run cannot "
+                    "carry a trusted execution identity."
+                )
+            },
+            "transcript_changes": migration_changes,
+            "approval_note": approval_note,
+        }
+        measurement["legacy_migration"] = migration
+        if migration_changes and not accept_transcript_changes:
+            console.print(
+                "\n[red]baseline not written: legacy transcript changes require "
+                "--accept-transcript-changes --approval-note[/red]"
+            )
+            raise typer.Exit(1)
+        console.print(
+            f"[yellow]legacy migration: {len(migration_changes)} transcript change(s); "
+            "omniasr-gguf remains diagnostic[/yellow]"
+        )
 
     write_json_atomic(measurement, run_dir / "summary.json")
     console.print(f"[dim]raw measurement → {run_dir}[/dim]")

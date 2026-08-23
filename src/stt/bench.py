@@ -47,6 +47,7 @@ from stt.telemetry import Series, pool_series
 
 #: Where the committed baseline lives.
 BASELINE = Path("baselines/bench.json")
+LEGACY_BASELINE = Path("baselines/legacy-v1-bench.json")
 ARTIFACT_DIR = Path("outputs/bench")
 MEASUREMENT_SCHEMA_VERSION = 3
 BASELINE_SCHEMA_VERSION = 2
@@ -64,10 +65,13 @@ CLIP_DIR = Path("data/fleurs/audio")
 SUBJECTS: tuple[tuple[str, str | None], ...] = (
     ("hf", "mms-1b-all"),
     ("hf", "seamless-m4t-v2"),
-    ("omniasr-gguf", None),
     ("dolphin", "small"),
     ("omniasr-torch", "omniASR_LLM_Unlimited_7B_v2"),
 )
+
+# CrispASR remains measurable for diagnostics, but its selected compute device
+# is not exposed by the upstream API and therefore cannot enter baseline-v2.
+DIAGNOSTIC_SUBJECTS: tuple[tuple[str, str | None], ...] = (("omniasr-gguf", None),)
 
 
 def text_hash(text: str) -> str:
@@ -953,6 +957,51 @@ def transcript_changes(
                         "audio_id": audio_id,
                         "baseline_sha256": before.get(audio_id),
                         "fresh_sha256": after.get(audio_id),
+                    }
+                )
+    return changes
+
+
+def legacy_transcript_changes(
+    legacy: dict[str, Any], fresh: dict[str, Any]
+) -> list[dict[str, str | None]]:
+    """Bridge schema-v1 reference hashes to fresh canonical audio identities."""
+    audio_id_by_reference = {
+        str(item.get("reference_id")): str(item.get("audio_id"))
+        for item in fresh.get("corpus", [])
+        if item.get("reference_id") and item.get("audio_id")
+    }
+    old_runs = {str(item.get("subject")): item for item in legacy.get("runs", [])}
+    new_runs = {str(item.get("subject")): item for item in fresh.get("runs", [])}
+    changes: list[dict[str, str | None]] = []
+    for subject in sorted(new_runs):
+        before = old_runs.get(subject, {}).get("hashes", {})
+        after = new_runs[subject].get("hashes", {})
+        reference_ids = set(before) | {
+            reference_id
+            for reference_id, audio_id in audio_id_by_reference.items()
+            if audio_id in after
+        }
+        for reference_id in sorted(reference_ids):
+            audio_id = audio_id_by_reference.get(reference_id)
+            old_hash = before.get(reference_id)
+            new_hash = after.get(audio_id) if audio_id is not None else None
+            compatible = bool(
+                old_hash
+                and new_hash
+                and (
+                    str(new_hash).startswith(str(old_hash))
+                    or str(old_hash).startswith(str(new_hash))
+                )
+            )
+            if not compatible:
+                changes.append(
+                    {
+                        "subject": subject,
+                        "audio_id": audio_id,
+                        "reference_id": reference_id,
+                        "baseline_sha256": old_hash,
+                        "fresh_sha256": new_hash,
                     }
                 )
     return changes

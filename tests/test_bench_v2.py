@@ -17,6 +17,7 @@ from stt.bench import (
     bootstrap_paired_ratio,
     compare,
     counterbalanced_schedule,
+    legacy_transcript_changes,
     save_baseline,
     summarize_workers,
     transcript_changes,
@@ -264,6 +265,28 @@ def test_transcript_change_is_not_hidden_by_provenance_change():
     assert transcript_changes(baseline, fresh)[0]["audio_id"].startswith("pcm16:")
 
 
+def test_legacy_transcript_changes_maps_reference_ids_and_short_hashes():
+    audio_id = "pcm16:16000:1:" + "1" * 64
+    full_hash = hashlib.sha256(b"stable").hexdigest()
+    legacy = {"runs": [{"subject": "fake/model", "hashes": {"clip": full_hash[:16]}}]}
+    fresh = {
+        "corpus": [{"reference_id": "clip", "audio_id": audio_id}],
+        "runs": [{"subject": "fake/model", "hashes": {audio_id: full_hash}}],
+    }
+
+    assert legacy_transcript_changes(legacy, fresh) == []
+    fresh["runs"][0]["hashes"][audio_id] = hashlib.sha256(b"changed").hexdigest()
+    assert legacy_transcript_changes(legacy, fresh) == [
+        {
+            "subject": "fake/model",
+            "audio_id": audio_id,
+            "reference_id": "clip",
+            "baseline_sha256": full_hash[:16],
+            "fresh_sha256": hashlib.sha256(b"changed").hexdigest(),
+        }
+    ]
+
+
 def test_host_change_suppresses_timing_but_not_transcript_checks():
     baseline, fresh = _comparison_artifact()
     fresh["host"] = _host("different-chip")
@@ -489,6 +512,15 @@ def test_five_session_archive_verifies_one_to_one(monkeypatch, tmp_path):
     archived_response = tmp_path / response_item["path"]
     archived_response.write_text("tampered\n", encoding="utf-8")
     assert any("checksum mismatch" in issue for issue in verify_baseline(baseline_path))
+
+
+def test_save_baseline_refuses_a_legacy_file_at_the_target(monkeypatch, tmp_path):
+    measurement, baseline_path = _accepted_measurement(monkeypatch, tmp_path)
+    baseline_path.parent.mkdir(parents=True, exist_ok=True)
+    baseline_path.write_text(json.dumps({"runs": []}), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="cannot replace an unverifiable legacy baseline"):
+        save_baseline(measurement, baseline_path)
 
 
 def test_verify_rejects_unsupported_baseline_schema(monkeypatch, tmp_path):

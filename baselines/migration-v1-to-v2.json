@@ -1,0 +1,22 @@
+{
+  "migration": "baseline-v1-to-v2",
+  "legacy_path": "baselines/legacy-v1-bench.json",
+  "legacy_subjects": [
+    "hf/mms-1b-all",
+    "hf/seamless-m4t-v2",
+    "omniasr-gguf",
+    "dolphin/small",
+    "omniasr-torch/omniASR_LLM_Unlimited_7B_v2"
+  ],
+  "trusted_subjects": [
+    "hf/mms-1b-all",
+    "hf/seamless-m4t-v2",
+    "dolphin/small",
+    "omniasr-torch/omniASR_LLM_Unlimited_7B_v2"
+  ],
+  "diagnostic_subjects": {
+    "omniasr-gguf": "CrispASR does not expose the selected compute device; the run cannot carry a trusted execution identity."
+  },
+  "transcript_changes": [],
+  "approval_note": null
+}

@@ -124,7 +124,9 @@ old tables explicitly as unverified history.
 
 Trusted performance uses baseline-v2 artifacts: five counterbalanced isolated
 sessions, three warmups, three measured repeats, immutable model/runtime
-provenance, and an archived raw-artifact manifest. A one-worker `stt bench` run
+provenance, and an archived raw-artifact manifest across four trusted subjects.
+GGUF remains diagnostic because CrispASR does not expose its selected compute
+device. A one-worker `stt bench` run
 is a transcript-only smoke diagnostic; it is never a performance baseline. A
 backend that cannot report its resolved device or another execution-defining
 setting remains diagnostic and cannot enter a trusted baseline.
