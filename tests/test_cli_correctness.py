@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 from contextlib import contextmanager
 
 import numpy as np
@@ -45,6 +46,45 @@ def _result(
         error=error,
         trusted=error is None,
     )
+
+
+def test_long_audio_command_writes_a_verified_v2_report(monkeypatch, tmp_path):
+    calls = []
+
+    def run_backend(backend, model, files, language, batch_size, options):
+        calls.append((backend, model, language, batch_size, options))
+        return [
+            TranscriptionResult(
+                audio_path=str(files[0].prepared_path),
+                text="sentinel",
+                backend=backend,
+                model=model,
+                language=language,
+                elapsed_s=0.5,
+                audio_duration_s=45.0,
+                segments=[Segment("sentinel", 0.0, 45.0, source="chunk")],
+            )
+        ]
+
+    monkeypatch.setattr(cli_mod, "_run_backend", run_backend)
+    output = tmp_path / "long-audio.json"
+
+    result = runner.invoke(
+        app,
+        ["long-audio", "--backend", "fake", "--model", "model", "--output", str(output)],
+    )
+
+    assert result.exit_code == 0, result.output
+    assert json.loads(output.read_text(encoding="utf-8"))["schema_version"] == 2
+    assert calls == [
+        (
+            "fake",
+            "model",
+            "mya_Mymr",
+            None,
+            {"device": None, "dtype": None, "n_threads": None, "chunk_seconds": None},
+        )
+    ]
 
 
 def test_eval_suppresses_legacy_metrics_unless_partial_is_explicit(tmp_path):

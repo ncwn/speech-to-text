@@ -13,6 +13,7 @@ stt route BASE STRONG            re-transcribe only the least-confident spans
 stt experiment run SPEC.json     run and archive an explicit paired experiment
 stt experiment verify ARTIFACT   recompute an archived experiment offline
 stt parity AUDIO                 compare an adapter with its official entry point
+stt long-audio                   archive a recomputable sentinel observation
 """
 
 from __future__ import annotations
@@ -712,6 +713,103 @@ def transcribe(
             console.print("[yellow]partial diagnostic artifact: not trusted evidence[/yellow]")
         else:
             raise typer.Exit(1)
+
+
+def _long_audio_entrypoint(backend: str, model: str, chunk_seconds: float | None) -> str:
+    if backend == "omniasr-gguf":
+        return "crispasr.transcribe_chunked" if chunk_seconds else "crispasr.transcribe"
+    if backend == "omniasr-torch":
+        return "fairseq2.pipeline-unlimited"
+    if backend == "dolphin":
+        return "dolphin.windowed"
+    if backend == "hf" and model == "seamless-m4t-v2":
+        return "seamless.windowed"
+    if backend == "hf":
+        return "transformers.chunked"
+    return "repository-adapter"
+
+
+@app.command("long-audio")
+def long_audio_command(
+    backend: Annotated[str, typer.Option("--backend", "-b", help="Backend name")],
+    model: Annotated[str, typer.Option("--model", "-m", help="Exact model name or card")],
+    output: Annotated[Path, typer.Option("--output", "-o", help="Report JSON path")],
+    language: Annotated[str, typer.Option("--language", "-l", help="Language code")] = BURMESE,
+    device: Annotated[str | None, typer.Option(help="Requested runtime device")] = None,
+    dtype: Annotated[str | None, typer.Option(help="Requested runtime dtype")] = None,
+    threads: Annotated[int | None, typer.Option(help="GGUF thread count")] = None,
+    chunk_seconds: Annotated[
+        float | None,
+        typer.Option(help="Use explicit GGUF chunking with this window size"),
+    ] = None,
+    batch_size: Annotated[
+        int | None,
+        typer.Option(help="Files per forward pass; omit for the measured backend default"),
+    ] = None,
+) -> None:
+    """Run one backend over the checked-in long-audio sentinel and archive raw output."""
+    from stt.long_audio import (
+        LongAudioRunnerSpec,
+        read_sentinel_spans,
+        run_runner_report,
+        sentinel_identity,
+        verify_observation,
+        write_report,
+    )
+
+    if chunk_seconds is not None and chunk_seconds <= 0:
+        raise typer.BadParameter("chunk_seconds must be positive")
+    root = checkout_root() or Path.cwd()
+    audio_path = root / "data" / "sentinels" / "long-audio-boundary-v1.wav"
+    annotation_path = root / "data" / "sentinels" / "long-audio-boundary-v1.json"
+    prepared = audio_mod.prepare_audio(audio_path, DEFAULT_CACHE)
+    audio_sha256, annotation_sha256 = sentinel_identity(annotation_path, audio_path)
+    entrypoint = _long_audio_entrypoint(backend, model, chunk_seconds)
+    mode = entrypoint.rsplit(".", 1)[-1]
+    spec = LongAudioRunnerSpec(
+        runner_id=f"{backend}-{_slug(model)}-{mode}",
+        backend=backend,
+        model=model,
+        entrypoint=entrypoint,
+        audio_sha256=audio_sha256,
+        annotation_sha256=annotation_sha256,
+    )
+
+    def transcribe_one() -> TranscriptionResult:
+        results = _run_backend(
+            backend,
+            model,
+            [prepared],
+            language,
+            batch_size,
+            {
+                "device": device,
+                "dtype": dtype,
+                "n_threads": threads,
+                "chunk_seconds": chunk_seconds,
+            },
+        )
+        if len(results) != 1:
+            raise RuntimeError(f"long-audio runner returned {len(results)} results")
+        return results[0]
+
+    report = run_runner_report(spec, transcribe_one, read_sentinel_spans(annotation_path))
+    write_report(report, output)
+    issues = verify_observation(
+        output,
+        audio_path=audio_path,
+        annotation_path=annotation_path,
+    )
+    if issues:
+        for issue in issues:
+            console.print(f"[red]{issue}[/red]")
+        raise typer.Exit(1)
+    observation = report.observation
+    console.print(
+        f"[green]long-audio report verified[/green] · {observation.matched_spans} matched · "
+        f"{observation.missed_spans} missed · {observation.duplicate_spans} duplicate → "
+        f"{output}"
+    )
 
 
 def _normalized_path(path: str | Path) -> Path:

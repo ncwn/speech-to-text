@@ -23,7 +23,7 @@ uv sync --extra dolphin         # Dolphin (pulls funasr + modelscope)
 
 make check                      # ruff + offline suite, ~6 s — what the hook runs
 make bench                      # isolated smoke gate + weights tests, minutes
-make bench-update               # intentionally blocked until provenance gates pass
+make bench-update               # trusted five-session baseline-v2 refresh
 make hooks                      # enable the tracked pre-commit hook
 
 uv run stt doctor               # runtimes, prerequisites, and where weights live
@@ -37,9 +37,9 @@ kept as a diagnostic subject because CrispASR does not expose its selected
 compute device. Tests needing real weights carry `@pytest.mark.weights` and are
 deselected by default.
 
-CLI: `doctor`, `bench` (including `--verify`), `experiment`, `parity`, `backends`, `models`,
-`hardware`, `fetch-fleurs`, `transcribe`, `align`, `eval`, `compare`, `vote`, `route`,
-`check-encoding`.
+CLI: `doctor`, `bench` (including `--verify`), `experiment`, `parity`, `long-audio`,
+`backends`, `models`, `hardware`, `fetch-fleurs`, `transcribe`, `align`, `eval`, `compare`,
+`vote`, `route`, `check-encoding`.
 `evidence` checks or updates the artifact-backed measured blocks in `docs/findings.md`.
 
 `tests/test_docs_consistency.py` fails if a command is missing from that list, an

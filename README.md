@@ -8,11 +8,10 @@ runtimes), Hugging Face `transformers` (SeamlessM4T, MMS, Whisper fine-tunes,
 w2v-BERT) and **DataoceanAI Dolphin**. ElevenLabs Scribe v2 and Google Chirp 3
 drop in as additional backends without restructuring anything.
 
-Historical runs ranked `omniASR_LLM_Unlimited_7B_v2` first, but those artifacts
-predate trusted waveform identity and the isolated measurement protocol. They are
-preserved as unverified context, not current claims. Publication remains blocked
-until the runs are regenerated through the evidence gate; see
-[docs/findings.md](docs/findings.md).
+The current baseline and public-corpus accuracy runs carry trusted waveform,
+model, and execution identity and verify offline. Copyrighted held-out runs and
+runtimes that cannot expose their selected device remain explicit diagnostics;
+see [docs/findings.md](docs/findings.md).
 
 ## Why this exists
 
@@ -112,15 +111,18 @@ uv run stt check-encoding data/fleurs/references.tsv
 
 # Verify an accepted baseline without loading model weights
 uv run stt bench --verify
+
+# Archive a recomputable long-audio sentinel observation
+uv run stt long-audio -b hf -m seamless-m4t-v2 -o outputs/seamless-long.json
 ```
 
 ## Results
 
-No accuracy or performance result is currently publication-eligible. The
-historical runs remain useful for forming hypotheses, but their JSONL lacks the
-trusted identity and complete provenance now required by `stt evidence`.
-[docs/findings.md](docs/findings.md) records that migration state and retains the
-old tables explicitly as unverified history.
+The accepted baseline-v2 and tracked FLEURS accuracy artifacts are
+publication-eligible and recomputed into [docs/findings.md](docs/findings.md).
+Held-out, confidence/routing, and unresolved-device comparisons remain
+status-only until redistributable trusted inputs or missing upstream identity
+become available.
 
 Trusted performance uses baseline-v2 artifacts: five counterbalanced isolated
 sessions, three warmups, three measured repeats, immutable model/runtime
