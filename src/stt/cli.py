@@ -1680,6 +1680,72 @@ def experiment_observer_spec(
     console.print(f"[green]observer specification written[/green] → {output}")
 
 
+@experiment_app.command("candidate-spec")
+def experiment_candidate_spec(
+    audio: Annotated[list[Path], typer.Argument(help="Canonical candidate corpus")],
+    output: Annotated[Path, typer.Option("--output", "-o", help="Specification JSON path")],
+    backend: Annotated[str, typer.Option("--backend", "-b")],
+    model: Annotated[str, typer.Option("--model", "-m")],
+    devices: Annotated[
+        str, typer.Option("--devices", help="Comma-separated device candidates")
+    ] = "cpu,mps",
+    dtypes: Annotated[
+        str, typer.Option("--dtypes", help="Comma-separated dtype candidates")
+    ] = "float32,float16,bfloat16",
+    experiment_id: Annotated[
+        str, typer.Option("--id", help="Immutable experiment archive id")
+    ] = "device-dtype-candidates",
+    limit: Annotated[int, typer.Option(help="Only the first N files; 0 for all")] = 0,
+    batch_size: Annotated[int, typer.Option(help="Corpus batch size")] = 1,
+    sessions: Annotated[int, typer.Option(help="Fresh sessions per candidate")] = 5,
+    warmups: Annotated[int, typer.Option(help="Untimed warmups per candidate")] = 3,
+    repeats: Annotated[int, typer.Option(help="Measured repeats per candidate")] = 3,
+    seed: Annotated[int, typer.Option(help="Counterbalanced schedule seed")] = 0,
+) -> None:
+    """Write a diagnostic device/dtype candidate matrix specification."""
+    if batch_size < 1 or sessions < 1 or warmups < 0 or repeats < 1:
+        raise typer.BadParameter("batch size, sessions, and repeats must be positive")
+    device_values = tuple(value.strip() for value in devices.split(",") if value.strip())
+    dtype_values = tuple(value.strip() for value in dtypes.split(",") if value.strip())
+    if not device_values or not dtype_values:
+        raise typer.BadParameter("devices and dtypes must each contain at least one value")
+    prepared = _prepare(audio, limit, convert=True)
+    inputs = tuple(_portable_audio_input(item) for item in prepared)
+    conditions = tuple(
+        ConditionSpec(
+            condition_id=f"{device}-{dtype}",
+            subject=SubjectSpec(
+                backend,
+                model,
+                BURMESE,
+                batch_size,
+                {
+                    "device": device,
+                    "dtype": dtype,
+                    "language": BURMESE,
+                    "batch_size": batch_size,
+                },
+            ),
+            input_set_id="canonical",
+        )
+        for device in device_values
+        for dtype in dtype_values
+    )
+    spec = ExperimentSpec(
+        experiment_id=experiment_id,
+        input_sets=(InputSetSpec("canonical", inputs),),
+        conditions=conditions,
+        contrasts=(),
+        sessions=sessions,
+        warmups=warmups,
+        repeats=repeats,
+        schedule_seed=seed,
+    )
+    spec.validate()
+    write_json_atomic(spec.to_dict(), output)
+    console.print(f"[green]candidate specification written[/green] → {output}")
+
+
 @experiment_app.command("verify")
 def experiment_verify(
     artifact: Annotated[Path, typer.Argument(help="Experiment directory or experiment.json")],
@@ -1741,10 +1807,17 @@ def experiment_run(
             console.print(
                 f"[yellow]{condition.condition_id} preflight unavailable[/yellow] — {exc}"
             )
+    gating_condition_ids = {
+        condition_id
+        for contrast in spec.contrasts
+        if contrast.gating
+        for condition_id in (contrast.control_condition_id, contrast.treatment_condition_id)
+    }
     missing_bindings = sorted(
         condition.condition_id
         for condition in spec.conditions
         if bindings[condition.request_key] is None
+        and condition.condition_id in gating_condition_ids
     )
     if missing_bindings:
         raise typer.BadParameter(

@@ -63,6 +63,44 @@ def test_observer_spec_pins_subjects_arms_and_balanced_schedule(monkeypatch, tmp
         ) == list(range(6))
 
 
+def test_candidate_spec_declares_cartesian_device_dtype_matrix(tmp_path):
+    audio = tmp_path / "clip.wav"
+    sf.write(audio, np.zeros(16_000), 16_000, subtype="PCM_16")
+    output = tmp_path / "candidates.json"
+
+    result = runner.invoke(
+        app,
+        [
+            "experiment",
+            "candidate-spec",
+            str(audio),
+            "--output",
+            str(output),
+            "--backend",
+            "fake",
+            "--model",
+            "model",
+            "--devices",
+            "cpu,mps",
+            "--dtypes",
+            "float32,float16",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    spec = ExperimentSpec.from_dict(json.loads(output.read_text(encoding="utf-8")))
+    candidates = {
+        (item.subject.options["device"], item.subject.options["dtype"]) for item in spec.conditions
+    }
+    assert candidates == {
+        ("cpu", "float32"),
+        ("cpu", "float16"),
+        ("mps", "float32"),
+        ("mps", "float16"),
+    }
+    assert not spec.contrasts
+
+
 def test_experiment_verify_reports_a_malformed_archive(tmp_path):
     descriptor = tmp_path / "experiment.json"
     descriptor.write_text('{"artifact_kind":"experiment-v1","spec":null}\n', encoding="utf-8")
