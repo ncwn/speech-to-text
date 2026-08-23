@@ -699,10 +699,10 @@
     },
     {
       "id": "seamless-utilization",
-      "corpus": "fleurs-test-duration-bucket-8",
+      "corpus": "fleurs-test-duration-bucket-32",
       "reference": "data/fleurs-test/references.tsv",
       "source_kind": "experiment-v1",
-      "source": "evidence/experiments/seamless-mps-utilization-v1/experiment.json",
+      "source": "evidence/experiments/seamless-mps-utilization-v2/experiment.json",
       "deriver": "experiment:v1",
       "runs": [],
       "metrics": [],

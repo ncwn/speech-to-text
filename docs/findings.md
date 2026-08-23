@@ -429,14 +429,18 @@ six CPU/MPS dtype conditions:
 <!-- stt-evidence:seamless-device-dtype:end -->
 
 Seamless autoregressive batches can be held open by their longest decoder tail.
-The production MPS path therefore duration-buckets and caps the effective batch
-at two even when callers request more. The profiled utilization condition is
-descriptive under observer policy:
+The production MPS path now duration-buckets inputs and derives each generation
+budget from the longest window in its group, preventing a missed end token from
+forcing every member through the model's unconditional ceiling. It honors the
+requested batch up to the measured Metal saturation cap. GPU observation is
+also spawn-safe: forking `ioreg` from the sampler thread could deadlock against
+OpenBLAS feature extraction and leave the GPU idle. The profiled utilization
+condition is descriptive under observer policy:
 
 <!-- stt-evidence:seamless-utilization:start -->
 | Condition | RTF | GPU mean % | GPU p50 % | GPU idle % | Peak RSS MB | Sessions | Repeats |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| mps-float32-request4-effective2 | 0.0798 | 63.3 | 62.0 | 11.2 | 1162 | 1 | 1 |
+| mps-float32-request32-capped | 0.0260 | 86.9 | 100.0 | 4.0 | 1262 | 1 | 1 |
 <!-- stt-evidence:seamless-utilization:end -->
 
 omniASR's MPS/float16 path is backed by its separate utilization experiment.
