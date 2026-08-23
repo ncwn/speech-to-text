@@ -15,18 +15,18 @@ lint:
 test:
 	uv run pytest -q
 
-## bench: isolated smoke comparison against the historical baseline, plus the
-## tests that need real weights. The old schema is transcript-only; timings are
-## not comparable until a trusted v2 baseline exists.
+## bench: isolated smoke comparison against baseline-v2, plus the tests that
+## need real weights.
 bench:
 	uv run stt bench
 	uv run pytest -m weights -q
 
-## bench-update: deliberately blocked until immutable model provenance and the
-## remaining measurement acceptance gates are implemented.
+## bench-update: rewrite baseline-v2 only from a clean tree and the trusted
+## five-session protocol. Transcript changes require explicit approval.
 bench-update:
-	@echo "bench update blocked: complete the measurement-plan acceptance gates first"
-	@false
+	uv run stt bench --update --workers 5 --warmups 3 --repeats 3 --no-profile \
+		--accept-transcript-changes \
+		--approval-note "explicit baseline-v2 refresh approval"
 
 ## hooks: point git at the tracked hooks directory
 hooks:
