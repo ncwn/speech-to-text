@@ -508,20 +508,26 @@ CPU-only runs still collect CPU/RSS series but do not claim GPU use.
 
 The original harness passed one CLI-sized chunk at a time, preventing a backend
 from seeing the full corpus and limiting native prefetch/bucketing. The verified
-MMS diagnostic below compares the declared batch candidates over one clip:
+MMS matrix compares batch 1/2/4/8 over separate duration-matched and mixed-duration
+eight-clip corpora, with five isolated sessions, three warmups, and three repeats:
 
 <!-- stt-evidence:batching:start -->
 | Condition | RTF | Peak RSS MB | Sessions | Repeats |
 | --- | ---: | ---: | ---: | ---: |
-| batch-1 | 0.0287 | 518 | 1 | 1 |
-| batch-2 | 0.0286 | 515 | 1 | 1 |
-| batch-4 | 0.0297 | 516 | 1 | 1 |
+| fixed-b1 | 0.0221 | 586 | 5 | 15 |
+| fixed-b2 | 0.0196 | 610 | 5 | 15 |
+| fixed-b4 | 0.0190 | 582 | 5 | 15 |
+| fixed-b8 | 0.0190 | 577 | 5 | 15 |
+| mixed-b1 | 0.0245 | 699 | 5 | 15 |
+| mixed-b2 | 0.0261 | 619 | 5 | 15 |
+| mixed-b4 | 0.0270 | 609 | 5 | 15 |
+| mixed-b8 | 0.0309 | 607 | 5 | 15 |
 <!-- stt-evidence:batching:end -->
 
-No default changes from this diagnostic table. Batching remains explicit,
-and transcript hashes must match before throughput is compared. The next matrix
-must use isolated repeated workers, exact model provenance, common-wall RTF, and
-complete corpus coverage.
+Every condition retained stable transcript hashes. The recomputable sweep stops at
+batch 8 for fixed-length input after two plateau steps, and at batch 4 for mixed
+input because larger batches regress. Duration bucketing is therefore part of the
+production batching path rather than an optional benchmark trick.
 
 ---
 

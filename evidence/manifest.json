@@ -835,7 +835,7 @@
         "lowercase": true
       },
       "source_kind": "experiment-v1",
-      "source": "evidence/experiments/mms-batch-smoke/experiment.json",
+      "source": "evidence/experiments/mms-batching-matrix-v1/experiment.json",
       "deriver": "experiment:v1"
     },
     {
