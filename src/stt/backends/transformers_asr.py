@@ -21,6 +21,7 @@ not for a commercial product.
 from __future__ import annotations
 
 import hashlib
+import math
 import os
 import re
 import shutil
@@ -44,6 +45,27 @@ _CHUNKING = {
     "ctc": (20.0, 3.0),
     "seamless": (20.0, 0.0),
 }
+
+# Seamless normally permits 256 generated tokens for every window. A missed EOS
+# in one batch member then holds the entire autoregressive batch open. The
+# trusted FLEURS test corpus stayed below 8 output tokens/s across 140 windows;
+# retain that measured ceiling with a floor for short tails and the model's
+# existing upper bound. Batch 32 is the measured Metal throughput knee: batch
+# 64 moves feature preparation into a GIL-bound NumPy path and starves the GPU.
+_SEAMLESS_OUTPUT_TOKENS_PER_SECOND = 8.0
+_SEAMLESS_MIN_NEW_TOKENS = 32
+_SEAMLESS_MAX_NEW_TOKENS = 256
+_SEAMLESS_MPS_MAX_BATCH_SIZE = 32
+
+
+def _seamless_max_new_tokens(sample_count: int, sample_rate: int) -> int:
+    """Return the bounded decoder budget for one Seamless audio window."""
+    if sample_count < 0 or sample_rate <= 0:
+        raise ValueError(
+            "Seamless token budgeting requires non-negative samples and a positive rate"
+        )
+    scaled = math.ceil(sample_count / sample_rate * _SEAMLESS_OUTPUT_TOKENS_PER_SECOND)
+    return min(_SEAMLESS_MAX_NEW_TOKENS, max(_SEAMLESS_MIN_NEW_TOKENS, scaled))
 
 
 @dataclass(frozen=True)
@@ -466,7 +488,11 @@ class TransformersASRBackend(ASRBackend):
                 **_audio_kwarg(np.asarray(chunk)), sampling_rate=rate, return_tensors="pt"
             ).to(model.device, model.dtype)
             with torch.inference_mode():
-                tokens = model.generate(**inputs, tgt_lang=self.spec.lang)
+                tokens = model.generate(
+                    **inputs,
+                    tgt_lang=self.spec.lang,
+                    max_new_tokens=_seamless_max_new_tokens(len(chunk), rate),
+                )
             return processor.decode(tokens[0].tolist(), skip_special_tokens=True).strip()
 
         return windowed(pcm, rate, window, decode)
@@ -510,7 +536,11 @@ class TransformersASRBackend(ASRBackend):
                 return_tensors="pt",
             ).to(model.device, model.dtype)
             with torch.inference_mode():
-                tokens = model.generate(**inputs, tgt_lang=self.spec.lang)
+                tokens = model.generate(
+                    **inputs,
+                    tgt_lang=self.spec.lang,
+                    max_new_tokens=_seamless_max_new_tokens(len(chunk), rate),
+                )
             return processor.decode(tokens[0].tolist(), skip_special_tokens=True).strip()
 
         # Padding a very short tail changes its decoder context on some Metal
@@ -543,7 +573,13 @@ class TransformersASRBackend(ASRBackend):
                 padding=True,
             ).to(model.device, model.dtype)
             with torch.inference_mode():
-                tokens = model.generate(**inputs, tgt_lang=self.spec.lang)
+                tokens = model.generate(
+                    **inputs,
+                    tgt_lang=self.spec.lang,
+                    max_new_tokens=_seamless_max_new_tokens(
+                        max(len(chunk) for chunk in chunks), rate
+                    ),
+                )
             texts = [
                 processor.decode(row.tolist(), skip_special_tokens=True).strip() for row in tokens
             ]
@@ -769,7 +805,11 @@ class TransformersASRBackend(ASRBackend):
                     return_tensors="pt",
                 ).to(model.device, model.dtype)
                 with torch.inference_mode():
-                    tokens = model.generate(**inputs, tgt_lang=self.spec.lang)
+                    tokens = model.generate(
+                        **inputs,
+                        tgt_lang=self.spec.lang,
+                        max_new_tokens=_seamless_max_new_tokens(len(decoded_pcm), sample_rate),
+                    )
                 generated.append(tokens.detach().cpu())
                 final = processor.decode(tokens[0].tolist(), skip_special_tokens=True).strip()
         finally:
@@ -835,6 +875,15 @@ class TransformersASRBackend(ASRBackend):
             "device": self.resolved_device,
             "dtype": self.resolved_dtype,
         }
+        if self.spec.family == "seamless":
+            meta.update(
+                {
+                    "max_new_tokens_per_second": _SEAMLESS_OUTPUT_TOKENS_PER_SECOND,
+                    "min_new_tokens": _SEAMLESS_MIN_NEW_TOKENS,
+                    "max_new_tokens": _SEAMLESS_MAX_NEW_TOKENS,
+                    "mps_batch_size_cap": _SEAMLESS_MPS_MAX_BATCH_SIZE,
+                }
+            )
 
         def failed(path: Path, duration: float | None, exc: Exception) -> TranscriptionResult:
             return TranscriptionResult(
@@ -861,7 +910,7 @@ class TransformersASRBackend(ASRBackend):
         # keeps each group homogeneous without changing the positional result
         # contract. Other families retain caller order.
         effective_batch_size = (
-            min(batch_size, 2)
+            min(batch_size, _SEAMLESS_MPS_MAX_BATCH_SIZE)
             if self.spec.family == "seamless" and self.resolved_device == "mps"
             else batch_size
         )

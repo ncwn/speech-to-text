@@ -5,7 +5,11 @@ from types import ModuleType
 
 import pytest
 
-from stt.backends.transformers_asr import TransformersASRBackend, _bound_hf_snapshot
+from stt.backends.transformers_asr import (
+    TransformersASRBackend,
+    _bound_hf_snapshot,
+    _seamless_max_new_tokens,
+)
 from stt.provenance import ArtifactDigest, ModelBinding, ModelProvenance, digest_file
 from stt.results import Segment
 
@@ -133,15 +137,26 @@ def test_seamless_mps_batches_by_duration_and_releases_cache(monkeypatch, tmp_pa
 
     backend._transcribe_seamless_batch = transcribe_batch
     backend._transcribe_seamless = transcribe_one
-    results = backend.transcribe(paths, language="mya_Mymr", batch_size=4)
+    results = backend.transcribe(paths, language="mya_Mymr", batch_size=64)
 
-    assert calls == [[paths[1], paths[3]], [paths[4], paths[2]], [paths[0]]]
+    assert calls == [[paths[1], paths[3], paths[4], paths[2], paths[0]]]
     assert [result.text for result in results] == list("abcde")
-    assert [result.metadata["batch_group"] for result in results] == [2, 0, 1, 0, 1]
-    assert all(result.metadata["batch_size"] == 4 for result in results)
-    assert all(result.metadata["effective_batch_size"] == 2 for result in results)
-    assert synchronized == ["sync"] * 3
-    assert emptied == ["empty"] * 3
+    assert all(result.metadata["batch_group"] == 0 for result in results)
+    assert all(result.metadata["batch_size"] == 64 for result in results)
+    assert all(result.metadata["effective_batch_size"] == 32 for result in results)
+    assert all(result.metadata["max_new_tokens_per_second"] == 8.0 for result in results)
+    assert all(result.metadata["mps_batch_size_cap"] == 32 for result in results)
+    assert synchronized == ["sync"]
+    assert emptied == ["empty"]
+
+
+def test_seamless_generation_budget_scales_and_clamps():
+    assert _seamless_max_new_tokens(1, 16_000) == 32
+    assert _seamless_max_new_tokens(16_560, 1_000) == 133
+    assert _seamless_max_new_tokens(40 * 16_000, 16_000) == 256
+
+    with pytest.raises(ValueError, match="positive rate"):
+        _seamless_max_new_tokens(1, 0)
 
 
 def test_hf_bound_pipeline_uses_exact_snapshot_for_all_components(monkeypatch, tmp_path):
@@ -507,8 +522,15 @@ def test_seamless_parity_hooks_capture_adapter_and_direct_encoder(tmp_path):
             super().__init__()
             self.speech_encoder = Encoder()
 
-        def generate(self, input_features, attention_mask=None, tgt_lang=None):
+        def generate(
+            self,
+            input_features,
+            attention_mask=None,
+            tgt_lang=None,
+            max_new_tokens=None,
+        ):
             del tgt_lang
+            assert max_new_tokens == 32
             self.speech_encoder(
                 input_features=input_features,
                 attention_mask=attention_mask,
