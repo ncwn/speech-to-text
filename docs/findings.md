@@ -334,19 +334,20 @@ load/inference path but is not a default-changing performance gate.
 
 ### omniASR on Metal
 
-Five FLEURS clips, same model, same audio, corpus CER 0.0280 in every row
-(historical device/dtype sweep):
+The verified utilization diagnostic uses eight duration-matched FLEURS test clips,
+MPS/float16, batch 8, and explicit cache release between duration buckets. Profiling
+is descriptive by observer policy, so this table does not replace baseline timing:
 
 <!-- stt-evidence:omniasr-metal:start -->
-> **Unverified legacy evidence.** Numeric publication is blocked because the declared artifacts are missing trusted audio identity, complete corpus coverage, or matching provenance. Regenerate the runs before publishing measured results.
+| Condition | RTF | GPU mean % | GPU p50 % | GPU idle % | Peak RSS MB | Sessions | Repeats |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| mps-float16-batch8-bucketed | 0.3425 | 81.5 | 76.0 | 0.0 | 26669 | 1 | 1 |
 <!-- stt-evidence:omniasr-metal:end -->
 
-Metal is 3.5× faster than CPU's best dtype and uses less memory, for
-bit-identical text, so `--device auto` selects it with an automatic fall back to
-CPU if a Metal kernel fails mid-run. Float16 is what
-[`fastest_dtype`](#precision) picks on this machine. The 0.61 and 0.70 figures
-are from that historical sweep; the current batch-1 baseline is the comparable
-regression signal.
+The CPU trace was dominated by sequential autoregressive SGEMMs despite eight
+configured Torch threads. Duration bucketing keeps padding bounded, while MPS cache
+release prevents transient generation buffers from accumulating across the corpus.
+`--device auto` still falls back to CPU if a Metal kernel fails mid-run.
 
 ### Dolphin stays on CPU
 

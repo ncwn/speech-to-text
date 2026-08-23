@@ -661,22 +661,9 @@
       "id": "omniasr-metal",
       "corpus": "fleurs-test-5",
       "reference": "data/fleurs-test/references.tsv",
-      "status_only": true,
-      "runs": [
-        {
-          "artifact": "outputs/t120-omni7b.jsonl",
-          "label": "omniASR Torch device sweep",
-          "backend": "omniasr-torch",
-          "model": "omniASR_LLM_Unlimited_7B_v2"
-        }
-      ],
-      "metrics": [
-        {
-          "name": "rtf",
-          "label": "RTF",
-          "digits": 2
-        }
-      ],
+      "status_only": false,
+      "runs": [],
+      "metrics": [],
       "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
       "expected_reference_count": 120,
       "normalization": {
@@ -685,7 +672,10 @@
         "strip_punctuation": true,
         "normalize_digits": true,
         "lowercase": true
-      }
+      },
+      "source_kind": "experiment-v1",
+      "source": "evidence/experiments/omni7b-mps-utilization-v2/experiment.json",
+      "deriver": "experiment:v1"
     },
     {
       "id": "dolphin-device",
