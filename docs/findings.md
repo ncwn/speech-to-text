@@ -30,6 +30,19 @@ both columns.
 > **Unverified legacy evidence.** Numeric publication is blocked because the declared artifacts are missing trusted audio identity, complete corpus coverage, or matching provenance. Regenerate the runs before publishing measured results.
 <!-- stt-evidence:baseline:end -->
 
+### Trusted accuracy refresh
+
+The regenerated 120-clip accuracy lane is identity-verified for the two completed
+subjects below. RTF is intentionally omitted here; common-wall timing comes from
+baseline-v2 artifacts.
+
+<!-- stt-evidence:accuracy-fleurs-test-120:start -->
+| Model | Backend | CER | N | Scored |
+| --- | --- | ---: | ---: | ---: |
+| MMS-1B (verified accuracy) | `hf` | 0.1565 | 120 | 120 |
+| Dolphin small (verified accuracy) | `dolphin` | 0.1480 | 120 | 120 |
+<!-- stt-evidence:accuracy-fleurs-test-120:end -->
+
 **The entire table is historical.** Its RTF values sum backend-provided
 `elapsed_s` fields whose work boundaries differ by runtime, so they are not valid
 cross-backend performance rankings. The JSONL also predates trusted audio

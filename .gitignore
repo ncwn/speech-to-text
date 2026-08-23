@@ -42,6 +42,8 @@ outputs/**
 # audit a published figure without re-running 88 GB of models for hours --
 # which is the same reason data/reference/ is tracked. Scratch runs stay out.
 !outputs/t120-*.jsonl
+!outputs/evidence-fleurs-test-mms.jsonl
+!outputs/evidence-fleurs-test-dolphin.jsonl
 # ...except a vote or route artifact, which `stt vote` and `stt route` write
 # with trusted=False and no model provenance by construction. Such a file can
 # never back a published number; the evidence renderer recomputes the vote from

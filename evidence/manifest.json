@@ -122,6 +122,59 @@
       }
     },
     {
+      "id": "accuracy-fleurs-test-120",
+      "corpus": "fleurs-test-120",
+      "reference": "data/fleurs-test/references.tsv",
+      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
+      "expected_reference_count": 120,
+      "runs": [
+        {
+          "artifact": "outputs/evidence-fleurs-test-mms.jsonl",
+          "label": "MMS-1B (verified accuracy)",
+          "backend": "hf",
+          "model": "mms-1b-all",
+          "settings": {
+            "device": "mps",
+            "dtype": "float32"
+          }
+        },
+        {
+          "artifact": "outputs/evidence-fleurs-test-dolphin.jsonl",
+          "label": "Dolphin small (verified accuracy)",
+          "backend": "dolphin",
+          "model": "small",
+          "settings": {
+            "device": "cpu",
+            "dtype": "float32"
+          }
+        }
+      ],
+      "metrics": [
+        {
+          "name": "cer",
+          "label": "CER",
+          "digits": 4
+        },
+        {
+          "name": "n_total",
+          "label": "N",
+          "digits": 0
+        },
+        {
+          "name": "n_scored",
+          "label": "Scored",
+          "digits": 0
+        }
+      ],
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      }
+    },
+    {
       "id": "tails",
       "corpus": "fleurs-test-120",
       "reference": "data/fleurs-test/references.tsv",
