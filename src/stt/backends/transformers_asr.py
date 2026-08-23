@@ -78,6 +78,13 @@ class HFModel:
     note: str = ""
 
 
+@dataclass(frozen=True)
+class _SeamlessBatchDecode:
+    segments: list[list[Segment]]
+    mode: str
+    per_file_elapsed_s: tuple[float, ...] | None = None
+
+
 MODELS: dict[str, HFModel] = {
     "whisper-my-large-v3": HFModel(
         "chuuhtetnaing/whisper-large-v3-myanmar",
@@ -497,7 +504,9 @@ class TransformersASRBackend(ASRBackend):
 
         return windowed(pcm, rate, window, decode)
 
-    def _transcribe_seamless_batch(self, paths: list[Path], batch_size: int) -> list[list[Segment]]:
+    def _transcribe_seamless_batch(
+        self, paths: list[Path], batch_size: int
+    ) -> _SeamlessBatchDecode:
         """Decode Seamless windows in batches while preserving file order."""
         import numpy as np
         import soundfile as sf
@@ -509,25 +518,39 @@ class TransformersASRBackend(ASRBackend):
         processor, model = self._seamless
         window, _ = _CHUNKING["seamless"]
         loaded: list[tuple[np.ndarray, int]] = []
+        per_file_elapsed = [0.0] * len(paths)
         for path in paths:
+            file_started = time.perf_counter()
             pcm, rate = sf.read(str(path), dtype="float32", always_2d=False)
             if pcm.ndim > 1:
                 pcm = pcm.mean(axis=1)
             loaded.append((pcm, rate))
+            per_file_elapsed[len(loaded) - 1] += time.perf_counter() - file_started
 
         # The normal CLI path converts everything to 16 kHz. If a caller uses
         # the backend directly with mixed rates, retain the old per-file path.
         if len({rate for _, rate in loaded}) != 1:
-            return [self._transcribe_seamless(path) for path in paths]
+            decoded = []
+            for index, path in enumerate(paths):
+                item_started = time.perf_counter()
+                decoded.append(self._transcribe_seamless(path))
+                per_file_elapsed[index] += time.perf_counter() - item_started
+            return _SeamlessBatchDecode(
+                decoded,
+                "serial-mixed-rate",
+                tuple(per_file_elapsed),
+            )
 
         rate = loaded[0][1]
         pending: list[tuple[int, int, int, np.ndarray]] = []
         segments: list[list[Segment]] = [[] for _ in paths]
         for file_index, (pcm, _) in enumerate(loaded):
+            split_started = time.perf_counter()
             for start, end in split_on_quiet(pcm, rate, window):
                 if end - start < rate * 0.2:
                     continue
                 pending.append((file_index, start, end, pcm[start:end]))
+            per_file_elapsed[file_index] += time.perf_counter() - split_started
 
         def decode_single(chunk: np.ndarray) -> str:
             inputs = processor(
@@ -550,7 +573,9 @@ class TransformersASRBackend(ASRBackend):
         for item in pending:
             file_index, start, end, chunk = item
             if len(chunk) < rate * 2.0:
+                item_started = time.perf_counter()
                 text = decode_single(chunk)
+                per_file_elapsed[file_index] += time.perf_counter() - item_started
                 if text:
                     segments[file_index].append(
                         Segment(
@@ -599,7 +624,14 @@ class TransformersASRBackend(ASRBackend):
                     )
         for items in segments:
             items.sort(key=lambda item: (item.start, item.end))
-        return segments
+        if not batchable:
+            return _SeamlessBatchDecode(
+                segments,
+                "serial-short-tails",
+                tuple(per_file_elapsed),
+            )
+        mode = "batched-with-serial-tails" if len(batchable) != len(pending) else "batched"
+        return _SeamlessBatchDecode(segments, mode)
 
     def _pipeline_kwargs(self) -> dict[str, Any]:
         if self.spec.family == "whisper":
@@ -930,10 +962,10 @@ class TransformersASRBackend(ASRBackend):
             started = time.perf_counter()
             try:
                 if can_batch and self.spec.family == "seamless":
-                    decoded = [
-                        (join_segments(items), items)
-                        for items in self._transcribe_seamless_batch(paths, effective_batch_size)
-                    ]
+                    seamless_decode = self._transcribe_seamless_batch(paths, effective_batch_size)
+                    decoded = [(join_segments(items), items) for items in seamless_decode.segments]
+                    if seamless_decode.per_file_elapsed_s is not None:
+                        measured.extend(seamless_decode.per_file_elapsed_s)
                 elif can_batch:
                     decoded = self._transcribe_pipeline_batch(paths, batch_size)
                 else:
@@ -976,6 +1008,11 @@ class TransformersASRBackend(ASRBackend):
                         metadata={
                             **meta,
                             **(
+                                {"seamless_decode_mode": seamless_decode.mode}
+                                if can_batch and self.spec.family == "seamless"
+                                else {}
+                            ),
+                            **(
                                 {
                                     "batch_size": batch_size,
                                     "effective_batch_size": effective_batch_size,
@@ -984,12 +1021,13 @@ class TransformersASRBackend(ASRBackend):
                                     "batch_elapsed_s": elapsed,
                                     "elapsed_s_source": "batch_proportional",
                                 }
-                                if can_batch
+                                if can_batch and per_item is None
                                 else {
                                     "batch_size": batch_size,
                                     "effective_batch_size": effective_batch_size,
                                     "batch_items": len(paths),
                                     "batch_group": batch_group,
+                                    "batch_internal_serial": can_batch,
                                     "elapsed_s_source": (
                                         "measured" if per_item is not None else "serial_share"
                                     ),

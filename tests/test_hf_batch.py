@@ -9,6 +9,7 @@ from stt.backends.transformers_asr import (
     TransformersASRBackend,
     _bound_hf_snapshot,
     _seamless_max_new_tokens,
+    _SeamlessBatchDecode,
 )
 from stt.provenance import ArtifactDigest, ModelBinding, ModelProvenance, digest_file
 from stt.results import Segment
@@ -129,7 +130,10 @@ def test_seamless_mps_batches_by_duration_and_releases_cache(monkeypatch, tmp_pa
     def transcribe_batch(group, batch_size):
         del batch_size
         calls.append(list(group))
-        return [[Segment(path.stem, 0.0, durations[path])] for path in group]
+        return _SeamlessBatchDecode(
+            [[Segment(path.stem, 0.0, durations[path])] for path in group],
+            "batched",
+        )
 
     def transcribe_one(path):
         calls.append([path])
@@ -146,6 +150,7 @@ def test_seamless_mps_batches_by_duration_and_releases_cache(monkeypatch, tmp_pa
     assert all(result.metadata["effective_batch_size"] == 32 for result in results)
     assert all(result.metadata["max_new_tokens_per_second"] == 8.0 for result in results)
     assert all(result.metadata["mps_batch_size_cap"] == 32 for result in results)
+    assert all(result.metadata["seamless_decode_mode"] == "batched" for result in results)
     assert synchronized == ["sync"]
     assert emptied == ["empty"]
 
@@ -157,6 +162,27 @@ def test_seamless_generation_budget_scales_and_clamps():
 
     with pytest.raises(ValueError, match="positive rate"):
         _seamless_max_new_tokens(1, 0)
+
+
+def test_seamless_internal_serial_fallback_uses_measured_item_times(monkeypatch, tmp_path):
+    paths = [tmp_path / "first.wav", tmp_path / "second.wav"]
+    monkeypatch.setattr("stt.audio.duration_of", lambda path: 2.0)
+    backend = TransformersASRBackend("seamless-m4t-v2")
+    backend._loaded = True
+    backend.resolved_device = "cpu"
+    backend.resolved_dtype = "float32"
+    backend._check_language = lambda language: None
+    backend._transcribe_seamless_batch = lambda group, batch_size: _SeamlessBatchDecode(
+        [[Segment(path.stem, 0.0, 2.0)] for path in group],
+        "serial-mixed-rate",
+        (0.25, 0.75),
+    )
+
+    results = backend.transcribe(paths, language="mya_Mymr", batch_size=2)
+
+    assert [result.elapsed_s for result in results] == [0.25, 0.75]
+    assert all(result.metadata["elapsed_s_source"] == "measured" for result in results)
+    assert all(result.metadata["seamless_decode_mode"] == "serial-mixed-rate" for result in results)
 
 
 def test_hf_bound_pipeline_uses_exact_snapshot_for_all_components(monkeypatch, tmp_path):
