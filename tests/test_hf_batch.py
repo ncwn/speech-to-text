@@ -7,6 +7,7 @@ import pytest
 
 from stt.backends.transformers_asr import TransformersASRBackend, _bound_hf_snapshot
 from stt.provenance import ArtifactDigest, ModelBinding, ModelProvenance, digest_file
+from stt.results import Segment
 
 
 def _hf_binding(tmp_path, model: str) -> tuple[ModelBinding, Path]:
@@ -102,6 +103,43 @@ def test_hf_batch_failure_retries_individually(monkeypatch, tmp_path):
 
     assert [result.text for result in results] == ["first", "second"]
     assert all(result.metadata["batch_fallback"] for result in results)
+
+
+def test_seamless_mps_batches_by_duration_and_releases_cache(monkeypatch, tmp_path):
+    import torch
+
+    paths = [tmp_path / f"{name}.wav" for name in "abcde"]
+    durations = dict(zip(paths, (5.0, 1.0, 4.0, 2.0, 3.0), strict=True))
+    monkeypatch.setattr("stt.audio.duration_of", durations.__getitem__)
+    synchronized: list[str] = []
+    emptied: list[str] = []
+    monkeypatch.setattr(torch.mps, "synchronize", lambda: synchronized.append("sync"))
+    monkeypatch.setattr(torch.mps, "empty_cache", lambda: emptied.append("empty"))
+    calls: list[list[Path]] = []
+    backend = TransformersASRBackend("seamless-m4t-v2")
+    backend._loaded = True
+    backend.resolved_device = "mps"
+    backend.resolved_dtype = "float32"
+    backend._check_language = lambda language: None
+
+    def transcribe_batch(group, batch_size):
+        del batch_size
+        calls.append(list(group))
+        return [[Segment(path.stem, 0.0, durations[path])] for path in group]
+
+    def transcribe_one(path):
+        calls.append([path])
+        return [Segment(path.stem, 0.0, durations[path])]
+
+    backend._transcribe_seamless_batch = transcribe_batch
+    backend._transcribe_seamless = transcribe_one
+    results = backend.transcribe(paths, language="mya_Mymr", batch_size=2)
+
+    assert calls == [[paths[1], paths[3]], [paths[4], paths[2]], [paths[0]]]
+    assert [result.text for result in results] == list("abcde")
+    assert [result.metadata["batch_group"] for result in results] == [2, 0, 1, 0, 1]
+    assert synchronized == ["sync"] * 3
+    assert emptied == ["empty"] * 3
 
 
 def test_hf_bound_pipeline_uses_exact_snapshot_for_all_components(monkeypatch, tmp_path):

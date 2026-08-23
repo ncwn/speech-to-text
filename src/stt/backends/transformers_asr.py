@@ -848,20 +848,25 @@ class TransformersASRBackend(ASRBackend):
                 metadata=dict(meta),
             )
 
-        for offset in range(0, len(audio_paths), batch_size):
-            chunk = audio_paths[offset : offset + batch_size]
-            valid: list[tuple[int, Path, float]] = []
-            for relative, path in enumerate(chunk):
-                index = offset + relative
-                duration: float | None = None
-                try:
-                    duration = duration_of(path)
-                    valid.append((index, path, duration))
-                except Exception as exc:  # noqa: BLE001 - preserve one-result-per-input
-                    slots[index] = failed(path, duration, exc)
+        valid_inputs: list[tuple[int, Path, float]] = []
+        for index, path in enumerate(audio_paths):
+            duration: float | None = None
+            try:
+                duration = duration_of(path)
+                valid_inputs.append((index, path, duration))
+            except Exception as exc:  # noqa: BLE001 - preserve one-result-per-input
+                slots[index] = failed(path, duration, exc)
 
-            if not valid:
-                continue
+        # Seamless padding cost follows the longest item. Duration ordering
+        # keeps each group homogeneous without changing the positional result
+        # contract. Other families retain caller order.
+        processing_order = (
+            sorted(valid_inputs, key=lambda item: (item[2], item[0]))
+            if self.spec.family == "seamless" and batch_size > 1
+            else valid_inputs
+        )
+        for batch_group, offset in enumerate(range(0, len(processing_order), batch_size)):
+            valid = processing_order[offset : offset + batch_size]
 
             paths = [path for _, path, _ in valid]
             can_batch = batch_size > 1 and len(paths) > 1 and self.spec.family != "whisper"
@@ -918,6 +923,7 @@ class TransformersASRBackend(ASRBackend):
                                 {
                                     "batch_size": batch_size,
                                     "batch_items": len(paths),
+                                    "batch_group": batch_group,
                                     "batch_elapsed_s": elapsed,
                                     "elapsed_s_source": "batch_proportional",
                                 }
@@ -925,6 +931,7 @@ class TransformersASRBackend(ASRBackend):
                                 else {
                                     "batch_size": batch_size,
                                     "batch_items": len(paths),
+                                    "batch_group": batch_group,
                                     "elapsed_s_source": (
                                         "measured" if per_item is not None else "serial_share"
                                     ),
@@ -964,6 +971,7 @@ class TransformersASRBackend(ASRBackend):
                                 **meta,
                                 "batch_size": batch_size,
                                 "batch_items": len(paths),
+                                "batch_group": batch_group,
                                 "batch_fallback": can_batch,
                                 "elapsed_s_source": "measured",
                             },
@@ -971,6 +979,12 @@ class TransformersASRBackend(ASRBackend):
                         )
                     except Exception as exc:  # noqa: BLE001 - preserve one-result contract
                         slots[index] = failed(path, duration, exc)
+            finally:
+                if self.resolved_device == "mps":
+                    import torch
+
+                    torch.mps.synchronize()
+                    torch.mps.empty_cache()
 
         assert all(result is not None for result in slots)
         return [result for result in slots if result is not None]
