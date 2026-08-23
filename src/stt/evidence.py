@@ -582,6 +582,7 @@ def _render_block(block: BlockSpec) -> tuple[str, list[str], bool]:
                 ),
                 references,
                 Requirements(settings={}, aligned_segments=block.aligned_segments),
+                normalization=block.normalization,
             )
             table = run_deriver(context, block.deriver, reference_path=block.reference)
             return _render_derived_table(table), issues, True

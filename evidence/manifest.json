@@ -172,52 +172,50 @@
       "id": "tails",
       "corpus": "fleurs-test-120",
       "reference": "data/fleurs-test/references.tsv",
-      "status_only": true,
+      "status_only": false,
       "runs": [
         {
-          "artifact": "outputs/t120-omni7b.jsonl",
-          "label": "omniASR 7B Unlimited v2",
+          "artifact": "outputs/evidence-fleurs-test-omni7b.jsonl",
+          "label": "omniASR 7B",
           "backend": "omniasr-torch",
-          "model": "omniASR_LLM_Unlimited_7B_v2"
+          "model": "omniASR_LLM_Unlimited_7B_v2",
+          "settings": {
+            "device": "mps",
+            "dtype": "float16"
+          }
         },
         {
-          "artifact": "outputs/t120-omni3b.jsonl",
-          "label": "omniASR 3B Unlimited v2",
-          "backend": "omniasr-torch",
-          "model": "omniASR_LLM_Unlimited_3B_v2"
-        },
-        {
-          "artifact": "outputs/t120-seamless-1.jsonl",
-          "label": "SeamlessM4T v2 large",
+          "artifact": "outputs/evidence-fleurs-test-seamless.jsonl",
+          "label": "SeamlessM4T v2",
           "backend": "hf",
-          "model": "seamless-m4t-v2"
+          "model": "seamless-m4t-v2",
+          "settings": {
+            "device": "mps",
+            "dtype": "float32"
+          }
         },
         {
-          "artifact": "outputs/t120-omni300m.jsonl",
-          "label": "omniASR 300M Unlimited v2",
-          "backend": "omniasr-torch",
-          "model": "omniASR_LLM_Unlimited_300M_v2"
-        },
-        {
-          "artifact": "outputs/t120-dolphin-small.jsonl",
-          "label": "Dolphin small (372M)",
+          "artifact": "outputs/evidence-fleurs-test-dolphin.jsonl",
+          "label": "Dolphin small",
           "backend": "dolphin",
-          "model": "small"
+          "model": "small",
+          "settings": {
+            "device": "cpu",
+            "dtype": "float32"
+          }
         },
         {
-          "artifact": "outputs/t120-mms.jsonl",
+          "artifact": "outputs/evidence-fleurs-test-mms.jsonl",
           "label": "MMS-1B",
           "backend": "hf",
-          "model": "mms-1b-all"
+          "model": "mms-1b-all",
+          "settings": {
+            "device": "mps",
+            "dtype": "float32"
+          }
         }
       ],
-      "metrics": [
-        {
-          "name": "cer",
-          "label": "CER",
-          "digits": 4
-        }
-      ],
+      "metrics": [],
       "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
       "expected_reference_count": 120,
       "normalization": {
@@ -226,7 +224,8 @@
         "strip_punctuation": true,
         "normalize_digits": true,
         "lowercase": true
-      }
+      },
+      "deriver": "tails:v1"
     },
     {
       "id": "held-out",

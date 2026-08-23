@@ -92,12 +92,17 @@ For long audio the tail matters more than the average, because one runaway
 segment contaminates everything after it. Same 120 clips:
 
 <!-- stt-evidence:tails:start -->
-> **Unverified legacy evidence.** Numeric publication is blocked because the declared artifacts are missing trusted audio identity, complete corpus coverage, or matching provenance. Regenerate the runs before publishing measured results.
+| Run | Corpus CER | Clip CER p90 | CER > 0.3 % | CER > 0.3 N | N |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| omniASR 7B | 0.0745 | 0.1520 | 0.0 | 0 | 120 |
+| SeamlessM4T v2 | 0.1036 | 0.2027 | 2.5 | 3 | 120 |
+| Dolphin small | 0.1480 | 0.2585 | 5.0 | 6 | 120 |
+| MMS-1B | 0.1565 | 0.2665 | 4.2 | 5 | 120 |
 <!-- stt-evidence:tails:end -->
 
-Every model puts 2.5–8 % of clips over CER 0.3. The 7B has the best tail by a
-clear margin — roughly half the failure rate of anything else — and for a long
-recording that matters more than the average does.
+The 7B has the best corpus score and tail, with no clip crossing the declared
+failure threshold. The other three subjects retain measurable tail failures,
+which matters when many clips are concatenated into a long workflow.
 
 ---
 

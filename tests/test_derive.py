@@ -71,6 +71,15 @@ def test_transcript_deriver_returns_typed_rows_and_recomputes_identity(tmp_path)
     assert reference_sha256(reference) == context.requirements.reference_sha256
 
 
+def test_tails_deriver_uses_declared_accuracy_normalization(tmp_path):
+    context, reference = _context(tmp_path)
+
+    table = derive(context, "tails:v1", reference_path=reference)
+
+    assert table.rows[0]["corpus_cer"] == 0.0
+    assert table.rows[0]["over_0_3_n"] == 0
+
+
 def test_deriver_rejects_waveform_map_drift(tmp_path):
     context, reference = _context(tmp_path)
     changed = replace(_result("clip"), audio_id="pcm16:16000:1:" + "b" * 64)

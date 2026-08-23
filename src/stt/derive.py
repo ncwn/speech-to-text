@@ -122,6 +122,7 @@ class DeriveContext:
     runs: tuple[tuple[str, tuple[TranscriptionResult, ...]], ...]
     references: dict[str, str]
     requirements: Requirements = Requirements()
+    normalization: dict[str, Any] = field(default_factory=dict)
 
     def validate(self) -> None:
         self.requirements.validate()
@@ -291,6 +292,50 @@ def transcript_table(context: DeriveContext) -> DerivedTable:
         deriver="transcripts:v1",
         columns=(DerivedColumn("run", "Run"), DerivedColumn("n_records", "Records", 0)),
         rows=rows,
+        row_key="run",
+    )
+
+
+@register("tails:v1")
+def tails_table(context: DeriveContext) -> DerivedTable:
+    """Derive corpus and per-clip tail CER under declared normalization."""
+    from stt.burmese import NormalizeOptions
+    from stt.evaluate import score_results
+
+    try:
+        options = NormalizeOptions(**context.normalization)
+    except TypeError as exc:
+        raise MeasurementError(f"invalid tail normalization: {exc}") from exc
+    rows: list[dict[str, Any]] = []
+    for label, results in context.runs:
+        score = score_results(
+            list(results), context.references, options=options, check_encoding=True
+        )
+        if score.n_failed or score.partial_cer is None or len(score.scored) != len(results):
+            raise MeasurementError(f"tail scoring is incomplete for {label}")
+        clip_cers = sorted(float(item.cer) for item in score.scored)
+        over = sum(value > 0.3 for value in clip_cers)
+        rows.append(
+            {
+                "run": label,
+                "corpus_cer": score.partial_cer,
+                "p90_clip_cer": _percentile(clip_cers, 0.9),
+                "over_0_3_pct": over / len(clip_cers) * 100.0,
+                "over_0_3_n": over,
+                "n": len(clip_cers),
+            }
+        )
+    return DerivedTable(
+        deriver="tails:v1",
+        columns=(
+            DerivedColumn("run", "Run"),
+            DerivedColumn("corpus_cer", "Corpus CER", 4),
+            DerivedColumn("p90_clip_cer", "Clip CER p90", 4),
+            DerivedColumn("over_0_3_pct", "CER > 0.3 %", 1),
+            DerivedColumn("over_0_3_n", "CER > 0.3 N", 0),
+            DerivedColumn("n", "N", 0),
+        ),
+        rows=tuple(rows),
         row_key="run",
     )
 
@@ -565,6 +610,7 @@ __all__ = [
     "reference_sha256",
     "register",
     "transcript_table",
+    "tails_table",
     "validate_context",
     "validate_aligned_segments",
     "validate_reference_identity",
