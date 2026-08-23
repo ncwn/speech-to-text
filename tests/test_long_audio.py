@@ -10,6 +10,7 @@ from stt.long_audio import (
     read_sentinel_spans,
     run_runner,
     sentinel_identity,
+    verify_observation,
 )
 from stt.results import Segment, TranscriptionResult
 from stt.sentinel import annotation
@@ -66,3 +67,16 @@ def test_runner_captures_failures_as_observations():
 
     assert observation.error == "RuntimeError: boom"
     assert observation.n_segments == 0
+
+
+def test_archived_sentinel_observations_bind_the_fixture_identities():
+    root = Path(__file__).parents[1]
+    audio = root / "data" / "sentinels" / "long-audio-boundary-v1.wav"
+    annotation_path = root / "data" / "sentinels" / "long-audio-boundary-v1.json"
+    reports = sorted((root / "evidence" / "experiments" / "long-audio-sentinel").glob("*.json"))
+
+    assert reports
+    assert all(
+        verify_observation(report, audio_path=audio, annotation_path=annotation_path) == []
+        for report in reports
+    )

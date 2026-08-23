@@ -175,6 +175,36 @@ def read_sentinel_spans(annotation_path: Path) -> tuple[tuple[float, float], ...
     return spans
 
 
+def verify_observation(
+    report_path: Path,
+    *,
+    audio_path: Path,
+    annotation_path: Path,
+) -> list[str]:
+    """Verify one archived observation against the immutable sentinel files."""
+    try:
+        value = json.loads(report_path.read_text(encoding="utf-8"))
+        raw_spec = dict(value["spec"])
+        raw_spec["boundaries_s"] = tuple(raw_spec.get("boundaries_s", BOUNDARIES_S))
+        spec = LongAudioRunnerSpec(**raw_spec)
+        raw_observation = dict(value["observation"])
+        raw_observation["boundary_hits"] = tuple(raw_observation.get("boundary_hits", ()))
+        observation = LongAudioObservation(**raw_observation)
+        spec.validate()
+        observation.validate()
+    except (OSError, ValueError, TypeError, KeyError, json.JSONDecodeError) as exc:
+        return [f"cannot read long-audio observation: {exc}"]
+    audio_sha, annotation_sha = sentinel_identity(annotation_path, audio_path)
+    issues: list[str] = []
+    if spec.audio_sha256 != audio_sha:
+        issues.append("long-audio observation audio identity differs")
+    if spec.annotation_sha256 != annotation_sha:
+        issues.append("long-audio observation annotation identity differs")
+    if spec.runner_id != observation.runner_id:
+        issues.append("long-audio observation runner identity differs")
+    return issues
+
+
 __all__ = [
     "LONG_AUDIO_SCHEMA_VERSION",
     "LongAudioObservation",
@@ -183,4 +213,5 @@ __all__ = [
     "read_sentinel_spans",
     "run_runner",
     "sentinel_identity",
+    "verify_observation",
 ]

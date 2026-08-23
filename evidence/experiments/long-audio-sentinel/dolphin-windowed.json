@@ -1,0 +1,27 @@
+{
+  "artifact_kind": "long-audio-observation-v1",
+  "spec": {
+    "runner_id": "dolphin-windowed",
+    "backend": "dolphin",
+    "model": "small",
+    "entrypoint": "dolphin.windowed",
+    "audio_sha256": "ca1f29a2ea1a095b224c41c8845ff35afb34df4941735cf848939d94b930de0c",
+    "annotation_sha256": "0de651d8301d6180f72e9924ec2a93b7074bb365ebd3a9fbacb1d7b2f96b0576",
+    "boundaries_s": [
+      20.0,
+      40.0
+    ]
+  },
+  "observation": {
+    "runner_id": "dolphin-windowed",
+    "transcript": "",
+    "elapsed_s": 5.765664874983486,
+    "n_segments": 0,
+    "matched_spans": 0,
+    "missed_spans": 6,
+    "duplicate_spans": 0,
+    "ordered": true,
+    "boundary_hits": [],
+    "error": "backend contract violation: empty transcript with no error set"
+  }
+}
