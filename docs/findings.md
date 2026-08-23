@@ -41,15 +41,17 @@ publication accuracy continues to use canonical prepared audio.
 
 The accepted baseline-v2 measures the four trusted subjects over the same five
 FLEURS Burmese `dev` clips. RTF is the synchronized complete-corpus wall divided
-by corpus duration; intervals bootstrap five isolated worker sessions.
+by corpus duration; intervals bootstrap five isolated worker sessions. It holds
+batch size at one as a latency/regression protocol. Model-specific batching and
+utilization tables below describe maximum-throughput operation separately.
 
 <!-- stt-evidence:baseline:start -->
 | Subject | RTF | CI low | CI high | Peak RSS MB | Sessions | Repeats |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| hf/mms-1b-all | 0.0247 | 0.0245 | 0.0252 | 625 | 5 | 15 |
-| hf/seamless-m4t-v2 | 0.1623 | 0.1537 | 0.1657 | 1196 | 5 | 15 |
-| dolphin/small | 0.1743 | 0.1673 | 0.1779 | 6171 | 5 | 15 |
-| omniasr-torch/omniASR_LLM_Unlimited_7B_v2 | 0.4236 | 0.4138 | 0.4297 | 25433 | 5 | 15 |
+| hf/mms-1b-all | 0.0242 | 0.0241 | 0.0244 | 628 | 5 | 15 |
+| hf/seamless-m4t-v2 | 0.1537 | 0.1501 | 0.1542 | 1231 | 5 | 15 |
+| dolphin/small | 0.1695 | 0.1673 | 0.1715 | 6188 | 5 | 15 |
+| omniasr-torch/omniASR_LLM_Unlimited_7B_v2 | 0.4073 | 0.4069 | 0.4126 | 25152 | 5 | 15 |
 <!-- stt-evidence:baseline:end -->
 
 ### Trusted accuracy refresh
