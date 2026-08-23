@@ -21,7 +21,8 @@ from urllib.parse import urlparse
 
 from stt.paths import cache_dir
 
-PROVENANCE_SCHEMA_VERSION = 1
+PROVENANCE_SCHEMA_VERSION = 2
+SUPPORTED_PROVENANCE_SCHEMA_VERSIONS = frozenset({1, PROVENANCE_SCHEMA_VERSION})
 DIGEST_CACHE_VERSION = 1
 _STAT_FINGERPRINT_KEYS = frozenset({"device", "inode", "size", "mtime_ns", "ctime_ns"})
 _DIGEST_CACHE_KEYS = frozenset({"version", "stat", "size_bytes", "sha256"})
@@ -187,7 +188,7 @@ class ModelProvenance:
         }
 
     def _execution_payload(self) -> dict[str, Any]:
-        return {
+        payload = {
             **self._content_payload(),
             "runtime_packages": dict(sorted(self.runtime_packages.items())),
             "requested_settings": self.requested_settings,
@@ -195,6 +196,9 @@ class ModelProvenance:
             "fallback_history": list(self.fallback_history),
             "uv_lock_sha256": self.uv_lock_sha256,
         }
+        if self.schema_version >= 2:
+            payload["adapter_git_commit"] = self.adapter_git_commit
+        return payload
 
     def finalized(self) -> ModelProvenance:
         """Return a copy with canonical content and execution hashes populated."""
@@ -249,7 +253,10 @@ class ModelProvenance:
         return self.execution_sha256
 
     def validate(self) -> None:
-        if type(self.schema_version) is not int or self.schema_version != PROVENANCE_SCHEMA_VERSION:
+        if (
+            type(self.schema_version) is not int
+            or self.schema_version not in SUPPORTED_PROVENANCE_SCHEMA_VERSIONS
+        ):
             raise ProvenanceError(f"unsupported provenance schema {self.schema_version}")
         if not isinstance(self.backend, str) or not isinstance(self.requested_model, str):
             raise ProvenanceError("backend and requested model must be strings")

@@ -67,7 +67,7 @@ def test_forged_canonical_hash_is_rejected():
         ModelProvenance.from_dict(raw)
 
 
-def test_execution_identity_excludes_adapter_commit_but_includes_runtime_settings():
+def test_execution_identity_includes_adapter_commit_and_runtime_settings():
     original = _provenance()
     other_commit = replace(
         original,
@@ -82,8 +82,27 @@ def test_execution_identity_excludes_adapter_commit_but_includes_runtime_setting
         execution_sha256="",
     ).finalized()
 
-    assert other_commit.execution_sha256 == original.execution_sha256
+    assert other_commit.execution_sha256 != original.execution_sha256
     assert other_batch.execution_sha256 != original.execution_sha256
+
+
+def test_schema_one_execution_identity_remains_readable_with_legacy_hash_semantics():
+    original = replace(
+        _provenance(),
+        schema_version=1,
+        content_sha256="",
+        execution_sha256="",
+    ).finalized()
+    other_commit = replace(
+        original,
+        adapter_git_commit="c" * 40,
+        content_sha256="",
+        execution_sha256="",
+    ).finalized()
+
+    assert other_commit.execution_sha256 == original.execution_sha256
+    assert ModelProvenance.from_dict(original.to_dict()) == original
+    assert original.complete
 
 
 def test_local_artifact_path_does_not_change_content_identity():
