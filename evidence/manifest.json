@@ -175,6 +175,37 @@
       }
     },
     {
+      "id": "accuracy-fleurs-test-seamless",
+      "corpus": "fleurs-test-120",
+      "reference": "data/fleurs-test/references.tsv",
+      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
+      "expected_reference_count": 120,
+      "runs": [
+        {
+          "artifact": "outputs/evidence-fleurs-test-seamless-b4.jsonl",
+          "label": "SeamlessM4T v2 (bounded incomplete lane)",
+          "backend": "hf",
+          "model": "seamless-m4t-v2"
+        }
+      ],
+      "metrics": [
+        {
+          "name": "cer",
+          "label": "CER",
+          "digits": 4
+        }
+      ],
+      "status_only": true,
+      "status_reason": "Seamless 120-clip accuracy was attempted serially for one hour and with batch size 4 for thirty minutes; neither run published a complete artifact, so no CER is promoted.",
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      }
+    },
+    {
       "id": "accuracy-fleurs-dev-12",
       "corpus": "fleurs-dev-12",
       "reference": "data/fleurs/references.tsv",
