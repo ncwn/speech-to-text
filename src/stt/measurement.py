@@ -211,13 +211,16 @@ class WorkerRequest:
             raise MeasurementError("launch_position must be non-negative")
         if not self.condition_id:
             raise MeasurementError("condition_id is required")
-        if self.runner_id not in {"adapter", "source"}:
+        if self.runner_id not in {"adapter", "source", "fault-delay", "fault-all-failed"}:
             raise MeasurementError(f"unsupported worker runner: {self.runner_id}")
         if self.input_mode not in {"prepared", "source"}:
             raise MeasurementError(f"unsupported worker input mode: {self.input_mode}")
         if self.runner_id == "source" and self.input_mode != "source":
             raise MeasurementError("source runner requires source input mode")
-        if self.runner_id == "adapter" and self.input_mode != "prepared":
+        if (
+            self.runner_id in {"adapter", "fault-delay", "fault-all-failed"}
+            and self.input_mode != "prepared"
+        ):
             raise MeasurementError("adapter runner requires prepared input mode")
         if self.model_binding is not None:
             self.model_binding.validate()

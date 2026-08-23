@@ -30,9 +30,35 @@ from stt.measurement import (
     write_response,
 )
 from stt.provenance import validate_binding
+from stt.results import TranscriptionResult
 from stt.telemetry import ResourceUsage, describe_host, measure
 
 BackendFactory = Callable[[str, str | None, dict[str, Any]], Any]
+
+
+class _FaultBackend:
+    """Deterministic failure fixture used inside the normal worker envelope."""
+
+    model = "fault-fixture"
+    resolved_device = "cpu"
+    resolved_dtype = "float32"
+
+    def __init__(self, *, delay_s: float, fail: bool) -> None:
+        self.delay_s = delay_s
+        self.fail = fail
+
+    def load(self) -> None:
+        return None
+
+    def unload(self) -> None:
+        return None
+
+    def transcribe(self, paths, language=None, batch_size=1):
+        del language, batch_size
+        time.sleep(self.delay_s)
+        if self.fail:
+            raise RuntimeError("fault fixture batch failure")
+        return [TranscriptionResult(str(path), "fault", "fault", self.model) for path in paths]
 
 
 def _phase(name: str, usage: ResourceUsage, *, repeat_index: int | None = None) -> PhaseEvent:
@@ -170,11 +196,21 @@ def execute_request(
         prepared = [
             _presented_input(item, input_mode=request.input_mode) for item in request.inputs
         ]
-        instance = backend_factory(
-            request.subject.backend,
-            request.subject.model,
-            request.subject.options,
-        )
+        if request.runner_id in {"fault-delay", "fault-all-failed"}:
+            default_delay = 0.01 if request.runner_id == "fault-delay" else 0.0
+            delay_s = float(request.subject.options.get("fault_delay_s", default_delay))
+            if delay_s < 0:
+                raise RuntimeError("fault_delay_s must be non-negative")
+            instance = _FaultBackend(
+                delay_s=delay_s,
+                fail=True,
+            )
+        else:
+            instance = backend_factory(
+                request.subject.backend,
+                request.subject.model,
+                request.subject.options,
+            )
         if request.model_binding is not None:
             bind_model = getattr(instance, "bind_model", None)
             if not callable(bind_model):
@@ -326,6 +362,7 @@ def execute_request(
             event = _phase(f"repeat-{index}", usage, repeat_index=index)
             if not complete:
                 detail = issues[0] if issues else "repeat is incomplete"
+                error = error or detail
                 event = PhaseEvent(
                     event.name,
                     event.started_ns,

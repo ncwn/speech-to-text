@@ -176,7 +176,7 @@ class ConditionSpec:
             raise MeasurementError("condition subject options must bind its batch size")
         if self.sample_uss and not self.profile:
             raise MeasurementError("USS sampling requires profiling")
-        if self.runner_id not in {"adapter", "source"}:
+        if self.runner_id not in {"adapter", "source", "fault-delay", "fault-all-failed"}:
             raise MeasurementError(f"unsupported experiment runner: {self.runner_id}")
 
     @property

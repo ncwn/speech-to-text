@@ -159,6 +159,23 @@ def test_source_runner_presents_source_path_without_rewriting_prepared_identity(
     assert response.runtime["runner_id"] == "source"
 
 
+def test_fault_runner_keeps_delayed_failure_inside_worker_phase(tmp_path):
+    base = _request(tmp_path, warmups=0, repeats=1)
+    request = replace(
+        base,
+        runner_id="fault-delay",
+        subject=replace(base.subject, options={"fault_delay_s": 0.01}),
+    )
+
+    response = execute_request(request, root=tmp_path)
+
+    assert not response.complete
+    assert response.error
+    assert response.repeats
+    assert response.repeats[0].phase.duration_s >= 0.01
+    assert response.runtime["runner_id"] == "fault-delay"
+
+
 def test_worker_subprocess_publishes_failure_response(tmp_path):
     request = _request(tmp_path, backend="definitely-not-a-backend", warmups=0, repeats=1)
     request_path = tmp_path / "request.json"

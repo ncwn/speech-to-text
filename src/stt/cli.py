@@ -1795,6 +1795,9 @@ def experiment_run(
     for condition in spec.conditions:
         if condition.request_key in bindings:
             continue
+        if condition.runner_id in {"fault-delay", "fault-all-failed"}:
+            bindings[condition.request_key] = None
+            continue
         try:
             bindings[condition.request_key] = preflight_model_binding(
                 condition.subject.backend,
