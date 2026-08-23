@@ -9,6 +9,7 @@ from stt.backends.transformers_asr import (
     TransformersASRBackend,
     _bound_hf_snapshot,
     _seamless_max_new_tokens,
+    _seamless_window_groups,
     _SeamlessBatchDecode,
 )
 from stt.provenance import ArtifactDigest, ModelBinding, ModelProvenance, digest_file
@@ -164,6 +165,14 @@ def test_seamless_generation_budget_scales_and_clamps():
         _seamless_max_new_tokens(1, 0)
 
 
+def test_seamless_window_groups_keep_a_short_long_audio_tail_scalar():
+    groups = _seamless_window_groups([20_000] * 50 + [7_700], 32)
+
+    assert [len(group) for group in groups] == [1, 32, 18]
+    assert groups[0] == [50]
+    assert _seamless_window_groups([12_780, 14_000, 15_600, 16_680], 32) == [[0, 1, 2, 3]]
+
+
 def test_seamless_internal_serial_fallback_uses_measured_item_times(monkeypatch, tmp_path):
     paths = [tmp_path / "first.wav", tmp_path / "second.wav"]
     monkeypatch.setattr("stt.audio.duration_of", lambda path: 2.0)
@@ -183,6 +192,36 @@ def test_seamless_internal_serial_fallback_uses_measured_item_times(monkeypatch,
     assert [result.elapsed_s for result in results] == [0.25, 0.75]
     assert all(result.metadata["elapsed_s_source"] == "measured" for result in results)
     assert all(result.metadata["seamless_decode_mode"] == "serial-mixed-rate" for result in results)
+
+
+def test_seamless_single_long_file_batches_internal_windows(monkeypatch, tmp_path):
+    path = tmp_path / "long.wav"
+    monkeypatch.setattr("stt.audio.duration_of", lambda value: 45.0)
+    backend = TransformersASRBackend("seamless-m4t-v2")
+    backend._loaded = True
+    backend.resolved_device = "mps"
+    backend.resolved_dtype = "float32"
+    backend._check_language = lambda language: None
+    calls = []
+
+    def transcribe_batch(paths, batch_size):
+        calls.append((paths, batch_size))
+        return _SeamlessBatchDecode(
+            [[Segment("long", 0.0, 45.0)]],
+            "batched",
+            window_count=3,
+            window_batches=1,
+        )
+
+    backend._transcribe_seamless_batch = transcribe_batch
+    backend._transcribe_seamless = lambda value: pytest.fail("serial path used")
+
+    (result,) = backend.transcribe([path], language="mya_Mymr", batch_size=32)
+
+    assert calls == [([path], 32)]
+    assert result.text == "long"
+    assert result.metadata["seamless_window_count"] == 3
+    assert result.metadata["seamless_window_batches"] == 1
 
 
 def test_hf_bound_pipeline_uses_exact_snapshot_for_all_components(monkeypatch, tmp_path):

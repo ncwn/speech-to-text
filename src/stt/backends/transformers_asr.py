@@ -56,6 +56,7 @@ _SEAMLESS_OUTPUT_TOKENS_PER_SECOND = 8.0
 _SEAMLESS_MIN_NEW_TOKENS = 32
 _SEAMLESS_MAX_NEW_TOKENS = 256
 _SEAMLESS_MPS_MAX_BATCH_SIZE = 32
+_SEAMLESS_MAX_WINDOW_LENGTH_RATIO = 1.5
 
 
 def _seamless_max_new_tokens(sample_count: int, sample_rate: int) -> int:
@@ -66,6 +67,28 @@ def _seamless_max_new_tokens(sample_count: int, sample_rate: int) -> int:
         )
     scaled = math.ceil(sample_count / sample_rate * _SEAMLESS_OUTPUT_TOKENS_PER_SECOND)
     return min(_SEAMLESS_MAX_NEW_TOKENS, max(_SEAMLESS_MIN_NEW_TOKENS, scaled))
+
+
+def _seamless_window_groups(sample_counts: list[int], batch_size: int) -> list[list[int]]:
+    """Group similarly sized windows without padding a lone tail into a full batch."""
+    if batch_size < 1:
+        raise ValueError("Seamless window batch size must be positive")
+    ordered = sorted(range(len(sample_counts)), key=lambda index: (sample_counts[index], index))
+    groups: list[list[int]] = []
+    for index in ordered:
+        if not groups:
+            groups.append([index])
+            continue
+        group = groups[-1]
+        shortest = sample_counts[group[0]]
+        if (
+            len(group) >= batch_size
+            or sample_counts[index] > shortest * _SEAMLESS_MAX_WINDOW_LENGTH_RATIO
+        ):
+            groups.append([index])
+        else:
+            group.append(index)
+    return groups
 
 
 @dataclass(frozen=True)
@@ -83,6 +106,8 @@ class _SeamlessBatchDecode:
     segments: list[list[Segment]]
     mode: str
     per_file_elapsed_s: tuple[float, ...] | None = None
+    window_count: int = 0
+    window_batches: int = 0
 
 
 MODELS: dict[str, HFModel] = {
@@ -595,8 +620,28 @@ class TransformersASRBackend(ASRBackend):
             else:
                 batchable.append(item)
 
-        for offset in range(0, len(batchable), max(1, batch_size)):
-            group = batchable[offset : offset + max(1, batch_size)]
+        window_groups = _seamless_window_groups(
+            [len(item[3]) for item in batchable], max(1, batch_size)
+        )
+        batched_window_count = 0
+        window_batch_count = 0
+        for indices in window_groups:
+            group = [batchable[index] for index in indices]
+            if len(group) == 1:
+                file_index, start, end, chunk = group[0]
+                item_started = time.perf_counter()
+                text = decode_single(chunk)
+                per_file_elapsed[file_index] += time.perf_counter() - item_started
+                if text:
+                    segments[file_index].append(
+                        Segment(
+                            text=text,
+                            start=start / rate,
+                            end=end / rate,
+                            source="chunk",
+                        )
+                    )
+                continue
             chunks = [item[3] for item in group]
             inputs = processor(
                 **_audio_kwarg(chunks),
@@ -615,6 +660,8 @@ class TransformersASRBackend(ASRBackend):
             texts = [
                 processor.decode(row.tolist(), skip_special_tokens=True).strip() for row in tokens
             ]
+            batched_window_count += len(group)
+            window_batch_count += 1
             if len(texts) != len(group):
                 raise RuntimeError(
                     f"Seamless returned {len(texts)} transcript(s) for {len(group)} windows"
@@ -629,16 +676,25 @@ class TransformersASRBackend(ASRBackend):
                             source="chunk",
                         )
                     )
+            if self.resolved_device == "mps":
+                torch.mps.synchronize()
+                torch.mps.empty_cache()
         for items in segments:
             items.sort(key=lambda item: (item.start, item.end))
-        if not batchable:
+        if window_batch_count == 0:
             return _SeamlessBatchDecode(
                 segments,
                 "serial-short-tails",
                 tuple(per_file_elapsed),
+                window_count=len(pending),
             )
-        mode = "batched-with-serial-tails" if len(batchable) != len(pending) else "batched"
-        return _SeamlessBatchDecode(segments, mode)
+        mode = "batched-with-serial-tails" if batched_window_count != len(pending) else "batched"
+        return _SeamlessBatchDecode(
+            segments,
+            mode,
+            window_count=len(pending),
+            window_batches=window_batch_count,
+        )
 
     def _pipeline_kwargs(self) -> dict[str, Any]:
         if self.spec.family == "whisper":
@@ -963,7 +1019,9 @@ class TransformersASRBackend(ASRBackend):
 
             paths = [path for _, path, _ in valid]
             can_batch = (
-                effective_batch_size > 1 and len(paths) > 1 and self.spec.family != "whisper"
+                effective_batch_size > 1
+                and self.spec.family != "whisper"
+                and (len(paths) > 1 or self.spec.family == "seamless")
             )
             measured: list[float] = []
             started = time.perf_counter()
@@ -1015,7 +1073,11 @@ class TransformersASRBackend(ASRBackend):
                         metadata={
                             **meta,
                             **(
-                                {"seamless_decode_mode": seamless_decode.mode}
+                                {
+                                    "seamless_decode_mode": seamless_decode.mode,
+                                    "seamless_window_count": seamless_decode.window_count,
+                                    "seamless_window_batches": seamless_decode.window_batches,
+                                }
                                 if can_batch and self.spec.family == "seamless"
                                 else {}
                             ),
