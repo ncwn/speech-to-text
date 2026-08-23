@@ -1,0 +1,2270 @@
+{
+  "complete": true,
+  "condition_id": "default",
+  "environment": {
+    "git_commit": "690fb2d883afb74ffe503b997132fa51a45e6477",
+    "git_dirty": false,
+    "machine": "arm64",
+    "packages": {
+      "accelerate": "1.14.0",
+      "crispasr": "0.8.29",
+      "dataoceanai-dolphin": "20260513",
+      "fairseq2": "0.6",
+      "funasr": "1.4.2",
+      "huggingface-hub": "0.36.2",
+      "modelscope": "1.39.1",
+      "omnilingual-asr": "0.2.0",
+      "psutil": "5.9.8",
+      "sentencepiece": "0.2.2",
+      "soundfile": "0.14.0",
+      "tokenizers": "0.22.2",
+      "torch": "2.8.0",
+      "torchaudio": "2.8.0",
+      "transformers": "4.57.6"
+    },
+    "pid": 2442,
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "power": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=24641635)\t80%; AC attached; not charging present: true",
+    "python": "3.12.13",
+    "python_executable": ".venv/bin/python3",
+    "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+    "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+  },
+  "error": null,
+  "experiment_id": "743f1d189c254ba1b1bb5b5a789d5899",
+  "host": {
+    "chip": "Apple M2 Max",
+    "compute_threads": 8,
+    "cores": {
+      "Efficiency": 4,
+      "Performance": 8
+    },
+    "cpu_count": 12,
+    "machine": "arm64",
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "ram_mb": 65536
+  },
+  "journal_recovered": false,
+  "launch_position": 3,
+  "load_resources": {
+    "cpu_s": 43.4632,
+    "cpu_utilization": 2.54,
+    "ended_ns": 196615561403125,
+    "gpu_mb": 15776.4,
+    "peak_rss_mb": 22896.8,
+    "phase": "load",
+    "process_peak_rss_mb": 22896.8,
+    "rss_peak_mb": 965.4,
+    "started_ns": 196598444677708,
+    "wall_s": 17.1167
+  },
+  "model_provenance": {
+    "adapter_git_commit": "690fb2d883afb74ffe503b997132fa51a45e6477",
+    "adapter_git_dirty": false,
+    "artifacts": [
+      {
+        "name": "omniASR-LLM-Unlimited-7B-v2.pt",
+        "path": ".cache/fairseq2/assets/be8b45a4444380016fa2f991/omniASR-LLM-Unlimited-7B-v2.pt",
+        "role": "weights",
+        "sha256": "600199f8be430aed4e43b6b1c7cf70fd83d471fac574c61c95b6bce90c47b68e",
+        "size_bytes": 31220520831,
+        "stat": {
+          "ctime_ns": 1787159223984645852,
+          "device": 16777235,
+          "inode": 5984141,
+          "mtime_ns": 1787087265633906879,
+          "size": 31220520831
+        }
+      },
+      {
+        "name": "omniASR_tokenizer_written_v2.model",
+        "path": ".cache/fairseq2/assets/e7be1a6acb8f76fdbca19dce/omniASR_tokenizer_written_v2.model",
+        "role": "tokenizer",
+        "sha256": "8aa11a1092142ef472537476ef6e76541123e2f0d789b79f3ebd119008240b1e",
+        "size_bytes": 91481,
+        "stat": {
+          "ctime_ns": 1787159200848561084,
+          "device": 16777235,
+          "inode": 5984130,
+          "mtime_ns": 1787060037638994009,
+          "size": 91481
+        }
+      },
+      {
+        "name": "omniASR_LLM_Unlimited_7B_v2.card.json",
+        "path": null,
+        "role": "card-metadata",
+        "sha256": "7c355b28c11a521c875d344a31d00dda3f152c3bf42b57a8cee0afde491b3e53",
+        "size_bytes": 349,
+        "stat": {}
+      }
+    ],
+    "backend": "omniasr-torch",
+    "content_sha256": "bed4307b49fe3162ff3f980d744831c81a262bffd3b1f2df79c3c6e3c53ee154",
+    "execution_sha256": "5fb13dfae3d11d5aba36c992f9d2c26a883b2b86fa1a7c0edb92db6541c2f263",
+    "fallback_history": [],
+    "issues": [],
+    "requested_model": "omniASR_LLM_Unlimited_7B_v2",
+    "requested_settings": {
+      "batch_size": 1,
+      "device": "auto",
+      "dtype": "auto",
+      "language": "mya_Mymr"
+    },
+    "resolved_settings": {
+      "chunk_seconds": null,
+      "device": "mps",
+      "dtype": "float16",
+      "n_threads": null
+    },
+    "revision_status": "unavailable-content-addressed",
+    "runtime_packages": {
+      "accelerate": "1.14.0",
+      "crispasr": "0.8.29",
+      "dataoceanai-dolphin": "20260513",
+      "fairseq2": "0.6",
+      "funasr": "1.4.2",
+      "huggingface-hub": "0.36.2",
+      "modelscope": "1.39.1",
+      "omnilingual-asr": "0.2.0",
+      "psutil": "5.9.8",
+      "sentencepiece": "0.2.2",
+      "soundfile": "0.14.0",
+      "tokenizers": "0.22.2",
+      "torch": "2.8.0",
+      "torchaudio": "2.8.0",
+      "transformers": "4.57.6"
+    },
+    "schema_version": 1,
+    "source_kind": "fairseq2-card",
+    "source_locator": "omniASR_LLM_Unlimited_7B_v2",
+    "upstream_revision": null,
+    "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+  },
+  "phases": [
+    {
+      "ended_ns": 196598444077625,
+      "error": null,
+      "name": "process-start",
+      "repeat_index": null,
+      "started_ns": 196595868020916,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 196615561403125,
+      "error": null,
+      "name": "load",
+      "repeat_index": null,
+      "started_ns": 196598444677708,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 196615563709041,
+      "error": null,
+      "name": "load-validation",
+      "repeat_index": null,
+      "started_ns": 196615561588875,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 196651819642625,
+      "error": null,
+      "name": "warmup-0",
+      "repeat_index": null,
+      "started_ns": 196615638992125,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 196681043142250,
+      "error": null,
+      "name": "warmup-1",
+      "repeat_index": null,
+      "started_ns": 196651824788375,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 196710402798708,
+      "error": null,
+      "name": "warmup-2",
+      "repeat_index": null,
+      "started_ns": 196681048116541,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 196739877866291,
+      "error": null,
+      "name": "repeat-0",
+      "repeat_index": 0,
+      "started_ns": 196710408099333,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 196769354358541,
+      "error": null,
+      "name": "repeat-1",
+      "repeat_index": 1,
+      "started_ns": 196739884367208,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 196798618523416,
+      "error": null,
+      "name": "repeat-2",
+      "repeat_index": 2,
+      "started_ns": 196769362079041,
+      "status": "ok"
+    },
+    {
+      "ended_ns": 196798720358000,
+      "error": null,
+      "name": "unload",
+      "repeat_index": null,
+      "started_ns": 196798627446291,
+      "status": "ok"
+    }
+  ],
+  "protocol_version": 3,
+  "provenance_issues": [],
+  "repeats": [
+    {
+      "complete": true,
+      "expected_audio_s": 71.22,
+      "index": 0,
+      "phase": {
+        "ended_ns": 196739877866291,
+        "error": null,
+        "name": "repeat-0",
+        "repeat_index": 0,
+        "started_ns": 196710408099333,
+        "status": "ok"
+      },
+      "resources": {
+        "cpu_s": 9.2076,
+        "cpu_utilization": 0.31,
+        "ended_ns": 196739877866291,
+        "gpu_mb": 18261.1,
+        "peak_rss_mb": 22896.8,
+        "phase": "repeat-0",
+        "process_peak_rss_mb": 22896.8,
+        "rss_peak_mb": 2193.5,
+        "started_ns": 196710408099333,
+        "wall_s": 29.4698
+      },
+      "results": [
+        {
+          "audio_duration_s": 27.6,
+          "audio_id": "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__36c25f8b1db4ba5ddab8b3edd0bbd8f2b2af1aeb466863f77cfacad95197ee61.wav",
+          "backend": "omniasr-torch",
+          "elapsed_s": 11.420326265795278,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_elapsed_s": 29.469407124997815,
+            "batch_items": 5,
+            "batch_size": 1,
+            "corpus_index": 0,
+            "corpus_size": 5,
+            "corpus_wall_s": 29.469766958,
+            "device": "mps",
+            "dtype": "float16",
+            "elapsed_s_source": "batch_proportional",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "requested_batch_size": 1,
+            "resource_scope": "corpus"
+          },
+          "model": "omniASR_LLM_Unlimited_7B_v2",
+          "model_provenance": {
+            "adapter_git_commit": "690fb2d883afb74ffe503b997132fa51a45e6477",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "omniASR-LLM-Unlimited-7B-v2.pt",
+                "path": ".cache/fairseq2/assets/be8b45a4444380016fa2f991/omniASR-LLM-Unlimited-7B-v2.pt",
+                "role": "weights",
+                "sha256": "600199f8be430aed4e43b6b1c7cf70fd83d471fac574c61c95b6bce90c47b68e",
+                "size_bytes": 31220520831,
+                "stat": {
+                  "ctime_ns": 1787159223984645852,
+                  "device": 16777235,
+                  "inode": 5984141,
+                  "mtime_ns": 1787087265633906879,
+                  "size": 31220520831
+                }
+              },
+              {
+                "name": "omniASR_tokenizer_written_v2.model",
+                "path": ".cache/fairseq2/assets/e7be1a6acb8f76fdbca19dce/omniASR_tokenizer_written_v2.model",
+                "role": "tokenizer",
+                "sha256": "8aa11a1092142ef472537476ef6e76541123e2f0d789b79f3ebd119008240b1e",
+                "size_bytes": 91481,
+                "stat": {
+                  "ctime_ns": 1787159200848561084,
+                  "device": 16777235,
+                  "inode": 5984130,
+                  "mtime_ns": 1787060037638994009,
+                  "size": 91481
+                }
+              },
+              {
+                "name": "omniASR_LLM_Unlimited_7B_v2.card.json",
+                "path": null,
+                "role": "card-metadata",
+                "sha256": "7c355b28c11a521c875d344a31d00dda3f152c3bf42b57a8cee0afde491b3e53",
+                "size_bytes": 349,
+                "stat": {}
+              }
+            ],
+            "backend": "omniasr-torch",
+            "content_sha256": "bed4307b49fe3162ff3f980d744831c81a262bffd3b1f2df79c3c6e3c53ee154",
+            "execution_sha256": "5fb13dfae3d11d5aba36c992f9d2c26a883b2b86fa1a7c0edb92db6541c2f263",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "omniASR_LLM_Unlimited_7B_v2",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "auto",
+              "dtype": "auto",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float16",
+              "n_threads": null
+            },
+            "revision_status": "unavailable-content-addressed",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 1,
+            "source_kind": "fairseq2-card",
+            "source_locator": "omniASR_LLM_Unlimited_7B_v2",
+            "upstream_revision": null,
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "10207165333468320061",
+          "resources": {
+            "cpu_s": 9.2076,
+            "cpu_utilization": 0.31,
+            "ended_ns": 196739877866291,
+            "gpu_mb": 18261.1,
+            "peak_rss_mb": 22896.8,
+            "phase": "repeat-0",
+            "process_peak_rss_mb": 22896.8,
+            "rss_peak_mb": 2193.5,
+            "started_ns": 196710408099333,
+            "wall_s": 29.4698
+          },
+          "rtf": 0.4137799371664956,
+          "segments": null,
+          "source_path": "data/fleurs/audio/10207165333468320061.wav",
+          "source_sha256": "36c25f8b1db4ba5ddab8b3edd0bbd8f2b2af1aeb466863f77cfacad95197ee61",
+          "text": "ဘုရှ် ပြောရေးဆိုခွင့်ရှိသူ ဂျော်ဒန်ဂျွန်ဒရိုး က မြောက်ကိုရီးယားနိုင်ငံ ကတိကဝတ်သည်ကို ကိုရီးယားကျွန်းဆွယ်အား အတည်ပြုနိုင်သည့် နျူကလီးယားစစ်ဆင်ရေး ဒေသဖြစ်စေရေး စွမ်းဆောင်မှု ရည်မှန်းချက်ကို လျှောက်လှမ်းရာတွင် အဓိကကျသော လှေကားထစ်တစ်ခု ဖြစ်သည်ဟု တုန်းနှုန်းပြောဆိုခဲ့သည်",
+          "trust_issues": [],
+          "trusted": true
+        },
+        {
+          "audio_duration_s": 9.18,
+          "audio_id": "pcm16:16000:1:fe0efa457ae9f7f11a5483e78adaa5795f11b3bf0d5882d7a670ca05ee6ec0e4",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__0f5596159ca1e135211cef735e90b32a3ca6fade92c6508f9f1d8b1b8a7a0979.wav",
+          "backend": "omniasr-torch",
+          "elapsed_s": 3.798499823188429,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_elapsed_s": 29.469407124997815,
+            "batch_items": 5,
+            "batch_size": 1,
+            "corpus_index": 1,
+            "corpus_size": 5,
+            "corpus_wall_s": 29.469766958,
+            "device": "mps",
+            "dtype": "float16",
+            "elapsed_s_source": "batch_proportional",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "requested_batch_size": 1
+          },
+          "model": "omniASR_LLM_Unlimited_7B_v2",
+          "model_provenance": {
+            "adapter_git_commit": "690fb2d883afb74ffe503b997132fa51a45e6477",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "omniASR-LLM-Unlimited-7B-v2.pt",
+                "path": ".cache/fairseq2/assets/be8b45a4444380016fa2f991/omniASR-LLM-Unlimited-7B-v2.pt",
+                "role": "weights",
+                "sha256": "600199f8be430aed4e43b6b1c7cf70fd83d471fac574c61c95b6bce90c47b68e",
+                "size_bytes": 31220520831,
+                "stat": {
+                  "ctime_ns": 1787159223984645852,
+                  "device": 16777235,
+                  "inode": 5984141,
+                  "mtime_ns": 1787087265633906879,
+                  "size": 31220520831
+                }
+              },
+              {
+                "name": "omniASR_tokenizer_written_v2.model",
+                "path": ".cache/fairseq2/assets/e7be1a6acb8f76fdbca19dce/omniASR_tokenizer_written_v2.model",
+                "role": "tokenizer",
+                "sha256": "8aa11a1092142ef472537476ef6e76541123e2f0d789b79f3ebd119008240b1e",
+                "size_bytes": 91481,
+                "stat": {
+                  "ctime_ns": 1787159200848561084,
+                  "device": 16777235,
+                  "inode": 5984130,
+                  "mtime_ns": 1787060037638994009,
+                  "size": 91481
+                }
+              },
+              {
+                "name": "omniASR_LLM_Unlimited_7B_v2.card.json",
+                "path": null,
+                "role": "card-metadata",
+                "sha256": "7c355b28c11a521c875d344a31d00dda3f152c3bf42b57a8cee0afde491b3e53",
+                "size_bytes": 349,
+                "stat": {}
+              }
+            ],
+            "backend": "omniasr-torch",
+            "content_sha256": "bed4307b49fe3162ff3f980d744831c81a262bffd3b1f2df79c3c6e3c53ee154",
+            "execution_sha256": "5fb13dfae3d11d5aba36c992f9d2c26a883b2b86fa1a7c0edb92db6541c2f263",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "omniASR_LLM_Unlimited_7B_v2",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "auto",
+              "dtype": "auto",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float16",
+              "n_threads": null
+            },
+            "revision_status": "unavailable-content-addressed",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 1,
+            "source_kind": "fairseq2-card",
+            "source_locator": "omniASR_LLM_Unlimited_7B_v2",
+            "upstream_revision": null,
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "10406743972683477081",
+          "resources": null,
+          "rtf": 0.4137799371664955,
+          "segments": null,
+          "source_path": "data/fleurs/audio/10406743972683477081.wav",
+          "source_sha256": "0f5596159ca1e135211cef735e90b32a3ca6fade92c6508f9f1d8b1b8a7a0979",
+          "text": "ငါ့အတွက်တော့ ဒါက လုံးဝ အဓိပ္ပာယ်မရှိဘူး လုံးဝကို မတရားဘူး",
+          "trust_issues": [],
+          "trusted": true
+        },
+        {
+          "audio_duration_s": 7.5,
+          "audio_id": "pcm16:16000:1:71a3b3b9e7886757e59ac908a3e9edb5188a430b50690285b250583008660f24",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__fc22a3c0a78d1c25a94274cc87c2fda6b7a668ca72913cd1fc928470c9790607.wav",
+          "backend": "omniasr-torch",
+          "elapsed_s": 3.103349528748717,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_elapsed_s": 29.469407124997815,
+            "batch_items": 5,
+            "batch_size": 1,
+            "corpus_index": 2,
+            "corpus_size": 5,
+            "corpus_wall_s": 29.469766958,
+            "device": "mps",
+            "dtype": "float16",
+            "elapsed_s_source": "batch_proportional",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "requested_batch_size": 1
+          },
+          "model": "omniASR_LLM_Unlimited_7B_v2",
+          "model_provenance": {
+            "adapter_git_commit": "690fb2d883afb74ffe503b997132fa51a45e6477",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "omniASR-LLM-Unlimited-7B-v2.pt",
+                "path": ".cache/fairseq2/assets/be8b45a4444380016fa2f991/omniASR-LLM-Unlimited-7B-v2.pt",
+                "role": "weights",
+                "sha256": "600199f8be430aed4e43b6b1c7cf70fd83d471fac574c61c95b6bce90c47b68e",
+                "size_bytes": 31220520831,
+                "stat": {
+                  "ctime_ns": 1787159223984645852,
+                  "device": 16777235,
+                  "inode": 5984141,
+                  "mtime_ns": 1787087265633906879,
+                  "size": 31220520831
+                }
+              },
+              {
+                "name": "omniASR_tokenizer_written_v2.model",
+                "path": ".cache/fairseq2/assets/e7be1a6acb8f76fdbca19dce/omniASR_tokenizer_written_v2.model",
+                "role": "tokenizer",
+                "sha256": "8aa11a1092142ef472537476ef6e76541123e2f0d789b79f3ebd119008240b1e",
+                "size_bytes": 91481,
+                "stat": {
+                  "ctime_ns": 1787159200848561084,
+                  "device": 16777235,
+                  "inode": 5984130,
+                  "mtime_ns": 1787060037638994009,
+                  "size": 91481
+                }
+              },
+              {
+                "name": "omniASR_LLM_Unlimited_7B_v2.card.json",
+                "path": null,
+                "role": "card-metadata",
+                "sha256": "7c355b28c11a521c875d344a31d00dda3f152c3bf42b57a8cee0afde491b3e53",
+                "size_bytes": 349,
+                "stat": {}
+              }
+            ],
+            "backend": "omniasr-torch",
+            "content_sha256": "bed4307b49fe3162ff3f980d744831c81a262bffd3b1f2df79c3c6e3c53ee154",
+            "execution_sha256": "5fb13dfae3d11d5aba36c992f9d2c26a883b2b86fa1a7c0edb92db6541c2f263",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "omniASR_LLM_Unlimited_7B_v2",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "auto",
+              "dtype": "auto",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float16",
+              "n_threads": null
+            },
+            "revision_status": "unavailable-content-addressed",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 1,
+            "source_kind": "fairseq2-card",
+            "source_locator": "omniASR_LLM_Unlimited_7B_v2",
+            "upstream_revision": null,
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "12011678642037122936",
+          "resources": null,
+          "rtf": 0.4137799371664956,
+          "segments": null,
+          "source_path": "data/fleurs/audio/12011678642037122936.wav",
+          "source_sha256": "fc22a3c0a78d1c25a94274cc87c2fda6b7a668ca72913cd1fc928470c9790607",
+          "text": "ခရိုင်အများစုကို သက်သောင့်သက်သာရှိ ကြံ့ခိုင်စွာ တည်ဆောက်ထားသည့် ဂျပန် ကော့စ်ကား ဘတ်စ်ကား များဖြင့် ဝန်ဆောင်မှုပေးနေသည်",
+          "trust_issues": [],
+          "trusted": true
+        },
+        {
+          "audio_duration_s": 14.16,
+          "audio_id": "pcm16:16000:1:57d0567a6d1c2c3b6a64ff09fd774af475b077840c117d443a07a07dc94832a1",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__122b1a2eaf5afbf4081a308f4cfc74a164fa3d42d4f3080c96ddce05d2f7333c.wav",
+          "backend": "omniasr-torch",
+          "elapsed_s": 5.859123910277578,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_elapsed_s": 29.469407124997815,
+            "batch_items": 5,
+            "batch_size": 1,
+            "corpus_index": 3,
+            "corpus_size": 5,
+            "corpus_wall_s": 29.469766958,
+            "device": "mps",
+            "dtype": "float16",
+            "elapsed_s_source": "batch_proportional",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "requested_batch_size": 1
+          },
+          "model": "omniASR_LLM_Unlimited_7B_v2",
+          "model_provenance": {
+            "adapter_git_commit": "690fb2d883afb74ffe503b997132fa51a45e6477",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "omniASR-LLM-Unlimited-7B-v2.pt",
+                "path": ".cache/fairseq2/assets/be8b45a4444380016fa2f991/omniASR-LLM-Unlimited-7B-v2.pt",
+                "role": "weights",
+                "sha256": "600199f8be430aed4e43b6b1c7cf70fd83d471fac574c61c95b6bce90c47b68e",
+                "size_bytes": 31220520831,
+                "stat": {
+                  "ctime_ns": 1787159223984645852,
+                  "device": 16777235,
+                  "inode": 5984141,
+                  "mtime_ns": 1787087265633906879,
+                  "size": 31220520831
+                }
+              },
+              {
+                "name": "omniASR_tokenizer_written_v2.model",
+                "path": ".cache/fairseq2/assets/e7be1a6acb8f76fdbca19dce/omniASR_tokenizer_written_v2.model",
+                "role": "tokenizer",
+                "sha256": "8aa11a1092142ef472537476ef6e76541123e2f0d789b79f3ebd119008240b1e",
+                "size_bytes": 91481,
+                "stat": {
+                  "ctime_ns": 1787159200848561084,
+                  "device": 16777235,
+                  "inode": 5984130,
+                  "mtime_ns": 1787060037638994009,
+                  "size": 91481
+                }
+              },
+              {
+                "name": "omniASR_LLM_Unlimited_7B_v2.card.json",
+                "path": null,
+                "role": "card-metadata",
+                "sha256": "7c355b28c11a521c875d344a31d00dda3f152c3bf42b57a8cee0afde491b3e53",
+                "size_bytes": 349,
+                "stat": {}
+              }
+            ],
+            "backend": "omniasr-torch",
+            "content_sha256": "bed4307b49fe3162ff3f980d744831c81a262bffd3b1f2df79c3c6e3c53ee154",
+            "execution_sha256": "5fb13dfae3d11d5aba36c992f9d2c26a883b2b86fa1a7c0edb92db6541c2f263",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "omniASR_LLM_Unlimited_7B_v2",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "auto",
+              "dtype": "auto",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float16",
+              "n_threads": null
+            },
+            "revision_status": "unavailable-content-addressed",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 1,
+            "source_kind": "fairseq2-card",
+            "source_locator": "omniASR_LLM_Unlimited_7B_v2",
+            "upstream_revision": null,
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "12202394788954760188",
+          "resources": null,
+          "rtf": 0.41377993716649564,
+          "segments": null,
+          "source_path": "data/fleurs/audio/12202394788954760188.wav",
+          "source_sha256": "122b1a2eaf5afbf4081a308f4cfc74a164fa3d42d4f3080c96ddce05d2f7333c",
+          "text": "မြေထဲပင်လယ်ဒေသနှင့် ဇုန်ခြင်းဆင်တူသော မဂျော့ဂန် ချက်ပြုတ်နည်းသည် ပေါင်မုခ် ဟင်းသီးဟင်းရွက်များနှင့် အသား အထူးသဖြင့် ဝက်သားတို့ပေါ်တွင် အခြေခံထားခြင်းဖြစ်ကာ သံလွင်ဆီကို သုံးစွဲပါသည်",
+          "trust_issues": [],
+          "trusted": true
+        },
+        {
+          "audio_duration_s": 12.78,
+          "audio_id": "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28.wav",
+          "backend": "omniasr-torch",
+          "elapsed_s": 5.288107596987814,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_elapsed_s": 29.469407124997815,
+            "batch_items": 5,
+            "batch_size": 1,
+            "corpus_index": 4,
+            "corpus_size": 5,
+            "corpus_wall_s": 29.469766958,
+            "device": "mps",
+            "dtype": "float16",
+            "elapsed_s_source": "batch_proportional",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "requested_batch_size": 1
+          },
+          "model": "omniASR_LLM_Unlimited_7B_v2",
+          "model_provenance": {
+            "adapter_git_commit": "690fb2d883afb74ffe503b997132fa51a45e6477",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "omniASR-LLM-Unlimited-7B-v2.pt",
+                "path": ".cache/fairseq2/assets/be8b45a4444380016fa2f991/omniASR-LLM-Unlimited-7B-v2.pt",
+                "role": "weights",
+                "sha256": "600199f8be430aed4e43b6b1c7cf70fd83d471fac574c61c95b6bce90c47b68e",
+                "size_bytes": 31220520831,
+                "stat": {
+                  "ctime_ns": 1787159223984645852,
+                  "device": 16777235,
+                  "inode": 5984141,
+                  "mtime_ns": 1787087265633906879,
+                  "size": 31220520831
+                }
+              },
+              {
+                "name": "omniASR_tokenizer_written_v2.model",
+                "path": ".cache/fairseq2/assets/e7be1a6acb8f76fdbca19dce/omniASR_tokenizer_written_v2.model",
+                "role": "tokenizer",
+                "sha256": "8aa11a1092142ef472537476ef6e76541123e2f0d789b79f3ebd119008240b1e",
+                "size_bytes": 91481,
+                "stat": {
+                  "ctime_ns": 1787159200848561084,
+                  "device": 16777235,
+                  "inode": 5984130,
+                  "mtime_ns": 1787060037638994009,
+                  "size": 91481
+                }
+              },
+              {
+                "name": "omniASR_LLM_Unlimited_7B_v2.card.json",
+                "path": null,
+                "role": "card-metadata",
+                "sha256": "7c355b28c11a521c875d344a31d00dda3f152c3bf42b57a8cee0afde491b3e53",
+                "size_bytes": 349,
+                "stat": {}
+              }
+            ],
+            "backend": "omniasr-torch",
+            "content_sha256": "bed4307b49fe3162ff3f980d744831c81a262bffd3b1f2df79c3c6e3c53ee154",
+            "execution_sha256": "5fb13dfae3d11d5aba36c992f9d2c26a883b2b86fa1a7c0edb92db6541c2f263",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "omniASR_LLM_Unlimited_7B_v2",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "auto",
+              "dtype": "auto",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float16",
+              "n_threads": null
+            },
+            "revision_status": "unavailable-content-addressed",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 1,
+            "source_kind": "fairseq2-card",
+            "source_locator": "omniASR_LLM_Unlimited_7B_v2",
+            "upstream_revision": null,
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "14755840805814218163",
+          "resources": null,
+          "rtf": 0.41377993716649564,
+          "segments": null,
+          "source_path": "data/fleurs/audio/14755840805814218163.wav",
+          "source_sha256": "8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28",
+          "text": "လွန်ခဲ့သောနှစ် ထောင်ပေါင်းများစွာက အရီစတာချက်ဇ် ဟုခေါ်သော အမျိုးသားတစ်ဦးသည် နေပတ်လည်တွင် ဆိုလာစနစ်သည် ရွေ့လျားလျက်ရှိသည်ဟု ပြောဆိုခဲ့သည်",
+          "trust_issues": [],
+          "trusted": true
+        }
+      ],
+      "trust_issues": []
+    },
+    {
+      "complete": true,
+      "expected_audio_s": 71.22,
+      "index": 1,
+      "phase": {
+        "ended_ns": 196769354358541,
+        "error": null,
+        "name": "repeat-1",
+        "repeat_index": 1,
+        "started_ns": 196739884367208,
+        "status": "ok"
+      },
+      "resources": {
+        "cpu_s": 9.2364,
+        "cpu_utilization": 0.31,
+        "ended_ns": 196769354358541,
+        "gpu_mb": 18261.1,
+        "peak_rss_mb": 22896.8,
+        "phase": "repeat-1",
+        "process_peak_rss_mb": 22896.8,
+        "rss_peak_mb": 2200.7,
+        "started_ns": 196739884367208,
+        "wall_s": 29.47
+      },
+      "results": [
+        {
+          "audio_duration_s": 27.6,
+          "audio_id": "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__36c25f8b1db4ba5ddab8b3edd0bbd8f2b2af1aeb466863f77cfacad95197ee61.wav",
+          "backend": "omniasr-torch",
+          "elapsed_s": 11.420427540594437,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_elapsed_s": 29.469668458012166,
+            "batch_items": 5,
+            "batch_size": 1,
+            "corpus_index": 0,
+            "corpus_size": 5,
+            "corpus_wall_s": 29.469991333,
+            "device": "mps",
+            "dtype": "float16",
+            "elapsed_s_source": "batch_proportional",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "requested_batch_size": 1,
+            "resource_scope": "corpus"
+          },
+          "model": "omniASR_LLM_Unlimited_7B_v2",
+          "model_provenance": {
+            "adapter_git_commit": "690fb2d883afb74ffe503b997132fa51a45e6477",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "omniASR-LLM-Unlimited-7B-v2.pt",
+                "path": ".cache/fairseq2/assets/be8b45a4444380016fa2f991/omniASR-LLM-Unlimited-7B-v2.pt",
+                "role": "weights",
+                "sha256": "600199f8be430aed4e43b6b1c7cf70fd83d471fac574c61c95b6bce90c47b68e",
+                "size_bytes": 31220520831,
+                "stat": {
+                  "ctime_ns": 1787159223984645852,
+                  "device": 16777235,
+                  "inode": 5984141,
+                  "mtime_ns": 1787087265633906879,
+                  "size": 31220520831
+                }
+              },
+              {
+                "name": "omniASR_tokenizer_written_v2.model",
+                "path": ".cache/fairseq2/assets/e7be1a6acb8f76fdbca19dce/omniASR_tokenizer_written_v2.model",
+                "role": "tokenizer",
+                "sha256": "8aa11a1092142ef472537476ef6e76541123e2f0d789b79f3ebd119008240b1e",
+                "size_bytes": 91481,
+                "stat": {
+                  "ctime_ns": 1787159200848561084,
+                  "device": 16777235,
+                  "inode": 5984130,
+                  "mtime_ns": 1787060037638994009,
+                  "size": 91481
+                }
+              },
+              {
+                "name": "omniASR_LLM_Unlimited_7B_v2.card.json",
+                "path": null,
+                "role": "card-metadata",
+                "sha256": "7c355b28c11a521c875d344a31d00dda3f152c3bf42b57a8cee0afde491b3e53",
+                "size_bytes": 349,
+                "stat": {}
+              }
+            ],
+            "backend": "omniasr-torch",
+            "content_sha256": "bed4307b49fe3162ff3f980d744831c81a262bffd3b1f2df79c3c6e3c53ee154",
+            "execution_sha256": "5fb13dfae3d11d5aba36c992f9d2c26a883b2b86fa1a7c0edb92db6541c2f263",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "omniASR_LLM_Unlimited_7B_v2",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "auto",
+              "dtype": "auto",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float16",
+              "n_threads": null
+            },
+            "revision_status": "unavailable-content-addressed",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 1,
+            "source_kind": "fairseq2-card",
+            "source_locator": "omniASR_LLM_Unlimited_7B_v2",
+            "upstream_revision": null,
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "10207165333468320061",
+          "resources": {
+            "cpu_s": 9.2364,
+            "cpu_utilization": 0.31,
+            "ended_ns": 196769354358541,
+            "gpu_mb": 18261.1,
+            "peak_rss_mb": 22896.8,
+            "phase": "repeat-1",
+            "process_peak_rss_mb": 22896.8,
+            "rss_peak_mb": 2200.7,
+            "started_ns": 196739884367208,
+            "wall_s": 29.47
+          },
+          "rtf": 0.41378360654327667,
+          "segments": null,
+          "source_path": "data/fleurs/audio/10207165333468320061.wav",
+          "source_sha256": "36c25f8b1db4ba5ddab8b3edd0bbd8f2b2af1aeb466863f77cfacad95197ee61",
+          "text": "ဘုရှ် ပြောရေးဆိုခွင့်ရှိသူ ဂျော်ဒန်ဂျွန်ဒရိုး က မြောက်ကိုရီးယားနိုင်ငံ ကတိကဝတ်သည်ကို ကိုရီးယားကျွန်းဆွယ်အား အတည်ပြုနိုင်သည့် နျူကလီးယားစစ်ဆင်ရေး ဒေသဖြစ်စေရေး စွမ်းဆောင်မှု ရည်မှန်းချက်ကို လျှောက်လှမ်းရာတွင် အဓိကကျသော လှေကားထစ်တစ်ခု ဖြစ်သည်ဟု တုန်းနှုန်းပြောဆိုခဲ့သည်",
+          "trust_issues": [],
+          "trusted": true
+        },
+        {
+          "audio_duration_s": 9.18,
+          "audio_id": "pcm16:16000:1:fe0efa457ae9f7f11a5483e78adaa5795f11b3bf0d5882d7a670ca05ee6ec0e4",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__0f5596159ca1e135211cef735e90b32a3ca6fade92c6508f9f1d8b1b8a7a0979.wav",
+          "backend": "omniasr-torch",
+          "elapsed_s": 3.7985335080672797,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_elapsed_s": 29.469668458012166,
+            "batch_items": 5,
+            "batch_size": 1,
+            "corpus_index": 1,
+            "corpus_size": 5,
+            "corpus_wall_s": 29.469991333,
+            "device": "mps",
+            "dtype": "float16",
+            "elapsed_s_source": "batch_proportional",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "requested_batch_size": 1
+          },
+          "model": "omniASR_LLM_Unlimited_7B_v2",
+          "model_provenance": {
+            "adapter_git_commit": "690fb2d883afb74ffe503b997132fa51a45e6477",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "omniASR-LLM-Unlimited-7B-v2.pt",
+                "path": ".cache/fairseq2/assets/be8b45a4444380016fa2f991/omniASR-LLM-Unlimited-7B-v2.pt",
+                "role": "weights",
+                "sha256": "600199f8be430aed4e43b6b1c7cf70fd83d471fac574c61c95b6bce90c47b68e",
+                "size_bytes": 31220520831,
+                "stat": {
+                  "ctime_ns": 1787159223984645852,
+                  "device": 16777235,
+                  "inode": 5984141,
+                  "mtime_ns": 1787087265633906879,
+                  "size": 31220520831
+                }
+              },
+              {
+                "name": "omniASR_tokenizer_written_v2.model",
+                "path": ".cache/fairseq2/assets/e7be1a6acb8f76fdbca19dce/omniASR_tokenizer_written_v2.model",
+                "role": "tokenizer",
+                "sha256": "8aa11a1092142ef472537476ef6e76541123e2f0d789b79f3ebd119008240b1e",
+                "size_bytes": 91481,
+                "stat": {
+                  "ctime_ns": 1787159200848561084,
+                  "device": 16777235,
+                  "inode": 5984130,
+                  "mtime_ns": 1787060037638994009,
+                  "size": 91481
+                }
+              },
+              {
+                "name": "omniASR_LLM_Unlimited_7B_v2.card.json",
+                "path": null,
+                "role": "card-metadata",
+                "sha256": "7c355b28c11a521c875d344a31d00dda3f152c3bf42b57a8cee0afde491b3e53",
+                "size_bytes": 349,
+                "stat": {}
+              }
+            ],
+            "backend": "omniasr-torch",
+            "content_sha256": "bed4307b49fe3162ff3f980d744831c81a262bffd3b1f2df79c3c6e3c53ee154",
+            "execution_sha256": "5fb13dfae3d11d5aba36c992f9d2c26a883b2b86fa1a7c0edb92db6541c2f263",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "omniASR_LLM_Unlimited_7B_v2",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "auto",
+              "dtype": "auto",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float16",
+              "n_threads": null
+            },
+            "revision_status": "unavailable-content-addressed",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 1,
+            "source_kind": "fairseq2-card",
+            "source_locator": "omniASR_LLM_Unlimited_7B_v2",
+            "upstream_revision": null,
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "10406743972683477081",
+          "resources": null,
+          "rtf": 0.41378360654327667,
+          "segments": null,
+          "source_path": "data/fleurs/audio/10406743972683477081.wav",
+          "source_sha256": "0f5596159ca1e135211cef735e90b32a3ca6fade92c6508f9f1d8b1b8a7a0979",
+          "text": "ငါ့အတွက်တော့ ဒါက လုံးဝ အဓိပ္ပာယ်မရှိဘူး လုံးဝကို မတရားဘူး",
+          "trust_issues": [],
+          "trusted": true
+        },
+        {
+          "audio_duration_s": 7.5,
+          "audio_id": "pcm16:16000:1:71a3b3b9e7886757e59ac908a3e9edb5188a430b50690285b250583008660f24",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__fc22a3c0a78d1c25a94274cc87c2fda6b7a668ca72913cd1fc928470c9790607.wav",
+          "backend": "omniasr-torch",
+          "elapsed_s": 3.1033770490745756,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_elapsed_s": 29.469668458012166,
+            "batch_items": 5,
+            "batch_size": 1,
+            "corpus_index": 2,
+            "corpus_size": 5,
+            "corpus_wall_s": 29.469991333,
+            "device": "mps",
+            "dtype": "float16",
+            "elapsed_s_source": "batch_proportional",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "requested_batch_size": 1
+          },
+          "model": "omniASR_LLM_Unlimited_7B_v2",
+          "model_provenance": {
+            "adapter_git_commit": "690fb2d883afb74ffe503b997132fa51a45e6477",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "omniASR-LLM-Unlimited-7B-v2.pt",
+                "path": ".cache/fairseq2/assets/be8b45a4444380016fa2f991/omniASR-LLM-Unlimited-7B-v2.pt",
+                "role": "weights",
+                "sha256": "600199f8be430aed4e43b6b1c7cf70fd83d471fac574c61c95b6bce90c47b68e",
+                "size_bytes": 31220520831,
+                "stat": {
+                  "ctime_ns": 1787159223984645852,
+                  "device": 16777235,
+                  "inode": 5984141,
+                  "mtime_ns": 1787087265633906879,
+                  "size": 31220520831
+                }
+              },
+              {
+                "name": "omniASR_tokenizer_written_v2.model",
+                "path": ".cache/fairseq2/assets/e7be1a6acb8f76fdbca19dce/omniASR_tokenizer_written_v2.model",
+                "role": "tokenizer",
+                "sha256": "8aa11a1092142ef472537476ef6e76541123e2f0d789b79f3ebd119008240b1e",
+                "size_bytes": 91481,
+                "stat": {
+                  "ctime_ns": 1787159200848561084,
+                  "device": 16777235,
+                  "inode": 5984130,
+                  "mtime_ns": 1787060037638994009,
+                  "size": 91481
+                }
+              },
+              {
+                "name": "omniASR_LLM_Unlimited_7B_v2.card.json",
+                "path": null,
+                "role": "card-metadata",
+                "sha256": "7c355b28c11a521c875d344a31d00dda3f152c3bf42b57a8cee0afde491b3e53",
+                "size_bytes": 349,
+                "stat": {}
+              }
+            ],
+            "backend": "omniasr-torch",
+            "content_sha256": "bed4307b49fe3162ff3f980d744831c81a262bffd3b1f2df79c3c6e3c53ee154",
+            "execution_sha256": "5fb13dfae3d11d5aba36c992f9d2c26a883b2b86fa1a7c0edb92db6541c2f263",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "omniASR_LLM_Unlimited_7B_v2",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "auto",
+              "dtype": "auto",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float16",
+              "n_threads": null
+            },
+            "revision_status": "unavailable-content-addressed",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 1,
+            "source_kind": "fairseq2-card",
+            "source_locator": "omniASR_LLM_Unlimited_7B_v2",
+            "upstream_revision": null,
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "12011678642037122936",
+          "resources": null,
+          "rtf": 0.4137836065432767,
+          "segments": null,
+          "source_path": "data/fleurs/audio/12011678642037122936.wav",
+          "source_sha256": "fc22a3c0a78d1c25a94274cc87c2fda6b7a668ca72913cd1fc928470c9790607",
+          "text": "ခရိုင်အများစုကို သက်သောင့်သက်သာရှိ ကြံ့ခိုင်စွာ တည်ဆောက်ထားသည့် ဂျပန် ကော့စ်ကား ဘတ်စ်ကား များဖြင့် ဝန်ဆောင်မှုပေးနေသည်",
+          "trust_issues": [],
+          "trusted": true
+        },
+        {
+          "audio_duration_s": 14.16,
+          "audio_id": "pcm16:16000:1:57d0567a6d1c2c3b6a64ff09fd774af475b077840c117d443a07a07dc94832a1",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__122b1a2eaf5afbf4081a308f4cfc74a164fa3d42d4f3080c96ddce05d2f7333c.wav",
+          "backend": "omniasr-torch",
+          "elapsed_s": 5.859175868652798,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_elapsed_s": 29.469668458012166,
+            "batch_items": 5,
+            "batch_size": 1,
+            "corpus_index": 3,
+            "corpus_size": 5,
+            "corpus_wall_s": 29.469991333,
+            "device": "mps",
+            "dtype": "float16",
+            "elapsed_s_source": "batch_proportional",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "requested_batch_size": 1
+          },
+          "model": "omniASR_LLM_Unlimited_7B_v2",
+          "model_provenance": {
+            "adapter_git_commit": "690fb2d883afb74ffe503b997132fa51a45e6477",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "omniASR-LLM-Unlimited-7B-v2.pt",
+                "path": ".cache/fairseq2/assets/be8b45a4444380016fa2f991/omniASR-LLM-Unlimited-7B-v2.pt",
+                "role": "weights",
+                "sha256": "600199f8be430aed4e43b6b1c7cf70fd83d471fac574c61c95b6bce90c47b68e",
+                "size_bytes": 31220520831,
+                "stat": {
+                  "ctime_ns": 1787159223984645852,
+                  "device": 16777235,
+                  "inode": 5984141,
+                  "mtime_ns": 1787087265633906879,
+                  "size": 31220520831
+                }
+              },
+              {
+                "name": "omniASR_tokenizer_written_v2.model",
+                "path": ".cache/fairseq2/assets/e7be1a6acb8f76fdbca19dce/omniASR_tokenizer_written_v2.model",
+                "role": "tokenizer",
+                "sha256": "8aa11a1092142ef472537476ef6e76541123e2f0d789b79f3ebd119008240b1e",
+                "size_bytes": 91481,
+                "stat": {
+                  "ctime_ns": 1787159200848561084,
+                  "device": 16777235,
+                  "inode": 5984130,
+                  "mtime_ns": 1787060037638994009,
+                  "size": 91481
+                }
+              },
+              {
+                "name": "omniASR_LLM_Unlimited_7B_v2.card.json",
+                "path": null,
+                "role": "card-metadata",
+                "sha256": "7c355b28c11a521c875d344a31d00dda3f152c3bf42b57a8cee0afde491b3e53",
+                "size_bytes": 349,
+                "stat": {}
+              }
+            ],
+            "backend": "omniasr-torch",
+            "content_sha256": "bed4307b49fe3162ff3f980d744831c81a262bffd3b1f2df79c3c6e3c53ee154",
+            "execution_sha256": "5fb13dfae3d11d5aba36c992f9d2c26a883b2b86fa1a7c0edb92db6541c2f263",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "omniASR_LLM_Unlimited_7B_v2",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "auto",
+              "dtype": "auto",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float16",
+              "n_threads": null
+            },
+            "revision_status": "unavailable-content-addressed",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 1,
+            "source_kind": "fairseq2-card",
+            "source_locator": "omniASR_LLM_Unlimited_7B_v2",
+            "upstream_revision": null,
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "12202394788954760188",
+          "resources": null,
+          "rtf": 0.4137836065432767,
+          "segments": null,
+          "source_path": "data/fleurs/audio/12202394788954760188.wav",
+          "source_sha256": "122b1a2eaf5afbf4081a308f4cfc74a164fa3d42d4f3080c96ddce05d2f7333c",
+          "text": "မြေထဲပင်လယ်ဒေသနှင့် ဇုန်ခြင်းဆင်တူသော မဂျော့ဂန် ချက်ပြုတ်နည်းသည် ပေါင်မုခ် ဟင်းသီးဟင်းရွက်များနှင့် အသား အထူးသဖြင့် ဝက်သားတို့ပေါ်တွင် အခြေခံထားခြင်းဖြစ်ကာ သံလွင်ဆီကို သုံးစွဲပါသည်",
+          "trust_issues": [],
+          "trusted": true
+        },
+        {
+          "audio_duration_s": 12.78,
+          "audio_id": "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28.wav",
+          "backend": "omniasr-torch",
+          "elapsed_s": 5.288154491623076,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_elapsed_s": 29.469668458012166,
+            "batch_items": 5,
+            "batch_size": 1,
+            "corpus_index": 4,
+            "corpus_size": 5,
+            "corpus_wall_s": 29.469991333,
+            "device": "mps",
+            "dtype": "float16",
+            "elapsed_s_source": "batch_proportional",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "requested_batch_size": 1
+          },
+          "model": "omniASR_LLM_Unlimited_7B_v2",
+          "model_provenance": {
+            "adapter_git_commit": "690fb2d883afb74ffe503b997132fa51a45e6477",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "omniASR-LLM-Unlimited-7B-v2.pt",
+                "path": ".cache/fairseq2/assets/be8b45a4444380016fa2f991/omniASR-LLM-Unlimited-7B-v2.pt",
+                "role": "weights",
+                "sha256": "600199f8be430aed4e43b6b1c7cf70fd83d471fac574c61c95b6bce90c47b68e",
+                "size_bytes": 31220520831,
+                "stat": {
+                  "ctime_ns": 1787159223984645852,
+                  "device": 16777235,
+                  "inode": 5984141,
+                  "mtime_ns": 1787087265633906879,
+                  "size": 31220520831
+                }
+              },
+              {
+                "name": "omniASR_tokenizer_written_v2.model",
+                "path": ".cache/fairseq2/assets/e7be1a6acb8f76fdbca19dce/omniASR_tokenizer_written_v2.model",
+                "role": "tokenizer",
+                "sha256": "8aa11a1092142ef472537476ef6e76541123e2f0d789b79f3ebd119008240b1e",
+                "size_bytes": 91481,
+                "stat": {
+                  "ctime_ns": 1787159200848561084,
+                  "device": 16777235,
+                  "inode": 5984130,
+                  "mtime_ns": 1787060037638994009,
+                  "size": 91481
+                }
+              },
+              {
+                "name": "omniASR_LLM_Unlimited_7B_v2.card.json",
+                "path": null,
+                "role": "card-metadata",
+                "sha256": "7c355b28c11a521c875d344a31d00dda3f152c3bf42b57a8cee0afde491b3e53",
+                "size_bytes": 349,
+                "stat": {}
+              }
+            ],
+            "backend": "omniasr-torch",
+            "content_sha256": "bed4307b49fe3162ff3f980d744831c81a262bffd3b1f2df79c3c6e3c53ee154",
+            "execution_sha256": "5fb13dfae3d11d5aba36c992f9d2c26a883b2b86fa1a7c0edb92db6541c2f263",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "omniASR_LLM_Unlimited_7B_v2",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "auto",
+              "dtype": "auto",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float16",
+              "n_threads": null
+            },
+            "revision_status": "unavailable-content-addressed",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 1,
+            "source_kind": "fairseq2-card",
+            "source_locator": "omniASR_LLM_Unlimited_7B_v2",
+            "upstream_revision": null,
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "14755840805814218163",
+          "resources": null,
+          "rtf": 0.4137836065432767,
+          "segments": null,
+          "source_path": "data/fleurs/audio/14755840805814218163.wav",
+          "source_sha256": "8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28",
+          "text": "လွန်ခဲ့သောနှစ် ထောင်ပေါင်းများစွာက အရီစတာချက်ဇ် ဟုခေါ်သော အမျိုးသားတစ်ဦးသည် နေပတ်လည်တွင် ဆိုလာစနစ်သည် ရွေ့လျားလျက်ရှိသည်ဟု ပြောဆိုခဲ့သည်",
+          "trust_issues": [],
+          "trusted": true
+        }
+      ],
+      "trust_issues": []
+    },
+    {
+      "complete": true,
+      "expected_audio_s": 71.22,
+      "index": 2,
+      "phase": {
+        "ended_ns": 196798618523416,
+        "error": null,
+        "name": "repeat-2",
+        "repeat_index": 2,
+        "started_ns": 196769362079041,
+        "status": "ok"
+      },
+      "resources": {
+        "cpu_s": 9.0109,
+        "cpu_utilization": 0.31,
+        "ended_ns": 196798618523416,
+        "gpu_mb": 18261.1,
+        "peak_rss_mb": 22896.8,
+        "phase": "repeat-2",
+        "process_peak_rss_mb": 22896.8,
+        "rss_peak_mb": 2207.8,
+        "started_ns": 196769362079041,
+        "wall_s": 29.2564
+      },
+      "results": [
+        {
+          "audio_duration_s": 27.6,
+          "audio_id": "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__36c25f8b1db4ba5ddab8b3edd0bbd8f2b2af1aeb466863f77cfacad95197ee61.wav",
+          "backend": "omniasr-torch",
+          "elapsed_s": 11.337660836146988,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_elapsed_s": 29.256094375014072,
+            "batch_items": 5,
+            "batch_size": 1,
+            "corpus_index": 0,
+            "corpus_size": 5,
+            "corpus_wall_s": 29.256444375,
+            "device": "mps",
+            "dtype": "float16",
+            "elapsed_s_source": "batch_proportional",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "requested_batch_size": 1,
+            "resource_scope": "corpus"
+          },
+          "model": "omniASR_LLM_Unlimited_7B_v2",
+          "model_provenance": {
+            "adapter_git_commit": "690fb2d883afb74ffe503b997132fa51a45e6477",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "omniASR-LLM-Unlimited-7B-v2.pt",
+                "path": ".cache/fairseq2/assets/be8b45a4444380016fa2f991/omniASR-LLM-Unlimited-7B-v2.pt",
+                "role": "weights",
+                "sha256": "600199f8be430aed4e43b6b1c7cf70fd83d471fac574c61c95b6bce90c47b68e",
+                "size_bytes": 31220520831,
+                "stat": {
+                  "ctime_ns": 1787159223984645852,
+                  "device": 16777235,
+                  "inode": 5984141,
+                  "mtime_ns": 1787087265633906879,
+                  "size": 31220520831
+                }
+              },
+              {
+                "name": "omniASR_tokenizer_written_v2.model",
+                "path": ".cache/fairseq2/assets/e7be1a6acb8f76fdbca19dce/omniASR_tokenizer_written_v2.model",
+                "role": "tokenizer",
+                "sha256": "8aa11a1092142ef472537476ef6e76541123e2f0d789b79f3ebd119008240b1e",
+                "size_bytes": 91481,
+                "stat": {
+                  "ctime_ns": 1787159200848561084,
+                  "device": 16777235,
+                  "inode": 5984130,
+                  "mtime_ns": 1787060037638994009,
+                  "size": 91481
+                }
+              },
+              {
+                "name": "omniASR_LLM_Unlimited_7B_v2.card.json",
+                "path": null,
+                "role": "card-metadata",
+                "sha256": "7c355b28c11a521c875d344a31d00dda3f152c3bf42b57a8cee0afde491b3e53",
+                "size_bytes": 349,
+                "stat": {}
+              }
+            ],
+            "backend": "omniasr-torch",
+            "content_sha256": "bed4307b49fe3162ff3f980d744831c81a262bffd3b1f2df79c3c6e3c53ee154",
+            "execution_sha256": "5fb13dfae3d11d5aba36c992f9d2c26a883b2b86fa1a7c0edb92db6541c2f263",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "omniASR_LLM_Unlimited_7B_v2",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "auto",
+              "dtype": "auto",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float16",
+              "n_threads": null
+            },
+            "revision_status": "unavailable-content-addressed",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 1,
+            "source_kind": "fairseq2-card",
+            "source_locator": "omniASR_LLM_Unlimited_7B_v2",
+            "upstream_revision": null,
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "10207165333468320061",
+          "resources": {
+            "cpu_s": 9.0109,
+            "cpu_utilization": 0.31,
+            "ended_ns": 196798618523416,
+            "gpu_mb": 18261.1,
+            "peak_rss_mb": 22896.8,
+            "phase": "repeat-2",
+            "process_peak_rss_mb": 22896.8,
+            "rss_peak_mb": 2207.8,
+            "started_ns": 196769362079041,
+            "wall_s": 29.2564
+          },
+          "rtf": 0.41078481290387636,
+          "segments": null,
+          "source_path": "data/fleurs/audio/10207165333468320061.wav",
+          "source_sha256": "36c25f8b1db4ba5ddab8b3edd0bbd8f2b2af1aeb466863f77cfacad95197ee61",
+          "text": "ဘုရှ် ပြောရေးဆိုခွင့်ရှိသူ ဂျော်ဒန်ဂျွန်ဒရိုး က မြောက်ကိုရီးယားနိုင်ငံ ကတိကဝတ်သည်ကို ကိုရီးယားကျွန်းဆွယ်အား အတည်ပြုနိုင်သည့် နျူကလီးယားစစ်ဆင်ရေး ဒေသဖြစ်စေရေး စွမ်းဆောင်မှု ရည်မှန်းချက်ကို လျှောက်လှမ်းရာတွင် အဓိကကျသော လှေကားထစ်တစ်ခု ဖြစ်သည်ဟု တုန်းနှုန်းပြောဆိုခဲ့သည်",
+          "trust_issues": [],
+          "trusted": true
+        },
+        {
+          "audio_duration_s": 9.18,
+          "audio_id": "pcm16:16000:1:fe0efa457ae9f7f11a5483e78adaa5795f11b3bf0d5882d7a670ca05ee6ec0e4",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__0f5596159ca1e135211cef735e90b32a3ca6fade92c6508f9f1d8b1b8a7a0979.wav",
+          "backend": "omniasr-torch",
+          "elapsed_s": 3.7710045824575844,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_elapsed_s": 29.256094375014072,
+            "batch_items": 5,
+            "batch_size": 1,
+            "corpus_index": 1,
+            "corpus_size": 5,
+            "corpus_wall_s": 29.256444375,
+            "device": "mps",
+            "dtype": "float16",
+            "elapsed_s_source": "batch_proportional",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "requested_batch_size": 1
+          },
+          "model": "omniASR_LLM_Unlimited_7B_v2",
+          "model_provenance": {
+            "adapter_git_commit": "690fb2d883afb74ffe503b997132fa51a45e6477",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "omniASR-LLM-Unlimited-7B-v2.pt",
+                "path": ".cache/fairseq2/assets/be8b45a4444380016fa2f991/omniASR-LLM-Unlimited-7B-v2.pt",
+                "role": "weights",
+                "sha256": "600199f8be430aed4e43b6b1c7cf70fd83d471fac574c61c95b6bce90c47b68e",
+                "size_bytes": 31220520831,
+                "stat": {
+                  "ctime_ns": 1787159223984645852,
+                  "device": 16777235,
+                  "inode": 5984141,
+                  "mtime_ns": 1787087265633906879,
+                  "size": 31220520831
+                }
+              },
+              {
+                "name": "omniASR_tokenizer_written_v2.model",
+                "path": ".cache/fairseq2/assets/e7be1a6acb8f76fdbca19dce/omniASR_tokenizer_written_v2.model",
+                "role": "tokenizer",
+                "sha256": "8aa11a1092142ef472537476ef6e76541123e2f0d789b79f3ebd119008240b1e",
+                "size_bytes": 91481,
+                "stat": {
+                  "ctime_ns": 1787159200848561084,
+                  "device": 16777235,
+                  "inode": 5984130,
+                  "mtime_ns": 1787060037638994009,
+                  "size": 91481
+                }
+              },
+              {
+                "name": "omniASR_LLM_Unlimited_7B_v2.card.json",
+                "path": null,
+                "role": "card-metadata",
+                "sha256": "7c355b28c11a521c875d344a31d00dda3f152c3bf42b57a8cee0afde491b3e53",
+                "size_bytes": 349,
+                "stat": {}
+              }
+            ],
+            "backend": "omniasr-torch",
+            "content_sha256": "bed4307b49fe3162ff3f980d744831c81a262bffd3b1f2df79c3c6e3c53ee154",
+            "execution_sha256": "5fb13dfae3d11d5aba36c992f9d2c26a883b2b86fa1a7c0edb92db6541c2f263",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "omniASR_LLM_Unlimited_7B_v2",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "auto",
+              "dtype": "auto",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float16",
+              "n_threads": null
+            },
+            "revision_status": "unavailable-content-addressed",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 1,
+            "source_kind": "fairseq2-card",
+            "source_locator": "omniASR_LLM_Unlimited_7B_v2",
+            "upstream_revision": null,
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "10406743972683477081",
+          "resources": null,
+          "rtf": 0.4107848129038763,
+          "segments": null,
+          "source_path": "data/fleurs/audio/10406743972683477081.wav",
+          "source_sha256": "0f5596159ca1e135211cef735e90b32a3ca6fade92c6508f9f1d8b1b8a7a0979",
+          "text": "ငါ့အတွက်တော့ ဒါက လုံးဝ အဓိပ္ပာယ်မရှိဘူး လုံးဝကို မတရားဘူး",
+          "trust_issues": [],
+          "trusted": true
+        },
+        {
+          "audio_duration_s": 7.5,
+          "audio_id": "pcm16:16000:1:71a3b3b9e7886757e59ac908a3e9edb5188a430b50690285b250583008660f24",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__fc22a3c0a78d1c25a94274cc87c2fda6b7a668ca72913cd1fc928470c9790607.wav",
+          "backend": "omniasr-torch",
+          "elapsed_s": 3.0808860967790728,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_elapsed_s": 29.256094375014072,
+            "batch_items": 5,
+            "batch_size": 1,
+            "corpus_index": 2,
+            "corpus_size": 5,
+            "corpus_wall_s": 29.256444375,
+            "device": "mps",
+            "dtype": "float16",
+            "elapsed_s_source": "batch_proportional",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "requested_batch_size": 1
+          },
+          "model": "omniASR_LLM_Unlimited_7B_v2",
+          "model_provenance": {
+            "adapter_git_commit": "690fb2d883afb74ffe503b997132fa51a45e6477",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "omniASR-LLM-Unlimited-7B-v2.pt",
+                "path": ".cache/fairseq2/assets/be8b45a4444380016fa2f991/omniASR-LLM-Unlimited-7B-v2.pt",
+                "role": "weights",
+                "sha256": "600199f8be430aed4e43b6b1c7cf70fd83d471fac574c61c95b6bce90c47b68e",
+                "size_bytes": 31220520831,
+                "stat": {
+                  "ctime_ns": 1787159223984645852,
+                  "device": 16777235,
+                  "inode": 5984141,
+                  "mtime_ns": 1787087265633906879,
+                  "size": 31220520831
+                }
+              },
+              {
+                "name": "omniASR_tokenizer_written_v2.model",
+                "path": ".cache/fairseq2/assets/e7be1a6acb8f76fdbca19dce/omniASR_tokenizer_written_v2.model",
+                "role": "tokenizer",
+                "sha256": "8aa11a1092142ef472537476ef6e76541123e2f0d789b79f3ebd119008240b1e",
+                "size_bytes": 91481,
+                "stat": {
+                  "ctime_ns": 1787159200848561084,
+                  "device": 16777235,
+                  "inode": 5984130,
+                  "mtime_ns": 1787060037638994009,
+                  "size": 91481
+                }
+              },
+              {
+                "name": "omniASR_LLM_Unlimited_7B_v2.card.json",
+                "path": null,
+                "role": "card-metadata",
+                "sha256": "7c355b28c11a521c875d344a31d00dda3f152c3bf42b57a8cee0afde491b3e53",
+                "size_bytes": 349,
+                "stat": {}
+              }
+            ],
+            "backend": "omniasr-torch",
+            "content_sha256": "bed4307b49fe3162ff3f980d744831c81a262bffd3b1f2df79c3c6e3c53ee154",
+            "execution_sha256": "5fb13dfae3d11d5aba36c992f9d2c26a883b2b86fa1a7c0edb92db6541c2f263",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "omniASR_LLM_Unlimited_7B_v2",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "auto",
+              "dtype": "auto",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float16",
+              "n_threads": null
+            },
+            "revision_status": "unavailable-content-addressed",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 1,
+            "source_kind": "fairseq2-card",
+            "source_locator": "omniASR_LLM_Unlimited_7B_v2",
+            "upstream_revision": null,
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "12011678642037122936",
+          "resources": null,
+          "rtf": 0.41078481290387636,
+          "segments": null,
+          "source_path": "data/fleurs/audio/12011678642037122936.wav",
+          "source_sha256": "fc22a3c0a78d1c25a94274cc87c2fda6b7a668ca72913cd1fc928470c9790607",
+          "text": "ခရိုင်အများစုကို သက်သောင့်သက်သာရှိ ကြံ့ခိုင်စွာ တည်ဆောက်ထားသည့် ဂျပန် ကော့စ်ကား ဘတ်စ်ကား များဖြင့် ဝန်ဆောင်မှုပေးနေသည်",
+          "trust_issues": [],
+          "trusted": true
+        },
+        {
+          "audio_duration_s": 14.16,
+          "audio_id": "pcm16:16000:1:57d0567a6d1c2c3b6a64ff09fd774af475b077840c117d443a07a07dc94832a1",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__122b1a2eaf5afbf4081a308f4cfc74a164fa3d42d4f3080c96ddce05d2f7333c.wav",
+          "backend": "omniasr-torch",
+          "elapsed_s": 5.816712950718889,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_elapsed_s": 29.256094375014072,
+            "batch_items": 5,
+            "batch_size": 1,
+            "corpus_index": 3,
+            "corpus_size": 5,
+            "corpus_wall_s": 29.256444375,
+            "device": "mps",
+            "dtype": "float16",
+            "elapsed_s_source": "batch_proportional",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "requested_batch_size": 1
+          },
+          "model": "omniASR_LLM_Unlimited_7B_v2",
+          "model_provenance": {
+            "adapter_git_commit": "690fb2d883afb74ffe503b997132fa51a45e6477",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "omniASR-LLM-Unlimited-7B-v2.pt",
+                "path": ".cache/fairseq2/assets/be8b45a4444380016fa2f991/omniASR-LLM-Unlimited-7B-v2.pt",
+                "role": "weights",
+                "sha256": "600199f8be430aed4e43b6b1c7cf70fd83d471fac574c61c95b6bce90c47b68e",
+                "size_bytes": 31220520831,
+                "stat": {
+                  "ctime_ns": 1787159223984645852,
+                  "device": 16777235,
+                  "inode": 5984141,
+                  "mtime_ns": 1787087265633906879,
+                  "size": 31220520831
+                }
+              },
+              {
+                "name": "omniASR_tokenizer_written_v2.model",
+                "path": ".cache/fairseq2/assets/e7be1a6acb8f76fdbca19dce/omniASR_tokenizer_written_v2.model",
+                "role": "tokenizer",
+                "sha256": "8aa11a1092142ef472537476ef6e76541123e2f0d789b79f3ebd119008240b1e",
+                "size_bytes": 91481,
+                "stat": {
+                  "ctime_ns": 1787159200848561084,
+                  "device": 16777235,
+                  "inode": 5984130,
+                  "mtime_ns": 1787060037638994009,
+                  "size": 91481
+                }
+              },
+              {
+                "name": "omniASR_LLM_Unlimited_7B_v2.card.json",
+                "path": null,
+                "role": "card-metadata",
+                "sha256": "7c355b28c11a521c875d344a31d00dda3f152c3bf42b57a8cee0afde491b3e53",
+                "size_bytes": 349,
+                "stat": {}
+              }
+            ],
+            "backend": "omniasr-torch",
+            "content_sha256": "bed4307b49fe3162ff3f980d744831c81a262bffd3b1f2df79c3c6e3c53ee154",
+            "execution_sha256": "5fb13dfae3d11d5aba36c992f9d2c26a883b2b86fa1a7c0edb92db6541c2f263",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "omniASR_LLM_Unlimited_7B_v2",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "auto",
+              "dtype": "auto",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float16",
+              "n_threads": null
+            },
+            "revision_status": "unavailable-content-addressed",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 1,
+            "source_kind": "fairseq2-card",
+            "source_locator": "omniASR_LLM_Unlimited_7B_v2",
+            "upstream_revision": null,
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "12202394788954760188",
+          "resources": null,
+          "rtf": 0.41078481290387636,
+          "segments": null,
+          "source_path": "data/fleurs/audio/12202394788954760188.wav",
+          "source_sha256": "122b1a2eaf5afbf4081a308f4cfc74a164fa3d42d4f3080c96ddce05d2f7333c",
+          "text": "မြေထဲပင်လယ်ဒေသနှင့် ဇုန်ခြင်းဆင်တူသော မဂျော့ဂန် ချက်ပြုတ်နည်းသည် ပေါင်မုခ် ဟင်းသီးဟင်းရွက်များနှင့် အသား အထူးသဖြင့် ဝက်သားတို့ပေါ်တွင် အခြေခံထားခြင်းဖြစ်ကာ သံလွင်ဆီကို သုံးစွဲပါသည်",
+          "trust_issues": [],
+          "trusted": true
+        },
+        {
+          "audio_duration_s": 12.78,
+          "audio_id": "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a",
+          "audio_path": "data/.converted/pcm16-mono-16000-v1__8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28.wav",
+          "backend": "omniasr-torch",
+          "elapsed_s": 5.24982990891154,
+          "error": null,
+          "language": "mya_Mymr",
+          "metadata": {
+            "batch_elapsed_s": 29.256094375014072,
+            "batch_items": 5,
+            "batch_size": 1,
+            "corpus_index": 4,
+            "corpus_size": 5,
+            "corpus_wall_s": 29.256444375,
+            "device": "mps",
+            "dtype": "float16",
+            "elapsed_s_source": "batch_proportional",
+            "host": {
+              "chip": "Apple M2 Max",
+              "compute_threads": 8,
+              "cores": {
+                "Efficiency": 4,
+                "Performance": 8
+              },
+              "cpu_count": 12,
+              "machine": "arm64",
+              "platform": "macOS-27.0-arm64-arm-64bit",
+              "ram_mb": 65536
+            },
+            "requested_batch_size": 1
+          },
+          "model": "omniASR_LLM_Unlimited_7B_v2",
+          "model_provenance": {
+            "adapter_git_commit": "690fb2d883afb74ffe503b997132fa51a45e6477",
+            "adapter_git_dirty": false,
+            "artifacts": [
+              {
+                "name": "omniASR-LLM-Unlimited-7B-v2.pt",
+                "path": ".cache/fairseq2/assets/be8b45a4444380016fa2f991/omniASR-LLM-Unlimited-7B-v2.pt",
+                "role": "weights",
+                "sha256": "600199f8be430aed4e43b6b1c7cf70fd83d471fac574c61c95b6bce90c47b68e",
+                "size_bytes": 31220520831,
+                "stat": {
+                  "ctime_ns": 1787159223984645852,
+                  "device": 16777235,
+                  "inode": 5984141,
+                  "mtime_ns": 1787087265633906879,
+                  "size": 31220520831
+                }
+              },
+              {
+                "name": "omniASR_tokenizer_written_v2.model",
+                "path": ".cache/fairseq2/assets/e7be1a6acb8f76fdbca19dce/omniASR_tokenizer_written_v2.model",
+                "role": "tokenizer",
+                "sha256": "8aa11a1092142ef472537476ef6e76541123e2f0d789b79f3ebd119008240b1e",
+                "size_bytes": 91481,
+                "stat": {
+                  "ctime_ns": 1787159200848561084,
+                  "device": 16777235,
+                  "inode": 5984130,
+                  "mtime_ns": 1787060037638994009,
+                  "size": 91481
+                }
+              },
+              {
+                "name": "omniASR_LLM_Unlimited_7B_v2.card.json",
+                "path": null,
+                "role": "card-metadata",
+                "sha256": "7c355b28c11a521c875d344a31d00dda3f152c3bf42b57a8cee0afde491b3e53",
+                "size_bytes": 349,
+                "stat": {}
+              }
+            ],
+            "backend": "omniasr-torch",
+            "content_sha256": "bed4307b49fe3162ff3f980d744831c81a262bffd3b1f2df79c3c6e3c53ee154",
+            "execution_sha256": "5fb13dfae3d11d5aba36c992f9d2c26a883b2b86fa1a7c0edb92db6541c2f263",
+            "fallback_history": [],
+            "issues": [],
+            "requested_model": "omniASR_LLM_Unlimited_7B_v2",
+            "requested_settings": {
+              "batch_size": 1,
+              "device": "auto",
+              "dtype": "auto",
+              "language": "mya_Mymr"
+            },
+            "resolved_settings": {
+              "chunk_seconds": null,
+              "device": "mps",
+              "dtype": "float16",
+              "n_threads": null
+            },
+            "revision_status": "unavailable-content-addressed",
+            "runtime_packages": {
+              "accelerate": "1.14.0",
+              "crispasr": "0.8.29",
+              "dataoceanai-dolphin": "20260513",
+              "fairseq2": "0.6",
+              "funasr": "1.4.2",
+              "huggingface-hub": "0.36.2",
+              "modelscope": "1.39.1",
+              "omnilingual-asr": "0.2.0",
+              "psutil": "5.9.8",
+              "sentencepiece": "0.2.2",
+              "soundfile": "0.14.0",
+              "tokenizers": "0.22.2",
+              "torch": "2.8.0",
+              "torchaudio": "2.8.0",
+              "transformers": "4.57.6"
+            },
+            "schema_version": 1,
+            "source_kind": "fairseq2-card",
+            "source_locator": "omniASR_LLM_Unlimited_7B_v2",
+            "upstream_revision": null,
+            "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+          },
+          "reference_id": "14755840805814218163",
+          "resources": null,
+          "rtf": 0.41078481290387636,
+          "segments": null,
+          "source_path": "data/fleurs/audio/14755840805814218163.wav",
+          "source_sha256": "8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28",
+          "text": "လွန်ခဲ့သောနှစ် ထောင်ပေါင်းများစွာက အရီစတာချက်ဇ် ဟုခေါ်သော အမျိုးသားတစ်ဦးသည် နေပတ်လည်တွင် ဆိုလာစနစ်သည် ရွေ့လျားလျက်ရှိသည်ဟု ပြောဆိုခဲ့သည်",
+          "trust_issues": [],
+          "trusted": true
+        }
+      ],
+      "trust_issues": []
+    }
+  ],
+  "request_key": "omniasr-torch/omniASR_LLM_Unlimited_7B_v2:b155d55ba4bc4a7f",
+  "request_sha256": "2e2f2af94cec8c95ecd336ca1ba62101decff7dac94dd472fa45a415017b173a",
+  "resolved_device": "mps",
+  "resolved_dtype": "float16",
+  "resolved_model": "omniASR_LLM_Unlimited_7B_v2",
+  "run_id": "743f1d189c254ba1b1bb5b5a789d5899",
+  "runtime": {
+    "device": "mps",
+    "dtype": "float16",
+    "input_mode": "prepared",
+    "model": "omniASR_LLM_Unlimited_7B_v2",
+    "n_threads": null,
+    "revision": null,
+    "runner_id": "adapter"
+  },
+  "schedule_seed": 0,
+  "session_id": "743f1d189c254ba1b1bb5b5a789d5899:session-4",
+  "session_index": 4,
+  "subject": {
+    "backend": "omniasr-torch",
+    "batch_size": 1,
+    "language": "mya_Mymr",
+    "model": "omniASR_LLM_Unlimited_7B_v2",
+    "options": {
+      "batch_size": 1,
+      "language": "mya_Mymr"
+    }
+  },
+  "termination": null,
+  "worker_index": 4
+}

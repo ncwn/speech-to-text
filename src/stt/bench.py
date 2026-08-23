@@ -42,6 +42,7 @@ from stt.measurement import (
     write_request,
     write_response,
 )
+from stt.paths import checkout_root
 from stt.provenance import ModelProvenance, ProvenanceError
 from stt.telemetry import Series, pool_series
 
@@ -1290,6 +1291,72 @@ def _baseline_summary_projection(baseline: dict[str, Any]) -> dict[str, Any]:
     return summary
 
 
+_PORTABLE_PATH_KEYS = frozenset(
+    {
+        "audio_path",
+        "path",
+        "prepared_path",
+        "python_executable",
+        "source_path",
+    }
+)
+
+
+def _portable_path(value: str, root: Path) -> str:
+    path = Path(value)
+    if not path.is_absolute():
+        return value
+    try:
+        return path.relative_to(root).as_posix()
+    except ValueError:
+        try:
+            return path.resolve(strict=False).relative_to(root.resolve()).as_posix()
+        except ValueError:
+            return value
+
+
+def _portable_json(value: Any, root: Path, *, key: str | None = None) -> Any:
+    if isinstance(value, dict):
+        return {name: _portable_json(item, root, key=name) for name, item in value.items()}
+    if isinstance(value, list):
+        return [_portable_json(item, root, key=key) for item in value]
+    if isinstance(value, str) and key in _PORTABLE_PATH_KEYS:
+        return _portable_path(value, root)
+    return value
+
+
+def _portable_worker_bytes(
+    source: Path,
+    *,
+    root: Path,
+    request_shas: dict[str, str],
+) -> bytes | None:
+    """Return portable JSON bytes and remap linked worker request identities."""
+    kind = next(
+        (label for label in ("request", "journal", "response") if f".{label}." in source.name),
+        None,
+    )
+    if kind is None:
+        return None
+    try:
+        value = json.loads(source.read_text(encoding="utf-8"))
+    except (OSError, TypeError, ValueError, json.JSONDecodeError):
+        return None
+    portable = _portable_json(value, root)
+    stem = source.name.removesuffix(f".{kind}.json")
+    if kind == "request":
+        request = WorkerRequest.from_dict(portable)
+        request_shas[stem] = request.identity_sha256
+        portable = request.to_dict()
+    else:
+        previous = str(portable.get("request_sha256", ""))
+        if stem in request_shas:
+            portable["request_sha256"] = request_shas[stem]
+        elif previous:
+            portable["request_sha256"] = previous
+    return _canonical_json_bytes(portable)
+
+
 def _recover_baseline_transactions(path: Path, archive_parent: Path) -> None:
     """Remove archives left by a crashed publication, preserving committed ones."""
     try:
@@ -1427,6 +1494,15 @@ def save_baseline(data: dict[str, Any], path: Path = BASELINE) -> None:
                 run_sources[run_index].append(source)
         seen_sources: set[Path] = set()
         archived_by_source: dict[Path, str] = {}
+        portable_root = checkout_root() or Path.cwd()
+        request_shas: dict[str, str] = {}
+        for source, _ in sources:
+            if source.name.endswith(".request.json"):
+                _portable_worker_bytes(
+                    source.resolve(),
+                    root=portable_root,
+                    request_shas=request_shas,
+                )
         context_by_stem: dict[str, dict[str, Any]] = {}
         for source, subject in sources:
             if not source.name.endswith(".request.json"):
@@ -1449,7 +1525,15 @@ def save_baseline(data: dict[str, Any], path: Path = BASELINE) -> None:
             destination = staging / source.name
             if destination.exists():
                 raise FileExistsError(f"duplicate raw artifact name: {source.name}")
-            shutil.copy2(source, destination)
+            portable_bytes = _portable_worker_bytes(
+                source,
+                root=portable_root,
+                request_shas=request_shas,
+            )
+            if portable_bytes is None:
+                shutil.copy2(source, destination)
+            else:
+                destination.write_bytes(portable_bytes)
             relative = str(manifest_prefix / "artifacts" / baseline_id / source.name)
             archived_by_source[source] = relative
             source_name = source.name
