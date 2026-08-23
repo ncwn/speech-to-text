@@ -51,7 +51,7 @@ _CHUNKING = {
 # trusted FLEURS test corpus stayed below 8 output tokens/s across 140 windows;
 # retain that measured ceiling with a floor for short tails and the model's
 # existing upper bound. Batch 32 is the measured Metal throughput knee: batch
-# 64 moves feature preparation into a GIL-bound NumPy path and starves the GPU.
+# 64 regresses corpus RTF and GPU occupancy while tripling Metal allocation.
 _SEAMLESS_OUTPUT_TOKENS_PER_SECOND = 8.0
 _SEAMLESS_MIN_NEW_TOKENS = 32
 _SEAMLESS_MAX_NEW_TOKENS = 256
