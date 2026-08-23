@@ -560,36 +560,15 @@ Two rules the measurements above imposed on the ones that follow them.
 
 ### A 12-clip screen is not a benchmark
 
-An earlier version of the baseline used 12 FLEURS **dev** clips:
-
-<!-- stt-evidence:methodology-screen:start -->
-The historical methodology screen has no typed artifact source; current methodology is represented by the verified baseline, parity, and experiment archives.
-<!-- stt-evidence:methodology-screen:end -->
-
-Every model scored roughly twice as well on the small sample, and the Seamless vs
-omniASR gap — 38 % on 12 clips — vanished entirely on 120. Small samples did not
-merely add noise, they inverted the ranking. Twelve clips is a smoke test for
-"does this backend work at all", nothing more.
+The current 12-clip table uses FLEURS **dev**, while publication accuracy uses
+all 120 tracked FLEURS **test** references. The small dev set is useful for smoke
+coverage and fast comparisons, but its different split and population make it an
+invalid substitute for the test result.
 
 ### Vendor CER for Burmese is not comparable across papers
 
-Meta reports **CER 4.4** for `omniASR_LLM_Unlimited_7B_v2` on Burmese. Measured
-here on 120 FLEURS test clips, that same checkpoint scores **0.1017** — 2.3×
-higher. The scaling curve behind it is smooth and well behaved:
-
-<!-- stt-evidence:methodology-card:start -->
-The historical methodology card has no typed artifact source; current methodology is represented by the verified baseline, parity, and experiment archives.
-<!-- stt-evidence:methodology-card:end -->
-
-so this is not a broken checkpoint or a bad decode — the model scales exactly as
-it should, at about one CER point per 10× parameters. The gap is almost certainly
-text normalisation: Burmese CER moves a long way depending on how you treat
-combining-mark order, the ၊ and ။ delimiters, and whitespace, and Meta does not
-publish its rule.
-
-The same applies to the 54.9 % WER on the `whisper-large-v3-myanmar` card and
-myMediWhisper's 23.44 %: three corpora, three normalisation rules, one of them
-clinical dialogue. **Vendor numbers for Burmese are not comparable across papers
-— including Meta's, and including this document.** What is comparable is the
-ordering *within* one table, which is why every number here comes from the same
-harness on the same clips.
+Vendor metrics use different corpora and often do not publish an equivalent
+Burmese normalization rule. Combining-mark order, Burmese punctuation, digits,
+and whitespace can materially change CER, so vendor numbers are not comparable
+to this harness or to one another. What is comparable here is the ordering within
+one generated table over one declared reference identity and normalization block.
