@@ -394,12 +394,20 @@ _UTILISATION = re.compile(r'"Device Utilization %"=(\d+)')
 
 def gpu_utilization_now() -> float | None:
     """Whole-GPU busy percentage, or ``None`` when ioreg is unavailable."""
-    if shutil.which("ioreg") is None:
+    ioreg = shutil.which("ioreg")
+    if ioreg is None:
         return None
     try:
+        # CPython only selects posix_spawn for this subprocess shape when the
+        # executable contains a directory and close_fds is false. Falling back
+        # to fork here can deadlock against OpenBLAS's at-fork handler while a
+        # model thread is inside NumPy: the sampler holds the GIL waiting for
+        # BLAS workers, while the workload waits for the GIL. ioreg is available
+        # only on macOS, where posix_spawn is the safe primitive for this probe.
         out = subprocess.run(
-            ["ioreg", "-r", "-d", "1", "-w", "0", "-c", "IOAccelerator"],
+            [ioreg, "-r", "-d", "1", "-w", "0", "-c", "IOAccelerator"],
             capture_output=True,
+            close_fds=False,
             text=True,
             timeout=5,
         ).stdout

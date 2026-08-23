@@ -288,6 +288,43 @@ def test_gpu_utilisation_returns_none_without_ioreg(monkeypatch):
     assert telemetry.gpu_utilization_now() is None
 
 
+def test_gpu_utilisation_keeps_subprocess_posix_spawn_eligible(monkeypatch):
+    from types import SimpleNamespace
+
+    from stt import telemetry
+
+    calls = []
+    monkeypatch.setattr(telemetry.shutil, "which", lambda _: "/usr/sbin/ioreg")
+
+    def run(argv, **kwargs):
+        calls.append((argv, kwargs))
+        return SimpleNamespace(stdout='"Device Utilization %"=73')
+
+    monkeypatch.setattr(telemetry.subprocess, "run", run)
+
+    assert telemetry.gpu_utilization_now() == 73.0
+    assert calls == [
+        (
+            [
+                "/usr/sbin/ioreg",
+                "-r",
+                "-d",
+                "1",
+                "-w",
+                "0",
+                "-c",
+                "IOAccelerator",
+            ],
+            {
+                "capture_output": True,
+                "close_fds": False,
+                "text": True,
+                "timeout": 5,
+            },
+        )
+    ]
+
+
 def test_saturation_names_the_busy_resource():
     from stt.telemetry import ResourceUsage, saturation
 
