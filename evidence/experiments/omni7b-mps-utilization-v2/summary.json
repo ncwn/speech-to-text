@@ -1,0 +1,250 @@
+{
+  "artifact_kind": "experiment-v1",
+  "condition_summaries": [
+    {
+      "baseline_eligible": true,
+      "condition_id": "mps-float16-batch8-bucketed",
+      "content_sha256": "bed4307b49fe3162ff3f980d744831c81a262bffd3b1f2df79c3c6e3c53ee154",
+      "cpu_utilization": 0.27320465234606883,
+      "endpoint_rss_mb": 1972.8,
+      "environment_identity": "dc3f62da69846a75db6586cc8ff6a58bad18918b9f10bc783c23272a99b51d77",
+      "error": null,
+      "execution_sha256": "f2dfb230d42f3315acf0044d2485643742f3bf47b80cc666f054480c1d5fc669",
+      "gpu_idle_pct": 0.0,
+      "gpu_scope": "pooled-windows",
+      "gpu_util_mean": 81.5,
+      "gpu_util_n": 183,
+      "gpu_util_p50": 76.0,
+      "hashes": {
+        "pcm16:16000:1:3c36945ab87846a2dbf3332346323b9b3d494b06e492302388937248395f4f3e": "7bd7e77b7b766850da76f8fb7bc82d7f8be588cb1879432de0cba6d23d2cd31c",
+        "pcm16:16000:1:42c90339ee2eac5d1bf7e7d828678af8cb692a39d3dee632d4d7ff16839111f7": "dbaf754f2d642fd7e9461dd9999a17ba8ad15ee11944f5c328df83fc3f81e689",
+        "pcm16:16000:1:447f36b462cf5f7cc1e90729c2f55c931a76f8816f9511fcb3c8570c5b5e1adf": "94d567a3bfc0e4d9c2738531df069471b7537c02cb2a52ba3d77225488790100",
+        "pcm16:16000:1:9c914c45a124f4b23f1bfdfc1ce0c145afb829b26cca3e02c745fe4f84698abd": "acfd5399ac78bfab350788098961e5a064ef355685864623a76224caf6f53a84",
+        "pcm16:16000:1:a8ae742d1da1be86b07f075271f824b5bb2c6eb34a785dbc211eda1e7b87d0d5": "5bbbc26c0740af21d639e74f2155b70077f7b62a0cae0e51631b4aa2386946c3",
+        "pcm16:16000:1:b15387eaf384d505390ed42747909204f4c0639223a6b6046fbf84c3fed66ae6": "539c7d046b26e571e8c8a4b1dcc725645188c249a323654e9301cff094d522af",
+        "pcm16:16000:1:ce7dc92530187d0f3202a8e123d184651e0e3e6327283cba27453b664b8c3efe": "01e5a4ead4b13937c4b01587fd4056fff10297db4a20ddc98a5dd8e2827e9bbe",
+        "pcm16:16000:1:d2b49c6935db88eac5af069c90772f438c5c7c2f906e573f2abaac0f14e03003": "7e8b879d75dced3a2e103e6531298f88b67b0724111ebf7d22406578d41c3dec"
+      },
+      "host_identity": "822f056562677109078af817bb8a4077165c054b083f1746b438ebab79bfb675",
+      "input_set_id": "duration-bucket",
+      "memory_metric": "worker-lifetime-ru-maxrss-diagnostic",
+      "model": "omniASR_LLM_Unlimited_7B_v2",
+      "natural_variation_ratio_99": 1.0,
+      "observer": {
+        "load_wall_s": 15.8326,
+        "observer_cpu_s": 6.440799999999999,
+        "profile": true,
+        "profiler_cpu_s": 2.6016,
+        "repeat_wall_s": 45.989688125,
+        "sample_uss": false,
+        "sampler_cpu_s": 3.8392,
+        "uss_sample_count": 0,
+        "uss_status": "disabled"
+      },
+      "peak_rss_mb": 26669.1,
+      "profile": true,
+      "protocol": {
+        "repeats": 1,
+        "schedule_seed": 0,
+        "sessions": 1,
+        "warmups": 0
+      },
+      "provenance_issues": [],
+      "repeats": 1,
+      "request_key": "omniasr-torch/omniASR_LLM_Unlimited_7B_v2:c180aa7866181012",
+      "rtf": 0.3424909750148943,
+      "rtf_ci95": [
+        0.3424909750148943,
+        0.3424909750148943
+      ],
+      "rtf_p25": 0.3424909750148943,
+      "rtf_p75": 0.3424909750148943,
+      "runner_id": "adapter",
+      "sample_uss": false,
+      "subject": "omniasr-torch/omniASR_LLM_Unlimited_7B_v2",
+      "text_digest": "a16b12a9d637fd049bca95b739e661e1e019edcb17f890277dc70223a60aca99",
+      "transcript_hashes": {
+        "pcm16:16000:1:3c36945ab87846a2dbf3332346323b9b3d494b06e492302388937248395f4f3e": "7bd7e77b7b766850da76f8fb7bc82d7f8be588cb1879432de0cba6d23d2cd31c",
+        "pcm16:16000:1:42c90339ee2eac5d1bf7e7d828678af8cb692a39d3dee632d4d7ff16839111f7": "dbaf754f2d642fd7e9461dd9999a17ba8ad15ee11944f5c328df83fc3f81e689",
+        "pcm16:16000:1:447f36b462cf5f7cc1e90729c2f55c931a76f8816f9511fcb3c8570c5b5e1adf": "94d567a3bfc0e4d9c2738531df069471b7537c02cb2a52ba3d77225488790100",
+        "pcm16:16000:1:9c914c45a124f4b23f1bfdfc1ce0c145afb829b26cca3e02c745fe4f84698abd": "acfd5399ac78bfab350788098961e5a064ef355685864623a76224caf6f53a84",
+        "pcm16:16000:1:a8ae742d1da1be86b07f075271f824b5bb2c6eb34a785dbc211eda1e7b87d0d5": "5bbbc26c0740af21d639e74f2155b70077f7b62a0cae0e51631b4aa2386946c3",
+        "pcm16:16000:1:b15387eaf384d505390ed42747909204f4c0639223a6b6046fbf84c3fed66ae6": "539c7d046b26e571e8c8a4b1dcc725645188c249a323654e9301cff094d522af",
+        "pcm16:16000:1:ce7dc92530187d0f3202a8e123d184651e0e3e6327283cba27453b664b8c3efe": "01e5a4ead4b13937c4b01587fd4056fff10297db4a20ddc98a5dd8e2827e9bbe",
+        "pcm16:16000:1:d2b49c6935db88eac5af069c90772f438c5c7c2f906e573f2abaac0f14e03003": "7e8b879d75dced3a2e103e6531298f88b67b0724111ebf7d22406578d41c3dec"
+      },
+      "worker_blocks": [
+        {
+          "hashes": {
+            "pcm16:16000:1:3c36945ab87846a2dbf3332346323b9b3d494b06e492302388937248395f4f3e": "7bd7e77b7b766850da76f8fb7bc82d7f8be588cb1879432de0cba6d23d2cd31c",
+            "pcm16:16000:1:42c90339ee2eac5d1bf7e7d828678af8cb692a39d3dee632d4d7ff16839111f7": "dbaf754f2d642fd7e9461dd9999a17ba8ad15ee11944f5c328df83fc3f81e689",
+            "pcm16:16000:1:447f36b462cf5f7cc1e90729c2f55c931a76f8816f9511fcb3c8570c5b5e1adf": "94d567a3bfc0e4d9c2738531df069471b7537c02cb2a52ba3d77225488790100",
+            "pcm16:16000:1:9c914c45a124f4b23f1bfdfc1ce0c145afb829b26cca3e02c745fe4f84698abd": "acfd5399ac78bfab350788098961e5a064ef355685864623a76224caf6f53a84",
+            "pcm16:16000:1:a8ae742d1da1be86b07f075271f824b5bb2c6eb34a785dbc211eda1e7b87d0d5": "5bbbc26c0740af21d639e74f2155b70077f7b62a0cae0e51631b4aa2386946c3",
+            "pcm16:16000:1:b15387eaf384d505390ed42747909204f4c0639223a6b6046fbf84c3fed66ae6": "539c7d046b26e571e8c8a4b1dcc725645188c249a323654e9301cff094d522af",
+            "pcm16:16000:1:ce7dc92530187d0f3202a8e123d184651e0e3e6327283cba27453b664b8c3efe": "01e5a4ead4b13937c4b01587fd4056fff10297db4a20ddc98a5dd8e2827e9bbe",
+            "pcm16:16000:1:d2b49c6935db88eac5af069c90772f438c5c7c2f906e573f2abaac0f14e03003": "7e8b879d75dced3a2e103e6531298f88b67b0724111ebf7d22406578d41c3dec"
+          },
+          "launch_position": 0,
+          "process_peak_rss_mb": 26669.1,
+          "repeat_rtfs": [
+            0.34249097501489423
+          ],
+          "representative_rtf": 0.3424909750148943,
+          "session_id": "omni7b-mps-utilization-v2:session-0",
+          "session_index": 0,
+          "worker_index": 0
+        }
+      ],
+      "worker_lifetime_peak_rss_mb": 26669.1,
+      "workers": 1
+    }
+  ],
+  "contrasts": [],
+  "experiment_id": "omni7b-mps-utilization-v2",
+  "gate_eligible": false,
+  "schema_version": 1,
+  "session_schedule": [
+    [
+      {
+        "condition_id": "mps-float16-batch8-bucketed",
+        "launch_position": 0,
+        "request_key": "omniasr-torch/omniASR_LLM_Unlimited_7B_v2:c180aa7866181012"
+      }
+    ]
+  ],
+  "spec": {
+    "conditions": [
+      {
+        "condition_id": "mps-float16-batch8-bucketed",
+        "input_set_id": "duration-bucket",
+        "profile": true,
+        "runner_id": "adapter",
+        "sample_uss": false,
+        "subject": {
+          "backend": "omniasr-torch",
+          "batch_size": 8,
+          "language": "mya_Mymr",
+          "model": "omniASR_LLM_Unlimited_7B_v2",
+          "options": {
+            "batch_size": 8,
+            "device": "mps",
+            "dtype": "float16",
+            "language": "mya_Mymr"
+          }
+        }
+      }
+    ],
+    "contrasts": [],
+    "experiment_id": "omni7b-mps-utilization-v2",
+    "input_sets": [
+      {
+        "input_mode": "prepared",
+        "input_set_id": "duration-bucket",
+        "inputs": [
+          {
+            "audio_id": "pcm16:16000:1:3c36945ab87846a2dbf3332346323b9b3d494b06e492302388937248395f4f3e",
+            "channels": 1,
+            "duration_s": 16.56,
+            "frames": 264960,
+            "prepared_path": "data/.converted/pcm16-mono-16000-v1__98cad0879cc68ff127b6c2ac012fc4cb0dae07bf3a81de8425f98de5f246d604.wav",
+            "reference_id": "7352377329387773389",
+            "sample_rate": 16000,
+            "source_path": "data/fleurs-test/audio/7352377329387773389.wav",
+            "source_sha256": "98cad0879cc68ff127b6c2ac012fc4cb0dae07bf3a81de8425f98de5f246d604"
+          },
+          {
+            "audio_id": "pcm16:16000:1:b15387eaf384d505390ed42747909204f4c0639223a6b6046fbf84c3fed66ae6",
+            "channels": 1,
+            "duration_s": 16.56,
+            "frames": 264960,
+            "prepared_path": "data/.converted/pcm16-mono-16000-v1__b18b92f405968516f945e31db01c2566fcdb78c1f8335be6afdaced199d0649b.wav",
+            "reference_id": "9911206073615608068",
+            "sample_rate": 16000,
+            "source_path": "data/fleurs-test/audio/9911206073615608068.wav",
+            "source_sha256": "b18b92f405968516f945e31db01c2566fcdb78c1f8335be6afdaced199d0649b"
+          },
+          {
+            "audio_id": "pcm16:16000:1:42c90339ee2eac5d1bf7e7d828678af8cb692a39d3dee632d4d7ff16839111f7",
+            "channels": 1,
+            "duration_s": 16.68,
+            "frames": 266880,
+            "prepared_path": "data/.converted/pcm16-mono-16000-v1__fe4b038e3b79ec37b0d54f14faeecb92de57a0b4aa55f06247b756e0093a7170.wav",
+            "reference_id": "6221639814777336039",
+            "sample_rate": 16000,
+            "source_path": "data/fleurs-test/audio/6221639814777336039.wav",
+            "source_sha256": "fe4b038e3b79ec37b0d54f14faeecb92de57a0b4aa55f06247b756e0093a7170"
+          },
+          {
+            "audio_id": "pcm16:16000:1:447f36b462cf5f7cc1e90729c2f55c931a76f8816f9511fcb3c8570c5b5e1adf",
+            "channels": 1,
+            "duration_s": 16.74,
+            "frames": 267840,
+            "prepared_path": "data/.converted/pcm16-mono-16000-v1__893380af55f2c5e0d2581eae8fb78358355578686bc0c4a3a5262fb78036e88c.wav",
+            "reference_id": "10655841079586991967",
+            "sample_rate": 16000,
+            "source_path": "data/fleurs-test/audio/10655841079586991967.wav",
+            "source_sha256": "893380af55f2c5e0d2581eae8fb78358355578686bc0c4a3a5262fb78036e88c"
+          },
+          {
+            "audio_id": "pcm16:16000:1:a8ae742d1da1be86b07f075271f824b5bb2c6eb34a785dbc211eda1e7b87d0d5",
+            "channels": 1,
+            "duration_s": 16.74,
+            "frames": 267840,
+            "prepared_path": "data/.converted/pcm16-mono-16000-v1__bfc91b7b3cae2c270076717508ef70c498ec0f59b1a36eff9d1ad2c0819f870f.wav",
+            "reference_id": "6649210285252365896",
+            "sample_rate": 16000,
+            "source_path": "data/fleurs-test/audio/6649210285252365896.wav",
+            "source_sha256": "bfc91b7b3cae2c270076717508ef70c498ec0f59b1a36eff9d1ad2c0819f870f"
+          },
+          {
+            "audio_id": "pcm16:16000:1:ce7dc92530187d0f3202a8e123d184651e0e3e6327283cba27453b664b8c3efe",
+            "channels": 1,
+            "duration_s": 16.92,
+            "frames": 270720,
+            "prepared_path": "data/.converted/pcm16-mono-16000-v1__1516ff2d4e60a7f9b871aedb61cf328a2f12d5c4050ed1c2fdfaa7fa69dedab6.wav",
+            "reference_id": "16374599435426800590",
+            "sample_rate": 16000,
+            "source_path": "data/fleurs-test/audio/16374599435426800590.wav",
+            "source_sha256": "1516ff2d4e60a7f9b871aedb61cf328a2f12d5c4050ed1c2fdfaa7fa69dedab6"
+          },
+          {
+            "audio_id": "pcm16:16000:1:9c914c45a124f4b23f1bfdfc1ce0c145afb829b26cca3e02c745fe4f84698abd",
+            "channels": 1,
+            "duration_s": 16.92,
+            "frames": 270720,
+            "prepared_path": "data/.converted/pcm16-mono-16000-v1__32fec994dee693fbbf0b92dd022ab81730d0d74f6854b9f509475994b01b85bf.wav",
+            "reference_id": "5235432885229267346",
+            "sample_rate": 16000,
+            "source_path": "data/fleurs-test/audio/5235432885229267346.wav",
+            "source_sha256": "32fec994dee693fbbf0b92dd022ab81730d0d74f6854b9f509475994b01b85bf"
+          },
+          {
+            "audio_id": "pcm16:16000:1:d2b49c6935db88eac5af069c90772f438c5c7c2f906e573f2abaac0f14e03003",
+            "channels": 1,
+            "duration_s": 17.16,
+            "frames": 274560,
+            "prepared_path": "data/.converted/pcm16-mono-16000-v1__dc7d31330383687a9b0933f21e843d66ca472c03a96b703a624eda1696d4ddb5.wav",
+            "reference_id": "6522587442052089609",
+            "sample_rate": 16000,
+            "source_path": "data/fleurs-test/audio/6522587442052089609.wav",
+            "source_sha256": "dc7d31330383687a9b0933f21e843d66ca472c03a96b703a624eda1696d4ddb5"
+          }
+        ]
+      }
+    ],
+    "repeats": 1,
+    "schedule_seed": 0,
+    "sessions": 1,
+    "statistics": {
+      "draws": 20000,
+      "estimator": "paired-session-median-log-ratio",
+      "min_repeats": 3,
+      "min_sessions": 5,
+      "min_warmups": 3,
+      "quantile_method": "linear",
+      "version": 1
+    },
+    "warmups": 0
+  }
+}

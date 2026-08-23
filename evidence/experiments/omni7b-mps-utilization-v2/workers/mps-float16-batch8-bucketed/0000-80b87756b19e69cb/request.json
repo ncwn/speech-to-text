@@ -1,0 +1,242 @@
+{
+  "condition_id": "mps-float16-batch8-bucketed",
+  "experiment_id": "omni7b-mps-utilization-v2",
+  "input_mode": "prepared",
+  "inputs": [
+    {
+      "audio_id": "pcm16:16000:1:3c36945ab87846a2dbf3332346323b9b3d494b06e492302388937248395f4f3e",
+      "channels": 1,
+      "duration_s": 16.56,
+      "frames": 264960,
+      "prepared_path": "data/.converted/pcm16-mono-16000-v1__98cad0879cc68ff127b6c2ac012fc4cb0dae07bf3a81de8425f98de5f246d604.wav",
+      "reference_id": "7352377329387773389",
+      "sample_rate": 16000,
+      "source_path": "data/fleurs-test/audio/7352377329387773389.wav",
+      "source_sha256": "98cad0879cc68ff127b6c2ac012fc4cb0dae07bf3a81de8425f98de5f246d604"
+    },
+    {
+      "audio_id": "pcm16:16000:1:b15387eaf384d505390ed42747909204f4c0639223a6b6046fbf84c3fed66ae6",
+      "channels": 1,
+      "duration_s": 16.56,
+      "frames": 264960,
+      "prepared_path": "data/.converted/pcm16-mono-16000-v1__b18b92f405968516f945e31db01c2566fcdb78c1f8335be6afdaced199d0649b.wav",
+      "reference_id": "9911206073615608068",
+      "sample_rate": 16000,
+      "source_path": "data/fleurs-test/audio/9911206073615608068.wav",
+      "source_sha256": "b18b92f405968516f945e31db01c2566fcdb78c1f8335be6afdaced199d0649b"
+    },
+    {
+      "audio_id": "pcm16:16000:1:42c90339ee2eac5d1bf7e7d828678af8cb692a39d3dee632d4d7ff16839111f7",
+      "channels": 1,
+      "duration_s": 16.68,
+      "frames": 266880,
+      "prepared_path": "data/.converted/pcm16-mono-16000-v1__fe4b038e3b79ec37b0d54f14faeecb92de57a0b4aa55f06247b756e0093a7170.wav",
+      "reference_id": "6221639814777336039",
+      "sample_rate": 16000,
+      "source_path": "data/fleurs-test/audio/6221639814777336039.wav",
+      "source_sha256": "fe4b038e3b79ec37b0d54f14faeecb92de57a0b4aa55f06247b756e0093a7170"
+    },
+    {
+      "audio_id": "pcm16:16000:1:447f36b462cf5f7cc1e90729c2f55c931a76f8816f9511fcb3c8570c5b5e1adf",
+      "channels": 1,
+      "duration_s": 16.74,
+      "frames": 267840,
+      "prepared_path": "data/.converted/pcm16-mono-16000-v1__893380af55f2c5e0d2581eae8fb78358355578686bc0c4a3a5262fb78036e88c.wav",
+      "reference_id": "10655841079586991967",
+      "sample_rate": 16000,
+      "source_path": "data/fleurs-test/audio/10655841079586991967.wav",
+      "source_sha256": "893380af55f2c5e0d2581eae8fb78358355578686bc0c4a3a5262fb78036e88c"
+    },
+    {
+      "audio_id": "pcm16:16000:1:a8ae742d1da1be86b07f075271f824b5bb2c6eb34a785dbc211eda1e7b87d0d5",
+      "channels": 1,
+      "duration_s": 16.74,
+      "frames": 267840,
+      "prepared_path": "data/.converted/pcm16-mono-16000-v1__bfc91b7b3cae2c270076717508ef70c498ec0f59b1a36eff9d1ad2c0819f870f.wav",
+      "reference_id": "6649210285252365896",
+      "sample_rate": 16000,
+      "source_path": "data/fleurs-test/audio/6649210285252365896.wav",
+      "source_sha256": "bfc91b7b3cae2c270076717508ef70c498ec0f59b1a36eff9d1ad2c0819f870f"
+    },
+    {
+      "audio_id": "pcm16:16000:1:ce7dc92530187d0f3202a8e123d184651e0e3e6327283cba27453b664b8c3efe",
+      "channels": 1,
+      "duration_s": 16.92,
+      "frames": 270720,
+      "prepared_path": "data/.converted/pcm16-mono-16000-v1__1516ff2d4e60a7f9b871aedb61cf328a2f12d5c4050ed1c2fdfaa7fa69dedab6.wav",
+      "reference_id": "16374599435426800590",
+      "sample_rate": 16000,
+      "source_path": "data/fleurs-test/audio/16374599435426800590.wav",
+      "source_sha256": "1516ff2d4e60a7f9b871aedb61cf328a2f12d5c4050ed1c2fdfaa7fa69dedab6"
+    },
+    {
+      "audio_id": "pcm16:16000:1:9c914c45a124f4b23f1bfdfc1ce0c145afb829b26cca3e02c745fe4f84698abd",
+      "channels": 1,
+      "duration_s": 16.92,
+      "frames": 270720,
+      "prepared_path": "data/.converted/pcm16-mono-16000-v1__32fec994dee693fbbf0b92dd022ab81730d0d74f6854b9f509475994b01b85bf.wav",
+      "reference_id": "5235432885229267346",
+      "sample_rate": 16000,
+      "source_path": "data/fleurs-test/audio/5235432885229267346.wav",
+      "source_sha256": "32fec994dee693fbbf0b92dd022ab81730d0d74f6854b9f509475994b01b85bf"
+    },
+    {
+      "audio_id": "pcm16:16000:1:d2b49c6935db88eac5af069c90772f438c5c7c2f906e573f2abaac0f14e03003",
+      "channels": 1,
+      "duration_s": 17.16,
+      "frames": 274560,
+      "prepared_path": "data/.converted/pcm16-mono-16000-v1__dc7d31330383687a9b0933f21e843d66ca472c03a96b703a624eda1696d4ddb5.wav",
+      "reference_id": "6522587442052089609",
+      "sample_rate": 16000,
+      "source_path": "data/fleurs-test/audio/6522587442052089609.wav",
+      "source_sha256": "dc7d31330383687a9b0933f21e843d66ca472c03a96b703a624eda1696d4ddb5"
+    }
+  ],
+  "launch_position": 0,
+  "model_binding": {
+    "paths": [
+      {
+        "name": "omniASR-LLM-Unlimited-7B-v2.pt",
+        "path": ".cache/fairseq2/assets/be8b45a4444380016fa2f991/omniASR-LLM-Unlimited-7B-v2.pt",
+        "role": "weights",
+        "sha256": "600199f8be430aed4e43b6b1c7cf70fd83d471fac574c61c95b6bce90c47b68e",
+        "size_bytes": 31220520831,
+        "stat": {
+          "ctime_ns": 1787159223984645852,
+          "device": 16777235,
+          "inode": 5984141,
+          "mtime_ns": 1787087265633906879,
+          "size": 31220520831
+        }
+      },
+      {
+        "name": "omniASR_tokenizer_written_v2.model",
+        "path": ".cache/fairseq2/assets/e7be1a6acb8f76fdbca19dce/omniASR_tokenizer_written_v2.model",
+        "role": "tokenizer",
+        "sha256": "8aa11a1092142ef472537476ef6e76541123e2f0d789b79f3ebd119008240b1e",
+        "size_bytes": 91481,
+        "stat": {
+          "ctime_ns": 1787159200848561084,
+          "device": 16777235,
+          "inode": 5984130,
+          "mtime_ns": 1787060037638994009,
+          "size": 91481
+        }
+      },
+      {
+        "name": "omniASR_LLM_Unlimited_7B_v2.card.json",
+        "path": null,
+        "role": "card-metadata",
+        "sha256": "7c355b28c11a521c875d344a31d00dda3f152c3bf42b57a8cee0afde491b3e53",
+        "size_bytes": 349,
+        "stat": {}
+      }
+    ],
+    "provenance": {
+      "adapter_git_commit": "b11dc1896109c4687331459ba7e1ac30faec1c9d",
+      "adapter_git_dirty": false,
+      "artifacts": [
+        {
+          "name": "omniASR-LLM-Unlimited-7B-v2.pt",
+          "path": ".cache/fairseq2/assets/be8b45a4444380016fa2f991/omniASR-LLM-Unlimited-7B-v2.pt",
+          "role": "weights",
+          "sha256": "600199f8be430aed4e43b6b1c7cf70fd83d471fac574c61c95b6bce90c47b68e",
+          "size_bytes": 31220520831,
+          "stat": {
+            "ctime_ns": 1787159223984645852,
+            "device": 16777235,
+            "inode": 5984141,
+            "mtime_ns": 1787087265633906879,
+            "size": 31220520831
+          }
+        },
+        {
+          "name": "omniASR_tokenizer_written_v2.model",
+          "path": ".cache/fairseq2/assets/e7be1a6acb8f76fdbca19dce/omniASR_tokenizer_written_v2.model",
+          "role": "tokenizer",
+          "sha256": "8aa11a1092142ef472537476ef6e76541123e2f0d789b79f3ebd119008240b1e",
+          "size_bytes": 91481,
+          "stat": {
+            "ctime_ns": 1787159200848561084,
+            "device": 16777235,
+            "inode": 5984130,
+            "mtime_ns": 1787060037638994009,
+            "size": 91481
+          }
+        },
+        {
+          "name": "omniASR_LLM_Unlimited_7B_v2.card.json",
+          "path": null,
+          "role": "card-metadata",
+          "sha256": "7c355b28c11a521c875d344a31d00dda3f152c3bf42b57a8cee0afde491b3e53",
+          "size_bytes": 349,
+          "stat": {}
+        }
+      ],
+      "backend": "omniasr-torch",
+      "content_sha256": "bed4307b49fe3162ff3f980d744831c81a262bffd3b1f2df79c3c6e3c53ee154",
+      "execution_sha256": "f2dfb230d42f3315acf0044d2485643742f3bf47b80cc666f054480c1d5fc669",
+      "fallback_history": [],
+      "issues": [],
+      "requested_model": "omniASR_LLM_Unlimited_7B_v2",
+      "requested_settings": {
+        "batch_size": 8,
+        "device": "mps",
+        "dtype": "float16",
+        "language": "mya_Mymr"
+      },
+      "resolved_settings": {
+        "chunk_seconds": null,
+        "device": "mps",
+        "dtype": "float16",
+        "n_threads": null
+      },
+      "revision_status": "unavailable-content-addressed",
+      "runtime_packages": {
+        "accelerate": "1.14.0",
+        "crispasr": "0.8.29",
+        "dataoceanai-dolphin": "20260513",
+        "fairseq2": "0.6",
+        "funasr": "1.4.2",
+        "huggingface-hub": "0.36.2",
+        "modelscope": "1.39.1",
+        "omnilingual-asr": "0.2.0",
+        "psutil": "5.9.8",
+        "sentencepiece": "0.2.2",
+        "soundfile": "0.14.0",
+        "tokenizers": "0.22.2",
+        "torch": "2.8.0",
+        "torchaudio": "2.8.0",
+        "transformers": "4.57.6"
+      },
+      "schema_version": 1,
+      "source_kind": "fairseq2-card",
+      "source_locator": "omniASR_LLM_Unlimited_7B_v2",
+      "upstream_revision": null,
+      "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+    }
+  },
+  "profile": true,
+  "protocol_version": 3,
+  "repeats": 1,
+  "run_id": "omni7b-mps-utilization-v2",
+  "runner_id": "adapter",
+  "sample_uss": false,
+  "schedule_seed": 0,
+  "session_id": "omni7b-mps-utilization-v2:session-0",
+  "session_index": 0,
+  "subject": {
+    "backend": "omniasr-torch",
+    "batch_size": 8,
+    "language": "mya_Mymr",
+    "model": "omniASR_LLM_Unlimited_7B_v2",
+    "options": {
+      "batch_size": 8,
+      "device": "mps",
+      "dtype": "float16",
+      "language": "mya_Mymr"
+    }
+  },
+  "warmups": 0,
+  "worker_index": 0
+}
