@@ -80,6 +80,5 @@
   },
   "status": "stopped",
   "stop_at": 4,
-  "stop_reason": "2 consecutive plateau steps",
-  "verification_issues": []
+  "stop_reason": "2 consecutive plateau steps"
 }

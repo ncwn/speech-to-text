@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 import pytest
 
 from stt.measurement import MeasurementError
@@ -58,3 +61,13 @@ def test_batch_sweep_records_failed_condition_instead_of_raising():
 def test_batch_sweep_requires_declared_powers_of_two():
     with pytest.raises(MeasurementError, match="powers of two"):
         BatchSweepSpec("bad", "fake-model", "fixed", (1, 3), 3).validate()
+
+
+def test_all_committed_batch_sweeps_recompute_from_observations():
+    root = Path(__file__).parents[1] / "evidence" / "experiments"
+    paths = sorted(root.glob("**/batch-sweep*.json"))
+
+    assert paths
+    assert all(
+        verify_batch_sweep(json.loads(path.read_text(encoding="utf-8"))) == [] for path in paths
+    )
