@@ -428,6 +428,82 @@ def baseline_table(path: Path) -> DerivedTable:
     return table
 
 
+def experiment_table(path: Path) -> DerivedTable:
+    """Derive descriptive condition timing from a verified experiment-v1 archive."""
+    from stt.experiment_archive import verify_experiment
+
+    issues = verify_experiment(path)
+    if issues:
+        raise MeasurementError("experiment-v1 verification failed: " + "; ".join(issues))
+    descriptor = path / "experiment.json" if path.is_dir() else path
+    try:
+        value = json.loads(descriptor.read_text(encoding="utf-8"))
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        raise MeasurementError(f"cannot read experiment-v1: {exc}") from exc
+    summaries = list(value.get("condition_summaries", []))
+    include_gpu = bool(summaries) and all(
+        summary.get(name) is not None
+        for summary in summaries
+        for name in ("gpu_util_mean", "gpu_util_p50", "gpu_idle_pct")
+    )
+    rows: list[dict[str, Any]] = []
+    for index, summary in enumerate(summaries):
+        if not summary.get("baseline_eligible") or summary.get("error"):
+            raise MeasurementError(f"experiment-v1 condition {index} is not publishable")
+        row = {
+            "condition": str(summary["condition_id"]),
+            "rtf": _finite(summary.get("rtf"), f"experiment condition {index}.rtf"),
+            "peak_rss_mb": _finite(
+                summary.get("peak_rss_mb"), f"experiment condition {index}.peak_rss_mb"
+            ),
+            "sessions": _finite(summary.get("workers"), f"experiment condition {index}.workers"),
+            "repeats": _finite(summary.get("repeats"), f"experiment condition {index}.repeats"),
+        }
+        if include_gpu:
+            row.update(
+                {
+                    "gpu_mean": _finite(
+                        summary.get("gpu_util_mean"), f"experiment condition {index}.gpu_mean"
+                    ),
+                    "gpu_p50": _finite(
+                        summary.get("gpu_util_p50"), f"experiment condition {index}.gpu_p50"
+                    ),
+                    "gpu_idle": _finite(
+                        summary.get("gpu_idle_pct"), f"experiment condition {index}.gpu_idle"
+                    ),
+                }
+            )
+        rows.append(row)
+    columns = [
+        DerivedColumn("condition", "Condition"),
+        DerivedColumn("rtf", "RTF", 4),
+    ]
+    if include_gpu:
+        columns.extend(
+            (
+                DerivedColumn("gpu_mean", "GPU mean %", 1),
+                DerivedColumn("gpu_p50", "GPU p50 %", 1),
+                DerivedColumn("gpu_idle", "GPU idle %", 1),
+            )
+        )
+    columns.extend(
+        (
+            DerivedColumn("peak_rss_mb", "Peak RSS MB", 0),
+            DerivedColumn("sessions", "Sessions", 0),
+            DerivedColumn("repeats", "Repeats", 0),
+        )
+    )
+    table = DerivedTable(
+        deriver="experiment:v1",
+        columns=tuple(columns),
+        rows=tuple(rows),
+        row_key="condition",
+        metadata={"experiment_id": value.get("experiment_id")},
+    )
+    table.validate()
+    return table
+
+
 __all__ = [
     "DERIVER_SCHEMA_VERSION",
     "DeriveContext",
@@ -445,4 +521,5 @@ __all__ = [
     "validate_same_waveform",
     "validate_settings",
     "baseline_table",
+    "experiment_table",
 ]

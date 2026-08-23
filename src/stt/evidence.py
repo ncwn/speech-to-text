@@ -15,7 +15,14 @@ from pathlib import Path
 from typing import Any
 
 from stt.burmese import NormalizeOptions
-from stt.derive import DeriveContext, DerivedTable, Requirements, baseline_table, validate_settings
+from stt.derive import (
+    DeriveContext,
+    DerivedTable,
+    Requirements,
+    baseline_table,
+    experiment_table,
+    validate_settings,
+)
 from stt.derive import derive as run_deriver
 from stt.evaluate import load_references, score_results
 from stt.measurement import MeasurementError
@@ -161,7 +168,7 @@ def load_manifest(path: Path) -> EvidenceManifest:
         seen_ids.add(block_id)
 
         source_kind = str(item.get("source_kind", "transcription-jsonl"))
-        if source_kind not in {"transcription-jsonl", "baseline-v2"}:
+        if source_kind not in {"transcription-jsonl", "baseline-v2", "experiment-v1"}:
             raise EvidenceError(f"{context}.source_kind is unsupported: {source_kind!r}")
         raw_runs = item.get("runs", [])
         if not isinstance(raw_runs, list):
@@ -540,6 +547,9 @@ def _render_block(block: BlockSpec) -> tuple[str, list[str], bool]:
         if block.source_kind == "baseline-v2":
             assert block.source is not None
             return _render_derived_table(baseline_table(block.source)), issues, True
+        if block.source_kind == "experiment-v1":
+            assert block.source is not None
+            return _render_derived_table(experiment_table(block.source)), issues, True
         references = load_references(block.reference)
         if not references:
             raise EvidenceError(f"empty reference corpus: {block.reference}")

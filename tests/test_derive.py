@@ -8,7 +8,14 @@ from pathlib import Path
 
 import pytest
 
-from stt.derive import DeriveContext, Requirements, baseline_table, derive, reference_sha256
+from stt.derive import (
+    DeriveContext,
+    Requirements,
+    baseline_table,
+    derive,
+    experiment_table,
+    reference_sha256,
+)
 from stt.measurement import MeasurementError
 from stt.provenance import ArtifactDigest, ModelProvenance
 from stt.results import Segment, TranscriptionResult
@@ -126,3 +133,9 @@ def test_committed_baseline_deriver_uses_verified_common_wall_artifact():
 
     assert len(table.rows) == 4
     assert all(row["sessions"] == 5 and row["repeats"] == 15 for row in table.rows)
+
+
+def test_committed_experiment_deriver_uses_verified_condition_summaries():
+    table = experiment_table(Path("evidence/experiments/mms-batch-smoke/experiment.json"))
+
+    assert [row["condition"] for row in table.rows] == ["batch-1", "batch-2", "batch-4"]

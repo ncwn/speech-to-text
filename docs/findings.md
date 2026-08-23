@@ -317,6 +317,21 @@ All four backends run on Metal. Whether they *should* differs per model:
 CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity.
 <!-- stt-evidence:device-defaults:end -->
 
+The verified MMS device/dtype candidate smoke below is descriptive: one clip,
+one isolated session, and one repeat per condition. It validates each full model
+load/inference path but is not a default-changing performance gate.
+
+<!-- stt-evidence:mms-device-dtype-smoke:start -->
+| Condition | RTF | Peak RSS MB | Sessions | Repeats |
+| --- | ---: | ---: | ---: | ---: |
+| cpu-float32 | 0.1172 | 5120 | 1 | 1 |
+| cpu-float16 | 2.4088 | 5938 | 1 | 1 |
+| cpu-bfloat16 | 2.6336 | 5939 | 1 | 1 |
+| mps-float32 | 0.0295 | 519 | 1 | 1 |
+| mps-float16 | 0.0307 | 5938 | 1 | 1 |
+| mps-bfloat16 | 0.0544 | 5939 | 1 | 1 |
+<!-- stt-evidence:mms-device-dtype-smoke:end -->
+
 ### omniASR on Metal
 
 Five FLEURS clips, same model, same audio, corpus CER 0.0280 in every row
@@ -494,15 +509,18 @@ CPU-only runs still collect CPU/RSS series but do not claim GPU use.
 ### Batching A/B
 
 The original harness passed one CLI-sized chunk at a time, preventing a backend
-from seeing the full corpus and limiting native prefetch/bucketing. Schema v2 now
-passes the complete corpus once per repeat. The old Seamless A/B below remains a
-hypothesis for the required full batching matrix:
+from seeing the full corpus and limiting native prefetch/bucketing. The verified
+MMS diagnostic below compares the declared batch candidates over one clip:
 
 <!-- stt-evidence:batching:start -->
-> **Unverified legacy evidence.** Numeric publication is blocked because the declared artifacts are missing trusted audio identity, complete corpus coverage, or matching provenance. Regenerate the runs before publishing measured results.
+| Condition | RTF | Peak RSS MB | Sessions | Repeats |
+| --- | ---: | ---: | ---: | ---: |
+| batch-1 | 0.0287 | 518 | 1 | 1 |
+| batch-2 | 0.0286 | 515 | 1 | 1 |
+| batch-4 | 0.0297 | 516 | 1 | 1 |
 <!-- stt-evidence:batching:end -->
 
-No speedup is currently published from this table. Batching remains explicit,
+No default changes from this diagnostic table. Batching remains explicit,
 and transcript hashes must match before throughput is compared. The next matrix
 must use isolated repeated workers, exact model provenance, common-wall RTF, and
 complete corpus coverage.

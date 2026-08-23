@@ -294,6 +294,25 @@ def test_baseline_v2_source_renders_only_after_offline_verification(tmp_path):
     assert "| Subject | RTF | CI low | CI high |" in check.document.read_text(encoding="utf-8")
 
 
+def test_experiment_v1_source_renders_only_after_offline_verification(tmp_path):
+    manifest = _fixture(tmp_path)
+    raw = json.loads(manifest.read_text(encoding="utf-8"))
+    block = raw["blocks"][0]
+    block["source_kind"] = "experiment-v1"
+    block["source"] = str(
+        (Path.cwd() / "evidence" / "experiments" / "mms-batch-smoke" / "experiment.json").resolve()
+    )
+    block["deriver"] = "experiment:v1"
+    block["runs"] = []
+    block["metrics"] = []
+    manifest.write_text(json.dumps(raw), encoding="utf-8")
+
+    check = update_evidence(manifest)
+
+    assert check.publishable
+    assert "| Condition | RTF | Peak RSS MB |" in check.document.read_text(encoding="utf-8")
+
+
 def test_check_rejects_unowned_markdown_table(tmp_path):
     manifest = _fixture(tmp_path)
     document = manifest.parent.parent / "docs" / "findings.md"

@@ -639,6 +639,25 @@
       "status_reason": "CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity."
     },
     {
+      "id": "mms-device-dtype-smoke",
+      "corpus": "fleurs-dev-one-clip",
+      "reference": "data/fleurs/references.tsv",
+      "source_kind": "experiment-v1",
+      "source": "evidence/experiments/mms-device-dtype-smoke/experiment.json",
+      "deriver": "experiment:v1",
+      "runs": [],
+      "metrics": [],
+      "reference_sha256": "d50f1117fb74d73bb16f060d45e58ed6bf207ee6535571536f73f795c46a9481",
+      "expected_reference_count": 12,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      }
+    },
+    {
       "id": "omniasr-metal",
       "corpus": "fleurs-test-5",
       "reference": "data/fleurs-test/references.tsv",
@@ -867,22 +886,9 @@
       "id": "batching",
       "corpus": "fleurs-test-8",
       "reference": "data/fleurs-test/references.tsv",
-      "status_only": true,
-      "runs": [
-        {
-          "artifact": "outputs/bench-hf-seamless-m4t-v2.jsonl",
-          "label": "SeamlessM4T v2 batching probe",
-          "backend": "hf",
-          "model": "seamless-m4t-v2"
-        }
-      ],
-      "metrics": [
-        {
-          "name": "rtf",
-          "label": "RTF",
-          "digits": 3
-        }
-      ],
+      "status_only": false,
+      "runs": [],
+      "metrics": [],
       "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
       "expected_reference_count": 120,
       "normalization": {
@@ -891,7 +897,10 @@
         "strip_punctuation": true,
         "normalize_digits": true,
         "lowercase": true
-      }
+      },
+      "source_kind": "experiment-v1",
+      "source": "evidence/experiments/mms-batch-smoke/experiment.json",
+      "deriver": "experiment:v1"
     },
     {
       "id": "methodology-screen",
