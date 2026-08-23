@@ -200,6 +200,26 @@
             "device": "cpu",
             "dtype": "float32"
           }
+        },
+        {
+          "artifact": "outputs/evidence-fleurs-dev-mms.jsonl",
+          "label": "MMS-1B (verified accuracy)",
+          "backend": "hf",
+          "model": "mms-1b-all",
+          "settings": {
+            "device": "mps",
+            "dtype": "float32"
+          }
+        },
+        {
+          "artifact": "outputs/evidence-fleurs-dev-dolphin.jsonl",
+          "label": "Dolphin small (verified accuracy)",
+          "backend": "dolphin",
+          "model": "small",
+          "settings": {
+            "device": "cpu",
+            "dtype": "float32"
+          }
         }
       ],
       "metrics": [

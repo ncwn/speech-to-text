@@ -48,6 +48,8 @@ baseline-v2 artifacts.
 | --- | --- | ---: | ---: | ---: |
 | SeamlessM4T v2 (verified accuracy) | `hf` | 0.0594 | 12 | 12 |
 | omniASR 7B (verified accuracy) | `omniasr-torch` | 0.0568 | 12 | 12 |
+| MMS-1B (verified accuracy) | `hf` | 0.1448 | 12 | 12 |
+| Dolphin small (verified accuracy) | `dolphin` | 0.0933 | 12 | 12 |
 <!-- stt-evidence:accuracy-fleurs-dev-12:end -->
 
 **The entire table is historical.** Its RTF values sum backend-provided
