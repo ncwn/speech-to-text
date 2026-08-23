@@ -44,6 +44,7 @@ outputs/**
 !outputs/t120-*.jsonl
 !outputs/evidence-fleurs-test-mms.jsonl
 !outputs/evidence-fleurs-test-dolphin.jsonl
+!outputs/evidence-fleurs-test-seamless.jsonl
 !outputs/evidence-fleurs-dev-seamless.jsonl
 !outputs/evidence-fleurs-dev-omni7b.jsonl
 !outputs/evidence-fleurs-dev-mms.jsonl
