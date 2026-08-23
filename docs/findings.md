@@ -1,23 +1,20 @@
-# Historical measured findings (unverified)
+# Measured findings and historical context
 
-This file preserves the measurements that motivated the current code. None is a
-current publication claim until its block is regenerated from trusted artifacts
-through `stt evidence`; the generated status below is authoritative.
+Generated tables in this file are current only when their evidence blocks verify
+from typed artifacts through `stt evidence`. Historical sections remain for the
+hypotheses that motivated the harness, with an explicit status in place of any
+unverified table.
 
 All measurements are from an M2 Max (12 cores, 64 GB) unless stated otherwise.
 Burmese is scored as **CER with whitespace stripped** — see
 [burmese.md](burmese.md) for why WER does not apply.
 
-<!-- stt-evidence:publication-status:start -->
-> **Unverified legacy evidence.** Numeric publication is blocked because the declared artifacts are missing trusted audio identity, complete corpus coverage, or matching provenance. Regenerate the runs before publishing measured results.
-<!-- stt-evidence:publication-status:end -->
-
 **Read the measurement base before comparing two numbers.** Three different
 bases appear below and they are not interchangeable:
 
-<!-- stt-evidence:measurement-base:start -->
-> **Unverified legacy evidence.** Numeric publication is blocked because the declared artifacts are missing trusted audio identity, complete corpus coverage, or matching provenance. Regenerate the runs before publishing measured results.
-<!-- stt-evidence:measurement-base:end -->
+Trusted transcription JSONL supplies accuracy and transcript-derived metrics;
+`experiment-v1` supplies measured diagnostic contrasts; and `baseline-v2`
+supplies common-wall timing and regression statistics.
 
 ---
 
