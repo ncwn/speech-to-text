@@ -1,0 +1,18 @@
+{
+  "artifact_kind": "long-audio-sentinel-v1",
+  "sample_rate": 16000,
+  "duration_s": 45.0,
+  "boundaries_s": [
+    20.0,
+    40.0
+  ],
+  "pcm16_sha256": "68c5e648ca50a6873fb8ad5206c9eea017ed2ea7b780277d2fac5647f5fa3083",
+  "spans": [
+    {"label": "before-boundary", "start_s": 18.75, "end_s": 19.75},
+    {"label": "across-boundary", "start_s": 19.75, "end_s": 20.75},
+    {"label": "after-boundary", "start_s": 20.75, "end_s": 21.75},
+    {"label": "before-second-boundary", "start_s": 38.75, "end_s": 39.75},
+    {"label": "across-second-boundary", "start_s": 39.75, "end_s": 40.75},
+    {"label": "after-second-boundary", "start_s": 40.75, "end_s": 41.75}
+  ]
+}
