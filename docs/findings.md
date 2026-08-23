@@ -414,8 +414,32 @@ separately verified MPS/float16 utilization condition.
 ### The best dtype belongs to the model, not just the chip
 
 Precision is a model property, not a chip-wide rule. Seamless remains pinned to
-float32 because no trusted dtype matrix has justified changing it; omniASR's
-MPS/float16 path is backed by its own utilization experiment.
+float32. The full-model candidate smoke produced identical transcripts across all
+six CPU/MPS dtype conditions:
+
+<!-- stt-evidence:seamless-device-dtype:start -->
+| Condition | RTF | Peak RSS MB | Sessions | Repeats |
+| --- | ---: | ---: | ---: | ---: |
+| cpu-float32 | 0.4642 | 6988 | 1 | 1 |
+| cpu-float16 | 2.0727 | 6561 | 1 | 1 |
+| cpu-bfloat16 | 2.1651 | 6605 | 1 | 1 |
+| mps-float32 | 0.1902 | 1053 | 1 | 1 |
+| mps-float16 | 0.1890 | 6590 | 1 | 1 |
+| mps-bfloat16 | 0.2028 | 6560 | 1 | 1 |
+<!-- stt-evidence:seamless-device-dtype:end -->
+
+Seamless autoregressive batches can be held open by their longest decoder tail.
+The production MPS path therefore duration-buckets and caps the effective batch
+at two even when callers request more. The profiled utilization condition is
+descriptive under observer policy:
+
+<!-- stt-evidence:seamless-utilization:start -->
+| Condition | RTF | GPU mean % | GPU p50 % | GPU idle % | Peak RSS MB | Sessions | Repeats |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| mps-float32-request4-effective2 | 0.0798 | 63.3 | 62.0 | 11.2 | 1162 | 1 | 1 |
+<!-- stt-evidence:seamless-utilization:end -->
+
+omniASR's MPS/float16 path is backed by its separate utilization experiment.
 
 ---
 

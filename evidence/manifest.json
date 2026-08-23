@@ -679,6 +679,44 @@
       "status_reason": "The historical Dolphin CPU/MPS comparison predates the experiment archive contract; MPS also records a float64-to-float32 numerical fallback, so no trusted causal table is published."
     },
     {
+      "id": "seamless-device-dtype",
+      "corpus": "fleurs-dev-one-clip",
+      "reference": "data/fleurs/references.tsv",
+      "source_kind": "experiment-v1",
+      "source": "evidence/experiments/seamless-device-dtype-v1/experiment.json",
+      "deriver": "experiment:v1",
+      "runs": [],
+      "metrics": [],
+      "reference_sha256": "d50f1117fb74d73bb16f060d45e58ed6bf207ee6535571536f73f795c46a9481",
+      "expected_reference_count": 12,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      }
+    },
+    {
+      "id": "seamless-utilization",
+      "corpus": "fleurs-test-duration-bucket-8",
+      "reference": "data/fleurs-test/references.tsv",
+      "source_kind": "experiment-v1",
+      "source": "evidence/experiments/seamless-mps-utilization-v1/experiment.json",
+      "deriver": "experiment:v1",
+      "runs": [],
+      "metrics": [],
+      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
+      "expected_reference_count": 120,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      }
+    },
+    {
       "id": "threads",
       "corpus": "fleurs-test-5",
       "reference": "data/fleurs-test/references.tsv",
