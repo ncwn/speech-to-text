@@ -231,6 +231,20 @@ def test_hf_defaults_to_float32():
     assert cls("whisper-my-small")._resolve_dtype("mps") is torch.float32
 
 
+def test_hf_uses_saturated_default_only_for_seamless_on_mps():
+    cls = get_backend("hf")
+    seamless = cls("seamless-m4t-v2")
+    seamless.resolved_device = "mps"
+    mms = cls("mms-1b-all")
+    mms.resolved_device = "mps"
+    cpu = cls("seamless-m4t-v2")
+    cpu.resolved_device = "cpu"
+
+    assert seamless.preferred_batch_size() == 32
+    assert mms.preferred_batch_size() == 1
+    assert cpu.preferred_batch_size() == 1
+
+
 @pytest.mark.parametrize(
     ("version", "dtype_key", "audio_key"),
     [

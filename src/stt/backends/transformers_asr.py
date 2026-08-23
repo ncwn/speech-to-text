@@ -383,6 +383,13 @@ class TransformersASRBackend(ASRBackend):
     def estimated_download_mb(self) -> int | None:
         return self.spec.approx_mb
 
+    def preferred_batch_size(self) -> int:
+        """Use the measured saturation batch only for Seamless on Metal."""
+        device = self.resolved_device or self._resolve_device()
+        if self.spec.family == "seamless" and device == "mps":
+            return _SEAMLESS_MPS_MAX_BATCH_SIZE
+        return 1
+
     def weights_cached(self) -> bool | None:
         from huggingface_hub import constants
 

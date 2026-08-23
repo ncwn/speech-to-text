@@ -195,6 +195,10 @@ class ASRBackend(ABC):
         """
         return None
 
+    def preferred_batch_size(self) -> int:
+        """Return the measured default for an ordinary multi-file call."""
+        return 1
+
     def weights_cached(self) -> bool | None:
         """Whether weights are already on disk.
 

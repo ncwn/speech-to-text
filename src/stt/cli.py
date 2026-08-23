@@ -527,11 +527,9 @@ def _run_backend(
     model: str | None,
     files: list[audio_mod.PreparedAudio],
     language: str | None,
-    batch_size: int,
+    batch_size: int | None,
     options: dict,
 ) -> list[TranscriptionResult]:
-    if batch_size < 1:
-        raise typer.BadParameter("batch_size must be at least 1")
     cls = get_backend(backend_name)
     ok, reason = cls.is_available()
     if not ok:
@@ -541,6 +539,9 @@ def _run_backend(
 
     kwargs = {k: v for k, v in options.items() if v is not None}
     instance = cls(model, **kwargs) if model else cls(**kwargs)
+    effective_batch_size = batch_size if batch_size is not None else instance.preferred_batch_size()
+    if effective_batch_size < 1:
+        raise typer.BadParameter("batch_size must be at least 1")
     environment = bench_mod.capture_environment()
     provenance_issue: str | None = None
     binding = None
@@ -548,7 +549,7 @@ def _run_backend(
         binding = preflight_model_binding(
             backend_name,
             model,
-            {**kwargs, "language": language, "batch_size": batch_size},
+            {**kwargs, "language": language, "batch_size": effective_batch_size},
             environment=environment,
         )
         bind_model = getattr(instance, "bind_model", None)
@@ -574,7 +575,7 @@ def _run_backend(
 
     console.print(
         f"[bold]{backend_name}[/bold] · model=[cyan]{instance.model}[/cyan] · "
-        f"{len(files)} file(s) · lang={language or 'auto'}"
+        f"{len(files)} file(s) · batch={effective_batch_size} · lang={language or 'auto'}"
     )
     load_usage: ResourceUsage | None = None
     with console.status("Loading model…"):
@@ -594,7 +595,7 @@ def _run_backend(
                 backend_name,
                 files,
                 language,
-                batch_size,
+                effective_batch_size,
                 profile=True,
                 load_usage=load_usage,
                 host=host,
@@ -633,7 +634,10 @@ def transcribe(
     threads: Annotated[
         int | None, typer.Option(help="omniasr-gguf only: ggml thread count")
     ] = None,
-    batch_size: Annotated[int, typer.Option(help="Files per forward pass")] = 1,
+    batch_size: Annotated[
+        int | None,
+        typer.Option(help="Files per forward pass; omit for the measured backend default"),
+    ] = None,
     no_convert: Annotated[
         bool, typer.Option("--no-convert", help="Skip 16 kHz mono normalisation")
     ] = False,
@@ -1170,7 +1174,13 @@ def compare(
     yes: Annotated[
         bool, typer.Option("--yes", "-y", help="Do not prompt before large downloads")
     ] = False,
-    batch_size: Annotated[int, typer.Option("--batch-size", help="Files per backend batch")] = 1,
+    batch_size: Annotated[
+        int | None,
+        typer.Option(
+            "--batch-size",
+            help="Files per backend batch; omit for each measured backend default",
+        ),
+    ] = None,
     allow_partial: Annotated[
         bool,
         typer.Option(
@@ -1180,7 +1190,7 @@ def compare(
     ] = False,
 ) -> None:
     """Run every installed backend over the same audio and tabulate the results."""
-    if batch_size < 1:
+    if batch_size is not None and batch_size < 1:
         raise typer.BadParameter("batch_size must be at least 1")
     files = _prepare(audio, limit, convert=True)
     refs = load_references(reference) if reference else None
