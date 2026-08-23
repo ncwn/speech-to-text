@@ -1777,6 +1777,8 @@ def experiment_run(
                 launch_position=entry.launch_position,
                 condition_id=condition.condition_id,
                 schedule_seed=spec.schedule_seed,
+                runner_id=condition.runner_id,
+                input_mode=input_sets[condition.input_set_id].input_mode,
                 model_binding=bindings[condition.request_key],
             )
             console.print(

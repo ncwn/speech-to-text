@@ -199,6 +199,8 @@ def _responses(
                 launch_position=entry.launch_position,
                 condition_id=condition.condition_id,
                 schedule_seed=spec.schedule_seed,
+                runner_id=condition.runner_id,
+                input_mode=spec.input_map[condition.input_set_id].input_mode,
                 model_binding=ModelBinding(provenance, provenance.artifacts),
             )
             found[condition.condition_id].append(
@@ -272,6 +274,8 @@ def _raw_artifacts(
                 launch_position=response.launch_position,
                 condition_id=condition_id,
                 schedule_seed=spec.schedule_seed,
+                runner_id=condition.runner_id,
+                input_mode=inputs[condition.input_set_id].input_mode,
                 model_binding=ModelBinding(provenance, provenance.artifacts),
             )
             assert request.identity_sha256 == response.request_sha256
@@ -393,11 +397,11 @@ def test_point_and_interval_limit_are_fail_closed():
 def test_source_identity_can_join_different_prepared_waveforms():
     source = "9"
     canonical = InputSetSpec("canonical", (_audio(suffix="1", source=source),))
-    native = InputSetSpec("native", (_audio(suffix="8", source=source),))
+    native = InputSetSpec("native", (_audio(suffix="8", source=source),), input_mode="source")
     subject = SubjectSpec("fake", "model", "mya_Mymr", 1, _options("cpu"))
     conditions = (
         ConditionSpec("prepared", subject, "canonical"),
-        ConditionSpec("native", subject, "native"),
+        ConditionSpec("native", subject, "native", runner_id="source"),
     )
     contrast = ContrastSpec("input", "prepared", "native", join_on="source_sha256")
     spec = _spec(
@@ -409,6 +413,15 @@ def test_source_identity_can_join_different_prepared_waveforms():
     result = summarize_experiment(spec, _responses(spec, {"prepared": 1.0, "native": 1.0}))
 
     assert result["contrasts"][0]["gating_eligible"]
+
+
+def test_source_runner_requires_source_input_set():
+    subject = SubjectSpec("fake", "model", "mya_Mymr", 1, _options("cpu"))
+    with pytest.raises(MeasurementError, match="requires a source input set"):
+        _spec(
+            conditions=(ConditionSpec("native", subject, "canonical", runner_id="source"),),
+            contrasts=(),
+        ).validate()
 
 
 def test_gating_protocol_and_nonfinite_threshold_are_rejected():

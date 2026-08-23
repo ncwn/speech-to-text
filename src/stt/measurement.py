@@ -186,6 +186,8 @@ class WorkerRequest:
     condition_id: str = "default"
     schedule_seed: int | None = None
     model_binding: ModelBinding | None = None
+    runner_id: str = "adapter"
+    input_mode: str = "prepared"
     protocol_version: int = PROTOCOL_VERSION
 
     def validate(self) -> None:
@@ -209,6 +211,14 @@ class WorkerRequest:
             raise MeasurementError("launch_position must be non-negative")
         if not self.condition_id:
             raise MeasurementError("condition_id is required")
+        if self.runner_id not in {"adapter", "source"}:
+            raise MeasurementError(f"unsupported worker runner: {self.runner_id}")
+        if self.input_mode not in {"prepared", "source"}:
+            raise MeasurementError(f"unsupported worker input mode: {self.input_mode}")
+        if self.runner_id == "source" and self.input_mode != "source":
+            raise MeasurementError("source runner requires source input mode")
+        if self.runner_id == "adapter" and self.input_mode != "prepared":
+            raise MeasurementError("adapter runner requires prepared input mode")
         if self.model_binding is not None:
             self.model_binding.validate()
         for item in self.inputs:
@@ -258,6 +268,8 @@ class WorkerRequest:
                 schedule_seed=(
                     int(data["schedule_seed"]) if data.get("schedule_seed") is not None else None
                 ),
+                runner_id=str(data.get("runner_id", "adapter")),
+                input_mode=str(data.get("input_mode", "prepared")),
                 model_binding=(
                     ModelBinding.from_dict(data["model_binding"])
                     if data.get("model_binding") is not None

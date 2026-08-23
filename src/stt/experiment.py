@@ -98,9 +98,12 @@ class InputSetSpec:
 
     input_set_id: str
     inputs: tuple[AudioInput, ...]
+    input_mode: str = "prepared"
 
     def validate(self) -> None:
         _simple_id(self.input_set_id, "input_set_id")
+        if self.input_mode not in {"prepared", "source"}:
+            raise MeasurementError(f"unsupported experiment input mode: {self.input_mode}")
         if not self.inputs:
             raise MeasurementError("an experiment input set cannot be empty")
         for item in self.inputs:
@@ -132,6 +135,7 @@ class InputSetSpec:
         return {
             "input_set_id": self.input_set_id,
             "inputs": [asdict(item) for item in self.inputs],
+            "input_mode": self.input_mode,
         }
 
     @classmethod
@@ -140,6 +144,7 @@ class InputSetSpec:
             result = cls(
                 input_set_id=str(value["input_set_id"]),
                 inputs=tuple(_audio_from_dict(item) for item in value["inputs"]),
+                input_mode=str(value.get("input_mode", "prepared")),
             )
         except (KeyError, TypeError, ValueError) as exc:
             raise MeasurementError(f"invalid input set specification: {exc}") from exc
@@ -171,7 +176,7 @@ class ConditionSpec:
             raise MeasurementError("condition subject options must bind its batch size")
         if self.sample_uss and not self.profile:
             raise MeasurementError("USS sampling requires profiling")
-        if self.runner_id != "adapter":
+        if self.runner_id not in {"adapter", "source"}:
             raise MeasurementError(f"unsupported experiment runner: {self.runner_id}")
 
     @property
@@ -343,6 +348,15 @@ class ExperimentSpec:
             if condition.input_set_id not in input_ids:
                 raise MeasurementError(
                     f"condition {condition.condition_id} names an unknown input set"
+                )
+            input_mode = self.input_map[condition.input_set_id].input_mode
+            if condition.runner_id == "source" and input_mode != "source":
+                raise MeasurementError(
+                    f"source runner {condition.condition_id} requires a source input set"
+                )
+            if condition.runner_id == "adapter" and input_mode != "prepared":
+                raise MeasurementError(
+                    f"adapter runner {condition.condition_id} requires a prepared input set"
                 )
         for contrast in self.contrasts:
             if {

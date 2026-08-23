@@ -438,6 +438,11 @@ def _request_issues(
         issues.append(f"archived request condition identity differs for {condition_id}")
     if request.subject != condition.subject:
         issues.append(f"archived request subject differs for {condition_id}")
+    expected_input_mode = spec.input_map[condition.input_set_id].input_mode
+    if request.runner_id != condition.runner_id:
+        issues.append(f"archived request runner differs for {condition_id}")
+    if request.input_mode != expected_input_mode:
+        issues.append(f"archived request input mode differs for {condition_id}")
     if request.profile != condition.profile or request.sample_uss != condition.sample_uss:
         issues.append(f"archived request observer flags differ for {condition_id}")
     expected_inputs = spec.input_map[condition.input_set_id].inputs

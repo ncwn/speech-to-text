@@ -134,6 +134,31 @@ def test_worker_rejects_prepared_audio_changed_after_request(tmp_path):
     assert not response.repeats
 
 
+def test_source_runner_presents_source_path_without_rewriting_prepared_identity(tmp_path):
+    request = replace(
+        _request(tmp_path, warmups=0, repeats=1),
+        runner_id="source",
+        input_mode="source",
+    )
+    seen: list[str] = []
+
+    class SourceBackend(FakeBackend):
+        def transcribe(self, paths, language=None, batch_size=1):
+            seen.extend(str(path) for path in paths)
+            return super().transcribe(paths, language, batch_size)
+
+    response = execute_request(
+        request,
+        backend_factory=lambda backend_name, model, options: SourceBackend(),
+        root=tmp_path,
+    )
+
+    assert response.complete
+    assert seen == [request.inputs[0].source_path]
+    assert response.runtime["input_mode"] == "source"
+    assert response.runtime["runner_id"] == "source"
+
+
 def test_worker_subprocess_publishes_failure_response(tmp_path):
     request = _request(tmp_path, backend="definitely-not-a-backend", warmups=0, repeats=1)
     request_path = tmp_path / "request.json"

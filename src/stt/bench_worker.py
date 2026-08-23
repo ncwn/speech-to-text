@@ -14,7 +14,7 @@ from typing import Any
 
 import soundfile as sf
 
-from stt.audio import canonical_audio_id, file_sha256
+from stt.audio import PreparedAudio, canonical_audio_id, file_sha256
 from stt.execution import create_backend, transcribe_corpus
 from stt.measurement import (
     ActivePhase,
@@ -41,20 +41,39 @@ def _phase(name: str, usage: ResourceUsage, *, repeat_index: int | None = None) 
     return PhaseEvent(name, usage.started_ns, usage.ended_ns, repeat_index=repeat_index)
 
 
-def _validate_input(item: AudioInput) -> None:
+def _validate_input(item: AudioInput, *, input_mode: str) -> None:
     item.validate()
     resolved = item.prepared()
     source = resolved.source_path
     prepared = resolved.prepared_path
     if file_sha256(source) != item.source_sha256:
         raise RuntimeError(f"source bytes changed before worker start: {item.reference_id}")
-    if canonical_audio_id(prepared) != item.audio_id:
+    if input_mode == "prepared" and canonical_audio_id(prepared) != item.audio_id:
         raise RuntimeError(f"prepared waveform changed before worker start: {item.reference_id}")
-    info = sf.info(prepared)
-    actual = (info.duration, info.samplerate, info.channels, info.frames)
-    expected = (item.duration_s, item.sample_rate, item.channels, item.frames)
-    if actual != expected:
-        raise RuntimeError(f"prepared audio facts changed before worker start: {item.reference_id}")
+    presented = prepared if input_mode == "prepared" else source
+    info = sf.info(presented)
+    if input_mode == "prepared":
+        actual = (info.duration, info.samplerate, info.channels, info.frames)
+        expected = (item.duration_s, item.sample_rate, item.channels, item.frames)
+        if actual != expected:
+            raise RuntimeError(
+                f"prepared audio facts changed before worker start: {item.reference_id}"
+            )
+    elif info.duration <= 0 or info.samplerate <= 0 or info.channels <= 0 or info.frames <= 0:
+        raise RuntimeError(f"source audio facts are invalid: {item.reference_id}")
+
+
+def _presented_input(item: AudioInput, *, input_mode: str) -> PreparedAudio:
+    prepared = item.prepared()
+    if input_mode == "prepared":
+        return prepared
+    return prepared.__class__(
+        source_path=prepared.source_path,
+        prepared_path=prepared.source_path,
+        reference_id=item.reference_id,
+        source_sha256=item.source_sha256,
+        audio_id=item.audio_id,
+    )
 
 
 def _runtime_facts(instance: Any) -> tuple[dict[str, Any], tuple[str, ...]]:
@@ -147,8 +166,10 @@ def execute_request(
             if binding_issues:
                 raise RuntimeError("model binding validation failed: " + "; ".join(binding_issues))
         for item in request.inputs:
-            _validate_input(item)
-        prepared = [item.prepared() for item in request.inputs]
+            _validate_input(item, input_mode=request.input_mode)
+        prepared = [
+            _presented_input(item, input_mode=request.input_mode) for item in request.inputs
+        ]
         instance = backend_factory(
             request.subject.backend,
             request.subject.model,
@@ -191,6 +212,8 @@ def execute_request(
             )
             active_phase = None
         runtime, provenance_issues = _runtime_facts(instance)
+        runtime["runner_id"] = request.runner_id
+        runtime["input_mode"] = request.input_mode
         try:
             model_provenance = instance.model_provenance().finalized().to_dict()
             provenance_issues = (*provenance_issues, *model_provenance.get("issues", []))
