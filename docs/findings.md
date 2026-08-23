@@ -89,19 +89,17 @@ uv run stt evidence --check
 
 ### Which to use
 
-**omniASR 7B** is the most accurate, is Apache-2.0, and runs on Metal. It needs
-31.2 GB on disk and about 14 GB resident on the GPU, and it emits **no
-punctuation at all**. Use it when licence and raw accuracy matter and you can
-post-process sentence breaks.
+**omniASR 7B** is the most accurate, is Apache-2.0, and runs on Metal. It is also
+the largest trusted subject and emits **no punctuation at all**. Use it when
+licence and raw accuracy matter and you can post-process sentence breaks.
 
-**SeamlessM4T v2** is the fastest at RTF 0.16 and segments output into real
-sentences. On held-out audio it is *more* accurate than the 7B once a single
-proper noun is set aside ([Held-out](#held-out)). The catch is the licence:
-**CC-BY-NC**, evaluation only.
+**SeamlessM4T v2** is the fastest generative subject in the baseline table and
+segments output into real sentences. The catch is the licence: **CC-BY-NC**,
+evaluation only.
 
 **Dolphin small** is the Apache-2.0 fallback if you need permissive licensing and
-can accept ~30 % more error — though it never touches the GPU and costs 4.9 GB of
-RAM to do it.
+can accept the accuracy gap shown above. It remains CPU-only in the trusted
+cohort and has a much larger resident-memory footprint than MMS.
 
 ---
 
@@ -127,37 +125,25 @@ which matters when many clips are concatenated into a long workflow.
 
 ## Held-out
 
-FLEURS is public and may be in these models' training data, so the ranking was
-re-checked against a hand-corrected transcript of a 16.8-minute Burmese film
-recap that none of them has seen ([data/reference](../data/reference/README.md)).
-The FLEURS ordering held:
+FLEURS is public and may be in these models' training data, so a long-form
+Burmese film recap was also inspected ([data/reference](../data/reference/README.md)).
+Its copyrighted audio and transcript artifacts are intentionally not published:
 
 <!-- stt-evidence:held-out:start -->
 Held-out audio and full transcript JSONL are deliberately untracked under the redistribution policy; a clean clone cannot audit a numeric table.
 <!-- stt-evidence:held-out:end -->
 
-Both leaders score *better* here than on FLEURS, so the contamination worry did
-not materialise into an inflated ranking.
-
-**But the top two are separated entirely by one proper noun.** The protagonist's
-name occurs 99 times — 2.9 % of the transcript. The reference spells it `ဂျုံး`
-(Joon). omniASR 7B produces `ဂျုံး` 78 times; SeamlessM4T produces `ဂျွန်`
-(John) 92 times and `ဂျုံး` never. The two spellings differ in three characters,
-so every mention costs three substitutions — 277 of Seamless's 810 substitutions
-come from that one word.
-
-Correct the name and the ranking inverts:
+The historical diagnostic showed that repeated proper-noun spelling could
+dominate the model ordering. The corrected-name result cannot be audited from a
+clean clone, so its magnitude and ranking are not republished:
 
 <!-- stt-evidence:held-out-name-corrected:start -->
 The corrected-name held-out result depends on deliberately untracked copyrighted transcript artifacts and remains diagnostic only.
 <!-- stt-evidence:held-out-name-corrected:end -->
 
-So SeamlessM4T is about 13 % more accurate on running text, and omniASR 7B wins
-overall only because it gets an out-of-vocabulary Korean name right. That is a
-real advantage — on a film recap the character's name is exactly what you cannot
-afford to lose — but it is not the general accuracy advantage the headline
-number implies. **A corpus CER cannot be read as a verdict on a specific
-recording. Check what the errors are.**
+The durable lesson is narrower: repeated names can dominate corpus edit counts,
+so a corpus CER cannot be read as a verdict on a specific recording. Check what
+the errors are.
 
 ### Punctuation, which CER does not measure
 
@@ -168,36 +154,26 @@ recognition accuracy and misleading for choosing a transcriber:
 Held-out punctuation counts depend on deliberately untracked copyrighted transcript artifacts and remain diagnostic only.
 <!-- stt-evidence:punctuation:end -->
 
-omniASR returns seventeen thousand characters with no sentence boundary
-anywhere. Seamless segments the same audio into 191 sentences. Neither shows up
-in CER. Note also that omniASR's real-time factor doubles on a single long file
-(1.79 on short clips, 3.60 here) — on CPU that was just under an hour for 17
-minutes of audio against four minutes for Seamless.
-
-Character counts differ by convention: the reference is 18,767 raw characters,
-~16,980 after normalisation, which is the figure error rates are computed
-against.
+The historical outputs differed sharply in sentence-boundary behavior, which CER
+normalizes away. Exact counts and long-file timing remain unpublished because the
+underlying held-out artifacts are deliberately absent.
 
 ---
 
 ## Quantisation
 
-The 300M GGUF at Q4_K scored **0.6647** on dev clips against 0.0959 for the same
-model at float32. It is bimodal rather than uniformly bad: most clips are fine,
-then a few collapse into decoder repetition loops emitting three to four times
-the reference length. On the 17-minute file it produced `၁၁၀၁၁၁သက်၁၁` where every
-full-precision model produced the sentence.
-
-Use 4-bit for iteration, never for output.
+The same-runtime GGUF quantization archive contains both Q4_K and float16 arms,
+but CrispASR does not expose the selected compute device. It therefore remains a
+diagnostic rather than a causal quality or speed claim. Repetition-loop failures
+observed in earlier untrusted output are a reason to keep quantized transcripts
+under review, not a publishable effect size.
 
 ---
 
 ## Voting
 
-Different systems fail on different words. An oracle picking the better of the
-top two per 200-character span would score **0.0571** where the best single model
-scores 0.0857 — a third of the remaining error is recoverable without a better
-model, just by choosing between hypotheses already in hand.
+Different systems can fail on different words, which makes voting worth testing
+once a complete same-waveform cohort exists.
 
 `stt vote` implements the practical version: align every run to a pivot, then
 vote position by position, weighted by measured accuracy. Chosen on FLEURS and
@@ -213,20 +189,16 @@ Three things that turned out to matter:
 pivot proposed, so the first run given anchors the result. Ties break toward the
 pivot, which is why adding a system can never do worse than a wash.
 
-**A pool of weak systems achieves nothing.** SeamlessM4T + Dolphin + MMS scores
-0.1301 — exactly what SeamlessM4T scores alone. The 7B is load-bearing.
+**A pool of weak systems is not automatically useful.** The strongest hypothesis
+must remain represented and independently validated.
 
-**Spacing convention dominates the alignment.** SeamlessM4T emits a space per
-sub-word, omniASR emits none, so on raw text the aligner spends its budget on
-whitespace instead of on the characters being voted: raw 0.0764, `tidy_spacing`
-0.0718, full normalisation 0.0714. The default is `tidy_spacing`, which captures
-nearly all of it while keeping the ၊ and ။ delimiters that full normalisation
-discards.
+**Spacing convention dominates the alignment.** SeamlessM4T emits spaces between
+subwords while omniASR does not, so raw alignment can spend its budget on
+whitespace instead of voted characters. The production join uses
+`tidy_spacing`, preserving Burmese delimiters while normalizing that convention.
 
-Cost is modest. Adding SeamlessM4T, Dolphin and MMS to a 7B run took the total
-real-time factor from 3.60 to 4.03 — 12 % more compute for 7.1 % less error on
-FLEURS. Adding the 3B as well reaches 0.0900 but costs RTF 6.63, which is 84 %
-more compute for a further 3 %.
+No ensemble cost or accuracy improvement is currently published; the required
+trusted full-cohort vote inputs are not tracked.
 
 ---
 
@@ -236,9 +208,7 @@ Every backend returns `Segment`s carrying `start`, `end` and, where it can be
 had, a confidence. `stt align` recovers all three for backends that produce none
 — omniASR's fairseq2 pipeline returns a bare `List[str]` — by forced alignment
 against MMS-1B, whose Burmese adapter is character-level, the right granularity
-for a script written without word delimiters. Out-of-vocabulary characters on a
-real transcript came to **0.15 %**, all uppercase Latin, which lowercasing
-removes.
+for a script written without word delimiters.
 
 The signal is real, measured on the 7B's transcript of the held-out recording
 against the human reference:
@@ -247,19 +217,16 @@ against the human reference:
 No redistributable trusted run currently carries aligned confidence segments; confidence quartiles cannot be published.
 <!-- stt-evidence:confidence-quartiles:end -->
 
-Pearson **r = −0.75**, and a **6.0×** error ratio between the quartiles. Error is
-concentrated, so it can be bought cheaply:
+The registered deriver can measure concentration once a redistributable aligned
+artifact is available:
 
 <!-- stt-evidence:confidence-routing:start -->
 No redistributable trusted base/strong pair currently carries aligned confidence segments; confidence routing cannot be published.
 <!-- stt-evidence:confidence-routing:end -->
 
-Note what this does *not* justify. Making the vote itself selective would save
-almost nothing: the four-model vote costs only **1.21×** the pivot alone on
-FLEURS and **1.11×** on the held-out recording, because the 7B pivot is 82–90 %
-of the bill and the other three are nearly free. The expensive thing is the
-pivot, so the concentration above is an argument for running the *pivot*
-selectively.
+Confidence does not by itself justify selective voting. A routing policy must
+measure the cost of the pivot and the other hypotheses under the same current
+execution protocol before claiming savings.
 
 **A caveat on the other confidence source.** CrispASR's `no_speech_prob` measures
 how likely a span is to be *silence*, not how likely the transcript is to be
@@ -272,61 +239,37 @@ of 2.0.
 ## Seam tax
 
 Routing between a cheap model and an expensive one only pays if the join is
-free, and it is not. Substituting the 7B's text into Seamless's least-confident
-regions, holding the escalated share of audio at ~30 % and varying only how many
-separate regions that share is split into:
+correct. The splice deriver therefore treats fragmentation as an explicit
+variable rather than assuming segment boundaries coincide:
 
 <!-- stt-evidence:seam-tax:start -->
 No redistributable trusted aligned base/strong pair exists for recomputing splice-seam endpoints.
 <!-- stt-evidence:seam-tax:end -->
 
-Monotonic, and the span is enormous — the same 30 % of audio escalated to the
-same model scores 0.162 or 0.075 depending only on fragmentation. The two models'
-segment boundaries do not coincide, so each seam drops or duplicates a few
-characters. At ~16,980 reference characters that is roughly **11 characters per
-seam**.
+Model segment boundaries do not necessarily coincide, so any future work that
+stitches outputs together must measure dropped and duplicated content rather
+than assuming the join is free.
 
-Two consequences. Switching has to happen in **coarse blocks**, not per segment;
-and any future work that stitches model outputs together pays this same tax and
-has to be measured with it included.
-
-**A correctness check worth keeping.** An earlier version of the splice scored
-0.1821 when escalating **100 %** of the audio, which must by definition reproduce
-the 7B's 0.0857. Base segments did not tile the timeline, so 7B segments landing
-in the gaps were silently dropped. The simulation now refuses to report
-intermediate numbers unless the 0 % and 100 % ends reproduce the two source
-transcripts exactly.
+**A correctness check worth keeping.** Base speech segments do not tile silence
+gaps, and an earlier splice silently dropped strong-model segments landing in
+those gaps. The simulation now refuses intermediate rows unless its all-base and
+all-strong endpoints reproduce the two source transcripts exactly.
 
 ---
 
 ## Routing
 
-If confidence predicts error, the expensive model only needs to run where the
-cheap one is unsure. Held-out check on the 120-clip test set, routing whole
-clips — Seamless everywhere, escalating the least-confident clips to the 7B.
-Whole-clip routing means no splice seams, so the tax above does not confound it.
+If confidence predicts error, the expensive model may only need to run where the
+cheap one is unsure. Whole-clip routing avoids splice seams, but still requires a
+trusted aligned base/strong pair before its curve can be published.
 
 <!-- stt-evidence:routing:start -->
 No redistributable trusted aligned base/strong pair exists for recomputing the routing curve and its endpoints.
 <!-- stt-evidence:routing:end -->
 
-Thirty percent of the compute budget captures **72.5 %** of the 7B's advantage
-over Seamless. Routing the same 30 % at random would capture 30 % by definition,
-so the ordering is doing real work.
-
-The RTF column here is CPU-era, matching [Baseline](#baseline). With the 7B now
-on Metal the absolute compute saving is much smaller; the accuracy result is
-unaffected, since routing changes which model transcribes what, not how fast it
-does so.
-
-**What did not replicate.** On the 17-minute recording, block routing appeared to
-beat *both* models (CER 0.0701 against the 7B's 0.0857). That does not hold here:
-per-clip routing approaches the 7B from above and never passes it. On that
-recording the two models are nearly tied (0.0887 vs 0.0857), so mixing them plays
-to each one's strengths, whereas on FLEURS the 7B is 22 % better outright and
-mixing can only interpolate. The 0.0701 figure was also the best of 24
-configurations chosen on the same file it was measured on, which is not a result.
-The **mechanism** generalises; that particular number does not.
+Historical CPU-era routing magnitudes are retired. The registered route deriver
+recomputes both endpoints and joins through production code, but no aligned
+redistributable pair currently satisfies its requirements.
 
 ---
 
@@ -449,19 +392,11 @@ omniASR's MPS/float16 path is backed by its separate utilization experiment.
 
 ## Threads
 
-macOS places threads across performance and efficiency cores itself, and nothing
-here overrides it. That is a measured decision:
-
-* the GGUF backend runs at **RTF 0.182 on 4, 8 and 12 threads alike** — the work
-  is on the GPU and the CPU sits at 0.05 cores;
-* a torch matmul scales **1.09× from 1 thread to 12**, because Accelerate does
-  its own threading through the AMX unit;
-* torch already derives its default from the system — it picks 8 on an M2 Max,
-  matching `hw.perflevel0.physicalcpu`, without being told.
-
-An earlier version of this repo set thread counts from a detected performance-core
-count and hardcoded `n_threads=8` for the GGUF backend. Both are gone: neither
-changed any measurement, and both could only be wrong on untested hardware.
+macOS places threads across performance and efficiency cores itself, and the
+trusted Torch paths do not override it. An earlier version set thread counts from
+a detected performance-core count and hardcoded a GGUF value; both overrides are
+gone because the current GGUF runtime cannot expose enough execution identity to
+publish a causal thread comparison.
 
 The core split *is* still detected, for reporting — a benchmark number is not
 interpretable without knowing the machine. Reading macOS's level *names*
@@ -502,11 +437,10 @@ GPU utilisation is not available from `torch.mps`, and `powermetrics` needs
 root, so it is read from `ioreg`. The primitive microbenchmarks are retired;
 paired whole-run observer calibration is the authoritative perturbation test.
 
-The profiler currently samples CPU/RSS at 50 ms and whole-GPU `ioreg` activity at
-250 ms, but neither cadence is ground truth. The forced post-work tail read has
-been removed. Dense observer results and the old 22% idle headline are retired;
-observer-off versus observer-on repeats must quantify perturbation before a
-profiled timing can support a claim.
+The profiler uses separate CPU/RSS and whole-GPU cadences, but neither is ground
+truth. The forced post-work tail read has been removed, and the old idle headline
+is retired; observer-off versus observer-on repeats quantify perturbation before
+a profiled timing can support a claim.
 
 The sampler's `ioreg` child CPU and its own in-process thread CPU are measured
 and subtracted after it joins, so an in-flight observer cannot be omitted from

@@ -325,3 +325,17 @@ def test_check_rejects_unowned_markdown_table(tmp_path):
 
     with pytest.raises(EvidenceError, match="unowned Markdown table row"):
         check_evidence(manifest)
+
+
+def test_check_rejects_unowned_measured_number(tmp_path):
+    manifest = _fixture(tmp_path)
+    document = manifest.parent.parent / "docs" / "findings.md"
+    document.write_text(
+        "before RTF 0.4242\n"
+        "<!-- stt-evidence:baseline:start -->\nstale 0.27\n"
+        "<!-- stt-evidence:baseline:end -->\nafter\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(EvidenceError, match=r"unowned measured number '0\.4242'.*line 1"):
+        check_evidence(manifest)

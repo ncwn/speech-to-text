@@ -449,9 +449,9 @@ def unowned_measured_numbers(document: str) -> list[tuple[int, str]]:
     invalidated when its artifact changes, and `stt evidence --update` cannot
     correct it. It is the same defect as a stale table, spread thinner.
 
-    This reports rather than raises, because the existing backlog has to be
-    migrated into derived blocks before it can become a hard gate. The tests
-    ratchet on it so the backlog cannot grow in the meantime.
+    The renderer uses this report to reject documents with measured prose that
+    it cannot regenerate. Keeping the scanner separate makes line-level failures
+    easy to test and diagnose.
     """
     found: list[tuple[int, str]] = []
     inside = False
@@ -512,6 +512,10 @@ def _validate_document_ownership(document: str, blocks: tuple[BlockSpec, ...]) -
                     f"document must contain exactly one {kind} marker for evidence block "
                     f"{block_id!r}"
                 )
+    unowned_numbers = unowned_measured_numbers(document)
+    if unowned_numbers:
+        line_number, value = unowned_numbers[0]
+        raise EvidenceError(f"unowned measured number {value!r} at document line {line_number}")
 
 
 def _render_derived_table(table: DerivedTable) -> str:

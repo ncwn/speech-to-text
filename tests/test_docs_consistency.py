@@ -127,77 +127,7 @@ def test_findings_is_the_only_place_with_a_results_table():
     assert offenders == [], f"CER tables outside findings.md: {offenders}"
 
 
-#: Measured-looking figures that currently sit in prose rather than in a
-#: generated evidence block. Every one of these is unregenerable: it cannot be
-#: invalidated when its artifact changes, and `stt evidence --update` cannot
-#: correct it. They are recorded here as a ratchet, not an approval -- the
-#: evidence-deriver work must move the load-bearing ones into blocks and delete
-#: the rest, driving this list to empty. It may shrink freely; it must not grow.
-UNOWNED_NUMBER_BACKLOG = {
-    "0 %",
-    "0.0280",
-    "0.0571",
-    "0.0701",
-    "0.0714",
-    "0.0718",
-    "0.075",
-    "0.0764",
-    "0.0857",
-    "0.0887",
-    "0.0900",
-    "0.0959",
-    "0.1017",
-    "0.1298",
-    "0.1301",
-    "0.15 %",
-    "0.162",
-    "0.182",
-    "0.1821",
-    "0.6647",
-    "1.09×",
-    "1.11×",
-    "1.21×",
-    "100 %",
-    "10×",
-    "12 %",
-    "13 %",
-    "2.1×",
-    "2.3×",
-    "2.9 %",
-    "22 %",
-    "22%",
-    "23.44 %",
-    "3 %",
-    "3.5×",
-    "30 %",
-    "38 %",
-    "4.1×",
-    "54.9 %",
-    "6.0×",
-    "7.1 %",
-    "72.5 %",
-    "8 %",
-    "84 %",
-    "90 %",
-}
-UNOWNED_NUMBER_CEILING = 56
-
-
 def test_no_new_measured_number_escapes_into_prose():
-    """A figure in a sentence cannot be regenerated, so none may be added.
-
-    The ownership check rejects an unowned Markdown table but never an unowned
-    number, which is where most of this document's figures actually live. Until
-    they are migrated into evidence blocks, the backlog is frozen: a new one is
-    a new unregenerable claim.
-    """
+    """A figure in a sentence cannot be regenerated, so none may be present."""
     found = unowned_measured_numbers(FINDINGS.read_text(encoding="utf-8"))
-    new = sorted({value for _, value in found} - UNOWNED_NUMBER_BACKLOG)
-    assert new == [], (
-        "new measured numbers in prose, which stt evidence cannot regenerate: "
-        f"{new}. Put them in an evidence block instead."
-    )
-    assert len(found) <= UNOWNED_NUMBER_CEILING, (
-        f"{len(found)} unowned numbers, up from {UNOWNED_NUMBER_CEILING}. "
-        "Existing prose figures may be removed but not multiplied."
-    )
+    assert found == [], f"measured numbers outside generated evidence blocks: {found}"
