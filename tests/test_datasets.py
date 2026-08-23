@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from stt.datasets import _COLUMNS, _clean_fleurs_field, _read_fleurs_rows
+from stt.evaluate import load_references
 
 
 def test_fleurs_parser_keeps_quoted_transcript_in_its_column(tmp_path):
@@ -56,3 +57,9 @@ def test_tracked_fleurs_references_are_two_column_tsvs(path):
     assert rows[0] == ["audio_id", "transcript"]
     assert all(len(row) == 2 for row in rows)
     assert all("\t" not in row[1] and "|" not in row[1] for row in rows[1:])
+
+
+def test_held_out_reference_uses_canonical_stem_identity():
+    references = load_references(Path("data/reference/references.tsv"))
+
+    assert list(references) == ["eternity"]
