@@ -248,7 +248,7 @@ def test_status_only_block_does_not_inspect_legacy_artifacts(tmp_path):
     updated = update_evidence(manifest)
 
     assert not updated.publishable
-    assert updated.issues == ["baseline: status_only legacy block"]
+    assert updated.issues == [f"baseline: status_only: {UNVERIFIED_MESSAGE}"]
     assert check_evidence(manifest).matches
 
 

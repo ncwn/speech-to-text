@@ -541,7 +541,7 @@ def _render_derived_table(table: DerivedTable) -> str:
 def _render_block(block: BlockSpec) -> tuple[str, list[str], bool]:
     if block.status_only:
         reason = block.status_reason or UNVERIFIED_MESSAGE
-        return reason, [f"{block.id}: status_only legacy block"], False
+        return reason, [f"{block.id}: status_only: {reason}"], False
 
     issues: list[str] = []
     try:

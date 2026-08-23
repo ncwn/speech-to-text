@@ -16,7 +16,7 @@ from pathlib import Path
 
 import pytest
 
-from stt.evidence import UNVERIFIED_MESSAGE, check_evidence, unowned_measured_numbers
+from stt.evidence import check_evidence, unowned_measured_numbers
 
 ROOT = Path(__file__).resolve().parents[1]
 FINDINGS = ROOT / "docs" / "findings.md"
@@ -79,7 +79,8 @@ def test_generated_evidence_blocks_match_artifacts():
     check = check_evidence(ROOT / "evidence" / "manifest.json")
     assert check.matches, "docs/findings.md evidence blocks need `stt evidence --update`"
     if not check.publishable:
-        assert UNVERIFIED_MESSAGE in FINDINGS.read_text(encoding="utf-8")
+        assert check.issues
+        assert all("status_only:" in issue for issue in check.issues)
 
 
 @pytest.mark.parametrize(

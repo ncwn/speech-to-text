@@ -274,7 +274,7 @@
         "normalize_digits": true,
         "lowercase": true
       },
-      "status_reason": "CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity."
+      "status_reason": "Held-out audio and full transcript JSONL are deliberately untracked under the redistribution policy; a clean clone cannot audit a numeric table."
     },
     {
       "id": "held-out-name-corrected",
@@ -310,7 +310,8 @@
         "strip_punctuation": true,
         "normalize_digits": true,
         "lowercase": true
-      }
+      },
+      "status_reason": "The corrected-name held-out result depends on deliberately untracked copyrighted transcript artifacts and remains diagnostic only."
     },
     {
       "id": "punctuation",
@@ -359,7 +360,7 @@
         "normalize_digits": true,
         "lowercase": true
       },
-      "status_reason": "CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity."
+      "status_reason": "Held-out punctuation counts depend on deliberately untracked copyrighted transcript artifacts and remain diagnostic only."
     },
     {
       "id": "voting",
@@ -395,7 +396,8 @@
         "strip_punctuation": true,
         "normalize_digits": true,
         "lowercase": true
-      }
+      },
+      "status_reason": "No current trusted full-cohort vote inputs are tracked; derived voting remains status-only until every constituent run shares complete waveform identity."
     },
     {
       "id": "confidence-quartiles",
@@ -425,7 +427,8 @@
         "strip_punctuation": true,
         "normalize_digits": true,
         "lowercase": true
-      }
+      },
+      "status_reason": "No redistributable trusted run currently carries aligned confidence segments; confidence quartiles cannot be published."
     },
     {
       "id": "confidence-routing",
@@ -455,7 +458,8 @@
         "strip_punctuation": true,
         "normalize_digits": true,
         "lowercase": true
-      }
+      },
+      "status_reason": "No redistributable trusted base/strong pair currently carries aligned confidence segments; confidence routing cannot be published."
     },
     {
       "id": "seam-tax",
@@ -491,7 +495,8 @@
         "strip_punctuation": true,
         "normalize_digits": true,
         "lowercase": true
-      }
+      },
+      "status_reason": "No redistributable trusted aligned base/strong pair exists for recomputing splice-seam endpoints."
     },
     {
       "id": "routing",
@@ -532,7 +537,8 @@
         "strip_punctuation": true,
         "normalize_digits": true,
         "lowercase": true
-      }
+      },
+      "status_reason": "No redistributable trusted aligned base/strong pair exists for recomputing the routing curve and its endpoints."
     },
     {
       "id": "device-defaults",
@@ -650,7 +656,8 @@
         "strip_punctuation": true,
         "normalize_digits": true,
         "lowercase": true
-      }
+      },
+      "status_reason": "The historical Dolphin CPU/MPS comparison predates the experiment archive contract; MPS also records a float64-to-float32 numerical fallback, so no trusted causal table is published."
     },
     {
       "id": "precision-gflops",
@@ -675,7 +682,7 @@
         "normalize_digits": true,
         "lowercase": true
       },
-      "status_reason": "CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity."
+      "status_reason": "The historical synthetic GEMM scores are not archived as experiment-v1 and cannot establish model-wide dtype support."
     },
     {
       "id": "seamless-dtype",
@@ -710,7 +717,8 @@
         "strip_punctuation": true,
         "normalize_digits": true,
         "lowercase": true
-      }
+      },
+      "status_reason": "The historical Seamless dtype sweep predates immutable experiment artifacts and has not been repeated under the trusted session protocol."
     },
     {
       "id": "threads",
@@ -836,7 +844,8 @@
         "strip_punctuation": true,
         "normalize_digits": true,
         "lowercase": true
-      }
+      },
+      "status_reason": "The historical methodology screen has no typed artifact source; current methodology is represented by the verified baseline, parity, and experiment archives."
     },
     {
       "id": "methodology-card",
@@ -878,7 +887,8 @@
         "strip_punctuation": true,
         "normalize_digits": true,
         "lowercase": true
-      }
+      },
+      "status_reason": "The historical methodology card has no typed artifact source; current methodology is represented by the verified baseline, parity, and experiment archives."
     }
   ]
 }

@@ -114,7 +114,7 @@ recap that none of them has seen ([data/reference](../data/reference/README.md))
 The FLEURS ordering held:
 
 <!-- stt-evidence:held-out:start -->
-CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity.
+Held-out audio and full transcript JSONL are deliberately untracked under the redistribution policy; a clean clone cannot audit a numeric table.
 <!-- stt-evidence:held-out:end -->
 
 Both leaders score *better* here than on FLEURS, so the contamination worry did
@@ -130,7 +130,7 @@ come from that one word.
 Correct the name and the ranking inverts:
 
 <!-- stt-evidence:held-out-name-corrected:start -->
-> **Unverified legacy evidence.** Numeric publication is blocked because the declared artifacts are missing trusted audio identity, complete corpus coverage, or matching provenance. Regenerate the runs before publishing measured results.
+The corrected-name held-out result depends on deliberately untracked copyrighted transcript artifacts and remains diagnostic only.
 <!-- stt-evidence:held-out-name-corrected:end -->
 
 So SeamlessM4T is about 13 % more accurate on running text, and omniASR 7B wins
@@ -146,7 +146,7 @@ Scoring normalises punctuation away on both sides. That is correct for comparing
 recognition accuracy and misleading for choosing a transcriber:
 
 <!-- stt-evidence:punctuation:start -->
-CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity.
+Held-out punctuation counts depend on deliberately untracked copyrighted transcript artifacts and remain diagnostic only.
 <!-- stt-evidence:punctuation:end -->
 
 omniASR returns seventeen thousand characters with no sentence boundary
@@ -185,7 +185,7 @@ vote position by position, weighted by measured accuracy. Chosen on FLEURS and
 verified on held-out audio, changing nothing between the two:
 
 <!-- stt-evidence:voting:start -->
-> **Unverified legacy evidence.** Numeric publication is blocked because the declared artifacts are missing trusted audio identity, complete corpus coverage, or matching provenance. Regenerate the runs before publishing measured results.
+No current trusted full-cohort vote inputs are tracked; derived voting remains status-only until every constituent run shares complete waveform identity.
 <!-- stt-evidence:voting:end -->
 
 Three things that turned out to matter:
@@ -225,14 +225,14 @@ The signal is real, measured on the 7B's transcript of the held-out recording
 against the human reference:
 
 <!-- stt-evidence:confidence-quartiles:start -->
-> **Unverified legacy evidence.** Numeric publication is blocked because the declared artifacts are missing trusted audio identity, complete corpus coverage, or matching provenance. Regenerate the runs before publishing measured results.
+No redistributable trusted run currently carries aligned confidence segments; confidence quartiles cannot be published.
 <!-- stt-evidence:confidence-quartiles:end -->
 
 Pearson **r = −0.75**, and a **6.0×** error ratio between the quartiles. Error is
 concentrated, so it can be bought cheaply:
 
 <!-- stt-evidence:confidence-routing:start -->
-> **Unverified legacy evidence.** Numeric publication is blocked because the declared artifacts are missing trusted audio identity, complete corpus coverage, or matching provenance. Regenerate the runs before publishing measured results.
+No redistributable trusted base/strong pair currently carries aligned confidence segments; confidence routing cannot be published.
 <!-- stt-evidence:confidence-routing:end -->
 
 Note what this does *not* justify. Making the vote itself selective would save
@@ -258,7 +258,7 @@ regions, holding the escalated share of audio at ~30 % and varying only how many
 separate regions that share is split into:
 
 <!-- stt-evidence:seam-tax:start -->
-> **Unverified legacy evidence.** Numeric publication is blocked because the declared artifacts are missing trusted audio identity, complete corpus coverage, or matching provenance. Regenerate the runs before publishing measured results.
+No redistributable trusted aligned base/strong pair exists for recomputing splice-seam endpoints.
 <!-- stt-evidence:seam-tax:end -->
 
 Monotonic, and the span is enormous — the same 30 % of audio escalated to the
@@ -288,7 +288,7 @@ clips — Seamless everywhere, escalating the least-confident clips to the 7B.
 Whole-clip routing means no splice seams, so the tax above does not confound it.
 
 <!-- stt-evidence:routing:start -->
-> **Unverified legacy evidence.** Numeric publication is blocked because the declared artifacts are missing trusted audio identity, complete corpus coverage, or matching provenance. Regenerate the runs before publishing measured results.
+No redistributable trusted aligned base/strong pair exists for recomputing the routing curve and its endpoints.
 <!-- stt-evidence:routing:end -->
 
 Thirty percent of the compute budget captures **72.5 %** of the 7B's advantage
@@ -366,7 +366,7 @@ string that moving the module does not update.
 With both fixed, Metal produces **identical text**, and is slower:
 
 <!-- stt-evidence:dolphin-device:start -->
-> **Unverified legacy evidence.** Numeric publication is blocked because the declared artifacts are missing trusted audio identity, complete corpus coverage, or matching provenance. Regenerate the runs before publishing measured results.
+The historical Dolphin CPU/MPS comparison predates the experiment archive contract; MPS also records a float64-to-float32 numerical fallback, so no trusted causal table is published.
 <!-- stt-evidence:dolphin-device:end -->
 
 It is a small model decoding 20-second windows one at a time, so kernel launch
@@ -384,7 +384,7 @@ Apple's GPUs are built around float16. bfloat16 is *accepted* everywhere but is
 not equally *accelerated*. A 4096² matmul on an M2 Max:
 
 <!-- stt-evidence:precision-gflops:start -->
-CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity.
+The historical synthetic GEMM scores are not archived as experiment-v1 and cannot establish model-wide dtype support.
 <!-- stt-evidence:precision-gflops:end -->
 
 bfloat16 is 2.1× slower than float16 and slower than float32 — it is being
@@ -414,7 +414,7 @@ SeamlessM4T v2 on the same GPU goes the other way — float32 is both faster and
 more accurate, so half precision buys only memory:
 
 <!-- stt-evidence:seamless-dtype:start -->
-> **Unverified legacy evidence.** Numeric publication is blocked because the declared artifacts are missing trusted audio identity, complete corpus coverage, or matching provenance. Regenerate the runs before publishing measured results.
+The historical Seamless dtype sweep predates immutable experiment artifacts and has not been repeated under the trusted session protocol.
 <!-- stt-evidence:seamless-dtype:end -->
 
 omniASR's LLM decoder is matmul-bound and gains from float16; Seamless is not and
@@ -563,7 +563,7 @@ Two rules the measurements above imposed on the ones that follow them.
 An earlier version of the baseline used 12 FLEURS **dev** clips:
 
 <!-- stt-evidence:methodology-screen:start -->
-> **Unverified legacy evidence.** Numeric publication is blocked because the declared artifacts are missing trusted audio identity, complete corpus coverage, or matching provenance. Regenerate the runs before publishing measured results.
+The historical methodology screen has no typed artifact source; current methodology is represented by the verified baseline, parity, and experiment archives.
 <!-- stt-evidence:methodology-screen:end -->
 
 Every model scored roughly twice as well on the small sample, and the Seamless vs
@@ -578,7 +578,7 @@ here on 120 FLEURS test clips, that same checkpoint scores **0.1017** — 2.3×
 higher. The scaling curve behind it is smooth and well behaved:
 
 <!-- stt-evidence:methodology-card:start -->
-> **Unverified legacy evidence.** Numeric publication is blocked because the declared artifacts are missing trusted audio identity, complete corpus coverage, or matching provenance. Regenerate the runs before publishing measured results.
+The historical methodology card has no typed artifact source; current methodology is represented by the verified baseline, parity, and experiment archives.
 <!-- stt-evidence:methodology-card:end -->
 
 so this is not a broken checkpoint or a bad decode — the model scales exactly as
