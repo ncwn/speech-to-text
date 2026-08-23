@@ -21,7 +21,16 @@
           "model": "seamless-m4t-v2"
         }
       ],
-      "metrics": []
+      "metrics": [],
+      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
+      "expected_reference_count": 120,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      }
     },
     {
       "id": "measurement-base",
@@ -36,7 +45,16 @@
           "model": "omniASR_LLM_Unlimited_7B_v2"
         }
       ],
-      "metrics": []
+      "metrics": [],
+      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
+      "expected_reference_count": 120,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      }
     },
     {
       "id": "baseline",
@@ -82,9 +100,26 @@
         }
       ],
       "metrics": [
-        {"name": "cer", "label": "CER", "digits": 4},
-        {"name": "rtf", "label": "RTF", "digits": 2}
-      ]
+        {
+          "name": "cer",
+          "label": "CER",
+          "digits": 4
+        },
+        {
+          "name": "rtf",
+          "label": "RTF",
+          "digits": 2
+        }
+      ],
+      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
+      "expected_reference_count": 120,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      }
     },
     {
       "id": "tails",
@@ -130,8 +165,21 @@
         }
       ],
       "metrics": [
-        {"name": "cer", "label": "CER", "digits": 4}
-      ]
+        {
+          "name": "cer",
+          "label": "CER",
+          "digits": 4
+        }
+      ],
+      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
+      "expected_reference_count": 120,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      }
     },
     {
       "id": "held-out",
@@ -165,8 +213,22 @@
         }
       ],
       "metrics": [
-        {"name": "cer", "label": "CER", "digits": 4}
-      ]
+        {
+          "name": "cer",
+          "label": "CER",
+          "digits": 4
+        }
+      ],
+      "reference_sha256": "09a3091bad88e549a6a66a688cabf02118a3487cd6b9744c4e1be90a99adfe34",
+      "expected_reference_count": 1,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      },
+      "status_reason": "CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity."
     },
     {
       "id": "held-out-name-corrected",
@@ -188,8 +250,21 @@
         }
       ],
       "metrics": [
-        {"name": "cer", "label": "CER", "digits": 4}
-      ]
+        {
+          "name": "cer",
+          "label": "CER",
+          "digits": 4
+        }
+      ],
+      "reference_sha256": "09a3091bad88e549a6a66a688cabf02118a3487cd6b9744c4e1be90a99adfe34",
+      "expected_reference_count": 1,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      }
     },
     {
       "id": "punctuation",
@@ -223,8 +298,22 @@
         }
       ],
       "metrics": [
-        {"name": "rtf", "label": "RTF", "digits": 2}
-      ]
+        {
+          "name": "rtf",
+          "label": "RTF",
+          "digits": 2
+        }
+      ],
+      "reference_sha256": "09a3091bad88e549a6a66a688cabf02118a3487cd6b9744c4e1be90a99adfe34",
+      "expected_reference_count": 1,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      },
+      "status_reason": "CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity."
     },
     {
       "id": "voting",
@@ -246,8 +335,21 @@
         }
       ],
       "metrics": [
-        {"name": "cer", "label": "CER", "digits": 4}
-      ]
+        {
+          "name": "cer",
+          "label": "CER",
+          "digits": 4
+        }
+      ],
+      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
+      "expected_reference_count": 120,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      }
     },
     {
       "id": "confidence-quartiles",
@@ -263,8 +365,21 @@
         }
       ],
       "metrics": [
-        {"name": "cer", "label": "CER", "digits": 4}
-      ]
+        {
+          "name": "cer",
+          "label": "CER",
+          "digits": 4
+        }
+      ],
+      "reference_sha256": "09a3091bad88e549a6a66a688cabf02118a3487cd6b9744c4e1be90a99adfe34",
+      "expected_reference_count": 1,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      }
     },
     {
       "id": "confidence-routing",
@@ -280,8 +395,21 @@
         }
       ],
       "metrics": [
-        {"name": "cer", "label": "CER", "digits": 4}
-      ]
+        {
+          "name": "cer",
+          "label": "CER",
+          "digits": 4
+        }
+      ],
+      "reference_sha256": "09a3091bad88e549a6a66a688cabf02118a3487cd6b9744c4e1be90a99adfe34",
+      "expected_reference_count": 1,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      }
     },
     {
       "id": "seam-tax",
@@ -303,8 +431,21 @@
         }
       ],
       "metrics": [
-        {"name": "cer", "label": "CER", "digits": 4}
-      ]
+        {
+          "name": "cer",
+          "label": "CER",
+          "digits": 4
+        }
+      ],
+      "reference_sha256": "09a3091bad88e549a6a66a688cabf02118a3487cd6b9744c4e1be90a99adfe34",
+      "expected_reference_count": 1,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      }
     },
     {
       "id": "routing",
@@ -326,9 +467,26 @@
         }
       ],
       "metrics": [
-        {"name": "cer", "label": "CER", "digits": 4},
-        {"name": "rtf", "label": "RTF", "digits": 2}
-      ]
+        {
+          "name": "cer",
+          "label": "CER",
+          "digits": 4
+        },
+        {
+          "name": "rtf",
+          "label": "RTF",
+          "digits": 2
+        }
+      ],
+      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
+      "expected_reference_count": 120,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      }
     },
     {
       "id": "device-defaults",
@@ -362,8 +520,22 @@
         }
       ],
       "metrics": [
-        {"name": "rtf", "label": "RTF", "digits": 2}
-      ]
+        {
+          "name": "rtf",
+          "label": "RTF",
+          "digits": 2
+        }
+      ],
+      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
+      "expected_reference_count": 120,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      },
+      "status_reason": "CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity."
     },
     {
       "id": "omniasr-metal",
@@ -379,8 +551,21 @@
         }
       ],
       "metrics": [
-        {"name": "rtf", "label": "RTF", "digits": 2}
-      ]
+        {
+          "name": "rtf",
+          "label": "RTF",
+          "digits": 2
+        }
+      ],
+      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
+      "expected_reference_count": 120,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      }
     },
     {
       "id": "dolphin-device",
@@ -396,8 +581,21 @@
         }
       ],
       "metrics": [
-        {"name": "rtf", "label": "RTF", "digits": 2}
-      ]
+        {
+          "name": "rtf",
+          "label": "RTF",
+          "digits": 2
+        }
+      ],
+      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
+      "expected_reference_count": 120,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      }
     },
     {
       "id": "precision-gflops",
@@ -412,7 +610,17 @@
           "model": "llm-unlimited-300m-v2"
         }
       ],
-      "metrics": []
+      "metrics": [],
+      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
+      "expected_reference_count": 120,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      },
+      "status_reason": "CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity."
     },
     {
       "id": "seamless-dtype",
@@ -428,9 +636,26 @@
         }
       ],
       "metrics": [
-        {"name": "rtf", "label": "RTF", "digits": 2},
-        {"name": "cer", "label": "CER", "digits": 4}
-      ]
+        {
+          "name": "rtf",
+          "label": "RTF",
+          "digits": 2
+        },
+        {
+          "name": "cer",
+          "label": "CER",
+          "digits": 4
+        }
+      ],
+      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
+      "expected_reference_count": 120,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      }
     },
     {
       "id": "threads",
@@ -446,8 +671,22 @@
         }
       ],
       "metrics": [
-        {"name": "rtf", "label": "RTF", "digits": 3}
-      ]
+        {
+          "name": "rtf",
+          "label": "RTF",
+          "digits": 3
+        }
+      ],
+      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
+      "expected_reference_count": 120,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      },
+      "status_reason": "CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity."
     },
     {
       "id": "telemetry-snapshot",
@@ -481,8 +720,22 @@
         }
       ],
       "metrics": [
-        {"name": "rtf", "label": "RTF", "digits": 2}
-      ]
+        {
+          "name": "rtf",
+          "label": "RTF",
+          "digits": 2
+        }
+      ],
+      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
+      "expected_reference_count": 120,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      },
+      "status_reason": "CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity."
     },
     {
       "id": "telemetry-cost",
@@ -497,7 +750,17 @@
           "model": "llm-unlimited-300m-v2"
         }
       ],
-      "metrics": []
+      "metrics": [],
+      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
+      "expected_reference_count": 120,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      },
+      "status_reason": "CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity."
     },
     {
       "id": "batching",
@@ -513,8 +776,21 @@
         }
       ],
       "metrics": [
-        {"name": "rtf", "label": "RTF", "digits": 3}
-      ]
+        {
+          "name": "rtf",
+          "label": "RTF",
+          "digits": 3
+        }
+      ],
+      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
+      "expected_reference_count": 120,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      }
     },
     {
       "id": "methodology-screen",
@@ -554,8 +830,21 @@
         }
       ],
       "metrics": [
-        {"name": "cer", "label": "CER", "digits": 4}
-      ]
+        {
+          "name": "cer",
+          "label": "CER",
+          "digits": 4
+        }
+      ],
+      "reference_sha256": "3542fb7c5da470b54ff54e4e0ff7a328ae8e187acbcec06ea3af549e22e92f16",
+      "expected_reference_count": 12,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      }
     },
     {
       "id": "methodology-card",
@@ -583,8 +872,21 @@
         }
       ],
       "metrics": [
-        {"name": "cer", "label": "CER", "digits": 4}
-      ]
+        {
+          "name": "cer",
+          "label": "CER",
+          "digits": 4
+        }
+      ],
+      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
+      "expected_reference_count": 120,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      }
     }
   ]
 }

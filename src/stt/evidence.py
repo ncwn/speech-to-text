@@ -14,7 +14,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from stt.burmese import NormalizeOptions
+from stt.derive import DeriveContext, Requirements, validate_settings
+from stt.derive import derive as run_deriver
 from stt.evaluate import load_references, score_results
+from stt.measurement import MeasurementError
 from stt.provenance import ModelProvenance, ProvenanceError
 from stt.results import TranscriptionResult, read_jsonl
 
@@ -44,6 +48,7 @@ class RunSpec:
     label: str
     backend: str
     model: str
+    settings: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -54,6 +59,11 @@ class BlockSpec:
     runs: tuple[RunSpec, ...]
     metrics: tuple[MetricSpec, ...]
     status_only: bool = False
+    status_reason: str | None = None
+    deriver: str | None = None
+    reference_sha256: str | None = None
+    expected_reference_count: int | None = None
+    normalization: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -129,6 +139,11 @@ def load_manifest(path: Path) -> EvidenceManifest:
             "runs",
             "metrics",
             "status_only",
+            "status_reason",
+            "deriver",
+            "reference_sha256",
+            "expected_reference_count",
+            "normalization",
         }
         if unknown:
             raise EvidenceError(f"{context} has unknown field(s): {', '.join(sorted(unknown))}")
@@ -147,7 +162,7 @@ def load_manifest(path: Path) -> EvidenceManifest:
             run_context = f"{context}.runs[{run_index}]"
             if not isinstance(run, dict):
                 raise EvidenceError(f"{run_context} must be an object")
-            unknown = set(run) - {"artifact", "label", "backend", "model"}
+            unknown = set(run) - {"artifact", "label", "backend", "model", "settings"}
             if unknown:
                 raise EvidenceError(
                     f"{run_context} has unknown field(s): {', '.join(sorted(unknown))}"
@@ -160,6 +175,7 @@ def load_manifest(path: Path) -> EvidenceManifest:
                     label=str(_required(run, "label", run_context)),
                     backend=str(_required(run, "backend", run_context)),
                     model=str(_required(run, "model", run_context)),
+                    settings=dict(run.get("settings", {})),
                 )
             )
 
@@ -189,7 +205,7 @@ def load_manifest(path: Path) -> EvidenceManifest:
         status_only = item.get("status_only", False)
         if not isinstance(status_only, bool):
             raise EvidenceError(f"{context}.status_only must be a boolean")
-        if not metrics and not status_only:
+        if not metrics and not status_only and item.get("deriver") is None:
             raise EvidenceError(f"{context} needs metrics or status_only=true")
         blocks.append(
             BlockSpec(
@@ -201,6 +217,21 @@ def load_manifest(path: Path) -> EvidenceManifest:
                 runs=tuple(runs),
                 metrics=tuple(metrics),
                 status_only=status_only,
+                status_reason=(
+                    str(item["status_reason"]) if item.get("status_reason") is not None else None
+                ),
+                deriver=(str(item["deriver"]) if item.get("deriver") is not None else None),
+                reference_sha256=(
+                    str(item["reference_sha256"])
+                    if item.get("reference_sha256") is not None
+                    else None
+                ),
+                expected_reference_count=(
+                    int(item["expected_reference_count"])
+                    if item.get("expected_reference_count") is not None
+                    else None
+                ),
+                normalization=dict(item.get("normalization", {})),
             )
         )
     return EvidenceManifest(path=path, document=document, blocks=tuple(blocks))
@@ -307,6 +338,11 @@ def _validate_run(run: RunSpec, expected_reference_ids: set[str]) -> list[Transc
         raise EvidenceError(
             f"{run.label}: expected one model execution identity, found {len(execution_ids)}"
         )
+    if run.settings:
+        try:
+            validate_settings((results,), run.settings)
+        except (MeasurementError, TypeError, ValueError) as exc:
+            raise EvidenceError(f"{run.label}: declared settings differ: {exc}") from exc
     found_ids = set(reference_ids)
     if found_ids != expected_reference_ids:
         missing = sorted(expected_reference_ids - found_ids)
@@ -339,8 +375,13 @@ def _metric_value(
     metric: MetricSpec,
     results: list[TranscriptionResult],
     references: dict[str, str],
+    normalization: dict[str, Any] | None = None,
 ) -> str:
-    score = score_results(results, references, check_encoding=True)
+    try:
+        options = NormalizeOptions(**(normalization or {}))
+    except TypeError as exc:
+        raise EvidenceError(f"invalid normalization settings: {exc}") from exc
+    score = score_results(results, references, options=options, check_encoding=True)
     if score.n_failed or len(score.scored) != len(results):
         raise EvidenceError(
             f"scoring incomplete: {len(score.scored)}/{len(results)} records scored"
@@ -442,21 +483,69 @@ def _validate_document_ownership(document: str, blocks: tuple[BlockSpec, ...]) -
 
 def _render_block(block: BlockSpec) -> tuple[str, list[str], bool]:
     if block.status_only:
-        return UNVERIFIED_MESSAGE, [f"{block.id}: status_only legacy block"], False
+        reason = block.status_reason or UNVERIFIED_MESSAGE
+        return reason, [f"{block.id}: status_only legacy block"], False
 
     issues: list[str] = []
     try:
         references = load_references(block.reference)
         if not references:
             raise EvidenceError(f"empty reference corpus: {block.reference}")
+        requirements = Requirements(
+            reference_sha256=block.reference_sha256,
+            expected_reference_count=block.expected_reference_count,
+            settings={},
+        )
+        if block.reference_sha256 is not None or block.expected_reference_count is not None:
+            from stt.derive import validate_reference_identity
+
+            validate_reference_identity(
+                references,
+                path=block.reference,
+                requirements=requirements,
+            )
         results_by_run = [_validate_run(run, set(references)) for run in block.runs]
         _validate_cross_run_identity(block.runs, results_by_run)
+        if block.deriver:
+            context = DeriveContext(
+                tuple(
+                    (run.label, tuple(results))
+                    for run, results in zip(block.runs, results_by_run, strict=True)
+                ),
+                references,
+                Requirements(settings={}),
+            )
+            table = run_deriver(context, block.deriver, reference_path=block.reference)
+            header = [column.label for column in table.columns]
+            rows = [
+                [
+                    str(row[column.name])
+                    if column.name == table.row_key
+                    else f"{float(row[column.name]):.{column.digits}f}"
+                    for column in table.columns
+                ]
+                for row in table.rows
+            ]
+            return (
+                "\n".join(
+                    [
+                        "| " + " | ".join(header) + " |",
+                        "| " + " | ".join(["---", *["---:" for _ in table.columns[1:]]]) + " |",
+                        *("| " + " | ".join(row) + " |" for row in rows),
+                    ]
+                ),
+                issues,
+                True,
+            )
         header = ["Model", "Backend", *(metric.label for metric in block.metrics)]
         rows = [
             [
                 run.label,
                 f"`{run.backend}`",
-                *(_metric_value(metric, results, references) for metric in block.metrics),
+                *(
+                    _metric_value(metric, results, references, block.normalization)
+                    for metric in block.metrics
+                ),
             ]
             for run, results in zip(block.runs, results_by_run, strict=True)
         ]

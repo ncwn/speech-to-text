@@ -88,7 +88,7 @@ recap that none of them has seen ([data/reference](../data/reference/README.md))
 The FLEURS ordering held:
 
 <!-- stt-evidence:held-out:start -->
-> **Unverified legacy evidence.** Numeric publication is blocked because the declared artifacts are missing trusted audio identity, complete corpus coverage, or matching provenance. Regenerate the runs before publishing measured results.
+CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity.
 <!-- stt-evidence:held-out:end -->
 
 Both leaders score *better* here than on FLEURS, so the contamination worry did
@@ -120,7 +120,7 @@ Scoring normalises punctuation away on both sides. That is correct for comparing
 recognition accuracy and misleading for choosing a transcriber:
 
 <!-- stt-evidence:punctuation:start -->
-> **Unverified legacy evidence.** Numeric publication is blocked because the declared artifacts are missing trusted audio identity, complete corpus coverage, or matching provenance. Regenerate the runs before publishing measured results.
+CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity.
 <!-- stt-evidence:punctuation:end -->
 
 omniASR returns seventeen thousand characters with no sentence boundary
@@ -290,7 +290,7 @@ The **mechanism** generalises; that particular number does not.
 All four backends run on Metal. Whether they *should* differs per model:
 
 <!-- stt-evidence:device-defaults:start -->
-> **Unverified legacy evidence.** Numeric publication is blocked because the declared artifacts are missing trusted audio identity, complete corpus coverage, or matching provenance. Regenerate the runs before publishing measured results.
+CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity.
 <!-- stt-evidence:device-defaults:end -->
 
 ### omniASR on Metal
@@ -342,7 +342,7 @@ Apple's GPUs are built around float16. bfloat16 is *accepted* everywhere but is
 not equally *accelerated*. A 4096² matmul on an M2 Max:
 
 <!-- stt-evidence:precision-gflops:start -->
-> **Unverified legacy evidence.** Numeric publication is blocked because the declared artifacts are missing trusted audio identity, complete corpus coverage, or matching provenance. Regenerate the runs before publishing measured results.
+CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity.
 <!-- stt-evidence:precision-gflops:end -->
 
 bfloat16 is 2.1× slower than float16 and slower than float32 — it is being
@@ -403,7 +403,7 @@ interpretable without knowing the machine. Reading macOS's level *names*
 across chips:
 
 <!-- stt-evidence:threads:start -->
-> **Unverified legacy evidence.** Numeric publication is blocked because the declared artifacts are missing trusted audio identity, complete corpus coverage, or matching provenance. Regenerate the runs before publishing measured results.
+CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity.
 <!-- stt-evidence:threads:end -->
 
 ---
@@ -420,7 +420,7 @@ as independent statistical replicates.
 The older one-file snapshot below is retained as historical context:
 
 <!-- stt-evidence:telemetry-snapshot:start -->
-> **Unverified legacy evidence.** Numeric publication is blocked because the declared artifacts are missing trusted audio identity, complete corpus coverage, or matching provenance. Regenerate the runs before publishing measured results.
+CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity.
 <!-- stt-evidence:telemetry-snapshot:end -->
 
 These observations originally suggested three hypotheses to retest:
@@ -455,7 +455,7 @@ and subtracted after it joins, so an in-flight observer cannot be omitted from
 the correction:
 
 <!-- stt-evidence:telemetry-cost:start -->
-> **Unverified legacy evidence.** Numeric publication is blocked because the declared artifacts are missing trusted audio identity, complete corpus coverage, or matching provenance. Regenerate the runs before publishing measured results.
+CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity.
 <!-- stt-evidence:telemetry-cost:end -->
 
 The historical cost table above is not yet regenerated under the timestamped

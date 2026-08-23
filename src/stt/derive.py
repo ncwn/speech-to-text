@@ -1,0 +1,270 @@
+"""Pure, versioned evidence derivers.
+
+Derivers receive already-loaded trusted records and return typed tables.  They
+never format Markdown and they cannot silently skip identity or settings checks.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import math
+from collections.abc import Callable, Mapping, Sequence
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any
+
+from stt.measurement import MeasurementError
+from stt.results import TranscriptionResult
+
+Numeric = int | float
+DERIVER_SCHEMA_VERSION = 1
+
+
+def _finite(value: object, name: str) -> Numeric:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise MeasurementError(f"{name} must be numeric")
+    if isinstance(value, float) and not math.isfinite(value):
+        raise MeasurementError(f"{name} must be finite")
+    return value
+
+
+@dataclass(frozen=True)
+class DerivedColumn:
+    name: str
+    label: str
+    digits: int = 4
+
+    def validate(self) -> None:
+        if not self.name or not self.label or any(char.isspace() for char in self.name):
+            raise MeasurementError("derived column names must be non-empty identifiers")
+        if not isinstance(self.digits, int) or not 0 <= self.digits <= 9:
+            raise MeasurementError("derived column digits must be between 0 and 9")
+
+
+@dataclass(frozen=True)
+class DerivedTable:
+    """Typed table with stable row keys and numeric cells."""
+
+    deriver: str
+    columns: tuple[DerivedColumn, ...]
+    rows: tuple[dict[str, Any], ...]
+    row_key: str
+    metadata: dict[str, Any] | None = None
+
+    def validate(self) -> None:
+        if not self.deriver or ":" not in self.deriver:
+            raise MeasurementError("derived table needs a versioned deriver name")
+        if not self.columns:
+            raise MeasurementError("derived table needs columns")
+        columns = {column.name for column in self.columns}
+        if len(columns) != len(self.columns):
+            raise MeasurementError("derived table columns must be unique")
+        for column in self.columns:
+            column.validate()
+        if self.row_key not in columns:
+            raise MeasurementError("derived table row key must be a declared column")
+        seen: set[str] = set()
+        for index, row in enumerate(self.rows):
+            if set(row) != columns:
+                raise MeasurementError(f"derived row {index} does not match declared columns")
+            key = row[self.row_key]
+            if not isinstance(key, str) or not key or key in seen:
+                raise MeasurementError(f"derived row {index} has an unstable or duplicate key")
+            seen.add(key)
+            for name, value in row.items():
+                if name != self.row_key:
+                    _finite(value, f"derived row {index}.{name}")
+
+    def to_dict(self) -> dict[str, Any]:
+        self.validate()
+        return {
+            "schema_version": DERIVER_SCHEMA_VERSION,
+            "deriver": self.deriver,
+            "columns": [column.__dict__ for column in self.columns],
+            "rows": [dict(row) for row in self.rows],
+            "row_key": self.row_key,
+            "metadata": dict(self.metadata or {}),
+        }
+
+
+@dataclass(frozen=True)
+class Requirements:
+    """Central identity requirements applied before a deriver runs."""
+
+    same_waveform: bool = True
+    reference_sha256: str | None = None
+    expected_reference_count: int | None = None
+    settings: dict[str, Any] = field(default_factory=dict)
+
+    def validate(self) -> None:
+        if self.reference_sha256 is not None and (
+            len(self.reference_sha256) != 64
+            or any(char not in "0123456789abcdef" for char in self.reference_sha256)
+        ):
+            raise MeasurementError("reference_sha256 must be a lowercase SHA-256")
+        if self.expected_reference_count is not None and self.expected_reference_count < 1:
+            raise MeasurementError("expected_reference_count must be positive")
+        if not isinstance(self.settings, dict):
+            raise MeasurementError("deriver settings must be an object")
+
+
+@dataclass(frozen=True)
+class DeriveContext:
+    runs: tuple[tuple[str, tuple[TranscriptionResult, ...]], ...]
+    references: dict[str, str]
+    requirements: Requirements = Requirements()
+
+    def validate(self) -> None:
+        self.requirements.validate()
+        if not self.runs:
+            raise MeasurementError("deriver context needs at least one run")
+        if not self.references:
+            raise MeasurementError("deriver context needs references")
+        for label, results in self.runs:
+            if not label or not results:
+                raise MeasurementError("deriver runs need labels and records")
+        if (
+            self.requirements.expected_reference_count is not None
+            and len(self.references) != self.requirements.expected_reference_count
+        ):
+            raise MeasurementError("reference count differs from the declared requirement")
+
+
+Deriver = Callable[[DeriveContext], DerivedTable]
+_DERIVERS: dict[str, Deriver] = {}
+
+
+def register(name: str) -> Callable[[Deriver], Deriver]:
+    if not name or ":" not in name:
+        raise ValueError("deriver names must include a version suffix")
+
+    def decorator(function: Deriver) -> Deriver:
+        if name in _DERIVERS:
+            raise ValueError(f"deriver is already registered: {name}")
+        _DERIVERS[name] = function
+        return function
+
+    return decorator
+
+
+def get(name: str) -> Deriver:
+    try:
+        return _DERIVERS[name]
+    except KeyError as exc:
+        raise MeasurementError(f"unknown evidence deriver: {name}") from exc
+
+
+def reference_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def validate_reference_identity(
+    references: Mapping[str, str],
+    *,
+    path: Path | None,
+    requirements: Requirements,
+) -> None:
+    requirements.validate()
+    if (
+        requirements.expected_reference_count is not None
+        and len(references) != requirements.expected_reference_count
+    ):
+        raise MeasurementError("reference count differs from the declared requirement")
+    if requirements.reference_sha256 is not None:
+        if path is None or reference_sha256(path) != requirements.reference_sha256:
+            raise MeasurementError("reference corpus checksum differs from the declared identity")
+
+
+def validate_same_waveform(runs: Sequence[Sequence[TranscriptionResult]]) -> None:
+    if not runs:
+        raise MeasurementError("same-waveform validation needs runs")
+    expected: dict[str, str] | None = None
+    for results in runs:
+        found = {result.reference_id: result.audio_id for result in results}
+        if any(not reference or not audio for reference, audio in found.items()):
+            raise MeasurementError("same-waveform validation needs reference/audio identities")
+        if len(found) != len(results):
+            raise MeasurementError("a run contains duplicate reference identities")
+        if expected is None:
+            expected = found
+        elif found != expected:
+            raise MeasurementError("runs do not contain the same reference-to-waveform map")
+
+
+def validate_settings(
+    runs: Sequence[Sequence[TranscriptionResult]], expected: Mapping[str, Any]
+) -> None:
+    for results in runs:
+        for result in results:
+            provenance = result.model_provenance
+            resolved = provenance.get("resolved_settings") if isinstance(provenance, dict) else None
+            if not isinstance(resolved, dict):
+                raise MeasurementError("deriver run is missing resolved settings")
+            for name, value in expected.items():
+                if value is None or resolved.get(name) != value:
+                    raise MeasurementError(
+                        f"declared setting {name!r} differs from the resolved run"
+                    )
+
+
+def validate_context(context: DeriveContext, *, reference_path: Path | None = None) -> None:
+    context.validate()
+    requirements = context.requirements
+    validate_reference_identity(context.references, path=reference_path, requirements=requirements)
+    runs = [results for _, results in context.runs]
+    if requirements.same_waveform:
+        validate_same_waveform(runs)
+    if requirements.settings:
+        validate_settings(runs, requirements.settings)
+
+
+def derive(
+    context: DeriveContext,
+    name: str,
+    *,
+    reference_path: Path | None = None,
+) -> DerivedTable:
+    validate_context(context, reference_path=reference_path)
+    table = get(name)(context)
+    table.validate()
+    return table
+
+
+@register("transcripts:v1")
+def transcript_table(context: DeriveContext) -> DerivedTable:
+    """A minimal structured transcript table useful for smoke verification."""
+    rows = tuple(
+        {
+            "run": label,
+            "n_records": len(results),
+        }
+        for label, results in context.runs
+    )
+    return DerivedTable(
+        deriver="transcripts:v1",
+        columns=(DerivedColumn("run", "Run"), DerivedColumn("n_records", "Records", 0)),
+        rows=rows,
+        row_key="run",
+    )
+
+
+__all__ = [
+    "DERIVER_SCHEMA_VERSION",
+    "DeriveContext",
+    "DerivedColumn",
+    "DerivedTable",
+    "Requirements",
+    "derive",
+    "get",
+    "reference_sha256",
+    "register",
+    "transcript_table",
+    "validate_context",
+    "validate_reference_identity",
+    "validate_same_waveform",
+    "validate_settings",
+]

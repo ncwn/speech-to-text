@@ -252,6 +252,31 @@ def test_status_only_block_does_not_inspect_legacy_artifacts(tmp_path):
     assert check_evidence(manifest).matches
 
 
+def test_versioned_deriver_renders_a_structured_table(tmp_path):
+    manifest = _fixture(tmp_path)
+    raw = json.loads(manifest.read_text(encoding="utf-8"))
+    raw["blocks"][0]["deriver"] = "transcripts:v1"
+    raw["blocks"][0]["metrics"] = []
+    manifest.write_text(json.dumps(raw), encoding="utf-8")
+
+    check = update_evidence(manifest)
+
+    assert check.publishable
+    assert "| Run | Records |" in check.document.read_text(encoding="utf-8")
+
+
+def test_status_reason_is_rendered_without_opening_legacy_files(tmp_path):
+    manifest = _fixture(tmp_path)
+    raw = json.loads(manifest.read_text(encoding="utf-8"))
+    raw["blocks"][0]["status_only"] = True
+    raw["blocks"][0]["status_reason"] = "specific upstream limitation"
+    manifest.write_text(json.dumps(raw), encoding="utf-8")
+
+    check = update_evidence(manifest)
+
+    assert "specific upstream limitation" in check.document.read_text(encoding="utf-8")
+
+
 def test_check_rejects_unowned_markdown_table(tmp_path):
     manifest = _fixture(tmp_path)
     document = manifest.parent.parent / "docs" / "findings.md"
