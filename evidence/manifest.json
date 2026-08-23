@@ -190,6 +190,16 @@
             "device": "mps",
             "dtype": "float32"
           }
+        },
+        {
+          "artifact": "outputs/evidence-fleurs-dev-omni7b.jsonl",
+          "label": "omniASR 7B (verified accuracy)",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_7B_v2",
+          "settings": {
+            "device": "cpu",
+            "dtype": "float32"
+          }
         }
       ],
       "metrics": [

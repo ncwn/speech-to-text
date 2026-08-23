@@ -47,6 +47,7 @@ baseline-v2 artifacts.
 | Model | Backend | CER | N | Scored |
 | --- | --- | ---: | ---: | ---: |
 | SeamlessM4T v2 (verified accuracy) | `hf` | 0.0594 | 12 | 12 |
+| omniASR 7B (verified accuracy) | `omniasr-torch` | 0.0568 | 12 | 12 |
 <!-- stt-evidence:accuracy-fleurs-dev-12:end -->
 
 **The entire table is historical.** Its RTF values sum backend-provided

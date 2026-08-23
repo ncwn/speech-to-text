@@ -45,6 +45,7 @@ outputs/**
 !outputs/evidence-fleurs-test-mms.jsonl
 !outputs/evidence-fleurs-test-dolphin.jsonl
 !outputs/evidence-fleurs-dev-seamless.jsonl
+!outputs/evidence-fleurs-dev-omni7b.jsonl
 # ...except a vote or route artifact, which `stt vote` and `stt route` write
 # with trusted=False and no model provenance by construction. Such a file can
 # never back a published number; the evidence renderer recomputes the vote from
