@@ -1,0 +1,85 @@
+{
+  "artifact_kind": "batch-sweep-v1",
+  "schema_version": 1,
+  "spec": {
+    "sweep_id": "mms-batch-smoke",
+    "subject": "hf-mms-1b-all",
+    "input_set_id": "canonical",
+    "batch_sizes": [
+      1,
+      2,
+      4
+    ],
+    "max_batch": 4,
+    "plateau_fraction": 0.05,
+    "plateau_consecutive": 2,
+    "sessions": 1,
+    "warmups": 0,
+    "repeats": 1,
+    "timeout_s": 7200.0
+  },
+  "observations": [
+    {
+      "batch_size": 1,
+      "median_rtf": 0.028725904311594205,
+      "interval_low": 0.028725904311594205,
+      "interval_high": 0.028725904311594205,
+      "transcript_hashes": {
+        "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0": "2c9bfc4460412cf8562e300d0c3f5c0d1f81b781f1de3e463a91c9b9c3f4200c"
+      },
+      "complete": true,
+      "error": null
+    },
+    {
+      "batch_size": 2,
+      "median_rtf": 0.02862773851449275,
+      "interval_low": 0.02862773851449275,
+      "interval_high": 0.02862773851449275,
+      "transcript_hashes": {
+        "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0": "2c9bfc4460412cf8562e300d0c3f5c0d1f81b781f1de3e463a91c9b9c3f4200c"
+      },
+      "complete": true,
+      "error": null
+    },
+    {
+      "batch_size": 4,
+      "median_rtf": 0.02971094804347826,
+      "interval_low": 0.02971094804347826,
+      "interval_high": 0.02971094804347826,
+      "transcript_hashes": {
+        "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0": "2c9bfc4460412cf8562e300d0c3f5c0d1f81b781f1de3e463a91c9b9c3f4200c"
+      },
+      "complete": true,
+      "error": null
+    }
+  ],
+  "rows": [
+    {
+      "batch_size": 1,
+      "plateau": false
+    },
+    {
+      "batch_size": 2,
+      "speedup": 1.0034290447724943,
+      "speedup_low": 1.0034290447724943,
+      "speedup_high": 1.0034290447724943,
+      "improvement": 0.003429044772494283,
+      "plateau": true
+    },
+    {
+      "batch_size": 4,
+      "speedup": 0.9635417379680928,
+      "speedup_low": 0.9635417379680928,
+      "speedup_high": 0.9635417379680928,
+      "improvement": -0.03645826203190716,
+      "plateau": true
+    }
+  ],
+  "transcript_hashes": {
+    "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0": "2c9bfc4460412cf8562e300d0c3f5c0d1f81b781f1de3e463a91c9b9c3f4200c"
+  },
+  "status": "stopped",
+  "stop_at": 4,
+  "stop_reason": "2 consecutive plateau steps",
+  "verification_issues": []
+}
