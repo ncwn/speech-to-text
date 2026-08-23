@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from stt.measurement import MeasurementError
+from stt.paths import checkout_root
 from stt.results import Segment, TranscriptionResult
 from stt.sentinel import BOUNDARIES_S, DURATION_S, SENTINEL_KIND, verify_annotation
 
@@ -370,6 +371,35 @@ def _result_to_dict(result: TranscriptionResult) -> dict[str, Any]:
     return value
 
 
+def _portable_path(value: Any, *, field_name: str) -> Any:
+    if value is None or not isinstance(value, str) or not Path(value).is_absolute():
+        return value
+    root = checkout_root()
+    if root is None:
+        raise MeasurementError(f"cannot make absolute {field_name} portable outside a checkout")
+    try:
+        return str(Path(value).relative_to(root))
+    except ValueError as exc:
+        raise MeasurementError(f"absolute {field_name} is outside the checkout") from exc
+
+
+def _portable_result_dict(result: TranscriptionResult) -> dict[str, Any]:
+    value = _result_to_dict(result)
+    value["audio_path"] = _portable_path(value["audio_path"], field_name="audio_path")
+    value["source_path"] = _portable_path(value["source_path"], field_name="source_path")
+    provenance = value.get("model_provenance")
+    if isinstance(provenance, dict):
+        artifacts = provenance.get("artifacts")
+        if isinstance(artifacts, list):
+            for artifact in artifacts:
+                if isinstance(artifact, dict) and "path" in artifact:
+                    artifact["path"] = _portable_path(
+                        artifact["path"], field_name="model artifact path"
+                    )
+    _validate_raw_result(value)
+    return value
+
+
 def _result_from_dict(value: Mapping[str, Any]) -> TranscriptionResult:
     _validate_raw_result(value)
     data = dict(value)
@@ -423,7 +453,7 @@ class LongAudioReport:
     def to_dict(self) -> dict[str, Any]:
         self.validate()
         spec = self.spec.to_dict()
-        result = _result_to_dict(self.result)
+        result = _portable_result_dict(self.result)
         observation = self.observation.to_dict()
         return {
             "artifact_kind": LONG_AUDIO_ARTIFACT_KIND,

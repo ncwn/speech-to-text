@@ -127,6 +127,33 @@ def test_v2_report_recomputes_from_raw_result_and_binds_fixture(tmp_path):
     assert verify_observation(report_path, audio_path=audio, annotation_path=annotation_path) == []
 
 
+def test_v2_report_makes_checkout_paths_portable(tmp_path):
+    root = Path(__file__).parents[1]
+    audio = root / "data" / "sentinels" / "long-audio-boundary-v1.wav"
+    annotation_path = root / "data" / "sentinels" / "long-audio-boundary-v1.json"
+    audio_sha, annotation_sha = sentinel_identity(annotation_path, audio)
+    spec = LongAudioRunnerSpec(
+        "adapter", "fake", "model", "adapter.transcribe", audio_sha, annotation_sha
+    )
+    result = _result([Segment("all", 0.0, 45.0, source="chunk")])
+    result.audio_path = str(audio)
+    result.source_path = str(audio)
+    result.model_provenance = {"artifacts": [{"path": str(root / ".cache" / "weights.bin")}]}
+    report = run_runner_report(
+        spec,
+        lambda: result,
+        read_sentinel_spans(annotation_path),
+    )
+    report_path = tmp_path / "portable.json"
+
+    write_report(report, report_path)
+
+    value = json.loads(report_path.read_text(encoding="utf-8"))
+    assert value["result"]["audio_path"] == "data/sentinels/long-audio-boundary-v1.wav"
+    assert value["result"]["source_path"] == "data/sentinels/long-audio-boundary-v1.wav"
+    assert value["result"]["model_provenance"]["artifacts"][0]["path"] == (".cache/weights.bin")
+
+
 @pytest.mark.parametrize(
     ("location", "mutate"),
     [
