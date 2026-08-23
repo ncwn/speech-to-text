@@ -42,6 +42,7 @@ baseline-v2 artifacts.
 | MMS-1B (verified accuracy) | `hf` | 0.1565 | 120 | 120 |
 | Dolphin small (verified accuracy) | `dolphin` | 0.1480 | 120 | 120 |
 | SeamlessM4T v2 (verified accuracy) | `hf` | 0.1036 | 120 | 120 |
+| omniASR 7B (verified accuracy) | `omniasr-torch` | 0.0745 | 120 | 120 |
 <!-- stt-evidence:accuracy-fleurs-test-120:end -->
 
 <!-- stt-evidence:accuracy-fleurs-dev-12:start -->
