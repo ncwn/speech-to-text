@@ -599,6 +599,61 @@ def observer_table(path: Path) -> DerivedTable:
     return table
 
 
+def input_control_table(path: Path) -> DerivedTable:
+    """Derive preparation and inference facts from a verified input control."""
+    from stt.experiment_archive import verify_experiment
+
+    issues = verify_experiment(path)
+    if issues:
+        raise MeasurementError("input-control verification failed: " + "; ".join(issues))
+    descriptor = path / "experiment.json" if path.is_dir() else path
+    value = json.loads(descriptor.read_text(encoding="utf-8"))
+    input_sets = {item["input_set_id"]: item for item in value["spec"]["input_sets"]}
+    conditions = {item["condition_id"]: item for item in value["spec"]["conditions"]}
+    contrasts = value.get("contrasts", [])
+    changed = len(contrasts[0].get("transcript_changes", [])) if len(contrasts) == 1 else 0
+    rows: list[dict[str, Any]] = []
+    for index, summary in enumerate(value.get("condition_summaries", [])):
+        condition = conditions[summary["condition_id"]]
+        input_set = input_sets[condition["input_set_id"]]
+        interval = summary.get("rtf_ci95")
+        if (
+            not summary.get("baseline_eligible")
+            or summary.get("error")
+            or not isinstance(interval, list)
+            or len(interval) != 2
+        ):
+            raise MeasurementError(f"input-control condition {index} is not publishable")
+        rows.append(
+            {
+                "condition": str(summary["condition_id"]),
+                "preparation_wall_s": _finite(
+                    input_set.get("preparation_wall_s"), f"input condition {index}.preparation"
+                ),
+                "rtf": _finite(summary.get("rtf"), f"input condition {index}.rtf"),
+                "ci_low": _finite(interval[0], f"input condition {index}.ci_low"),
+                "ci_high": _finite(interval[1], f"input condition {index}.ci_high"),
+                "text_changes": changed,
+            }
+        )
+    table = DerivedTable(
+        deriver="input-control:v1",
+        columns=(
+            DerivedColumn("condition", "Condition"),
+            DerivedColumn("preparation_wall_s", "Preparation wall s", 4),
+            DerivedColumn("rtf", "RTF", 4),
+            DerivedColumn("ci_low", "CI low", 4),
+            DerivedColumn("ci_high", "CI high", 4),
+            DerivedColumn("text_changes", "Text changes", 0),
+        ),
+        rows=tuple(rows),
+        row_key="condition",
+        metadata={"experiment_id": value.get("experiment_id")},
+    )
+    table.validate()
+    return table
+
+
 __all__ = [
     "DERIVER_SCHEMA_VERSION",
     "DeriveContext",
@@ -619,4 +674,5 @@ __all__ = [
     "baseline_table",
     "experiment_table",
     "observer_table",
+    "input_control_table",
 ]

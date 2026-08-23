@@ -21,6 +21,7 @@ from stt.derive import (
     Requirements,
     baseline_table,
     experiment_table,
+    input_control_table,
     observer_table,
     validate_settings,
 )
@@ -553,7 +554,11 @@ def _render_block(block: BlockSpec) -> tuple[str, list[str], bool]:
             table = (
                 observer_table(block.source)
                 if block.deriver == "observer:v1"
-                else experiment_table(block.source)
+                else (
+                    input_control_table(block.source)
+                    if block.deriver == "input-control:v1"
+                    else experiment_table(block.source)
+                )
             )
             return _render_derived_table(table), issues, True
         references = load_references(block.reference)

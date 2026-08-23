@@ -3,6 +3,25 @@
   "document": "docs/findings.md",
   "blocks": [
     {
+      "id": "input-control",
+      "corpus": "fleurs-dev-one-float-wav",
+      "reference": "data/fleurs/references.tsv",
+      "source_kind": "experiment-v1",
+      "source": "evidence/experiments/mms-input-control-v1/experiment.json",
+      "deriver": "input-control:v1",
+      "runs": [],
+      "metrics": [],
+      "reference_sha256": "d50f1117fb74d73bb16f060d45e58ed6bf207ee6535571536f73f795c46a9481",
+      "expected_reference_count": 12,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      }
+    },
+    {
       "id": "baseline",
       "corpus": "fleurs-test-120",
       "reference": "data/fleurs-test/references.tsv",

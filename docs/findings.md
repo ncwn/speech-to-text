@@ -18,6 +18,25 @@ supplies common-wall timing and regression statistics.
 
 ---
 
+## Input preparation control
+
+The paired MMS control presents the same FLOAT WAV either through a fresh canonical
+PCM16 conversion or directly through native source ingestion. Preparation is timed
+outside every warm inference repeat and the two arms join by source SHA:
+
+<!-- stt-evidence:input-control:start -->
+| Condition | Preparation wall s | RTF | CI low | CI high | Text changes |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| canonical | 0.0394 | 0.0239 | 0.0238 | 0.0244 | 1 |
+| native | 0.0031 | 0.0238 | 0.0238 | 0.0245 | 1 |
+<!-- stt-evidence:input-control:end -->
+
+Native and canonical ingestion changed the transcript for the same source bytes,
+so they are not semantically interchangeable. The timing ratio remains descriptive;
+publication accuracy continues to use canonical prepared audio.
+
+---
+
 ## Baseline
 
 The accepted baseline-v2 measures the four trusted subjects over the same five

@@ -14,6 +14,7 @@ from stt.derive import (
     baseline_table,
     derive,
     experiment_table,
+    input_control_table,
     observer_table,
     reference_sha256,
 )
@@ -156,3 +157,11 @@ def test_committed_observer_deriver_uses_verified_accounting():
 
     assert len(table.rows) == 6
     assert table.rows[0]["observer_cpu_s"] == 0.0
+
+
+def test_committed_input_control_deriver_keeps_preparation_outside_rtf():
+    table = input_control_table(Path("evidence/experiments/mms-input-control-v1/experiment.json"))
+
+    assert len(table.rows) == 2
+    assert all(row["preparation_wall_s"] > 0 for row in table.rows)
+    assert all(row["text_changes"] == 1 for row in table.rows)
