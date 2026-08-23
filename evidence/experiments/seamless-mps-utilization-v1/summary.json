@@ -1,0 +1,250 @@
+{
+  "artifact_kind": "experiment-v1",
+  "condition_summaries": [
+    {
+      "baseline_eligible": true,
+      "condition_id": "mps-float32-request4-effective2",
+      "content_sha256": "2b8ee7972365d6233a5b5e5c16db24bbfa27635e31d67086fd8a674f9309f8b0",
+      "cpu_utilization": 1.0777602508937156,
+      "endpoint_rss_mb": 1162.4,
+      "environment_identity": "88e872216ea0a4079811e0fd04eb44e3eab3774a3e50f33bfad7381aaa2262e2",
+      "error": null,
+      "execution_sha256": "00782105b5dbb7a7c30d76b462aa1894e2e041bbb1cbe33355bfe731c19112b7",
+      "gpu_idle_pct": 11.2,
+      "gpu_scope": "pooled-windows",
+      "gpu_util_mean": 63.3,
+      "gpu_util_n": 42,
+      "gpu_util_p50": 62.0,
+      "hashes": {
+        "pcm16:16000:1:3c36945ab87846a2dbf3332346323b9b3d494b06e492302388937248395f4f3e": "392b630dc75475ef57c90d04b9feb3879fc2bdb9e8ae7e6e56d73c9f3b697889",
+        "pcm16:16000:1:42c90339ee2eac5d1bf7e7d828678af8cb692a39d3dee632d4d7ff16839111f7": "932b7139e8a88b75a995725826f375a9ad8b39e6bed95117774ddfe70934774b",
+        "pcm16:16000:1:447f36b462cf5f7cc1e90729c2f55c931a76f8816f9511fcb3c8570c5b5e1adf": "b767fd3edd36819500d01dd63ec347dbe07b11d40149737376ba97bc15984f51",
+        "pcm16:16000:1:9c914c45a124f4b23f1bfdfc1ce0c145afb829b26cca3e02c745fe4f84698abd": "4985d81d58f0b7e38a21df77500deb94d95ec1f0b2a79ea314e4f2824664944a",
+        "pcm16:16000:1:a8ae742d1da1be86b07f075271f824b5bb2c6eb34a785dbc211eda1e7b87d0d5": "5e2a22bff0e45acf2945dd12bb18547e58eab48b1679ae0494a206a811f2eea5",
+        "pcm16:16000:1:b15387eaf384d505390ed42747909204f4c0639223a6b6046fbf84c3fed66ae6": "0e2cc80e424711bac23fbc46a1dd3becbcf654b0c3d45f384c398ea04e67b8d2",
+        "pcm16:16000:1:ce7dc92530187d0f3202a8e123d184651e0e3e6327283cba27453b664b8c3efe": "cc81cbd2179cc15b7202265868f0b167269ff1f93f02c504af22966107f314d7",
+        "pcm16:16000:1:d2b49c6935db88eac5af069c90772f438c5c7c2f906e573f2abaac0f14e03003": "4985d81d58f0b7e38a21df77500deb94d95ec1f0b2a79ea314e4f2824664944a"
+      },
+      "host_identity": "822f056562677109078af817bb8a4077165c054b083f1746b438ebab79bfb675",
+      "input_set_id": "duration-bucket",
+      "memory_metric": "worker-lifetime-ru-maxrss-diagnostic",
+      "model": "seamless-m4t-v2",
+      "natural_variation_ratio_99": 1.0,
+      "observer": {
+        "load_wall_s": 4.9439,
+        "observer_cpu_s": 1.4811,
+        "profile": true,
+        "profiler_cpu_s": 0.5762,
+        "repeat_wall_s": 10.713663834,
+        "sample_uss": false,
+        "sampler_cpu_s": 0.9049,
+        "uss_sample_count": 0,
+        "uss_status": "disabled"
+      },
+      "peak_rss_mb": 1162.4,
+      "profile": true,
+      "protocol": {
+        "repeats": 1,
+        "schedule_seed": 0,
+        "sessions": 1,
+        "warmups": 0
+      },
+      "provenance_issues": [],
+      "repeats": 1,
+      "request_key": "hf/seamless-m4t-v2:b341edd12fe3a5e4",
+      "rtf": 0.07978599816800713,
+      "rtf_ci95": [
+        0.07978599816800713,
+        0.07978599816800713
+      ],
+      "rtf_p25": 0.07978599816800713,
+      "rtf_p75": 0.07978599816800713,
+      "runner_id": "adapter",
+      "sample_uss": false,
+      "subject": "hf/seamless-m4t-v2",
+      "text_digest": "0d9e9c1a5d45bb0255d0b632d6f0b48aa9e1004801be297c6917a295f46b6ab8",
+      "transcript_hashes": {
+        "pcm16:16000:1:3c36945ab87846a2dbf3332346323b9b3d494b06e492302388937248395f4f3e": "392b630dc75475ef57c90d04b9feb3879fc2bdb9e8ae7e6e56d73c9f3b697889",
+        "pcm16:16000:1:42c90339ee2eac5d1bf7e7d828678af8cb692a39d3dee632d4d7ff16839111f7": "932b7139e8a88b75a995725826f375a9ad8b39e6bed95117774ddfe70934774b",
+        "pcm16:16000:1:447f36b462cf5f7cc1e90729c2f55c931a76f8816f9511fcb3c8570c5b5e1adf": "b767fd3edd36819500d01dd63ec347dbe07b11d40149737376ba97bc15984f51",
+        "pcm16:16000:1:9c914c45a124f4b23f1bfdfc1ce0c145afb829b26cca3e02c745fe4f84698abd": "4985d81d58f0b7e38a21df77500deb94d95ec1f0b2a79ea314e4f2824664944a",
+        "pcm16:16000:1:a8ae742d1da1be86b07f075271f824b5bb2c6eb34a785dbc211eda1e7b87d0d5": "5e2a22bff0e45acf2945dd12bb18547e58eab48b1679ae0494a206a811f2eea5",
+        "pcm16:16000:1:b15387eaf384d505390ed42747909204f4c0639223a6b6046fbf84c3fed66ae6": "0e2cc80e424711bac23fbc46a1dd3becbcf654b0c3d45f384c398ea04e67b8d2",
+        "pcm16:16000:1:ce7dc92530187d0f3202a8e123d184651e0e3e6327283cba27453b664b8c3efe": "cc81cbd2179cc15b7202265868f0b167269ff1f93f02c504af22966107f314d7",
+        "pcm16:16000:1:d2b49c6935db88eac5af069c90772f438c5c7c2f906e573f2abaac0f14e03003": "4985d81d58f0b7e38a21df77500deb94d95ec1f0b2a79ea314e4f2824664944a"
+      },
+      "worker_blocks": [
+        {
+          "hashes": {
+            "pcm16:16000:1:3c36945ab87846a2dbf3332346323b9b3d494b06e492302388937248395f4f3e": "392b630dc75475ef57c90d04b9feb3879fc2bdb9e8ae7e6e56d73c9f3b697889",
+            "pcm16:16000:1:42c90339ee2eac5d1bf7e7d828678af8cb692a39d3dee632d4d7ff16839111f7": "932b7139e8a88b75a995725826f375a9ad8b39e6bed95117774ddfe70934774b",
+            "pcm16:16000:1:447f36b462cf5f7cc1e90729c2f55c931a76f8816f9511fcb3c8570c5b5e1adf": "b767fd3edd36819500d01dd63ec347dbe07b11d40149737376ba97bc15984f51",
+            "pcm16:16000:1:9c914c45a124f4b23f1bfdfc1ce0c145afb829b26cca3e02c745fe4f84698abd": "4985d81d58f0b7e38a21df77500deb94d95ec1f0b2a79ea314e4f2824664944a",
+            "pcm16:16000:1:a8ae742d1da1be86b07f075271f824b5bb2c6eb34a785dbc211eda1e7b87d0d5": "5e2a22bff0e45acf2945dd12bb18547e58eab48b1679ae0494a206a811f2eea5",
+            "pcm16:16000:1:b15387eaf384d505390ed42747909204f4c0639223a6b6046fbf84c3fed66ae6": "0e2cc80e424711bac23fbc46a1dd3becbcf654b0c3d45f384c398ea04e67b8d2",
+            "pcm16:16000:1:ce7dc92530187d0f3202a8e123d184651e0e3e6327283cba27453b664b8c3efe": "cc81cbd2179cc15b7202265868f0b167269ff1f93f02c504af22966107f314d7",
+            "pcm16:16000:1:d2b49c6935db88eac5af069c90772f438c5c7c2f906e573f2abaac0f14e03003": "4985d81d58f0b7e38a21df77500deb94d95ec1f0b2a79ea314e4f2824664944a"
+          },
+          "launch_position": 0,
+          "process_peak_rss_mb": 1162.4,
+          "repeat_rtfs": [
+            0.07978599816800715
+          ],
+          "representative_rtf": 0.07978599816800713,
+          "session_id": "seamless-mps-utilization-v1:session-0",
+          "session_index": 0,
+          "worker_index": 0
+        }
+      ],
+      "worker_lifetime_peak_rss_mb": 1162.4,
+      "workers": 1
+    }
+  ],
+  "contrasts": [],
+  "experiment_id": "seamless-mps-utilization-v1",
+  "gate_eligible": false,
+  "schema_version": 1,
+  "session_schedule": [
+    [
+      {
+        "condition_id": "mps-float32-request4-effective2",
+        "launch_position": 0,
+        "request_key": "hf/seamless-m4t-v2:b341edd12fe3a5e4"
+      }
+    ]
+  ],
+  "spec": {
+    "conditions": [
+      {
+        "condition_id": "mps-float32-request4-effective2",
+        "input_set_id": "duration-bucket",
+        "profile": true,
+        "runner_id": "adapter",
+        "sample_uss": false,
+        "subject": {
+          "backend": "hf",
+          "batch_size": 4,
+          "language": "mya_Mymr",
+          "model": "seamless-m4t-v2",
+          "options": {
+            "batch_size": 4,
+            "device": "mps",
+            "dtype": "float32",
+            "language": "mya_Mymr"
+          }
+        }
+      }
+    ],
+    "contrasts": [],
+    "experiment_id": "seamless-mps-utilization-v1",
+    "input_sets": [
+      {
+        "input_mode": "prepared",
+        "input_set_id": "duration-bucket",
+        "inputs": [
+          {
+            "audio_id": "pcm16:16000:1:3c36945ab87846a2dbf3332346323b9b3d494b06e492302388937248395f4f3e",
+            "channels": 1,
+            "duration_s": 16.56,
+            "frames": 264960,
+            "prepared_path": "data/.converted/pcm16-mono-16000-v1__98cad0879cc68ff127b6c2ac012fc4cb0dae07bf3a81de8425f98de5f246d604.wav",
+            "reference_id": "7352377329387773389",
+            "sample_rate": 16000,
+            "source_path": "data/fleurs-test/audio/7352377329387773389.wav",
+            "source_sha256": "98cad0879cc68ff127b6c2ac012fc4cb0dae07bf3a81de8425f98de5f246d604"
+          },
+          {
+            "audio_id": "pcm16:16000:1:b15387eaf384d505390ed42747909204f4c0639223a6b6046fbf84c3fed66ae6",
+            "channels": 1,
+            "duration_s": 16.56,
+            "frames": 264960,
+            "prepared_path": "data/.converted/pcm16-mono-16000-v1__b18b92f405968516f945e31db01c2566fcdb78c1f8335be6afdaced199d0649b.wav",
+            "reference_id": "9911206073615608068",
+            "sample_rate": 16000,
+            "source_path": "data/fleurs-test/audio/9911206073615608068.wav",
+            "source_sha256": "b18b92f405968516f945e31db01c2566fcdb78c1f8335be6afdaced199d0649b"
+          },
+          {
+            "audio_id": "pcm16:16000:1:42c90339ee2eac5d1bf7e7d828678af8cb692a39d3dee632d4d7ff16839111f7",
+            "channels": 1,
+            "duration_s": 16.68,
+            "frames": 266880,
+            "prepared_path": "data/.converted/pcm16-mono-16000-v1__fe4b038e3b79ec37b0d54f14faeecb92de57a0b4aa55f06247b756e0093a7170.wav",
+            "reference_id": "6221639814777336039",
+            "sample_rate": 16000,
+            "source_path": "data/fleurs-test/audio/6221639814777336039.wav",
+            "source_sha256": "fe4b038e3b79ec37b0d54f14faeecb92de57a0b4aa55f06247b756e0093a7170"
+          },
+          {
+            "audio_id": "pcm16:16000:1:447f36b462cf5f7cc1e90729c2f55c931a76f8816f9511fcb3c8570c5b5e1adf",
+            "channels": 1,
+            "duration_s": 16.74,
+            "frames": 267840,
+            "prepared_path": "data/.converted/pcm16-mono-16000-v1__893380af55f2c5e0d2581eae8fb78358355578686bc0c4a3a5262fb78036e88c.wav",
+            "reference_id": "10655841079586991967",
+            "sample_rate": 16000,
+            "source_path": "data/fleurs-test/audio/10655841079586991967.wav",
+            "source_sha256": "893380af55f2c5e0d2581eae8fb78358355578686bc0c4a3a5262fb78036e88c"
+          },
+          {
+            "audio_id": "pcm16:16000:1:a8ae742d1da1be86b07f075271f824b5bb2c6eb34a785dbc211eda1e7b87d0d5",
+            "channels": 1,
+            "duration_s": 16.74,
+            "frames": 267840,
+            "prepared_path": "data/.converted/pcm16-mono-16000-v1__bfc91b7b3cae2c270076717508ef70c498ec0f59b1a36eff9d1ad2c0819f870f.wav",
+            "reference_id": "6649210285252365896",
+            "sample_rate": 16000,
+            "source_path": "data/fleurs-test/audio/6649210285252365896.wav",
+            "source_sha256": "bfc91b7b3cae2c270076717508ef70c498ec0f59b1a36eff9d1ad2c0819f870f"
+          },
+          {
+            "audio_id": "pcm16:16000:1:ce7dc92530187d0f3202a8e123d184651e0e3e6327283cba27453b664b8c3efe",
+            "channels": 1,
+            "duration_s": 16.92,
+            "frames": 270720,
+            "prepared_path": "data/.converted/pcm16-mono-16000-v1__1516ff2d4e60a7f9b871aedb61cf328a2f12d5c4050ed1c2fdfaa7fa69dedab6.wav",
+            "reference_id": "16374599435426800590",
+            "sample_rate": 16000,
+            "source_path": "data/fleurs-test/audio/16374599435426800590.wav",
+            "source_sha256": "1516ff2d4e60a7f9b871aedb61cf328a2f12d5c4050ed1c2fdfaa7fa69dedab6"
+          },
+          {
+            "audio_id": "pcm16:16000:1:9c914c45a124f4b23f1bfdfc1ce0c145afb829b26cca3e02c745fe4f84698abd",
+            "channels": 1,
+            "duration_s": 16.92,
+            "frames": 270720,
+            "prepared_path": "data/.converted/pcm16-mono-16000-v1__32fec994dee693fbbf0b92dd022ab81730d0d74f6854b9f509475994b01b85bf.wav",
+            "reference_id": "5235432885229267346",
+            "sample_rate": 16000,
+            "source_path": "data/fleurs-test/audio/5235432885229267346.wav",
+            "source_sha256": "32fec994dee693fbbf0b92dd022ab81730d0d74f6854b9f509475994b01b85bf"
+          },
+          {
+            "audio_id": "pcm16:16000:1:d2b49c6935db88eac5af069c90772f438c5c7c2f906e573f2abaac0f14e03003",
+            "channels": 1,
+            "duration_s": 17.16,
+            "frames": 274560,
+            "prepared_path": "data/.converted/pcm16-mono-16000-v1__dc7d31330383687a9b0933f21e843d66ca472c03a96b703a624eda1696d4ddb5.wav",
+            "reference_id": "6522587442052089609",
+            "sample_rate": 16000,
+            "source_path": "data/fleurs-test/audio/6522587442052089609.wav",
+            "source_sha256": "dc7d31330383687a9b0933f21e843d66ca472c03a96b703a624eda1696d4ddb5"
+          }
+        ]
+      }
+    ],
+    "repeats": 1,
+    "schedule_seed": 0,
+    "sessions": 1,
+    "statistics": {
+      "draws": 20000,
+      "estimator": "paired-session-median-log-ratio",
+      "min_repeats": 3,
+      "min_sessions": 5,
+      "min_warmups": 3,
+      "quantile_method": "linear",
+      "version": 1
+    },
+    "warmups": 0
+  }
+}
