@@ -1,0 +1,371 @@
+{
+  "artifact_kind": "experiment-v1",
+  "artifact_manifest": [
+    {
+      "condition_id": null,
+      "kind": "summary",
+      "path": "summary.json",
+      "request_sha256": null,
+      "session_id": null,
+      "session_index": null,
+      "sha256": "eb68a5f85b57e94764380a3df34cfd43d87ffd7f85907ac6777844e56b44e579",
+      "size_bytes": 8991
+    },
+    {
+      "condition_id": "llm-unlimited-300m-v2-f16-v2",
+      "kind": "journal",
+      "path": "workers/llm-unlimited-300m-v2-f16-v2/0000-98aeb973a4016b5a/journal.json",
+      "request_sha256": "98aeb973a4016b5a70a11022f96469bcd2e8742f199e259e2c192c9adda74c72",
+      "session_id": "omniasr-gguf-quantization-v2:session-0",
+      "session_index": 0,
+      "sha256": "f90e96976925914bbb5892d28ddba6076e44fd529a785994d928a45f0bae2e79",
+      "size_bytes": 13762
+    },
+    {
+      "condition_id": "llm-unlimited-300m-v2-f16-v2",
+      "kind": "request",
+      "path": "workers/llm-unlimited-300m-v2-f16-v2/0000-98aeb973a4016b5a/request.json",
+      "request_sha256": "98aeb973a4016b5a70a11022f96469bcd2e8742f199e259e2c192c9adda74c72",
+      "session_id": "omniasr-gguf-quantization-v2:session-0",
+      "session_index": 0,
+      "sha256": "6c9580c90bf0dc58a6a1f028ade7b7c3519a1e98a03a67e7de9bbf72d3bacfdc",
+      "size_bytes": 4409
+    },
+    {
+      "condition_id": "llm-unlimited-300m-v2-f16-v2",
+      "kind": "response",
+      "path": "workers/llm-unlimited-300m-v2-f16-v2/0000-98aeb973a4016b5a/response.json",
+      "request_sha256": "98aeb973a4016b5a70a11022f96469bcd2e8742f199e259e2c192c9adda74c72",
+      "session_id": "omniasr-gguf-quantization-v2:session-0",
+      "session_index": 0,
+      "sha256": "fe6ae668ae4431ae6adca4b2d7269d94342eae5dc2e9184cd96502c4864b47b2",
+      "size_bytes": 13860
+    },
+    {
+      "condition_id": "llm-unlimited-300m-v2-f16-v2",
+      "kind": "stderr",
+      "path": "workers/llm-unlimited-300m-v2-f16-v2/0000-98aeb973a4016b5a/stderr.txt",
+      "request_sha256": "98aeb973a4016b5a70a11022f96469bcd2e8742f199e259e2c192c9adda74c72",
+      "session_id": "omniasr-gguf-quantization-v2:session-0",
+      "session_index": 0,
+      "sha256": "21b6aee5ff1f7bc31a5eab8bc39308bb3dbd961f93689f044b91a6569f93abf1",
+      "size_bytes": 83
+    },
+    {
+      "condition_id": "llm-unlimited-300m-v2-f16-v2",
+      "kind": "stdout",
+      "path": "workers/llm-unlimited-300m-v2-f16-v2/0000-98aeb973a4016b5a/stdout.txt",
+      "request_sha256": "98aeb973a4016b5a70a11022f96469bcd2e8742f199e259e2c192c9adda74c72",
+      "session_id": "omniasr-gguf-quantization-v2:session-0",
+      "session_index": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "condition_id": "llm-unlimited-300m-v2-v2",
+      "kind": "journal",
+      "path": "workers/llm-unlimited-300m-v2-v2/0000-492a3290f6e9ff67/journal.json",
+      "request_sha256": "492a3290f6e9ff67449d8d98f2129f1e3bd6c6eab56971c392c635e5e9a46d54",
+      "session_id": "omniasr-gguf-quantization-v2:session-0",
+      "session_index": 0,
+      "sha256": "00c4e51a3b2c4996633177f413ca18b516e907fe5f4584fa826535ea10f67094",
+      "size_bytes": 13864
+    },
+    {
+      "condition_id": "llm-unlimited-300m-v2-v2",
+      "kind": "request",
+      "path": "workers/llm-unlimited-300m-v2-v2/0000-492a3290f6e9ff67/request.json",
+      "request_sha256": "492a3290f6e9ff67449d8d98f2129f1e3bd6c6eab56971c392c635e5e9a46d54",
+      "session_id": "omniasr-gguf-quantization-v2:session-0",
+      "session_index": 0,
+      "sha256": "e3cdab5decac4d937511cc666d38ce8b34e394bad5c84d2770a392898bb9462a",
+      "size_bytes": 4400
+    },
+    {
+      "condition_id": "llm-unlimited-300m-v2-v2",
+      "kind": "response",
+      "path": "workers/llm-unlimited-300m-v2-v2/0000-492a3290f6e9ff67/response.json",
+      "request_sha256": "492a3290f6e9ff67449d8d98f2129f1e3bd6c6eab56971c392c635e5e9a46d54",
+      "session_id": "omniasr-gguf-quantization-v2:session-0",
+      "session_index": 0,
+      "sha256": "bc9335d62a5b58e4c9278ddb54cfd6c916463e5bd3772a63cc848794caa20e60",
+      "size_bytes": 13958
+    },
+    {
+      "condition_id": "llm-unlimited-300m-v2-v2",
+      "kind": "stderr",
+      "path": "workers/llm-unlimited-300m-v2-v2/0000-492a3290f6e9ff67/stderr.txt",
+      "request_sha256": "492a3290f6e9ff67449d8d98f2129f1e3bd6c6eab56971c392c635e5e9a46d54",
+      "session_id": "omniasr-gguf-quantization-v2:session-0",
+      "session_index": 0,
+      "sha256": "21b6aee5ff1f7bc31a5eab8bc39308bb3dbd961f93689f044b91a6569f93abf1",
+      "size_bytes": 83
+    },
+    {
+      "condition_id": "llm-unlimited-300m-v2-v2",
+      "kind": "stdout",
+      "path": "workers/llm-unlimited-300m-v2-v2/0000-492a3290f6e9ff67/stdout.txt",
+      "request_sha256": "492a3290f6e9ff67449d8d98f2129f1e3bd6c6eab56971c392c635e5e9a46d54",
+      "session_id": "omniasr-gguf-quantization-v2:session-0",
+      "session_index": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    }
+  ],
+  "artifact_root": ".",
+  "condition_summaries": [
+    {
+      "baseline_eligible": false,
+      "condition_id": "llm-unlimited-300m-v2-v2",
+      "content_sha256": "ee0dfbdcf108304f91195d417235f759fc508d12c466a60af519be3cbe249b2b",
+      "cpu_utilization": 0.04096432771462172,
+      "endpoint_rss_mb": 1391.8,
+      "environment_identity": "819402a42da736cf9c2ee01d5f8b7ffca15d74129e8c417d9eb3b65d4a9143ca",
+      "error": "1/1 result(s) lack complete model provenance",
+      "execution_sha256": "387835dbb6eb9cb239f6291396c475ba505eae2048fbc99a775736d1237da6b3",
+      "gpu_idle_pct": null,
+      "gpu_scope": null,
+      "gpu_util_mean": null,
+      "gpu_util_n": null,
+      "gpu_util_p50": null,
+      "hashes": {
+        "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0": "03c704e3fd91b2e59ead81d7a957c6029c009901fd93a31d04fb8424a9f43ac7"
+      },
+      "host_identity": "822f056562677109078af817bb8a4077165c054b083f1746b438ebab79bfb675",
+      "input_set_id": "canonical",
+      "memory_metric": "worker-lifetime-ru-maxrss-diagnostic",
+      "model": "llm-unlimited-300m-v2",
+      "natural_variation_ratio_99": null,
+      "observer": {
+        "load_wall_s": 0.162,
+        "observer_cpu_s": 0.0,
+        "profile": false,
+        "profiler_cpu_s": 0.0,
+        "repeat_wall_s": 0.0,
+        "sample_uss": false,
+        "sampler_cpu_s": 0.0,
+        "uss_sample_count": 0,
+        "uss_status": "disabled"
+      },
+      "peak_rss_mb": 1391.8,
+      "profile": false,
+      "protocol": {
+        "repeats": 1,
+        "schedule_seed": 0,
+        "sessions": 1,
+        "warmups": 0
+      },
+      "provenance_issues": [
+        "runtime did not report the selected device",
+        "resolved compute device is unavailable, so this run cannot carry a unique execution identity",
+        "adapter worktree is dirty",
+        "worker (0, 'omniasr-gguf-quantization-v2:session-0') has incomplete model provenance"
+      ],
+      "repeats": 1,
+      "request_key": "omniasr-gguf/llm-unlimited-300m-v2:2eb8c8d1f9fef614",
+      "rtf": null,
+      "rtf_ci95": null,
+      "rtf_p25": null,
+      "rtf_p75": null,
+      "runner_id": "adapter",
+      "sample_uss": false,
+      "subject": "omniasr-gguf/llm-unlimited-300m-v2",
+      "text_digest": "5045bb0277950ed90e7833cc635ca47129263975b7e14cae43be93475f4cbe13",
+      "transcript_hashes": {
+        "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0": "03c704e3fd91b2e59ead81d7a957c6029c009901fd93a31d04fb8424a9f43ac7"
+      },
+      "worker_blocks": [
+        {
+          "hashes": {
+            "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0": "03c704e3fd91b2e59ead81d7a957c6029c009901fd93a31d04fb8424a9f43ac7"
+          },
+          "launch_position": 0,
+          "process_peak_rss_mb": 1391.8,
+          "repeat_rtfs": [
+            null
+          ],
+          "representative_rtf": null,
+          "session_id": "omniasr-gguf-quantization-v2:session-0",
+          "session_index": 0,
+          "worker_index": 0
+        }
+      ],
+      "worker_lifetime_peak_rss_mb": 1391.8,
+      "workers": 1
+    },
+    {
+      "baseline_eligible": false,
+      "condition_id": "llm-unlimited-300m-v2-f16-v2",
+      "content_sha256": "2efd48c31bffff0eba901dcfcf3502d7205ac215d80b0c9d34b4a00b97f7b3e1",
+      "cpu_utilization": 0.03609329856951589,
+      "endpoint_rss_mb": 3479.4,
+      "environment_identity": "819402a42da736cf9c2ee01d5f8b7ffca15d74129e8c417d9eb3b65d4a9143ca",
+      "error": "1/1 result(s) lack complete model provenance",
+      "execution_sha256": "caa5a3689bd5ee2671460c36e644dbef835feb267b7ed0c5acd036e23fb43737",
+      "gpu_idle_pct": null,
+      "gpu_scope": null,
+      "gpu_util_mean": null,
+      "gpu_util_n": null,
+      "gpu_util_p50": null,
+      "hashes": {
+        "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0": "a1e9d32b0ac915bdb2b8b145f583294e866bd8b725da463ff40b1539662705d0"
+      },
+      "host_identity": "822f056562677109078af817bb8a4077165c054b083f1746b438ebab79bfb675",
+      "input_set_id": "canonical",
+      "memory_metric": "worker-lifetime-ru-maxrss-diagnostic",
+      "model": "llm-unlimited-300m-v2-f16",
+      "natural_variation_ratio_99": null,
+      "observer": {
+        "load_wall_s": 0.3865,
+        "observer_cpu_s": 0.0,
+        "profile": false,
+        "profiler_cpu_s": 0.0,
+        "repeat_wall_s": 0.0,
+        "sample_uss": false,
+        "sampler_cpu_s": 0.0,
+        "uss_sample_count": 0,
+        "uss_status": "disabled"
+      },
+      "peak_rss_mb": 3479.4,
+      "profile": false,
+      "protocol": {
+        "repeats": 1,
+        "schedule_seed": 0,
+        "sessions": 1,
+        "warmups": 0
+      },
+      "provenance_issues": [
+        "runtime did not report the selected device",
+        "resolved compute device is unavailable, so this run cannot carry a unique execution identity",
+        "adapter worktree is dirty",
+        "worker (0, 'omniasr-gguf-quantization-v2:session-0') has incomplete model provenance"
+      ],
+      "repeats": 1,
+      "request_key": "omniasr-gguf/llm-unlimited-300m-v2-f16:bc317893cdfaf021",
+      "rtf": null,
+      "rtf_ci95": null,
+      "rtf_p25": null,
+      "rtf_p75": null,
+      "runner_id": "adapter",
+      "sample_uss": false,
+      "subject": "omniasr-gguf/llm-unlimited-300m-v2-f16",
+      "text_digest": "2c212177c9fdb24fb6196cc1a18589832abb13e0a582d197797e6b00e6c667a4",
+      "transcript_hashes": {
+        "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0": "a1e9d32b0ac915bdb2b8b145f583294e866bd8b725da463ff40b1539662705d0"
+      },
+      "worker_blocks": [
+        {
+          "hashes": {
+            "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0": "a1e9d32b0ac915bdb2b8b145f583294e866bd8b725da463ff40b1539662705d0"
+          },
+          "launch_position": 1,
+          "process_peak_rss_mb": 3479.4,
+          "repeat_rtfs": [
+            null
+          ],
+          "representative_rtf": null,
+          "session_id": "omniasr-gguf-quantization-v2:session-0",
+          "session_index": 0,
+          "worker_index": 0
+        }
+      ],
+      "worker_lifetime_peak_rss_mb": 3479.4,
+      "workers": 1
+    }
+  ],
+  "contrasts": [],
+  "experiment_id": "omniasr-gguf-quantization-v2",
+  "gate_eligible": false,
+  "manifest_sha256": "8fb1e77dfc61f5006dbba62ab38fc28ea19ab94918f671776dde5c675c145355",
+  "manifest_version": "experiment-manifest-v1",
+  "schema_version": 1,
+  "session_schedule": [
+    [
+      {
+        "condition_id": "llm-unlimited-300m-v2-v2",
+        "launch_position": 0,
+        "request_key": "omniasr-gguf/llm-unlimited-300m-v2:2eb8c8d1f9fef614"
+      },
+      {
+        "condition_id": "llm-unlimited-300m-v2-f16-v2",
+        "launch_position": 1,
+        "request_key": "omniasr-gguf/llm-unlimited-300m-v2-f16:bc317893cdfaf021"
+      }
+    ]
+  ],
+  "spec": {
+    "conditions": [
+      {
+        "condition_id": "llm-unlimited-300m-v2-v2",
+        "input_set_id": "canonical",
+        "profile": false,
+        "runner_id": "adapter",
+        "sample_uss": false,
+        "subject": {
+          "backend": "omniasr-gguf",
+          "batch_size": 1,
+          "language": "mya_Mymr",
+          "model": "llm-unlimited-300m-v2",
+          "options": {
+            "batch_size": 1,
+            "language": "mya_Mymr",
+            "n_threads": 8
+          }
+        }
+      },
+      {
+        "condition_id": "llm-unlimited-300m-v2-f16-v2",
+        "input_set_id": "canonical",
+        "profile": false,
+        "runner_id": "adapter",
+        "sample_uss": false,
+        "subject": {
+          "backend": "omniasr-gguf",
+          "batch_size": 1,
+          "language": "mya_Mymr",
+          "model": "llm-unlimited-300m-v2-f16",
+          "options": {
+            "batch_size": 1,
+            "language": "mya_Mymr",
+            "n_threads": 8
+          }
+        }
+      }
+    ],
+    "contrasts": [],
+    "experiment_id": "omniasr-gguf-quantization-v2",
+    "input_sets": [
+      {
+        "input_mode": "prepared",
+        "input_set_id": "canonical",
+        "inputs": [
+          {
+            "audio_id": "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0",
+            "channels": 1,
+            "duration_s": 27.6,
+            "frames": 441600,
+            "prepared_path": "data/.converted/pcm16-mono-16000-v1__36c25f8b1db4ba5ddab8b3edd0bbd8f2b2af1aeb466863f77cfacad95197ee61.wav",
+            "reference_id": "10207165333468320061",
+            "sample_rate": 16000,
+            "source_path": "data/fleurs/audio/10207165333468320061.wav",
+            "source_sha256": "36c25f8b1db4ba5ddab8b3edd0bbd8f2b2af1aeb466863f77cfacad95197ee61"
+          }
+        ]
+      }
+    ],
+    "repeats": 1,
+    "schedule_seed": 0,
+    "sessions": 1,
+    "statistics": {
+      "draws": 20000,
+      "estimator": "paired-session-median-log-ratio",
+      "min_repeats": 3,
+      "min_sessions": 5,
+      "min_warmups": 3,
+      "quantile_method": "linear",
+      "version": 1
+    },
+    "warmups": 0
+  },
+  "summary_artifact": "summary.json"
+}

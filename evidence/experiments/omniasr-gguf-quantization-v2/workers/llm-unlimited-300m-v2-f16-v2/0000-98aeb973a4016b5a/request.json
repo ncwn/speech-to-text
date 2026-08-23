@@ -1,0 +1,124 @@
+{
+  "condition_id": "llm-unlimited-300m-v2-f16-v2",
+  "experiment_id": "omniasr-gguf-quantization-v2",
+  "input_mode": "prepared",
+  "inputs": [
+    {
+      "audio_id": "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0",
+      "channels": 1,
+      "duration_s": 27.6,
+      "frames": 441600,
+      "prepared_path": "data/.converted/pcm16-mono-16000-v1__36c25f8b1db4ba5ddab8b3edd0bbd8f2b2af1aeb466863f77cfacad95197ee61.wav",
+      "reference_id": "10207165333468320061",
+      "sample_rate": 16000,
+      "source_path": "data/fleurs/audio/10207165333468320061.wav",
+      "source_sha256": "36c25f8b1db4ba5ddab8b3edd0bbd8f2b2af1aeb466863f77cfacad95197ee61"
+    }
+  ],
+  "launch_position": 1,
+  "model_binding": {
+    "paths": [
+      {
+        "name": "omniasr-llm-unlimited-300m-v2-f16.gguf",
+        "path": ".cache/huggingface/hub/models--cstr--omniasr-llm-unlimited-300m-v2-GGUF/blobs/e6e2220532ec7f76d0bdb0896109b2ab3d14bd46d639123a6212a57a932b3d8b",
+        "role": "weights",
+        "sha256": "e6e2220532ec7f76d0bdb0896109b2ab3d14bd46d639123a6212a57a932b3d8b",
+        "size_bytes": 3264076512,
+        "stat": {
+          "ctime_ns": 1787473187286884193,
+          "device": 16777235,
+          "inode": 6017462,
+          "mtime_ns": 1787473187283406514,
+          "size": 3264076512
+        }
+      }
+    ],
+    "provenance": {
+      "adapter_git_commit": "6b9260cac17378260c1d909abe7fd91106f4839a",
+      "adapter_git_dirty": true,
+      "artifacts": [
+        {
+          "name": "omniasr-llm-unlimited-300m-v2-f16.gguf",
+          "path": ".cache/huggingface/hub/models--cstr--omniasr-llm-unlimited-300m-v2-GGUF/blobs/e6e2220532ec7f76d0bdb0896109b2ab3d14bd46d639123a6212a57a932b3d8b",
+          "role": "weights",
+          "sha256": "e6e2220532ec7f76d0bdb0896109b2ab3d14bd46d639123a6212a57a932b3d8b",
+          "size_bytes": 3264076512,
+          "stat": {
+            "ctime_ns": 1787473187286884193,
+            "device": 16777235,
+            "inode": 6017462,
+            "mtime_ns": 1787473187283406514,
+            "size": 3264076512
+          }
+        }
+      ],
+      "backend": "omniasr-gguf",
+      "content_sha256": "2efd48c31bffff0eba901dcfcf3502d7205ac215d80b0c9d34b4a00b97f7b3e1",
+      "execution_sha256": "caa5a3689bd5ee2671460c36e644dbef835feb267b7ed0c5acd036e23fb43737",
+      "fallback_history": [],
+      "issues": [
+        "resolved compute device is unavailable, so this run cannot carry a unique execution identity"
+      ],
+      "requested_model": "llm-unlimited-300m-v2-f16",
+      "requested_settings": {
+        "batch_size": 1,
+        "chunk_seconds": 0,
+        "language": "mya_Mymr",
+        "n_threads": 8
+      },
+      "resolved_settings": {
+        "chunk_seconds": 0,
+        "crisp_backend": "omniasr-llm-unlimited",
+        "device": null,
+        "dtype": null,
+        "n_threads": 8,
+        "unlimited": true
+      },
+      "revision_status": "pinned",
+      "runtime_packages": {
+        "accelerate": "1.14.0",
+        "crispasr": "0.8.29",
+        "dataoceanai-dolphin": "20260513",
+        "fairseq2": "0.6",
+        "funasr": "1.4.2",
+        "huggingface-hub": "0.36.2",
+        "modelscope": "1.39.1",
+        "omnilingual-asr": "0.2.0",
+        "psutil": "5.9.8",
+        "sentencepiece": "0.2.2",
+        "soundfile": "0.14.0",
+        "tokenizers": "0.22.2",
+        "torch": "2.8.0",
+        "torchaudio": "2.8.0",
+        "transformers": "4.57.6"
+      },
+      "schema_version": 1,
+      "source_kind": "huggingface-gguf",
+      "source_locator": "https://huggingface.co/cstr/omniasr-llm-unlimited-300m-v2-GGUF/resolve/a68f5d040b483506c0966a1602050ee1550a0382/omniasr-llm-unlimited-300m-v2-f16.gguf",
+      "upstream_revision": "a68f5d040b483506c0966a1602050ee1550a0382",
+      "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+    }
+  },
+  "profile": false,
+  "protocol_version": 3,
+  "repeats": 1,
+  "run_id": "omniasr-gguf-quantization-v2",
+  "runner_id": "adapter",
+  "sample_uss": false,
+  "schedule_seed": 0,
+  "session_id": "omniasr-gguf-quantization-v2:session-0",
+  "session_index": 0,
+  "subject": {
+    "backend": "omniasr-gguf",
+    "batch_size": 1,
+    "language": "mya_Mymr",
+    "model": "llm-unlimited-300m-v2-f16",
+    "options": {
+      "batch_size": 1,
+      "language": "mya_Mymr",
+      "n_threads": 8
+    }
+  },
+  "warmups": 0,
+  "worker_index": 0
+}
