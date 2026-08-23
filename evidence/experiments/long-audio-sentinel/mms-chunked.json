@@ -1,7 +1,8 @@
 {
-  "artifact_kind": "long-audio-observation-v1",
+  "artifact_kind": "long-audio-observation-v2",
+  "schema_version": 2,
   "spec": {
-    "runner_id": "hf-mms-chunked",
+    "runner_id": "hf-mms-1b-all-chunked",
     "backend": "hf",
     "model": "mms-1b-all",
     "entrypoint": "transformers.chunked",
@@ -12,10 +13,261 @@
       40.0
     ]
   },
+  "result": {
+    "audio_path": "data/sentinels/long-audio-boundary-v1.wav",
+    "text": "hhhhh",
+    "backend": "hf",
+    "model": "mms-1b-all",
+    "language": "mya_Mymr",
+    "elapsed_s": 1.1999173750227783,
+    "audio_duration_s": 45.0,
+    "error": null,
+    "metadata": {
+      "repo": "facebook/mms-1b-all",
+      "family": "mms",
+      "device": "mps",
+      "dtype": "float32",
+      "batch_size": 1,
+      "effective_batch_size": 1,
+      "batch_items": 1,
+      "batch_group": 0,
+      "batch_internal_serial": false,
+      "elapsed_s_source": "measured",
+      "host": {
+        "chip": "Apple M2 Max",
+        "platform": "macOS-27.0-arm64-arm-64bit",
+        "machine": "arm64",
+        "cores": {
+          "Performance": 8,
+          "Efficiency": 4
+        },
+        "compute_threads": 8,
+        "cpu_count": 12,
+        "ram_mb": 65536
+      },
+      "corpus_index": 0,
+      "corpus_size": 1,
+      "requested_batch_size": 1,
+      "corpus_wall_s": 1.200465792,
+      "resource_scope": "corpus",
+      "load": {
+        "wall_s": 3.4508,
+        "cpu_s": 2.1151,
+        "peak_rss_mb": 451.6,
+        "started_ns": 224879913795166,
+        "ended_ns": 224883364633250,
+        "rss_peak_mb": 444.2,
+        "process_peak_rss_mb": 451.6,
+        "cpu_utilization": 0.61,
+        "gpu_mb": 4240.4,
+        "profiler_cpu_s": 0.003
+      },
+      "load_s": 3.450838084
+    },
+    "segments": null,
+    "resources": null,
+    "audio_id": "pcm16:16000:1:d4ae8ee5e0ae1f3a6c014bebc1329b56ad8b3062a565e9d28a67f12a2457941f",
+    "source_path": "data/sentinels/long-audio-boundary-v1.wav",
+    "source_sha256": "ca1f29a2ea1a095b224c41c8845ff35afb34df4941735cf848939d94b930de0c",
+    "reference_id": "long-audio-boundary-v1",
+    "trusted": true,
+    "trust_issues": [],
+    "model_provenance": {
+      "backend": "hf",
+      "requested_model": "mms-1b-all",
+      "source_kind": "huggingface",
+      "source_locator": "facebook/mms-1b-all",
+      "upstream_revision": "3d33597edbdaaba14a8e858e2c8caa76e3cec0cd",
+      "revision_status": "pinned",
+      "artifacts": [
+        {
+          "role": "model-or-processor",
+          "name": "adapter.mya.safetensors",
+          "size_bytes": 9357088,
+          "sha256": "c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+          "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+          "stat": {
+            "device": 16777235,
+            "inode": 5984066,
+            "size": 9357088,
+            "mtime_ns": 1787079596406661677,
+            "ctime_ns": 1787158435149503713
+          }
+        },
+        {
+          "role": "model-or-processor",
+          "name": "config.json",
+          "size_bytes": 2040,
+          "sha256": "ee172ef39a0e40c55403fb811fa0f56c6198c7ed21a2bdf5bd0e72e52c07a41c",
+          "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/dd547cc1b61ca6edfefb2f0cf65e3d8f81eceb6a",
+          "stat": {
+            "device": 16777235,
+            "inode": 5984069,
+            "size": 2040,
+            "mtime_ns": 1787079452518242432,
+            "ctime_ns": 1787158435152482514
+          }
+        },
+        {
+          "role": "model-or-processor",
+          "name": "create_adapters.py",
+          "size_bytes": 10188,
+          "sha256": "b5f11c4e55342e718fa90697f34f82664fbff16a421d8fae206d997045f73921",
+          "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b2e99c339dafb630e1b02c44f5c267927979106f",
+          "stat": {
+            "device": 16777235,
+            "inode": 5986586,
+            "size": 10188,
+            "mtime_ns": 1787235792759124152,
+            "ctime_ns": 1787235792760670739
+          }
+        },
+        {
+          "role": "model-or-processor",
+          "name": "create_vocab.py",
+          "size_bytes": 878,
+          "sha256": "a6e7e16a54f0b09f46045b9135483776393267d0d8a6b3e86072906e61be46f5",
+          "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b36fe95573033e2a2742aaeed8d3078946b7a320",
+          "stat": {
+            "device": 16777235,
+            "inode": 5986580,
+            "size": 878,
+            "mtime_ns": 1787235792683967611,
+            "ctime_ns": 1787235792684531696
+          }
+        },
+        {
+          "role": "model-or-processor",
+          "name": "model.safetensors",
+          "size_bytes": 3859521128,
+          "sha256": "0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+          "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+          "stat": {
+            "device": 16777235,
+            "inode": 5984070,
+            "size": 3859521128,
+            "mtime_ns": 1787079592306092277,
+            "ctime_ns": 1787158436530154511
+          }
+        },
+        {
+          "role": "model-or-processor",
+          "name": "preprocessor_config.json",
+          "size_bytes": 254,
+          "sha256": "f724fdad65341e79bd9741888fe4e8ce1bb2e7b44fc8216c28c591afb1e202f4",
+          "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/e7d53bd058c34639e2dec1357537a3d013bcda63",
+          "stat": {
+            "device": 16777235,
+            "inode": 5984067,
+            "size": 254,
+            "mtime_ns": 1787079443378807804,
+            "ctime_ns": 1787158435150048006
+          }
+        },
+        {
+          "role": "model-or-processor",
+          "name": "special_tokens_map.json",
+          "size_bytes": 96,
+          "sha256": "9046da57c270c8e74d0f38832b4adce269c9d914ef21d2a0925e7772152dd793",
+          "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/fdafe480f024ff444c7492147536765ce5d55a2d",
+          "stat": {
+            "device": 16777235,
+            "inode": 5984065,
+            "size": 96,
+            "mtime_ns": 1787079449792831686,
+            "ctime_ns": 1787158435143879487
+          }
+        },
+        {
+          "role": "model-or-processor",
+          "name": "tokenizer_config.json",
+          "size_bytes": 397,
+          "sha256": "42a65547cf0654d12263ece7c909c4b0c574b660c78658f806c772cc223bc01b",
+          "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/8119434548d4a82fbe4e5e53c95d186bca037257",
+          "stat": {
+            "device": 16777235,
+            "inode": 5984064,
+            "size": 397,
+            "mtime_ns": 1787079445299892278,
+            "ctime_ns": 1787158435143238985
+          }
+        },
+        {
+          "role": "model-or-processor",
+          "name": "vocab.json",
+          "size_bytes": 1340148,
+          "sha256": "0375a07a977a599040a7ff333b6974996965cd93754020619518c15db7691f01",
+          "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/5c1626173fb1db1da574d16b6e924e8efc1ade4c",
+          "stat": {
+            "device": 16777235,
+            "inode": 5984068,
+            "size": 1340148,
+            "mtime_ns": 1787079449054862750,
+            "ctime_ns": 1787158435151871262
+          }
+        },
+        {
+          "role": "model-or-processor",
+          "name": "vocabs/mya.txt",
+          "size_bytes": 1005,
+          "sha256": "d01af8e834039592efc79902675773d7ef622a4ce07cccd46fb2644785cc0734",
+          "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/49191e00b11ea3281db39a6b8022d0b003bae2da",
+          "stat": {
+            "device": 16777235,
+            "inode": 5987135,
+            "size": 1005,
+            "mtime_ns": 1787235938362249071,
+            "ctime_ns": 1787235938363752533
+          }
+        }
+      ],
+      "runtime_packages": {
+        "torch": "2.8.0",
+        "torchaudio": "2.8.0",
+        "transformers": "4.57.6",
+        "huggingface-hub": "0.36.2",
+        "tokenizers": "0.22.2",
+        "accelerate": "1.14.0",
+        "sentencepiece": "0.2.2",
+        "omnilingual-asr": "0.2.0",
+        "fairseq2": "0.6",
+        "crispasr": "0.8.29",
+        "dataoceanai-dolphin": "20260513",
+        "modelscope": "1.39.1",
+        "funasr": "1.4.2",
+        "soundfile": "0.14.0",
+        "psutil": "5.9.8"
+      },
+      "requested_settings": {
+        "language": "mya_Mymr",
+        "batch_size": 1,
+        "device": "mps",
+        "dtype": "float32"
+      },
+      "resolved_settings": {
+        "device": "mps",
+        "dtype": "float32",
+        "n_threads": null,
+        "chunk_seconds": null,
+        "family": "mms",
+        "lang": "mya"
+      },
+      "fallback_history": [],
+      "adapter_git_commit": "185b24b8df308a79c2afa3b741647e19f76bee6c",
+      "adapter_git_dirty": false,
+      "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5",
+      "issues": [],
+      "schema_version": 2,
+      "content_sha256": "9c7c2b2e8bbe8d6179207d8936a7ccd150a37878ef3229827ed8a07af85f3482",
+      "execution_sha256": "af32b2dbcb43b1036c11375e467973ddc94c5ce95de94ac6440ff86b4ea4465d"
+    },
+    "rtf": 0.02666483055606174
+  },
+  "elapsed_s": 6.557705832994543,
   "observation": {
-    "runner_id": "hf-mms-chunked",
+    "runner_id": "hf-mms-1b-all-chunked",
     "transcript": "hhhhh",
-    "elapsed_s": 1.3544999579899013,
+    "elapsed_s": 6.557705832994543,
     "n_segments": 0,
     "matched_spans": 0,
     "missed_spans": 6,
@@ -23,5 +275,8 @@
     "ordered": true,
     "boundary_hits": [],
     "error": null
-  }
+  },
+  "spec_sha256": "022f35026c7209747bd27b142e3301e0b79931d62af81e95a314992f2efbf349",
+  "result_sha256": "7ec513483794d17d8bdc1a3b6d6c95023c8ec1a1e3523ebd21b34a3f0db32095",
+  "observation_sha256": "1ba1efbe2faf35d64ee39c03155691e5b35ab25bfe16437cd87ed0f83d1eabf8"
 }

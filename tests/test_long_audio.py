@@ -80,14 +80,16 @@ def test_archived_sentinel_observations_bind_the_fixture_identities():
     annotation_path = root / "data" / "sentinels" / "long-audio-boundary-v1.json"
     reports = sorted((root / "evidence" / "experiments" / "long-audio-sentinel").glob("*.json"))
 
-    assert reports
+    assert {report.name for report in reports} == {
+        "dolphin-windowed.json",
+        "mms-chunked.json",
+        "omniasr-gguf-native-chunked.json",
+        "omniasr-gguf-native.json",
+        "omniasr-torch-unlimited.json",
+        "seamless-windowed.json",
+    }
     assert all(
-        any(
-            "legacy" in issue
-            for issue in verify_observation(
-                report, audio_path=audio, annotation_path=annotation_path
-            )
-        )
+        verify_observation(report, audio_path=audio, annotation_path=annotation_path) == []
         for report in reports
     )
 
