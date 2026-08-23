@@ -19,7 +19,7 @@ from stt.experiment import (
     build_schedule,
     summarize_experiment,
 )
-from stt.experiment_archive import publish_experiment, verify_experiment
+from stt.experiment_archive import _portable_log_text, publish_experiment, verify_experiment
 from stt.measurement import (
     AudioInput,
     MeasurementError,
@@ -498,6 +498,12 @@ def test_experiment_archive_round_trip_and_raw_tamper_detection(tmp_path):
     archived_response = next(descriptor.parent.glob("workers/**/response.json"))
     archived_response.write_text("tampered\n", encoding="utf-8")
     assert any("checksum mismatch" in issue for issue in verify_experiment(descriptor))
+
+
+def test_native_log_external_paths_are_redacted_for_portable_archives():
+    value = "compiler cache /Users/fenyxgrey/Library/Caches/metal/a.metallib"
+
+    assert _portable_log_text(value) == "compiler cache <external-path>"
 
 
 def test_archive_verifier_binds_observer_flags_after_manifest_rehash(tmp_path):

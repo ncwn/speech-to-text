@@ -218,9 +218,10 @@ def _portable_log_text(value: str) -> str:
     root = checkout_root()
     if root is not None:
         value = value.replace(str(root.resolve()), ".")
-    if "/Users/" in value or "/Volumes/" in value:
-        raise ValueError("experiment worker log retains an external local path")
-    return value
+    # Native runtimes may print cache/compiler paths outside the checkout. Logs
+    # are diagnostic text, so redact those tokens while structured artifacts
+    # continue to fail closed on unresolved path fields.
+    return re.sub(r"(?<![\w])/(?:Users|Volumes)/[^\s\"'<>]+", "<external-path>", value)
 
 
 def publish_experiment(
