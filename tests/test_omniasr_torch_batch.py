@@ -50,6 +50,33 @@ def test_transcribe_passes_all_paths_and_matching_language_list(monkeypatch, tmp
     )
 
 
+def test_mps_batches_are_duration_bucketed_and_release_transient_cache(monkeypatch, tmp_path):
+    import torch
+
+    paths = [tmp_path / f"{name}.wav" for name in "abcde"]
+    durations = dict(zip(paths, (5.0, 1.0, 4.0, 2.0, 3.0), strict=True))
+    monkeypatch.setattr("stt.audio.duration_of", durations.__getitem__)
+    synchronized: list[str] = []
+    emptied: list[str] = []
+    monkeypatch.setattr(torch.mps, "synchronize", lambda: synchronized.append("sync"))
+    monkeypatch.setattr(torch.mps, "empty_cache", lambda: emptied.append("empty"))
+    pipeline = RecordingPipeline()
+    backend = _backend(pipeline)
+    backend.resolved_device = "mps"
+
+    results = backend.transcribe(paths, language="mya_Mymr", batch_size=2)
+
+    assert [call[0] for call in pipeline.calls] == [
+        [str(paths[1]), str(paths[3])],
+        [str(paths[4]), str(paths[2])],
+        [str(paths[0])],
+    ]
+    assert [result.text for result in results] == list("abcde")
+    assert [result.metadata["batch_group"] for result in results] == [2, 0, 1, 0, 1]
+    assert synchronized == ["sync"] * 3
+    assert emptied == ["empty"] * 3
+
+
 def test_length_validation_keeps_invalid_file_out_of_batch(monkeypatch, tmp_path):
     long_path = tmp_path / "too-long.wav"
     short_path = tmp_path / "short.wav"

@@ -472,32 +472,28 @@ class OmniASRTorchBackend(ASRBackend):
                     metadata=_result_metadata(),
                 )
 
-        if valid:
-            paths = [str(path) for _, path, _ in valid]
+        # Similar lengths share a batch so padding does not turn short clips
+        # into long decoder calls. Explicit groups also let MPS release
+        # transient generation buffers between batches instead of retaining a
+        # corpus-sized cache that can exceed physical memory.
+        ordered = sorted(valid, key=lambda item: (item[2], item[0]))
+        for group_index, offset in enumerate(range(0, len(ordered), batch_size)):
+            group = ordered[offset : offset + batch_size]
+            paths = [str(path) for _, path, _ in group]
             lang_arg = [language] * len(paths) if language else None
             started = time.perf_counter()
             try:
                 texts = self._transcribe_paths(paths, lang_arg, batch_size)
                 elapsed = time.perf_counter() - started
-                total_duration = sum(duration for _, _, duration in valid)
-                # The pipeline reports one aggregate wall time. Allocate it by
-                # duration so corpus RTF remains meaningful, and mark it as an
-                # estimate rather than pretending it was measured per file.
+                total_duration = sum(duration for _, _, duration in group)
                 weights = (
-                    [duration / total_duration for _, _, duration in valid]
+                    [duration / total_duration for _, _, duration in group]
                     if total_duration > 0
-                    else [1.0 / len(valid)] * len(valid)
+                    else [1.0 / len(group)] * len(group)
                 )
                 for (index, path, duration), text, weight in zip(
-                    valid, texts, weights, strict=True
+                    group, texts, weights, strict=True
                 ):
-                    result_metadata = {
-                        **_result_metadata(),
-                        "batch_size": batch_size,
-                        "batch_items": len(valid),
-                        "batch_elapsed_s": elapsed,
-                        "elapsed_s_source": "batch_proportional",
-                    }
                     slots[index] = TranscriptionResult(
                         audio_path=str(path),
                         text=text.strip(),
@@ -506,20 +502,27 @@ class OmniASRTorchBackend(ASRBackend):
                         language=language,
                         elapsed_s=elapsed * weight,
                         audio_duration_s=duration,
-                        metadata=result_metadata,
+                        metadata={
+                            **_result_metadata(),
+                            "batch_size": batch_size,
+                            "batch_items": len(group),
+                            "batch_group": group_index,
+                            "batch_duration_min_s": min(item[2] for item in group),
+                            "batch_duration_max_s": max(item[2] for item in group),
+                            "batch_elapsed_s": elapsed,
+                            "elapsed_s_source": "batch_proportional",
+                        },
                     )
             except Exception as batch_exc:  # noqa: BLE001 - retry per-file below
-                # A single malformed clip, unsupported batch shape, or OOM must
-                # not discard successful transcripts from the other inputs.
                 import logging
 
                 logging.getLogger(__name__).warning(
                     "omniASR batch of %d file(s) failed (%s: %s); retrying individually.",
-                    len(valid),
+                    len(group),
                     type(batch_exc).__name__,
                     batch_exc,
                 )
-                for index, path, duration in valid:
+                for index, path, duration in group:
                     single_started = time.perf_counter()
                     try:
                         texts = self._transcribe_one(
@@ -538,7 +541,8 @@ class OmniASRTorchBackend(ASRBackend):
                             metadata={
                                 **_result_metadata(),
                                 "batch_size": batch_size,
-                                "batch_items": len(valid),
+                                "batch_items": len(group),
+                                "batch_group": group_index,
                                 "batch_fallback": True,
                                 "elapsed_s_source": "measured",
                             },
@@ -555,10 +559,17 @@ class OmniASRTorchBackend(ASRBackend):
                             metadata={
                                 **_result_metadata(),
                                 "batch_size": batch_size,
-                                "batch_items": len(valid),
+                                "batch_items": len(group),
+                                "batch_group": group_index,
                                 "batch_fallback": True,
                             },
                         )
+            finally:
+                if self.resolved_device == "mps":
+                    import torch
+
+                    torch.mps.synchronize()
+                    torch.mps.empty_cache()
 
         # Validation and decoder paths above fill every slot; the assertion is
         # a guard against accidentally weakening the one-result-per-input API.
