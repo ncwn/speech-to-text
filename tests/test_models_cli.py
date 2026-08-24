@@ -13,11 +13,11 @@ from stt import cli
 from stt.registry import all_backends, get_backend
 from stt.results import TranscriptionResult
 
-runner = CliRunner()
+runner = CliRunner(env={"TERM": "dumb", "FORCE_COLOR": None, "NO_COLOR": "1"})
 
 
 def test_models_download_requires_a_backend():
-    result = runner.invoke(cli.app, ["models", "--download", "small"], terminal_width=240)
+    result = runner.invoke(cli.app, ["models", "--download", "small"])
 
     assert result.exit_code == 2
     assert "--backend is required" in result.output
@@ -65,11 +65,7 @@ def test_models_missing_runtime_includes_install_hint(monkeypatch):
         backend, "is_available", classmethod(lambda cls: (False, "missing dependency: dolphin"))
     )
 
-    result = runner.invoke(
-        cli.app,
-        ["models", "--backend", "dolphin", "--download", "small"],
-        terminal_width=240,
-    )
+    result = runner.invoke(cli.app, ["models", "--backend", "dolphin", "--download", "small"])
 
     assert result.exit_code == 2
     assert backend.install_hint in result.output
