@@ -45,3 +45,16 @@ proxy.
 If CTC fails the quality gate, move to PYAW with a backend-neutral API and keep
 Seamless as a research fallback. Do not start full model fine-tuning from this
 result alone; collect real dictation failures first.
+
+## Observed Gate Results
+
+The full 120-clip FLEURS test set was run on the Apple M2 Max with immutable
+provenance. CTC 300M float16 scored CER 0.1643 at RTF 0.0141 for batch 1 and
+RTF 0.0076 for batch 8; GPU mean was 82% and 95% respectively. CTC 1B
+float16 returned empty transcripts on MPS. Its float32 arm scored CER 0.1191
+at RTF 0.0247 for batch 1 and 0.0180 for batch 8, with GPU mean 92% and 98%.
+CTC 7B float16 scored CER 0.0952 at RTF 0.0832, with GPU mean 97%.
+
+The 7B CTC arm improved quality over 300M and 1B, but remains slower than the
+Seamless FP16/BF16 path and is not a first live-dictation default. The 1B
+float16 failure is specific to this MPS runtime; its float32 arm is valid.
