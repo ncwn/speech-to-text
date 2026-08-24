@@ -1,5 +1,6 @@
 import hashlib
 import json
+import os
 import sys
 from dataclasses import replace
 from pathlib import Path
@@ -14,6 +15,53 @@ from stt.registry import all_backends, get_backend
 from stt.results import TranscriptionResult
 
 runner = CliRunner(env={"TERM": "dumb", "FORCE_COLOR": None, "NO_COLOR": "1"})
+
+
+def test_models_show_size_and_offline_status(monkeypatch):
+    backend = get_backend("hf")
+    monkeypatch.setattr(
+        backend,
+        "weights_cached",
+        lambda self: self.model == "whisper-my-small",
+    )
+
+    result = runner.invoke(cli.app, ["models", "--backend", "hf"])
+
+    assert result.exit_code == 0, result.output
+    assert "Size" in result.output
+    assert "Offline" in result.output
+    assert "Download" not in result.output
+    assert "yes" in result.output
+    assert "no" in result.output
+
+
+def test_project_model_caches_are_defaults_but_do_not_override_environment(monkeypatch, tmp_path):
+    paths = {
+        "CRISPASR_CACHE_DIR": "crispasr",
+        "DOLPHIN_CACHE_DIR": "dolphin",
+        "FAIRSEQ2_CACHE_DIR": "fairseq2/assets",
+        "HF_HUB_CACHE": "huggingface/hub",
+    }
+    for variable, relative in paths.items():
+        monkeypatch.delenv(variable, raising=False)
+        (tmp_path / relative).mkdir(parents=True)
+    monkeypatch.delenv("HF_HOME", raising=False)
+    monkeypatch.delenv("XDG_CACHE_HOME", raising=False)
+    monkeypatch.setenv("HF_HOME", "/explicit/huggingface")
+
+    cli._configure_project_model_caches(tmp_path)
+
+    assert {variable: os.environ[variable] for variable in paths if variable != "HF_HUB_CACHE"} == {
+        "CRISPASR_CACHE_DIR": str(tmp_path / "crispasr"),
+        "DOLPHIN_CACHE_DIR": str(tmp_path / "dolphin"),
+        "FAIRSEQ2_CACHE_DIR": str(tmp_path / "fairseq2/assets"),
+    }
+    assert os.environ["HF_HOME"] == "/explicit/huggingface"
+    assert "HF_HUB_CACHE" not in os.environ
+
+    monkeypatch.delenv("HF_HOME")
+    cli._configure_project_model_caches(tmp_path)
+    assert os.environ["HF_HUB_CACHE"] == str(tmp_path / "huggingface/hub")
 
 
 def test_models_download_requires_a_backend():
@@ -292,6 +340,7 @@ def test_gguf_cache_probe_stream_hashes_the_model(monkeypatch, tmp_path):
 
 def test_gguf_download_validates_before_returning(monkeypatch, tmp_path):
     backend = get_backend("omniasr-gguf")()
+    backend.spec = replace(backend.spec, sha256="0" * 64)
     path = tmp_path / backend.spec.filename
     calls = []
 
@@ -315,6 +364,7 @@ def test_gguf_download_validates_before_returning(monkeypatch, tmp_path):
 @pytest.mark.parametrize("entry", ["partial", "dangling"])
 def test_gguf_load_refuses_an_invalid_existing_model(monkeypatch, tmp_path, entry):
     backend = get_backend("omniasr-gguf")()
+    backend.spec = replace(backend.spec, sha256="0" * 64)
     path = tmp_path / backend.spec.filename
     if entry == "partial":
         path.write_bytes(b"partial")
@@ -371,6 +421,31 @@ def test_gguf_load_downloads_missing_model_then_reuses_it(monkeypatch, tmp_path)
         (str(path), {"backend": backend.spec.crisp_backend}),
         (str(path), {"backend": backend.spec.crisp_backend}),
     ]
+
+
+def test_gguf_reuses_a_verified_hugging_face_snapshot(monkeypatch, tmp_path):
+    from huggingface_hub import constants
+
+    payload = b"verified GGUF fixture"
+    backend = get_backend("omniasr-gguf")()
+    backend.spec = replace(backend.spec, sha256=hashlib.sha256(payload).hexdigest())
+    crisp_cache = tmp_path / "crispasr"
+    crisp_cache.mkdir()
+    monkeypatch.setitem(
+        sys.modules,
+        "crispasr",
+        SimpleNamespace(
+            cache_dir=lambda: crisp_cache,
+            cache_ensure_file=lambda *args, **kwargs: pytest.fail("unexpected download"),
+        ),
+    )
+    monkeypatch.setattr(constants, "HF_HUB_CACHE", str(tmp_path / "huggingface"))
+    snapshot = backend._hf_cache_path()
+    snapshot.parent.mkdir(parents=True)
+    snapshot.write_bytes(payload)
+
+    assert backend.weights_cached() is True
+    assert backend.ensure_weights() == snapshot
 
 
 def _mock_torch_download(monkeypatch, checkpoint: Path, tokenizer: Path) -> None:

@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import hashlib
 import itertools
+import os
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -74,7 +75,7 @@ MODELS: dict[str, DolphinModel] = {
 DEFAULT_MODEL = "small"
 
 #: Checkpoints and train.yaml are size-specific, so each model gets its own cache.
-CACHE_ROOT = Path.home() / ".cache" / "dolphin"
+CACHE_ROOT = Path(os.environ.get("DOLPHIN_CACHE_DIR", Path.home() / ".cache" / "dolphin"))
 
 
 def cache_dir(size: str) -> Path:

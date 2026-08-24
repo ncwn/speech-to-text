@@ -132,12 +132,14 @@ Bootstrap and `uv sync` leave these caches in place:
 | fairseq2 | `~/.cache/fairseq2/assets/` | `FAIRSEQ2_CACHE_DIR`; otherwise `XDG_CACHE_HOME/fairseq2/assets` |
 | CrispASR | `~/.cache/crispasr/` | `CRISPASR_CACHE_DIR` |
 | Hugging Face Hub | `~/.cache/huggingface/hub/` | `HF_HUB_CACHE`; otherwise `HF_HOME/hub` or `XDG_CACHE_HOME/huggingface/hub` |
-| Dolphin | `~/.cache/dolphin/<size>/` | No repository override; each size has its own directory |
+| Dolphin | `~/.cache/dolphin/<size>/` | `DOLPHIN_CACHE_DIR`; each size has its own directory |
 | dtype probe | `~/.cache/stt/hardware.json` | No repository override |
 | ggml Metal kernels | `~/Library/Caches/ggml-metal/` | Managed by ggml |
 
 Set cache variables before the first command in a shell; changing one points the
 runtime at a different cache and does not migrate existing files.
+When an ignored `.cache/<runtime>/` directory already exists in this checkout,
+the CLI uses it unless the corresponding environment variable is set explicitly.
 
 Never delete an entire user cache tree to recover one model. That can destroy
 unrelated application data and every working checkpoint. Preserve the existing
