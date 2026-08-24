@@ -29,5 +29,5 @@ jobs:
           enable-cache: true
       - run: uv python install 3.12
       - run: brew install ffmpeg
-      - run: uv sync --dev --extra hf
+      - run: uv sync --dev --extra hf --extra omniasr
       - run: make check

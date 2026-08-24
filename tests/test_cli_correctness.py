@@ -566,7 +566,11 @@ def test_align_text_serializes_the_same_alignment_metadata(monkeypatch, tmp_path
 
 
 def test_bench_rejects_partial_baseline_updates_before_loading_models():
-    result = runner.invoke(app, ["bench", "--update", "--only", "hf"])
+    result = runner.invoke(
+        app,
+        ["bench", "--update", "--only", "hf"],
+        terminal_width=240,
+    )
 
     assert result.exit_code != 0
     assert "--update cannot be combined with --only" in result.output

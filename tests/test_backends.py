@@ -67,12 +67,13 @@ def test_torch_backend_reports_download_size():
     assert cls("some_unrecognised_card").estimated_download_mb() is None
 
 
-def test_cpu_prefers_float32_because_bfloat16_is_emulated_there():
+def test_cpu_prefers_float32_because_bfloat16_is_emulated_there(monkeypatch):
     """Measured on the 7B: bf16 on CPU is RTF 8.85 against fp32's 2.14, for
     identical text. PyTorch has no native half kernels on CPU, so the only
     reason to pick bf16 is not fitting in memory."""
     torch = pytest.importorskip("torch")
     cls = get_backend("omniasr-torch")
+    monkeypatch.setattr("stt.hardware.total_ram_mb", lambda: 64 * 1024)
 
     assert cls("omniASR_LLM_Unlimited_300M_v2")._resolve_dtype("cpu") is torch.float32
     large = cls("omniASR_LLM_Unlimited_7B_v2")
