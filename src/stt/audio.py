@@ -204,9 +204,8 @@ def windowed(
 
     Seamless and Dolphin both have a fixed input length, so both have to slice
     long audio and stitch the pieces back together. Sharing the loop here means
-    the sample offsets :func:`split_on_quiet` already computed survive into the
-    result instead of being thrown away, which is what makes subtitles and
-    per-region confidence possible for those backends.
+    the sample offsets :func:`split_on_quiet` already computed survive for
+    subtitle output.
 
     Windows shorter than ``min_s`` are skipped because very short tails tend
     to produce unstable tokens.

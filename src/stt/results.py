@@ -36,13 +36,9 @@ class Segment:
     end: float
     #: 0..1, higher is better. ``None`` when the backend offers no signal.
     confidence: float | None = None
-    #: Reserved for diarization; nothing populates this yet.
+    #: Reserved for diarization; retained in the persisted result schema.
     speaker: str | None = None
     source: SegmentSource = "chunk"
-
-    @property
-    def duration(self) -> float:
-        return max(0.0, self.end - self.start)
 
 
 @dataclass
@@ -107,11 +103,7 @@ def write_text(results: list[TranscriptionResult], path: Path) -> None:
 
 
 def read_jsonl(path: Path) -> list[TranscriptionResult]:
-    """Read back a JSONL file written by :func:`write_jsonl`.
-
-    Tolerates files written before a field existed, so older result files stay
-    loadable as the schema grows.
-    """
+    """Read back a JSONL file written by :func:`write_jsonl`."""
     results: list[TranscriptionResult] = []
     with path.open(encoding="utf-8") as f:
         for line in f:

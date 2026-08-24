@@ -2,7 +2,7 @@
 
 Hypotheses are aligned to a pivot and voted position by position. The pivot
 should be the strongest input because voting can only correct characters that
-it proposed. Historical measurements live in ``docs/findings.md``.
+it proposed.
 """
 
 from __future__ import annotations
@@ -13,16 +13,6 @@ from collections.abc import Callable
 import jiwer
 
 from stt.burmese import tidy_spacing
-
-#: Coarse defaults from historical FLEURS ranking; unknown models use 1.0.
-DEFAULT_WEIGHTS: dict[str, float] = {
-    "omniASR_LLM_Unlimited_7B_v2": 2.0,
-    "seamless-m4t-v2": 1.9,
-    "omniASR_LLM_Unlimited_3B_v2": 1.4,
-    "omniASR_LLM_Unlimited_300M_v2": 1.2,
-    "small": 1.0,  # dolphin
-    "mms-1b-all": 0.9,
-}
 
 
 def _columns(pivot: str, hypothesis: str) -> list[str]:

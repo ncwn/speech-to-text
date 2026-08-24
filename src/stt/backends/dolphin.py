@@ -1,16 +1,15 @@
 """DataoceanAI Dolphin — multilingual ASR for 40 Eastern languages.
 
-Dolphin is a Whisper-style encoder-decoder trained on East, South and
-Southeast Asian speech. Burmese is in its language table as ``my`` with region
-``MM``, which makes it one of the few general-purpose multilingual recognisers
-that covers Burmese at all.
+Dolphin is an encoder-decoder trained on East, South and Southeast Asian speech.
+Burmese is in its language table as ``my`` with region ``MM``.
 
 This adapter exposes the public base and small checkpoints. Upstream language
-coverage is linked from ``docs/models.md``.
+coverage is linked from ``docs/model-survey.md``.
 """
 
 from __future__ import annotations
 
+import hashlib
 import itertools
 import time
 from dataclasses import dataclass
@@ -23,7 +22,7 @@ from stt.native import suppress_native_output
 from stt.registry import register
 from stt.results import Segment, TranscriptionResult
 
-#: Dolphin inherits Whisper's fixed 30-second input window.
+#: Match upstream's 30-second segmentation and timestamp scope.
 WINDOW_SEC = 30.0
 
 #: Burmese, as Dolphin's two-level language/region scheme spells it.
@@ -36,26 +35,55 @@ class DolphinModel:
     size: str
     params_m: int
     approx_mb: int
+    repo: str
+    revision: str
+    artifacts: tuple[tuple[str, str], ...]
 
 
 MODELS: dict[str, DolphinModel] = {
-    "small": DolphinModel("small", 372, 1500),
-    "base": DolphinModel("base", 140, 570),
+    "small": DolphinModel(
+        "small",
+        372,
+        1500,
+        "DataoceanAI/dolphin-small",
+        "1df1f4f848fa1ad4bfe1fbdd1603ae45b5afb2ae",
+        (
+            ("small.pt", "4a0c6c636657121ec2a2b656e97e45b29a8b29c92fa3998006e02ab146d8ac51"),
+            ("train.yaml", "e2765fc748f683710546fc61a840f49dda7b2189afaa6aed38ec09df5a1a7f08"),
+            ("feats_stats.npz", "5a37d00c07d595dbc2479b31be42b3c75de422469a947ce4b7bda193c3b1de7f"),
+            ("units.txt", "c3788261a51df1899ea4b210b552cd42139204de72c0ad60f6cebb199078872e"),
+            ("bpe.model", "4b9102181ef1a2a3c42ce8fbca8a545ea4a55bce47ba7a5222951ab5bb21bb3c"),
+        ),
+    ),
+    "base": DolphinModel(
+        "base",
+        140,
+        570,
+        "DataoceanAI/dolphin-base",
+        "4f498c42abc03065b6a8b088800d08eb342b6e35",
+        (
+            ("base.pt", "688f0cdb26da2684a4eec200a432091920287585e8e332507cbe9c1ab6d77401"),
+            ("train.yaml", "8f1ea59adf48e47696e0f71b8f421a8201b464644cdcce2eb4efbec8dd7e2c93"),
+            ("feats_stats.npz", "5a37d00c07d595dbc2479b31be42b3c75de422469a947ce4b7bda193c3b1de7f"),
+            ("units.txt", "c3788261a51df1899ea4b210b552cd42139204de72c0ad60f6cebb199078872e"),
+            ("bpe.model", "4b9102181ef1a2a3c42ce8fbca8a545ea4a55bce47ba7a5222951ab5bb21bb3c"),
+        ),
+    ),
 }
 
 DEFAULT_MODEL = "small"
 
-#: Weights land here rather than in the repo, matching the other backends.
-#: Dolphin writes ``config.yaml`` and ``train.yaml`` alongside the ``.pt`` under
-#: whatever directory it is handed, and skips files that already exist. Sharing
-#: one directory across sizes therefore leaves the *first* model's config next to
-#: a later model's weights, and the load fails with a shape mismatch. Give each
-#: size its own directory.
+#: Checkpoints and train.yaml are size-specific, so each model gets its own cache.
 CACHE_ROOT = Path.home() / ".cache" / "dolphin"
 
 
 def cache_dir(size: str) -> Path:
     return CACHE_ROOT / size
+
+
+def _sha256(path: Path) -> str:
+    with path.open("rb") as source:
+        return hashlib.file_digest(source, "sha256").hexdigest()
 
 
 def _demote_float64(module: Any) -> list[str]:
@@ -91,8 +119,7 @@ class DolphinBackend(ASRBackend):
     name: ClassVar[str] = "dolphin"
     description: ClassVar[str] = "DataoceanAI Dolphin with Burmese my/MM support"
     install_hint: ClassVar[str] = "uv sync --extra dolphin"
-    accepts_language: ClassVar[bool] = True
-    is_local: ClassVar[bool] = True
+    supported_options: ClassVar[frozenset[str]] = frozenset({"device", "verbose"})
 
     def __init__(
         self,
@@ -126,21 +153,64 @@ class DolphinBackend(ASRBackend):
             return self.device_arg
         if torch.cuda.is_available():
             return "cuda"
-        # Historical local checks favored CPU for this windowed model. MPS
-        # remains available when freeing CPU capacity matters.
+        # CPU is the automatic default; MPS remains available explicitly.
         return "cpu"
 
     def estimated_download_mb(self) -> int | None:
         return self.spec.approx_mb
 
+    def _invalid_artifacts(self) -> tuple[str, ...]:
+        directory = cache_dir(self.spec.size)
+        invalid: list[str] = []
+        for filename, expected in self.spec.artifacts:
+            path = directory / filename
+            try:
+                if not path.is_file() or _sha256(path) != expected:
+                    invalid.append(filename)
+            except OSError:
+                invalid.append(filename)
+        return tuple(invalid)
+
+    def _has_any_artifact(self) -> bool:
+        directory = cache_dir(self.spec.size)
+        return any(
+            (directory / filename).exists() or (directory / filename).is_symlink()
+            for filename, _ in self.spec.artifacts
+        )
+
     def weights_cached(self) -> bool | None:
-        return (cache_dir(self.spec.size) / f"{self.spec.size}.pt").is_file()
+        return not self._invalid_artifacts()
+
+    def download_weights(self) -> None:
+        from huggingface_hub import snapshot_download
+
+        snapshot_download(
+            repo_id=self.spec.repo,
+            revision=self.spec.revision,
+            local_dir=cache_dir(self.spec.size),
+            allow_patterns=[filename for filename, _ in self.spec.artifacts],
+        )
+        if invalid := self._invalid_artifacts():
+            raise RuntimeError(
+                f"Dolphin {self.spec.size} download failed integrity validation: "
+                f"{', '.join(invalid)}"
+            )
 
     def load(self) -> None:
+        directory = cache_dir(self.spec.size)
+        if invalid := self._invalid_artifacts():
+            if not self._has_any_artifact():
+                self.download_weights()
+            else:
+                raise RuntimeError(
+                    f"Dolphin {self.spec.size} cache is incomplete or failed integrity validation "
+                    f"({', '.join(invalid)}). Run `stt models --backend dolphin "
+                    f"--download {self.spec.size}`."
+                )
+
+        # train.yaml is hash-verified above before the locked dependency's YAML loader sees it.
         import dolphin
 
-        directory = cache_dir(self.spec.size)
-        directory.mkdir(parents=True, exist_ok=True)
         self.resolved_device = self._resolve_device()
 
         with suppress_native_output(not self.options.get("verbose")):
@@ -181,10 +251,9 @@ class DolphinBackend(ASRBackend):
     def _transcribe_file(self, path: Path) -> list[Segment]:
         """Window the audio at 30 s, since Dolphin decodes in a single pass.
 
-        ``dolphin.transcribe`` does no chunking of its own and the model
-        inherits Whisper's fixed 30-second input, so anything longer has to be
-        split here. It takes a *path* rather than samples, so each window is
-        staged as a temporary wav.
+        The upstream long-form path uses VAD capped to 30-second segments. This
+        adapter uses the same scope without adding a second VAD pass. It takes a
+        *path* rather than samples, so each window is staged as a temporary wav.
         """
         import tempfile
 

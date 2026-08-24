@@ -6,6 +6,7 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
+.cache/
 
 # Model weights and caches — never commit, these are 1-31 GB each
 models/
@@ -30,7 +31,7 @@ outputs/**
 # Third-party sources built from scratch
 vendor/
 
-# Credentials reserved for unimplemented cloud backends
+# Local credentials
 .env
 *.json.key
 service-account*.json

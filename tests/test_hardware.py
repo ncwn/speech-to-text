@@ -6,7 +6,7 @@ import sys
 
 import pytest
 
-from stt.hardware import CoreLayout, chip_name, compute_threads, core_layout, describe
+from stt.hardware import CoreLayout, chip_name, core_layout, describe
 
 
 def _layout(*levels: tuple[str, int]) -> CoreLayout:
@@ -45,10 +45,6 @@ def test_a_single_level_machine_uses_every_core():
 def test_an_all_efficiency_machine_still_reports_usable_cores():
     """Guards against returning zero threads, which would deadlock a pool."""
     assert _layout(("Efficiency", 4)).compute == 4
-
-
-def test_compute_threads_is_positive_on_this_machine():
-    assert compute_threads() >= 1
 
 
 def test_real_layout_is_consistent():

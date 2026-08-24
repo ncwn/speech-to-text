@@ -3,55 +3,82 @@
 A Burmese-focused speech-to-text harness for running local ASR models over the
 same audio and scoring them with the same normalization.
 
-The repository supports four backend families on Apple Silicon: Meta
+The repository supports four local backends on Apple Silicon: Meta
 Omnilingual ASR through fairseq2 or CrispASR, Hugging Face Transformers, and
 DataoceanAI Dolphin. Cloud backends are not implemented.
 
 ## Why Burmese needs its own harness
 
-- Burmese has no word delimiters, so Character Error Rate (CER), not Word Error
-  Rate, is the primary metric.
+- Burmese spaces do not provide reliable word boundaries, so whitespace-token
+  WER is unsuitable for this harness. Character Error Rate (CER) is primary.
 - Zawgyi and Unicode can render similarly while using incompatible encodings;
-  evaluation rejects mismatched pairs.
+  evaluation rejects detector-identified mismatches.
 - Unicode normalization and consistent treatment of digits, punctuation, and
   whitespace are required for comparable scores.
 
-See [Evaluating Burmese ASR](docs/burmese.md) for the scoring contract.
+The exact scoring behavior and detector limitations are documented in
+[Evaluating Burmese ASR](docs/burmese.md).
 
 ## Backends
 
 | Backend | Runtime | Models |
 |---|---|---|
-| `omniasr-torch` | Meta fairseq2 | Upstream omniASR card names |
-| `omniasr-gguf` | CrispASR/ggml | Bundled 300M and 1B GGUF cards |
+| `omniasr-torch` | Meta fairseq2 | Upstream omniASR v2 card names |
+| `omniasr-gguf` | CrispASR/ggml | Downloadable 300M and 1B GGUF variants |
 | `hf` | Hugging Face Transformers | Whisper fine-tunes, MMS, SeamlessM4T, w2v-BERT |
 | `dolphin` | DataoceanAI Dolphin | Dolphin base and small |
 
-Run `uv run stt backends` for installed runtimes and `uv run stt models` for
-the model names accepted by the current checkout. Device defaults, model
-constraints, and licences live in [Models and runtimes](docs/models.md).
+Run `uv run stt backends` for installed runtimes. Runtime constraints, model
+licences, and device behavior are in [Models and runtimes](docs/models.md).
 
 ## Setup
 
-Requires macOS 14 or newer on Apple Silicon, Xcode Command Line Tools,
-[uv](https://docs.astral.sh/uv/), ffmpeg, and Homebrew libsndfile.
+The default bootstrap targets Apple Silicon and installs the GGUF and fairseq2
+runtimes. Its fairseq2 path requires macOS 14 or newer, Xcode Command Line
+Tools, and Homebrew `libsndfile`. All setups require
+[uv](https://docs.astral.sh/uv/) and ffmpeg.
 
 ```bash
-xcode-select --install
+xcode-select -p || xcode-select --install
+# If the installer opened, finish it before continuing.
+xcode-select -p
 brew install ffmpeg libsndfile
 ./scripts/bootstrap.sh
 ```
 
-The bootstrap script installs the two omniASR runtimes. Install another backend
-only when needed:
+Bootstrap installs the project environment and runtime dependencies only. It
+does not download model weights, remove partial downloads, or modify existing
+model caches. A GGUF-only setup has fewer prerequisites:
 
 ```bash
-uv sync --extra hf
-uv sync --extra dolphin
+brew install ffmpeg
+./scripts/bootstrap.sh --gguf-only
 ```
 
-See [Setup on macOS](docs/setup-macos.md) for selective installs, cache paths,
-large-download recovery, and troubleshooting.
+See [Setup on macOS](docs/setup-macos.md) for the verified steps, complete extra
+sets, cache locations, and recovery without deleting existing weights.
+
+## Select a model
+
+List the available backends and models before downloading anything:
+
+```bash
+uv run stt backends
+uv run stt models
+uv run stt models --backend hf
+```
+
+Download one selected model through its normal upstream cache, then pass the
+same backend and model ID to transcription:
+
+```bash
+uv run stt models --backend hf --download whisper-my-small
+uv run stt transcribe recording.mp3 \
+    --backend hf --model whisper-my-small
+```
+
+Listing models does not download weights. Transcription still downloads the
+selected model on first use when it is not cached.
 
 ## Usage
 
@@ -67,7 +94,7 @@ uv run stt fetch-fleurs --limit 20
 # Transcribe with the default GGUF model
 uv run stt transcribe data/fleurs/audio -b omniasr-gguf --limit 5
 
-# Transcribe with omniASR 7B; auto selects an available accelerator
+# Transcribe with one explicitly selected omniASR card
 uv run stt transcribe data/fleurs/audio -b omniasr-torch \
     -m omniASR_LLM_Unlimited_7B_v2 --limit 5
 
@@ -75,22 +102,27 @@ uv run stt transcribe data/fleurs/audio -b omniasr-torch \
 uv run stt eval outputs/omniasr-gguf.jsonl \
     --reference data/fleurs/references.tsv
 
-# Compare installed backends; --yes accepts any large-download prompts
+# Compare only the named, installed backends; each large download is confirmed
 uv run stt compare data/fleurs/audio \
-    --reference data/fleurs/references.tsv --limit 10 --yes
+    --reference data/fleurs/references.tsv --limit 10 \
+    --only omniasr-gguf --only hf
 
-# Combine runs by per-character vote; put the pivot/best run first
+# Combine runs by per-character vote; put the pivot run first
 uv run stt vote out-7b.jsonl out-seamless.jsonl out-dolphin.jsonl \
     -o voted.jsonl
 
-# Check whether text is Unicode or Zawgyi
+# Check whether text is detector-identified as Unicode or Zawgyi
 uv run stt check-encoding data/fleurs/references.tsv
 ```
 
-Forced alignment requires the Hugging Face extra:
+Keep the large-download confirmations enabled for comparisons; they apply to
+every selected backend.
+
+Forced alignment requires the `hf` extra in the same environment as the
+transcription backend. For fairseq2 transcription plus alignment:
 
 ```bash
-uv sync --extra hf
+uv sync --frozen --extra omniasr --extra hf
 uv run stt transcribe recording.mp3 -b omniasr-torch --align --srt
 uv run stt align recording.mp3 --results outputs/omniasr-torch.jsonl
 ```
@@ -100,19 +132,17 @@ CLI reference.
 
 ## Results status
 
-Current `main` does not track the result files or provenance needed to reproduce
-its earlier CER and performance tables from a clean clone. Those observations
-are kept in one place, explicitly marked historical and unverified:
-[Measured findings](docs/findings.md). Do not promote them to current baselines
-without committing the supporting evidence and a reproducible validation path.
+This repository does not currently track the inputs and artifacts required to
+reproduce a model accuracy or performance comparison. [Findings
+status](docs/findings.md) defines the evidence required before publishing one.
 
 ## Layout
 
 ```text
 src/stt/            CLI, scoring, alignment, voting, telemetry, and backends
 tests/              fast offline tests
-docs/               durable workflow, setup, model, scoring, and findings docs
-data/reference/     tracked hand-corrected reference transcripts
+docs/               workflow, setup, model, scoring, and evidence documentation
+data/reference/     tracked reference transcript contract
 data/fleurs*/       fetched, gitignored public datasets
 outputs/            generated, gitignored transcription runs
 ```
@@ -121,21 +151,25 @@ outputs/            generated, gitignored transcription runs
 
 Implement `ASRBackend` in `src/stt/backends/`, register the class, and import its
 module from `src/stt/backends/__init__.py`. Heavy optional dependencies belong
-inside `load()`. Return one `TranscriptionResult` per input, including failures,
-so a bad file does not discard the rest of a run.
+inside `load()` or another method that needs them. Return one
+`TranscriptionResult` per input, including failures, so a bad file does not
+discard the rest of a run.
 
 ## Documentation
+
+README is the repository documentation index:
 
 - [Git and pull request workflow](docs/GIT_WORKFLOW.md)
 - [Setup on macOS](docs/setup-macos.md)
 - [Models and runtimes](docs/models.md)
 - [Dated external model survey](docs/model-survey.md)
 - [Evaluating Burmese ASR](docs/burmese.md)
-- [Measured findings](docs/findings.md)
-- [Held-out reference data](data/reference/README.md)
+- [Findings status and evidence requirements](docs/findings.md)
+- [Reference data contract](data/reference/README.md)
 - [Contributing](CONTRIBUTING.md)
 
 ## Licence
 
-The harness is MIT licensed. Model weights retain their own licences; check
-[Models and runtimes](docs/models.md) before product use.
+The harness is MIT licensed. Model weights retain their own licences; consult
+the upstream sources linked from [Models and runtimes](docs/models.md) before
+redistribution or product use.

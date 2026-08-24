@@ -82,11 +82,6 @@ def chip_name() -> str:
     return _sysctl("machdep.cpu.brand_string") or "unknown"
 
 
-def compute_threads() -> int:
-    """How many non-efficiency cores this machine reports."""
-    return core_layout().compute
-
-
 # ------------------------------------------------------------- dtype probing
 
 #: Half formats considered for memory-bounded GPU inference. float32 is timed as

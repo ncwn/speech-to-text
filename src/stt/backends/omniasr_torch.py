@@ -9,7 +9,9 @@ retried on CPU for the rest of the run.
 
 from __future__ import annotations
 
+import hashlib
 import time
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, ClassVar
 
@@ -22,8 +24,42 @@ MAX_LIMITED_AUDIO_SEC = 40
 
 DEFAULT_MODEL = "omniASR_LLM_Unlimited_7B_v2"
 
-#: Approximate fp32 checkpoint download size per card, in MB.
-_DOWNLOAD_MB = {"300M": 6500, "1B": 9100, "3B": 17500, "7B": 31200}
+
+@dataclass(frozen=True)
+class OmniASRModel:
+    family: str
+    size: str
+    size_bytes: int
+    unlimited: bool = False
+
+    @property
+    def approx_mb(self) -> int:
+        return round(self.size_bytes / 1_000_000)
+
+
+#: Upstream v2 cards and exact checkpoint sizes reported by their origin server.
+MODELS: dict[str, OmniASRModel] = {
+    "omniASR_CTC_300M_v2": OmniASRModel("CTC", "300M", 1_304_065_508),
+    "omniASR_CTC_1B_v2": OmniASRModel("CTC", "1B", 3_902_956_068),
+    "omniASR_CTC_3B_v2": OmniASRModel("CTC", "3B", 12_325_920_624),
+    "omniASR_CTC_7B_v2": OmniASRModel("CTC", "7B", 26_023_732_143),
+    "omniASR_LLM_300M_v2": OmniASRModel("LLM", "300M", 6_526_183_880),
+    "omniASR_LLM_1B_v2": OmniASRModel("LLM", "1B", 9_118_733_852),
+    "omniASR_LLM_3B_v2": OmniASRModel("LLM", "3B", 17_522_679_843),
+    "omniASR_LLM_7B_v2": OmniASRModel("LLM", "7B", 31_220_488_063),
+    "omniASR_LLM_Unlimited_300M_v2": OmniASRModel("LLM", "300M", 6_526_216_648, True),
+    "omniASR_LLM_Unlimited_1B_v2": OmniASRModel("LLM", "1B", 9_118_766_620, True),
+    "omniASR_LLM_Unlimited_3B_v2": OmniASRModel("LLM", "3B", 17_522_712_611, True),
+    "omniASR_LLM_Unlimited_7B_v2": OmniASRModel("LLM", "7B", 31_220_520_831, True),
+}
+
+TOKENIZER_SIZE_BYTES = 91_481
+TOKENIZER_SHA256 = "8aa11a1092142ef472537476ef6e76541123e2f0d789b79f3ebd119008240b1e"
+
+
+def _sha256(path: Path) -> str:
+    with path.open("rb") as source:
+        return hashlib.file_digest(source, "sha256").hexdigest()
 
 
 @register
@@ -31,8 +67,7 @@ class OmniASRTorchBackend(ASRBackend):
     name: ClassVar[str] = "omniasr-torch"
     description: ClassVar[str] = "Meta Omnilingual ASR, official PyTorch/fairseq2 runtime"
     install_hint: ClassVar[str] = "uv sync --extra omniasr"
-    accepts_language: ClassVar[bool] = True
-    is_local: ClassVar[bool] = True
+    supported_options: ClassVar[frozenset[str]] = frozenset({"device", "dtype"})
 
     def __init__(
         self,
@@ -41,7 +76,11 @@ class OmniASRTorchBackend(ASRBackend):
         dtype: str = "auto",
         **options: Any,
     ) -> None:
+        if model not in MODELS:
+            known = ", ".join(MODELS)
+            raise ValueError(f"Unknown omniASR model {model!r}. Available: {known}")
         super().__init__(model, **options)
+        self.spec = MODELS[model]
         self.device_arg = device
         self.dtype_arg = dtype
         self.pipeline = None
@@ -112,24 +151,18 @@ class OmniASRTorchBackend(ASRBackend):
         """
         from stt.hardware import total_ram_mb
 
-        checkpoint_mb = _DOWNLOAD_MB.get(self._model_size_tag())
+        checkpoint_mb = self.spec.approx_mb
         ram_mb = total_ram_mb()
         if not checkpoint_mb or not ram_mb:
             return True  # unknown card or unknown machine: keep the fast path
         return ram_mb >= checkpoint_mb * self._FLOAT32_OVERHEAD
 
-    def _model_size_tag(self) -> str:
-        for tag in ("300M", "1B", "3B", "7B"):
-            if f"_{tag}_" in self.model or self.model.endswith(f"_{tag}"):
-                return tag
-        return "unknown"
-
     @property
     def is_unlimited(self) -> bool:
-        return "Unlimited" in self.model
+        return self.spec.unlimited
 
     def estimated_download_mb(self) -> int | None:
-        return _DOWNLOAD_MB.get(self._model_size_tag())
+        return self.spec.approx_mb
 
     def weights_cached(self) -> bool | None:
         """Unknowable: fairseq2 stores assets under opaque content hashes.
@@ -139,9 +172,45 @@ class OmniASRTorchBackend(ASRBackend):
         """
         return None
 
+    def download_weights(self) -> None:
+        from fairseq2.assets import AssetDownloadManager, AssetStore
+        from fairseq2.data.tokenizers.ref import resolve_tokenizer_reference
+        from fairseq2.runtime.dependency import get_dependency_resolver
+
+        resolver = get_dependency_resolver()
+        store = resolver.resolve(AssetStore)
+        manager = resolver.resolve(AssetDownloadManager)
+        card = store.retrieve_card(self.model)
+        checkpoint = Path(manager.download_model(card.field("checkpoint").as_uri(), card.name))
+        tokenizer = resolve_tokenizer_reference(store, card)
+        tokenizer_path = Path(
+            manager.download_tokenizer(tokenizer.field("tokenizer").as_uri(), tokenizer.name)
+        )
+
+        invalid = []
+        try:
+            if not checkpoint.is_file() or checkpoint.stat().st_size != self.spec.size_bytes:
+                invalid.append(f"checkpoint {checkpoint}")
+        except OSError:
+            invalid.append(f"checkpoint {checkpoint}")
+        try:
+            if (
+                not tokenizer_path.is_file()
+                or tokenizer_path.stat().st_size != TOKENIZER_SIZE_BYTES
+                or _sha256(tokenizer_path) != TOKENIZER_SHA256
+            ):
+                invalid.append(f"tokenizer {tokenizer_path}")
+        except OSError:
+            invalid.append(f"tokenizer {tokenizer_path}")
+        if invalid:
+            raise RuntimeError(
+                "omniASR download failed integrity validation: " + ", ".join(invalid)
+            )
+
     def load(self) -> None:
         from omnilingual_asr.models.inference.pipeline import ASRInferencePipeline
 
+        self.download_weights()
         device = self._resolve_device()
         dtype = self._resolve_dtype(device)
 

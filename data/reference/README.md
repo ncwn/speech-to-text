@@ -14,9 +14,6 @@ native speaker.
 The audio is third-party copyrighted material. Keep it outside the repository
 and pass its path explicitly to `stt transcribe`.
 
-For scoring and normalisation, see
-[`docs/burmese.md`](../../docs/burmese.md).
-
 ## Reference ID contract
 
 `stt eval` reads the two-column TSV below. The human-readable `.txt` copy is

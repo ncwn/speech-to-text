@@ -74,27 +74,6 @@ def has_myanmar(text: str) -> bool:
     return any("က" <= ch <= "႟" or "ꩠ" <= ch <= "ꩿ" for ch in text)
 
 
-def zawgyi_to_unicode(text: str) -> str:
-    """Convert Zawgyi to Unicode.
-
-    Requires PyICU, which is an optional dependency because it needs a native
-    ICU build. Install with ``brew install icu4c && uv pip install PyICU``.
-    """
-    try:
-        from icu import Transliterator
-    except ImportError as exc:  # pragma: no cover - depends on optional native lib
-        raise RuntimeError(
-            "Zawgyi->Unicode conversion needs PyICU. Install it with:\n"
-            "  brew install icu4c pkg-config\n"
-            '  PATH="$(brew --prefix icu4c)/bin:$PATH" '
-            'PKG_CONFIG_PATH="$(brew --prefix icu4c)/lib/pkgconfig" uv pip install PyICU'
-        ) from exc
-
-    from myanmartools import ZAWGYI_TO_UNICODE_RULES
-
-    return Transliterator.createFromRules("z2u", ZAWGYI_TO_UNICODE_RULES).transliterate(text)
-
-
 @dataclass(frozen=True)
 class NormalizeOptions:
     """Knobs for :func:`normalize`. Defaults are the fair-CER settings."""

@@ -7,7 +7,7 @@ stt fetch-fleurs                 download Burmese eval audio + references
 stt transcribe AUDIO...          run one backend
 stt eval RESULTS.jsonl           score a run against references
 stt align AUDIO --text FILE      time an existing transcript (subtitles)
-stt compare AUDIO...             run every installed backend and compare
+stt compare AUDIO...             compare cached defaults or selected backends
 """
 
 from __future__ import annotations
@@ -32,7 +32,7 @@ from stt.results import (
     write_vtt,
 )
 from stt.telemetry import describe_host, measure
-from stt.vote import DEFAULT_WEIGHTS, rover
+from stt.vote import rover
 
 app = typer.Typer(
     name="stt",
@@ -81,14 +81,26 @@ def models(
     backend: Annotated[
         str | None, typer.Option("--backend", "-b", help="Show models for one backend only")
     ] = None,
+    download: Annotated[
+        str | None, typer.Option("--download", help="Download one model into its upstream cache")
+    ] = None,
 ) -> None:
-    """List the model names each backend accepts for ``-m``."""
+    """List selectable models, or download one model into its upstream cache."""
     from stt.backends.omniasr_gguf import DEFAULT_MODEL as GGUF_DEFAULT
     from stt.backends.omniasr_gguf import MODELS as GGUF_MODELS
     from stt.backends.omniasr_torch import DEFAULT_MODEL as TORCH_DEFAULT
+    from stt.backends.omniasr_torch import MODELS as TORCH_MODELS
+
+    known = all_backends()
+    if backend is not None and backend not in known:
+        raise typer.BadParameter(
+            f"Unknown backend {backend!r}. Available: {', '.join(known)}", param_hint="--backend"
+        )
+    if download is not None and backend is None:
+        raise typer.BadParameter("--backend is required with --download", param_hint="--backend")
 
     if backend in (None, "omniasr-gguf"):
-        table = Table(title="omniasr-gguf  (Metal GPU)")
+        table = Table(title="omniasr-gguf  (runtime-selected device)")
         table.add_column("Model", style="bold")
         table.add_column("Size", justify="right")
         table.add_column("Long audio")
@@ -106,25 +118,20 @@ def models(
         table.add_column("Model card", style="bold")
         table.add_column("Download", justify="right")
         table.add_column("Long audio")
-        rows = [
-            ("omniASR_LLM_Unlimited_300M_v2", "6.5 GB", "unlimited"),
-            ("omniASR_LLM_Unlimited_1B_v2", "9.1 GB", "unlimited"),
-            ("omniASR_LLM_Unlimited_3B_v2", "17.5 GB", "unlimited"),
-            ("omniASR_LLM_Unlimited_7B_v2", "31.2 GB", "unlimited"),
-            ("omniASR_LLM_7B_v2", "31.2 GB", "40 s max"),
-            ("omniASR_CTC_7B_v2", "~30 GB", "40 s max"),
-        ]
-        for card, size, limit in rows:
+        for card, spec in TORCH_MODELS.items():
             label = f"{card}  [dim](default)[/dim]" if card == TORCH_DEFAULT else card
-            table.add_row(label, size, limit)
+            table.add_row(
+                label,
+                f"{spec.approx_mb} MB",
+                "unlimited" if spec.unlimited else "40 s max",
+            )
         console.print(table)
-        console.print("[dim]Upstream card names are accepted; these are the common ones.[/dim]")
 
     if backend in (None, "hf"):
         from stt.backends.transformers_asr import DEFAULT_MODEL as HF_DEFAULT
         from stt.backends.transformers_asr import MODELS as HF_MODELS
 
-        table = Table(title="hf  (Metal GPU via transformers)")
+        table = Table(title="hf  (auto device)")
         table.add_column("Model", style="bold")
         table.add_column("Download", justify="right")
         table.add_column("Family")
@@ -139,7 +146,7 @@ def models(
         from stt.backends.dolphin import DEFAULT_MODEL as DOLPHIN_DEFAULT
         from stt.backends.dolphin import MODELS as DOLPHIN_MODELS
 
-        table = Table(title="dolphin  (CPU)")
+        table = Table(title="dolphin  (CPU default)")
         table.add_column("Model", style="bold")
         table.add_column("Params", justify="right")
         table.add_column("Download", justify="right")
@@ -148,6 +155,23 @@ def models(
             table.add_row(label, f"{spec.params_m}M", f"{spec.approx_mb} MB")
         console.print(table)
         console.print("[dim]This adapter exposes the base and small cards.[/dim]")
+
+    if download is not None:
+        assert backend is not None
+        cls = known[backend]
+        ok, reason = cls.is_available()
+        if not ok:
+            raise typer.BadParameter(
+                f"Backend {backend!r} is not available: {reason}. Install with: {cls.install_hint}",
+                param_hint="--backend",
+            )
+        try:
+            selected = cls(download)
+        except ValueError as exc:
+            raise typer.BadParameter(str(exc), param_hint="--download") from exc
+        console.print(f"Downloading [bold]{backend}[/bold] · [cyan]{download}[/cyan]")
+        selected.download_weights()
+        console.print(f"[green]cached[/green] · {backend} · {download}")
 
 
 @app.command()
@@ -330,6 +354,32 @@ def _run_backend(
         )
 
     kwargs = {k: v for k, v in options.items() if v is not None}
+    unsupported = kwargs.keys() - cls.supported_options
+    if unsupported:
+        option = sorted(unsupported)[0]
+        flag = "--threads" if option == "n_threads" else f"--{option.replace('_', '-')}"
+        raise typer.BadParameter(
+            f"{flag} is not supported by backend {backend_name!r}", param_hint=flag
+        )
+    if (device := kwargs.get("device")) not in (None, "auto", "cpu", "mps", "cuda"):
+        raise typer.BadParameter(
+            f"Unknown device {device!r}. Choose from: auto, cpu, mps, cuda",
+            param_hint="--device",
+        )
+    if (dtype := kwargs.get("dtype")) not in (
+        None,
+        "auto",
+        "float32",
+        "fp32",
+        "float16",
+        "fp16",
+        "bfloat16",
+        "bf16",
+    ):
+        raise typer.BadParameter(
+            f"Unknown dtype {dtype!r}. Choose from: auto, float32, float16, bfloat16",
+            param_hint="--dtype",
+        )
     instance = cls(model, **kwargs) if model else cls(**kwargs)
 
     console.print(
@@ -367,11 +417,12 @@ def transcribe(
     limit: Annotated[int, typer.Option(help="Only the first N files; 0 for all")] = 0,
     output: Annotated[Path | None, typer.Option("--output", "-o", help="JSONL path")] = None,
     device: Annotated[
-        str | None, typer.Option(help="Backend device override: auto, cpu, mps, cuda")
+        str | None,
+        typer.Option(help="omniasr-torch/hf/dolphin device: auto, cpu, mps, cuda"),
     ] = None,
     dtype: Annotated[
         str | None,
-        typer.Option(help="omniasr-torch only: auto, float32, float16, bfloat16"),
+        typer.Option(help="omniasr-torch/hf dtype: auto, float32, float16, bfloat16"),
     ] = None,
     threads: Annotated[
         int | None, typer.Option(help="omniasr-gguf only: ggml thread count")
@@ -391,7 +442,8 @@ def transcribe(
     srt: Annotated[bool, typer.Option("--srt", help="Also write SubRip subtitles")] = False,
     vtt: Annotated[bool, typer.Option("--vtt", help="Also write WebVTT subtitles")] = False,
     verbose: Annotated[
-        bool, typer.Option("--verbose", "-v", help="Show the runtime's own native logs")
+        bool,
+        typer.Option("--verbose", "-v", help="omniasr-gguf/dolphin: show native logs"),
     ] = False,
 ) -> None:
     """Transcribe audio with one backend."""
@@ -576,7 +628,7 @@ def vote(
     output: Annotated[Path, typer.Option("--output", "-o", help="Where to write the result")],
     weight: Annotated[
         list[str] | None,
-        typer.Option("--weight", "-w", help="model=value, repeatable. Default: historical ranking"),
+        typer.Option("--weight", "-w", help="model=value, repeatable. Default: 1.0"),
     ] = None,
 ) -> None:
     """Combine several transcription runs by weighted per-character vote.
@@ -587,7 +639,7 @@ def vote(
     if len(runs) < 2:
         raise typer.BadParameter("need at least two runs to vote between")
 
-    weights = dict(DEFAULT_WEIGHTS)
+    weights: dict[str, float] = {}
     for item in weight or []:
         name, _, value = item.partition("=")
         if not value:
@@ -647,8 +699,8 @@ def vote(
 def _confirm_download(cls) -> bool:
     """Ask before a backend's default model pulls a large checkpoint.
 
-    ``stt compare`` runs every installed backend at its default model, and the
-    omniasr-torch default is a 31 GB download. Starting that unannounced is a
+    An explicitly selected backend may still need its default model. Starting a
+    multi-gigabyte download unannounced is a
     nasty surprise, so anything over a gigabyte that is not known to be cached
     gets a prompt.
     """
@@ -685,7 +737,7 @@ def compare(
         bool, typer.Option("--yes", "-y", help="Do not prompt before large downloads")
     ] = False,
 ) -> None:
-    """Run every installed backend over the same audio and tabulate the results."""
+    """Compare cached defaults, or explicitly selected backends."""
     files = _prepare(audio, limit, convert=True)
     refs = load_references(reference) if reference else None
 
@@ -698,18 +750,34 @@ def compare(
 
     ran = 0
     for name, cls in all_backends().items():
-        if only and name not in only:
+        if only is not None and name not in only:
             continue
         ok, reason = cls.is_available()
         if not ok:
             console.print(f"[yellow]skipping {name}[/yellow] — {reason}")
             continue
 
-        if not yes and not _confirm_download(cls):
+        if only is None:
+            probe = cls()
+            cached = probe.weights_cached()
+            if cached is None:
+                console.print(
+                    f"[yellow]skipping {name}[/yellow] — cache status cannot be verified; "
+                    f"select it explicitly with `--only {name}`"
+                )
+                continue
+            if not cached:
+                console.print(
+                    f"[yellow]skipping {name}[/yellow] — default model is not cached; "
+                    f"download it with `stt models --backend {name} --download {probe.model}`"
+                )
+                continue
+        elif not yes and not _confirm_download(cls):
             console.print(f"[yellow]skipping {name}[/yellow] — download declined")
             continue
 
-        results = _run_backend(name, None, files, language, 1, {})
+        options = {"local_files_only": True} if only is None and name == "hf" else {}
+        results = _run_backend(name, None, files, language, 1, options)
         write_jsonl(results, output_dir / f"{name}.jsonl")
         ran += 1
 
@@ -721,7 +789,9 @@ def compare(
         table.add_row(name, model, cer, _fmt(mean_rtf(results), ".2f"), str(failed))
 
     if not ran:
-        console.print("[red]No backends available.[/red] Run `stt backends` to see why.")
+        console.print(
+            "[red]No backends ran.[/red] Check installation and model cache status above."
+        )
         raise typer.Exit(1)
 
     console.print()

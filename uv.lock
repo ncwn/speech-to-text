@@ -1563,6 +1563,7 @@ hf = [
     { name = "transformers" },
 ]
 omniasr = [
+    { name = "fairseq2" },
     { name = "omnilingual-asr" },
     { name = "torch" },
     { name = "torchaudio" },
@@ -1579,6 +1580,7 @@ requires-dist = [
     { name = "accelerate", marker = "extra == 'hf'", specifier = ">=1.0" },
     { name = "crispasr", marker = "extra == 'gguf'", specifier = ">=0.8.29" },
     { name = "dataoceanai-dolphin", marker = "extra == 'dolphin'", specifier = ">=20260513" },
+    { name = "fairseq2", marker = "extra == 'omniasr'", specifier = "==0.6.0" },
     { name = "huggingface-hub", specifier = ">=0.32" },
     { name = "jiwer", specifier = ">=4.0" },
     { name = "myanmartools", specifier = ">=1.2.1" },

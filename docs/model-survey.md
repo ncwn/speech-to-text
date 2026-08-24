@@ -1,44 +1,21 @@
 # Burmese ASR survey
 
-This is a dated, non-exhaustive research snapshot, checked on 2026-08-24. Model
-and vendor catalogs change, so this page does not claim to enumerate every
-Burmese-capable checkpoint. Current repo support is in
-[models.md](models.md); local measurements and their evidence status are in
-[findings.md](findings.md).
+This is a dated, non-exhaustive snapshot checked on 2026-08-24. It records only
+claims supported by primary upstream model cards, repositories, or papers.
+Published scores are not comparable across different corpora or normalization
+rules, and this repository has no tracked local benchmark evidence.
 
-## Selected primary sources
-
-| Subject | Primary source | Snapshot conclusion |
+| Subject | Primary source | Verified scope |
 |---|---|---|
-| Meta Omnilingual ASR | [repository](https://github.com/facebookresearch/omnilingual-asr), [Burmese results](https://raw.githubusercontent.com/facebookresearch/omnilingual-asr/main/per_language_results_table_7B_llm_asr.csv) | Open multilingual ASR with Burmese coverage; the published corpus is not comparable to this repo's historical observations. |
-| Burmese Whisper fine-tune | [`chuuhtetnaing/whisper-large-v3-myanmar`](https://huggingface.co/chuuhtetnaing/whisper-large-v3-myanmar) | Weights are released; the card's WER is on its own evaluation set and should not be ranked against unrelated corpora. |
-| myMediWhisper | [paper](https://arxiv.org/abs/2608.11036) | A clinical-speech paper, not a released general-purpose checkpoint in this snapshot. |
-| DataoceanAI Dolphin | [repository and language table](https://github.com/DataoceanAI/Dolphin/blob/main/languages.md) | Burmese is listed; this repo implements the public `base` and `small` checkpoints. |
-| MMS-1B | [`facebook/mms-1b-all`](https://huggingface.co/facebook/mms-1b-all) | Burmese adapter is available; the weights are CC-BY-NC-4.0. |
-| SeamlessM4T v2 | [`facebook/seamless-m4t-v2-large`](https://huggingface.co/facebook/seamless-m4t-v2-large) | Burmese speech recognition is available; the weights are CC-BY-NC-4.0. |
-| Burmese w2v-BERT fine-tune | [`YonaKhine/finetuned-w2v2-bert-burmese-asr`](https://huggingface.co/YonaKhine/finetuned-w2v2-bert-burmese-asr) | A released Burmese CTC fine-tune with no published score recorded here. |
+| Meta Omnilingual ASR | [repository and model table](https://github.com/facebookresearch/omnilingual-asr#models), [v2 asset cards](https://github.com/facebookresearch/omnilingual-asr/blob/main/src/omnilingual_asr/cards/models/rc_models_v2.yaml), [inference guide](https://github.com/facebookresearch/omnilingual-asr/blob/main/src/omnilingual_asr/models/inference/README.md#44-punctuation-and-capitalization) | Burmese is in the multilingual system. v2 CTC and LLM cards are limited to audio under 40 seconds; v2 Unlimited LLM cards cover longer audio. Output is spoken form without punctuation or capitalization. Apache-2.0. |
+| Burmese Whisper fine-tune | [`chuuhtetnaing/whisper-large-v3-myanmar`](https://huggingface.co/chuuhtetnaing/whisper-large-v3-myanmar) | Apache-2.0 weights trained on the listed OpenSLR-80-derived dataset. Its reported WER belongs to that card's evaluation setup and is not a cross-model result. |
+| DataoceanAI Dolphin | [repository](https://github.com/DataoceanAI/Dolphin), [language table](https://github.com/DataoceanAI/Dolphin/blob/main/languages.md), [transcription code](https://github.com/DataoceanAI/Dolphin/blob/main/dolphin/transcribe.py), [constants](https://github.com/DataoceanAI/Dolphin/blob/main/dolphin/constants.py) | Burmese is listed as `my`/`MM`. Upstream uses `SPEECH_LENGTH = 30` to choose long-form handling and cap VAD segments; this does not make its single-file extractor a fixed Whisper window. Apache-2.0. |
+| MMS-1B | [`facebook/mms-1b-all`](https://huggingface.co/facebook/mms-1b-all) | The multilingual CTC card includes the `mya` adapter. CC-BY-NC-4.0. |
+| SeamlessM4T v2 | [`facebook/seamless-m4t-v2-large`](https://huggingface.co/facebook/seamless-m4t-v2-large#supported-languages) | Burmese (`mya`, `Mymr`) is source speech and source text, and target text. It is not a Burmese target-speech language. CC-BY-NC-4.0. |
+| Burmese w2v-BERT fine-tune | [`YonaKhine/finetuned-w2v2-bert-burmese-asr`](https://huggingface.co/YonaKhine/finetuned-w2v2-bert-burmese-asr) | MIT-licensed CTC fine-tune of `facebook/w2v-bert-2.0` on the listed OpenSLR-80-derived dataset. The card reports evaluation WER `0.4256`, but leaves its evaluation-data section unspecified; whitespace-token WER is unsuitable for this harness. |
+| FLEURS | [`google/fleurs`](https://huggingface.co/datasets/google/fleurs) | Public multilingual read-speech dataset with a Burmese `my_mm` configuration. A FLEURS score requires an identified split, immutable inputs, and this harness's stated normalization before it can be reproduced. |
 
-The implemented rows above are cataloged by the repo in [models.md](models.md).
-Their runtime, device, precision, and benchmark details must not be copied into
-this survey.
-
-## Important scope checks
-
-- **Published error rates are not interchangeable.** Model cards, papers, and
-  this repo use different corpora and normalization rules. Use the common local
-  evidence in [findings.md](findings.md) when comparing implemented backends.
-- **BURMESE-SAN is a text benchmark, not an ASR system.** See the
-  [paper](https://arxiv.org/abs/2602.18788) before using it as speech evidence.
-- **Audio-capable language models are not automatically transcribers.** An
-  audio-understanding model needs verbatim ASR evidence before it belongs in an
-  ASR comparison.
-- **Absence is not a durable finding.** A model absent from this snapshot may
-  appear later on Hugging Face or in a vendor catalog; recheck the primary source
-  before adopting or ruling out a candidate.
-
-## Licensing
-
-The external cards above carry their own terms. In particular, MMS-1B and
-SeamlessM4T are CC-BY-NC-4.0, while omniASR is Apache-2.0. Licensing is included
-here only as a research caveat; the implementation catalog remains
-[models.md](models.md).
+Do not infer Apple Silicon support, memory use, download size, accuracy, or
+throughput from a model's parameter count or multilingual language table. Those
+properties require either an upstream statement for the exact runtime or local
+evidence that records the resolved device and artifacts.

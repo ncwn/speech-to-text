@@ -29,7 +29,6 @@ class ScoredItem:
     wer: float
     ref_chars: int
     error: str | None = None
-    warning: str | None = None
 
 
 @dataclass
@@ -69,10 +68,6 @@ class Score:
         if not items:
             return float("nan")
         return sum(i.wer for i in items) / len(items)
-
-    @property
-    def mean_rtf(self) -> float | None:
-        return None
 
 
 def load_references(path: Path) -> dict[str, str]:
@@ -128,7 +123,6 @@ def score_results(
             )
             continue
 
-        warning = None
         if check_encoding and r.text.strip():
             ref_zawgyi = is_zawgyi(lookup)
             hyp_zawgyi = is_zawgyi(r.text)
@@ -189,7 +183,6 @@ def score_results(
                 cer=float(cer),
                 wer=float(wer),
                 ref_chars=len(ref),
-                warning=warning,
             )
         )
 

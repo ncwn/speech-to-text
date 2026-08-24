@@ -1,4 +1,4 @@
-"""Meta Omnilingual ASR via CrispASR's ggml runtime — Metal GPU on Apple Silicon.
+"""Meta Omnilingual ASR via CrispASR's ggml runtime.
 
 CrispASR is a whisper.cpp/ggml fork with an ``omniasr-llm`` backend. It picks
 the best available ggml backend at init (CUDA > Metal > Vulkan > CPU), so on a
@@ -9,6 +9,7 @@ The model table below defines the GGUF conversions exposed by this adapter.
 
 from __future__ import annotations
 
+import hashlib
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -29,6 +30,8 @@ class GgufModel:
 
     filename: str
     url: str
+    revision: str
+    sha256: str
     crisp_backend: str
     approx_mb: int
     unlimited: bool
@@ -38,49 +41,90 @@ class GgufModel:
 MODELS: dict[str, GgufModel] = {
     "llm-unlimited-300m-v2": GgufModel(
         filename="omniasr-llm-unlimited-300m-v2-q4_k.gguf",
-        url=f"{_HF}/cstr/omniasr-llm-unlimited-300m-v2-GGUF/resolve/main/omniasr-llm-unlimited-300m-v2-q4_k.gguf",
+        url=(
+            f"{_HF}/cstr/omniasr-llm-unlimited-300m-v2-GGUF/resolve/"
+            "a68f5d040b483506c0966a1602050ee1550a0382/"
+            "omniasr-llm-unlimited-300m-v2-q4_k.gguf"
+        ),
+        revision="a68f5d040b483506c0966a1602050ee1550a0382",
+        sha256="56879dd6c0411aa19b225440aac088f11bad9496f64a1c0aa0d293e1450d7203",
         crisp_backend="omniasr-llm-unlimited",
-        approx_mb=1025,
+        approx_mb=1075,
         unlimited=True,
     ),
     "llm-unlimited-300m-v2-f16": GgufModel(
         filename="omniasr-llm-unlimited-300m-v2-f16.gguf",
-        url=f"{_HF}/cstr/omniasr-llm-unlimited-300m-v2-GGUF/resolve/main/omniasr-llm-unlimited-300m-v2-f16.gguf",
+        url=(
+            f"{_HF}/cstr/omniasr-llm-unlimited-300m-v2-GGUF/resolve/"
+            "a68f5d040b483506c0966a1602050ee1550a0382/"
+            "omniasr-llm-unlimited-300m-v2-f16.gguf"
+        ),
+        revision="a68f5d040b483506c0966a1602050ee1550a0382",
+        sha256="e6e2220532ec7f76d0bdb0896109b2ab3d14bd46d639123a6212a57a932b3d8b",
         crisp_backend="omniasr-llm-unlimited",
-        approx_mb=3113,
+        approx_mb=3264,
         unlimited=True,
     ),
     "llm-300m-v2": GgufModel(
         filename="omniasr-llm-300m-v2-q4_k.gguf",
-        url=f"{_HF}/cstr/omniasr-llm-300m-v2-GGUF/resolve/main/omniasr-llm-300m-v2-q4_k.gguf",
+        url=(
+            f"{_HF}/cstr/omniasr-llm-300m-v2-GGUF/resolve/"
+            "f77a5ccffff18e90f8e5605279103cec2b184b46/"
+            "omniasr-llm-300m-v2-q4_k.gguf"
+        ),
+        revision="f77a5ccffff18e90f8e5605279103cec2b184b46",
+        sha256="2039697e6d21d27a2394372c972de6f3439a0a74a3575876949130466d87f90c",
         crisp_backend="omniasr-llm",
-        approx_mb=1019,
+        approx_mb=1068,
         unlimited=False,
     ),
     "llm-1b": GgufModel(
         filename="omniasr-llm-1b-q4_k.gguf",
-        url=f"{_HF}/cstr/omniasr-llm-1b-GGUF/resolve/main/omniasr-llm-1b-q4_k.gguf",
+        url=(
+            f"{_HF}/cstr/omniasr-llm-1b-GGUF/resolve/"
+            "7b433b6ab2b211c3cdde8591d8bb23642fe2742f/"
+            "omniasr-llm-1b-q4_k.gguf"
+        ),
+        revision="7b433b6ab2b211c3cdde8591d8bb23642fe2742f",
+        sha256="0181ce14efc1197222601c330035ccb7446119c4d8ffb0b0cdb526634c404fdf",
         crisp_backend="omniasr-llm",
-        approx_mb=1376,
+        approx_mb=1442,
         unlimited=False,
     ),
     "ctc-1b-v2": GgufModel(
         filename="omniasr-ctc-1b-v2-q4_k.gguf",
-        url=f"{_HF}/cstr/omniASR-CTC-1B-v2-GGUF/resolve/main/omniasr-ctc-1b-v2-q4_k.gguf",
+        url=(
+            f"{_HF}/cstr/omniASR-CTC-1B-v2-GGUF/resolve/"
+            "317880194be65674e7b27efba10273be1afeb9f1/"
+            "omniasr-ctc-1b-v2-q4_k.gguf"
+        ),
+        revision="317880194be65674e7b27efba10273be1afeb9f1",
+        sha256="fcd75539c542f335877c04a83cbe6d9ccf31deae42ee72c655a8adefd6627036",
         crisp_backend="omniasr",
-        approx_mb=658,
+        approx_mb=691,
         unlimited=False,
     ),
     "ctc-300m-v2": GgufModel(
         filename="omniasr-ctc-300m-v2-q4_k.gguf",
-        url=f"{_HF}/cstr/omniASR-CTC-300M-v2-GGUF/resolve/main/omniasr-ctc-300m-v2-q4_k.gguf",
+        url=(
+            f"{_HF}/cstr/omniASR-CTC-300M-v2-GGUF/resolve/"
+            "fc3e3765175be5aaf0c9e75ed25a7e8843ef04d5/"
+            "omniasr-ctc-300m-v2-q4_k.gguf"
+        ),
+        revision="fc3e3765175be5aaf0c9e75ed25a7e8843ef04d5",
+        sha256="cac0ae5eef46f146e47a1445e9fb8a4e894fac78c5b90e4d6318dc3734b34808",
         crisp_backend="omniasr-300m",
-        approx_mb=194,
+        approx_mb=204,
         unlimited=False,
     ),
 }
 
 DEFAULT_MODEL = "llm-unlimited-300m-v2"
+
+
+def _sha256(path: Path) -> str:
+    with path.open("rb") as stream:
+        return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
 def _speech_confidence(no_speech_prob: float) -> float | None:
@@ -103,10 +147,9 @@ def _speech_confidence(no_speech_prob: float) -> float | None:
 @register
 class OmniASRGgufBackend(ASRBackend):
     name: ClassVar[str] = "omniasr-gguf"
-    description: ClassVar[str] = "Meta Omnilingual ASR via CrispASR/ggml (bundled 300M/1B cards)"
+    description: ClassVar[str] = "Meta Omnilingual ASR via CrispASR/ggml (selectable 300M/1B cards)"
     install_hint: ClassVar[str] = "uv sync --extra gguf"
-    accepts_language: ClassVar[bool] = True
-    is_local: ClassVar[bool] = True
+    supported_options: ClassVar[frozenset[str]] = frozenset({"n_threads", "verbose"})
 
     def __init__(
         self,
@@ -142,19 +185,50 @@ class OmniASRGgufBackend(ASRBackend):
     def estimated_download_mb(self) -> int | None:
         return self.spec.approx_mb
 
-    def weights_cached(self) -> bool | None:
+    def _cache_path(self) -> Path:
         from crispasr import cache_dir
 
-        return (Path(cache_dir()) / self.spec.filename).exists()
+        directory = cache_dir()
+        if not directory:
+            raise RuntimeError("CrispASR did not provide a cache directory")
+        return Path(directory) / self.spec.filename
+
+    def _weights_valid(self, path: Path) -> bool:
+        try:
+            return path.is_file() and _sha256(path) == self.spec.sha256
+        except OSError:
+            return False
+
+    def weights_cached(self) -> bool | None:
+        try:
+            return self._weights_valid(self._cache_path())
+        except RuntimeError:
+            return False
+
+    def download_weights(self) -> None:
+        self.ensure_weights()
 
     def ensure_weights(self, quiet: bool = False) -> Path:
-        """Download the GGUF to ``~/.cache/crispasr`` if it is not already there."""
+        """Return verified weights, downloading only when the model is absent."""
         from crispasr import cache_ensure_file
+
+        cached = self._cache_path()
+        if self._weights_valid(cached):
+            return cached
+        # The model is authoritative; a stale .src must not trigger replacement.
+        if cached.exists() or cached.is_symlink():
+            raise RuntimeError(
+                f"GGUF cache failed integrity validation: {cached}. Quarantine the model and "
+                f"its {cached.name}.src sidecar, then retry."
+            )
 
         path = cache_ensure_file(self.spec.filename, self.spec.url, quiet=quiet)
         if not path:
             raise RuntimeError(f"Failed to download {self.spec.filename} from {self.spec.url}")
-        return Path(path)
+        downloaded = Path(path)
+        if not self._weights_valid(downloaded):
+            raise RuntimeError(f"GGUF download failed integrity validation: {downloaded}")
+        return downloaded
 
     def load(self) -> None:
         from crispasr import Session

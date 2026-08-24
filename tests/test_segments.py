@@ -38,9 +38,8 @@ def test_segments_survive_a_jsonl_round_trip(tmp_path):
     assert back.segments[1].source == "chunk"  # default
 
 
-def test_old_results_without_segments_still_load(tmp_path):
-    """Legacy JSONL without segment fields must keep working."""
-    path = tmp_path / "old.jsonl"
+def test_results_without_optional_segments_load(tmp_path):
+    path = tmp_path / "result.jsonl"
     path.write_text(
         json.dumps(
             {
@@ -72,11 +71,6 @@ def test_absent_and_empty_segments_are_both_falsy(tmp_path):
     back = read_jsonl(path)
     assert back[0].segments is None
     assert not back[1].segments
-
-
-def test_segment_duration_never_goes_negative():
-    assert Segment("x", 5.0, 3.0).duration == 0.0
-    assert Segment("x", 1.0, 3.5).duration == 2.5
 
 
 def test_srt_numbers_cues_and_formats_timestamps(tmp_path):

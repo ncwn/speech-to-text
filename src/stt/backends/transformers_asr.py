@@ -5,10 +5,10 @@ This adapter covers four model families behind one interface:
 ``whisper``    Burmese fine-tunes of Whisper, plus stock Whisper as a baseline.
 ``mms``        Meta MMS-1B with its per-language adapter (``mya``).
 ``ctc``        Monolingual Burmese CTC fine-tunes (w2v2-BERT).
-``seamless``   SeamlessM4T v2, which transcribes Burmese speech but cannot
-               synthesise it — source-side only.
+``seamless``   SeamlessM4T v2 with speech/text input and text output. This
+               adapter does not expose speech output.
 
-Transformers uses MPS by default on Apple Silicon.
+Device ``auto`` selects CUDA, then MPS, then CPU.
 
 Licensing: MMS and SeamlessM4T weights are CC-BY-NC-4.0. Fine for evaluation,
 not for a commercial product.
@@ -16,6 +16,7 @@ not for a commercial product.
 
 from __future__ import annotations
 
+import json
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -40,6 +41,7 @@ _CHUNKING = {
 @dataclass(frozen=True)
 class HFModel:
     repo: str
+    revision: str
     family: str
     approx_mb: int
     #: Language code this family expects, given a Burmese request.
@@ -50,6 +52,7 @@ class HFModel:
 MODELS: dict[str, HFModel] = {
     "whisper-my-large-v3": HFModel(
         "chuuhtetnaing/whisper-large-v3-myanmar",
+        "c6d3e92a45b561cb5c00724625ca1904f830d887",
         "whisper",
         6174,
         "my",
@@ -57,6 +60,7 @@ MODELS: dict[str, HFModel] = {
     ),
     "whisper-my-medium": HFModel(
         "chuuhtetnaing/whisper-medium-myanmar",
+        "6ddaae5665c80e0d3c322bd352656074b9851566",
         "whisper",
         3056,
         "my",
@@ -64,6 +68,7 @@ MODELS: dict[str, HFModel] = {
     ),
     "whisper-my-small": HFModel(
         "chuuhtetnaing/whisper-small-myanmar",
+        "f3de3c167914fec3c0974aad1189eda3fa77d8cd",
         "whisper",
         967,
         "my",
@@ -71,6 +76,7 @@ MODELS: dict[str, HFModel] = {
     ),
     "whisper-large-v3": HFModel(
         "openai/whisper-large-v3",
+        "06f233fe06e710322aca913c1bc4249a0d71fce1",
         "whisper",
         3087,
         "my",
@@ -78,6 +84,7 @@ MODELS: dict[str, HFModel] = {
     ),
     "mms-1b-all": HFModel(
         "facebook/mms-1b-all",
+        "3d33597edbdaaba14a8e858e2c8caa76e3cec0cd",
         "mms",
         3869,
         "mya",
@@ -85,13 +92,15 @@ MODELS: dict[str, HFModel] = {
     ),
     "seamless-m4t-v2": HFModel(
         "facebook/seamless-m4t-v2-large",
+        "5f8cc790b19fc3f67a61c105133b20b34e3dcb76",
         "seamless",
         9237,
         "mya",
-        "CC-BY-NC; Burmese is source-speech only",
+        "CC-BY-NC; speech/text input, text output only",
     ),
     "w2v-bert-my": HFModel(
         "YonaKhine/finetuned-w2v2-bert-burmese-asr",
+        "3a0bb058936140acfe7c905171eefc78234e93be",
         "ctc",
         2423,
         None,
@@ -99,26 +108,23 @@ MODELS: dict[str, HFModel] = {
     ),
 }
 
-# Selected from historical local CER; see docs/findings.md. Its weights are
-# CC-BY-NC-4.0 and unsuitable for commercial use.
+# Its weights are CC-BY-NC-4.0 and unsuitable for commercial use.
 DEFAULT_MODEL = "seamless-m4t-v2"
 
 
 @register
 class TransformersASRBackend(ASRBackend):
     name: ClassVar[str] = "hf"
-    description: ClassVar[str] = (
-        "Hugging Face transformers: Whisper / MMS / SeamlessM4T / w2v-BERT (Metal GPU)"
-    )
+    description: ClassVar[str] = "Hugging Face transformers: Whisper / MMS / SeamlessM4T / w2v-BERT"
     install_hint: ClassVar[str] = "uv sync --extra hf"
-    accepts_language: ClassVar[bool] = True
-    is_local: ClassVar[bool] = True
+    supported_options: ClassVar[frozenset[str]] = frozenset({"device", "dtype", "local_files_only"})
 
     def __init__(
         self,
         model: str = DEFAULT_MODEL,
         device: str = "auto",
         dtype: str = "auto",
+        local_files_only: bool = False,
         **options: Any,
     ) -> None:
         if model not in MODELS:
@@ -128,6 +134,7 @@ class TransformersASRBackend(ASRBackend):
         self.spec = MODELS[model]
         self.device_arg = device
         self.dtype_arg = dtype
+        self.local_files_only = local_files_only
         self.pipe: Any = None
         self._seamless: tuple[Any, Any] | None = None
         self.resolved_device: str | None = None
@@ -142,8 +149,14 @@ class TransformersASRBackend(ASRBackend):
             import transformers
         except ImportError as exc:
             return False, f"missing dependency: {exc.name}"
-        gpu = "mps" if torch.backends.mps.is_available() else "cpu"
-        return True, f"transformers {transformers.__version__} on {gpu}"
+        device = (
+            "cuda"
+            if torch.cuda.is_available()
+            else "mps"
+            if torch.backends.mps.is_available()
+            else "cpu"
+        )
+        return True, f"transformers {transformers.__version__} on {device}"
 
     def _resolve_device(self) -> str:
         import torch
@@ -172,8 +185,7 @@ class TransformersASRBackend(ASRBackend):
             if self.dtype_arg not in named:
                 raise ValueError(f"Unknown dtype {self.dtype_arg!r}. Choose from {sorted(named)}")
             return named[self.dtype_arg]
-        # Historical local checks favored float32 for both speed and output
-        # stability; see docs/findings.md.
+        # Keep the adapter's default numerics stable across supported devices.
         return torch.float32
 
     def estimated_download_mb(self) -> int | None:
@@ -186,8 +198,110 @@ class TransformersASRBackend(ASRBackend):
         folder = cache / f"models--{self.spec.repo.replace('/', '--')}"
         if not folder.is_dir():
             return False
-        snapshots = folder / "snapshots"
-        return any(snapshots.iterdir()) if snapshots.is_dir() else False
+        return self._snapshot_complete(folder / "snapshots" / self.spec.revision)
+
+    def _snapshot_complete(self, snapshot: Path) -> bool:
+        if not (snapshot / "config.json").is_file():
+            return False
+        weights = any(
+            (snapshot / filename).is_file()
+            for filename in ("model.safetensors", "pytorch_model.bin")
+        )
+        for filename in ("model.safetensors.index.json", "pytorch_model.bin.index.json"):
+            index = snapshot / filename
+            if not index.is_file():
+                continue
+            try:
+                shards = set(json.loads(index.read_text(encoding="utf-8"))["weight_map"].values())
+            except (KeyError, OSError, TypeError, ValueError):
+                continue
+            if shards and all((snapshot / shard).is_file() for shard in shards):
+                weights = True
+                break
+        if not weights:
+            return False
+        if not (snapshot / "preprocessor_config.json").is_file():
+            return False
+        if self.spec.family == "whisper":
+            return (snapshot / "tokenizer.json").is_file() or all(
+                (snapshot / filename).is_file() for filename in ("vocab.json", "merges.txt")
+            )
+        if self.spec.family == "mms":
+            adapter = any(
+                (snapshot / f"adapter.{self.spec.lang}.{suffix}").is_file()
+                for suffix in ("safetensors", "bin")
+            )
+            return adapter and (snapshot / "vocab.json").is_file()
+        if self.spec.family == "ctc":
+            return (snapshot / "vocab.json").is_file()
+        if self.spec.family == "seamless":
+            return all(
+                (snapshot / filename).is_file()
+                for filename in ("tokenizer.model", "sentencepiece.bpe.model")
+            )
+        return False
+
+    def download_weights(self) -> None:
+        from huggingface_hub import HfApi, snapshot_download
+
+        names = [
+            file.rfilename
+            for file in HfApi()
+            .model_info(
+                self.spec.repo,
+                revision=self.spec.revision,
+                files_metadata=True,
+            )
+            .siblings
+        ]
+        weights = [
+            name
+            for name in names
+            if name == "model.safetensors"
+            or (name.startswith("model-") and name.endswith(".safetensors"))
+        ]
+        if any(name.startswith("model-") for name in weights):
+            weights.append("model.safetensors.index.json")
+        if not weights:
+            weights = [
+                name
+                for name in names
+                if name == "pytorch_model.bin"
+                or (name.startswith("pytorch_model-") and name.endswith(".bin"))
+            ]
+            if any(name.startswith("pytorch_model-") for name in weights):
+                weights.append("pytorch_model.bin.index.json")
+        if not weights:
+            raise RuntimeError(f"No PyTorch weights found in {self.spec.repo}")
+        if self.spec.family == "mms":
+            adapters = (
+                f"adapter.{self.spec.lang}.safetensors",
+                f"adapter.{self.spec.lang}.bin",
+            )
+            adapter = next((name for name in adapters if name in names), None)
+            if adapter is None:
+                raise RuntimeError(f"No {self.spec.lang} adapter found in {self.spec.repo}")
+            weights.append(adapter)
+
+        metadata_suffixes = (".json", ".txt", ".model", ".yaml", ".yml")
+        metadata = [
+            name
+            for name in names
+            if name.endswith(metadata_suffixes)
+            and not name.endswith(".index.json")
+            and not (self.spec.family == "mms" and "/" in name)
+        ]
+        snapshot = Path(
+            snapshot_download(
+                repo_id=self.spec.repo,
+                revision=self.spec.revision,
+                allow_patterns=metadata + weights,
+            )
+        )
+        if not self._snapshot_complete(snapshot):
+            raise RuntimeError(
+                f"Downloaded snapshot for {self.spec.repo}@{self.spec.revision} is incomplete"
+            )
 
     def load(self) -> None:
         from transformers import AutoProcessor, pipeline
@@ -198,12 +312,16 @@ class TransformersASRBackend(ASRBackend):
         self.resolved_dtype = str(dtype).replace("torch.", "")
 
         repo = self.spec.repo
+        hub_options = {
+            "revision": self.spec.revision,
+            "local_files_only": self.local_files_only,
+        }
 
         if self.spec.family == "seamless":
             from transformers import SeamlessM4Tv2ForSpeechToText
 
-            processor = AutoProcessor.from_pretrained(repo)
-            model = SeamlessM4Tv2ForSpeechToText.from_pretrained(repo, torch_dtype=dtype)
+            processor = AutoProcessor.from_pretrained(repo, **hub_options)
+            model = SeamlessM4Tv2ForSpeechToText.from_pretrained(repo, dtype=dtype, **hub_options)
             model.to(device).eval()
             self._seamless = (processor, model)
             self._loaded = True
@@ -212,20 +330,20 @@ class TransformersASRBackend(ASRBackend):
         if self.spec.family == "mms":
             from transformers import Wav2Vec2ForCTC
 
-            processor = AutoProcessor.from_pretrained(repo)
-            model = Wav2Vec2ForCTC.from_pretrained(repo, torch_dtype=dtype)
+            processor = AutoProcessor.from_pretrained(repo, **hub_options)
+            model = Wav2Vec2ForCTC.from_pretrained(repo, dtype=dtype, **hub_options)
             # MMS is one shared encoder plus a tiny per-language adapter; both
             # the tokenizer and the model have to be switched to Burmese or you
             # silently decode with the previous language's vocabulary.
             processor.tokenizer.set_target_lang(self.spec.lang)
-            model.load_adapter(self.spec.lang)
+            model.load_adapter(self.spec.lang, **hub_options)
             model.to(device).eval()
             self.pipe = pipeline(
                 "automatic-speech-recognition",
                 model=model,
                 tokenizer=processor.tokenizer,
                 feature_extractor=processor.feature_extractor,
-                torch_dtype=dtype,
+                dtype=dtype,
                 device=device,
             )
             self._loaded = True
@@ -234,7 +352,9 @@ class TransformersASRBackend(ASRBackend):
         self.pipe = pipeline(
             "automatic-speech-recognition",
             model=repo,
-            torch_dtype=dtype,
+            revision=self.spec.revision,
+            model_kwargs={"local_files_only": self.local_files_only},
+            dtype=dtype,
             device=device,
         )
         self._loaded = True

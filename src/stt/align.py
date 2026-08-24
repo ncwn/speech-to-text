@@ -1,9 +1,7 @@
 """Recover timestamps and confidence for a transcript by forced alignment.
 
-Our most accurate model is also our most opaque: fairseq2's ``ASRInferencePipeline``
-returns a bare ``List[str]``, with no timings and no per-token scores. That
-makes subtitles impossible and, worse, leaves us unable to say *which part* of a
-long transcript to distrust.
+Some ASR backends return only transcript text, without timings or token scores.
+That prevents subtitle output and region-level confidence checks.
 
 Forced alignment fixes this without touching the decoder. Given audio and a
 transcript, a CTC acoustic model can be constrained to the one path through its

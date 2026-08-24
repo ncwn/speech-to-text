@@ -42,11 +42,47 @@ def test_gguf_backend_rejects_unknown_model():
 def test_gguf_model_table_is_coherent():
     from stt.backends.omniasr_gguf import DEFAULT_MODEL, MODELS
 
+    expected = {
+        "llm-unlimited-300m-v2": (
+            "a68f5d040b483506c0966a1602050ee1550a0382",
+            "56879dd6c0411aa19b225440aac088f11bad9496f64a1c0aa0d293e1450d7203",
+            1075,
+        ),
+        "llm-unlimited-300m-v2-f16": (
+            "a68f5d040b483506c0966a1602050ee1550a0382",
+            "e6e2220532ec7f76d0bdb0896109b2ab3d14bd46d639123a6212a57a932b3d8b",
+            3264,
+        ),
+        "llm-300m-v2": (
+            "f77a5ccffff18e90f8e5605279103cec2b184b46",
+            "2039697e6d21d27a2394372c972de6f3439a0a74a3575876949130466d87f90c",
+            1068,
+        ),
+        "llm-1b": (
+            "7b433b6ab2b211c3cdde8591d8bb23642fe2742f",
+            "0181ce14efc1197222601c330035ccb7446119c4d8ffb0b0cdb526634c404fdf",
+            1442,
+        ),
+        "ctc-1b-v2": (
+            "317880194be65674e7b27efba10273be1afeb9f1",
+            "fcd75539c542f335877c04a83cbe6d9ccf31deae42ee72c655a8adefd6627036",
+            691,
+        ),
+        "ctc-300m-v2": (
+            "fc3e3765175be5aaf0c9e75ed25a7e8843ef04d5",
+            "cac0ae5eef46f146e47a1445e9fb8a4e894fac78c5b90e4d6318dc3734b34808",
+            204,
+        ),
+    }
     assert DEFAULT_MODEL in MODELS
     assert MODELS[DEFAULT_MODEL].unlimited, "default should handle long audio"
+    assert {
+        key: (spec.revision, spec.sha256, spec.approx_mb) for key, spec in MODELS.items()
+    } == expected
     for key, spec in MODELS.items():
         assert spec.url.endswith(spec.filename), f"{key}: url/filename mismatch"
-        assert spec.approx_mb > 0
+        assert f"/resolve/{spec.revision}/" in spec.url
+        assert "/resolve/main/" not in spec.url
 
 
 def test_torch_backend_identifies_unlimited_cards():
@@ -55,16 +91,27 @@ def test_torch_backend_identifies_unlimited_cards():
     assert not cls("omniASR_LLM_7B_v2").is_unlimited
 
 
-def test_torch_backend_parses_model_size():
-    cls = get_backend("omniasr-torch")
-    assert cls("omniASR_LLM_Unlimited_7B_v2")._model_size_tag() == "7B"
-    assert cls("omniASR_LLM_Unlimited_300M_v2")._model_size_tag() == "300M"
-
-
 def test_torch_backend_reports_download_size():
+    from stt.backends.omniasr_torch import MODELS
+
     cls = get_backend("omniasr-torch")
-    assert cls("omniASR_LLM_Unlimited_7B_v2").estimated_download_mb() == 31200
-    assert cls("some_unrecognised_card").estimated_download_mb() is None
+    expected = {
+        "omniASR_CTC_300M_v2": (1_304_065_508, 1304),
+        "omniASR_CTC_1B_v2": (3_902_956_068, 3903),
+        "omniASR_CTC_3B_v2": (12_325_920_624, 12326),
+        "omniASR_CTC_7B_v2": (26_023_732_143, 26024),
+        "omniASR_LLM_300M_v2": (6_526_183_880, 6526),
+        "omniASR_LLM_1B_v2": (9_118_733_852, 9119),
+        "omniASR_LLM_3B_v2": (17_522_679_843, 17523),
+        "omniASR_LLM_7B_v2": (31_220_488_063, 31220),
+        "omniASR_LLM_Unlimited_300M_v2": (6_526_216_648, 6526),
+        "omniASR_LLM_Unlimited_1B_v2": (9_118_766_620, 9119),
+        "omniASR_LLM_Unlimited_3B_v2": (17_522_712_611, 17523),
+        "omniASR_LLM_Unlimited_7B_v2": (31_220_520_831, 31221),
+    }
+    assert {name: (spec.size_bytes, spec.approx_mb) for name, spec in MODELS.items()} == expected
+    with pytest.raises(ValueError, match="Unknown omniASR model"):
+        cls("some_unrecognised_card")
 
 
 def test_cpu_prefers_float32_because_bfloat16_is_emulated_there():
@@ -191,7 +238,17 @@ def test_hf_backend_rejects_unknown_model():
 def test_hf_model_table_is_coherent():
     from stt.backends.transformers_asr import _CHUNKING, DEFAULT_MODEL, MODELS
 
+    expected_revisions = {
+        "whisper-my-large-v3": "c6d3e92a45b561cb5c00724625ca1904f830d887",
+        "whisper-my-medium": "6ddaae5665c80e0d3c322bd352656074b9851566",
+        "whisper-my-small": "f3de3c167914fec3c0974aad1189eda3fa77d8cd",
+        "whisper-large-v3": "06f233fe06e710322aca913c1bc4249a0d71fce1",
+        "mms-1b-all": "3d33597edbdaaba14a8e858e2c8caa76e3cec0cd",
+        "seamless-m4t-v2": "5f8cc790b19fc3f67a61c105133b20b34e3dcb76",
+        "w2v-bert-my": "3a0bb058936140acfe7c905171eefc78234e93be",
+    }
     assert DEFAULT_MODEL in MODELS
+    assert {key: spec.revision for key, spec in MODELS.items()} == expected_revisions
     for key, spec in MODELS.items():
         assert "/" in spec.repo, f"{key}: repo should be owner/name"
         assert spec.approx_mb > 0
