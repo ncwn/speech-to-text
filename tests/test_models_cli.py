@@ -198,6 +198,81 @@ def test_implicit_compare_makes_only_hf_cached_only(monkeypatch):
     assert calls == [("hf", {})]
 
 
+def test_compare_all_cached_models_runs_each_verified_variant(monkeypatch, tmp_path):
+    class Backend:
+        name = "test"
+
+        def __init__(self, model="default"):
+            self.model = model
+
+        @classmethod
+        def is_available(cls):
+            return True, "test"
+
+        def weights_cached(self):
+            return self.model != "missing"
+
+    calls = []
+    outputs = []
+
+    def run(name, model, files, language, batch_size, options):
+        calls.append((name, model, options))
+        return [TranscriptionResult(audio_path="audio.wav", text="", backend=name, model=model)]
+
+    monkeypatch.setattr(cli, "_prepare", lambda *args, **kwargs: [Path("audio.wav")])
+    monkeypatch.setattr(cli, "all_backends", lambda: {"test": Backend})
+    monkeypatch.setattr(cli, "_model_names_by_backend", lambda: {"test": ("one", "missing")})
+    monkeypatch.setattr(cli, "_run_backend", run)
+    monkeypatch.setattr(cli, "write_jsonl", lambda _results, path: outputs.append(path))
+
+    result = runner.invoke(
+        cli.app,
+        ["compare", "audio.wav", "--all-cached-models", "--output-dir", str(tmp_path)],
+    )
+
+    assert result.exit_code == 0, result.output
+    assert calls == [("test", "one", {})]
+    assert outputs == [tmp_path / "test--one.jsonl"]
+    assert "test · missing" in result.output
+
+
+def test_compare_suppresses_partial_corpus_cer(monkeypatch, tmp_path):
+    class Backend:
+        name = "test"
+        model = "model"
+
+        @classmethod
+        def is_available(cls):
+            return True, "test"
+
+        def weights_cached(self):
+            return True
+
+    results = [
+        TranscriptionResult(audio_path="one.wav", text="က", backend="test", model="model"),
+        TranscriptionResult(audio_path="two.wav", text="က", backend="test", model="model"),
+    ]
+    references = tmp_path / "references.tsv"
+    references.write_text("audio_id\ttranscript\none\tက\n", encoding="utf-8")
+
+    monkeypatch.setattr(cli, "_prepare", lambda *args, **kwargs: [Path("audio.wav")])
+    monkeypatch.setattr(cli, "all_backends", lambda: {"test": Backend})
+    monkeypatch.setattr(cli, "_run_backend", lambda *args, **kwargs: results)
+    monkeypatch.setattr(cli, "write_jsonl", lambda *args, **kwargs: None)
+
+    result = runner.invoke(cli.app, ["compare", "audio.wav", "--reference", str(references)])
+
+    assert result.exit_code == 0, result.output
+    assert "0.0000" not in result.output
+    assert "test" in result.output and "model" in result.output
+
+    references.write_text("audio_id\ttranscript\n", encoding="utf-8")
+    result = runner.invoke(cli.app, ["compare", "audio.wav", "--reference", str(references)])
+    assert result.exit_code == 0, result.output
+    assert "Pass --reference" not in result.output
+    assert "0.0000" not in result.output
+
+
 def test_gguf_cache_probe_stream_hashes_the_model(monkeypatch, tmp_path):
     payload = b"verified GGUF fixture"
     backend = get_backend("omniasr-gguf")()
@@ -363,6 +438,29 @@ def test_torch_download_rejects_wrong_tokenizer_hash_without_deleting_it(monkeyp
         backend.download_weights()
 
     assert tokenizer.read_bytes() == b"x" * omniasr_torch.TOKENIZER_SIZE_BYTES
+
+
+def test_torch_cache_probe_validates_files_inside_opaque_asset_directories(monkeypatch, tmp_path):
+    from stt.backends import omniasr_torch
+
+    backend = get_backend("omniasr-torch")("omniASR_CTC_300M_v2")
+    backend.spec = replace(backend.spec, size_bytes=4)
+    checkpoint = backend._asset_path(tmp_path, "omniASR-CTC-300M-v2.pt")
+    tokenizer = backend._asset_path(tmp_path, omniasr_torch._TOKENIZER_FILENAME)
+    checkpoint.parent.mkdir()
+    tokenizer.parent.mkdir()
+    monkeypatch.setenv("FAIRSEQ2_CACHE_DIR", str(tmp_path))
+    monkeypatch.setattr(omniasr_torch, "_sha256", lambda _path: omniasr_torch.TOKENIZER_SHA256)
+
+    orphan = tmp_path / "orphan" / checkpoint.name
+    orphan.parent.mkdir()
+    orphan.write_bytes(b"card")
+    assert backend.weights_cached() is False
+    checkpoint.write_bytes(b"card")
+    tokenizer.write_bytes(b"x" * omniasr_torch.TOKENIZER_SIZE_BYTES)
+    assert backend.weights_cached() is True
+    checkpoint.write_bytes(b"partial")
+    assert backend.weights_cached() is False
 
 
 def test_torch_load_validates_download_before_pipeline_construction(monkeypatch):

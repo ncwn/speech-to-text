@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import numpy as np
 import pytest
 
+from stt import audio
 from stt.audio import join_segments, windowed
 
 RATE = 16_000
@@ -65,3 +68,29 @@ def test_windows_that_decode_to_nothing_are_dropped():
 def test_joining_reproduces_the_flat_transcript():
     segments = windowed(_speech(20.0), RATE, 5.0, lambda _c: "ကမ္ဘာ")
     assert join_segments(segments) == " ".join(["ကမ္ဘာ"] * len(segments))
+
+
+def test_conversion_cache_separates_same_named_dataset_files(monkeypatch, tmp_path):
+    sources = [tmp_path / name / "audio" / "clip.mp3" for name in ("one", "two")]
+    for source in sources:
+        source.parent.mkdir(parents=True)
+        source.write_bytes(source.parent.parent.name.encode())
+
+    calls: list[Path] = []
+
+    def convert(command, *, check):
+        assert check
+        output = Path(command[-1])
+        output.write_bytes(b"wav")
+        calls.append(output)
+
+    monkeypatch.setattr(audio, "needs_conversion", lambda _path: True)
+    monkeypatch.setattr(audio.shutil, "which", lambda _name: "/opt/homebrew/bin/ffmpeg")
+    monkeypatch.setattr(audio.subprocess, "run", convert)
+
+    converted = [audio.to_16k_mono(source, tmp_path / "cache") for source in sources]
+
+    assert converted[0] != converted[1]
+    assert [path.name for path in converted] == ["clip.16k.wav", "clip.16k.wav"]
+    assert audio.to_16k_mono(sources[0], tmp_path / "cache") == converted[0]
+    assert calls == converted

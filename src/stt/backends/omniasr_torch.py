@@ -10,6 +10,7 @@ retried on CPU for the rest of the run.
 from __future__ import annotations
 
 import hashlib
+import os
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -55,6 +56,8 @@ MODELS: dict[str, OmniASRModel] = {
 
 TOKENIZER_SIZE_BYTES = 91_481
 TOKENIZER_SHA256 = "8aa11a1092142ef472537476ef6e76541123e2f0d789b79f3ebd119008240b1e"
+_ASSET_BASE = "https://dl.fbaipublicfiles.com/mms"
+_TOKENIZER_FILENAME = "omniASR_tokenizer_written_v2.model"
 
 
 def _sha256(path: Path) -> str:
@@ -165,12 +168,41 @@ class OmniASRTorchBackend(ASRBackend):
         return self.spec.approx_mb
 
     def weights_cached(self) -> bool | None:
-        """Unknowable: fairseq2 stores assets under opaque content hashes.
+        root = Path(
+            os.environ.get(
+                "FAIRSEQ2_CACHE_DIR",
+                Path(os.environ.get("XDG_CACHE_HOME", Path.home() / ".cache"))
+                / "fairseq2"
+                / "assets",
+            )
+        )
+        checkpoint_name = self.model.replace("_", "-") + ".pt"
+        checkpoint = self._asset_path(root, checkpoint_name)
+        tokenizer = self._asset_path(root, _TOKENIZER_FILENAME)
+        return self._valid_checkpoint(checkpoint) and self._valid_tokenizer(tokenizer)
 
-        Returning None makes callers warn about the download rather than
-        wrongly promising it is either cached or not.
-        """
-        return None
+    @staticmethod
+    def _asset_path(root: Path, filename: str) -> Path:
+        uri = f"{_ASSET_BASE}/{filename}"
+        directory = hashlib.sha1(uri.encode(), usedforsecurity=False).hexdigest()[:24]
+        return root / directory / filename
+
+    def _valid_checkpoint(self, path: Path) -> bool:
+        try:
+            return path.is_file() and path.stat().st_size == self.spec.size_bytes
+        except OSError:
+            return False
+
+    @staticmethod
+    def _valid_tokenizer(path: Path) -> bool:
+        try:
+            return (
+                path.is_file()
+                and path.stat().st_size == TOKENIZER_SIZE_BYTES
+                and _sha256(path) == TOKENIZER_SHA256
+            )
+        except OSError:
+            return False
 
     def download_weights(self) -> None:
         from fairseq2.assets import AssetDownloadManager, AssetStore
@@ -188,19 +220,9 @@ class OmniASRTorchBackend(ASRBackend):
         )
 
         invalid = []
-        try:
-            if not checkpoint.is_file() or checkpoint.stat().st_size != self.spec.size_bytes:
-                invalid.append(f"checkpoint {checkpoint}")
-        except OSError:
+        if not self._valid_checkpoint(checkpoint):
             invalid.append(f"checkpoint {checkpoint}")
-        try:
-            if (
-                not tokenizer_path.is_file()
-                or tokenizer_path.stat().st_size != TOKENIZER_SIZE_BYTES
-                or _sha256(tokenizer_path) != TOKENIZER_SHA256
-            ):
-                invalid.append(f"tokenizer {tokenizer_path}")
-        except OSError:
+        if not self._valid_tokenizer(tokenizer_path):
             invalid.append(f"tokenizer {tokenizer_path}")
         if invalid:
             raise RuntimeError(

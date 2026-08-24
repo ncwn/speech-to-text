@@ -15,12 +15,10 @@ models/
 *.safetensors
 *.mlmodelc/
 
-# Audio and transcripts
+# Dataset audio stays local; references, transcripts, and provenance are tracked.
+data/*/audio/**
+# Keep audio from older checkouts ignored after the layout migration.
 data/audio/**
-!data/audio/.gitkeep
-# Hand-corrected reference transcripts are tracked because they cannot be
-# re-fetched; the corresponding third-party audio remains untracked.
-!data/reference/**
 data/fleurs*/
 # Resampled 16 kHz mono copies produced by stt.audio, and ad-hoc slices
 data/.converted/

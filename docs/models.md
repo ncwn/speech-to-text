@@ -75,7 +75,7 @@ Defaults do not cause setup to download weights. A transcription or explicit
 model-download command fetches only the selected model.
 
 Dolphin, GGUF, and Transformers downloads are pinned to immutable upstream
-revisions. An implicit `stt compare` runs the Hugging Face default in
+revisions. A plain `stt compare` and `--all-cached-models` run Hugging Face in
 cached-files-only mode, so a missing file cannot trigger a download after its
 cache check. An explicit `--only hf` comparison or transcription retains normal
 first-use download behavior.

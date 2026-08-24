@@ -7,6 +7,7 @@ they can read directly.
 
 from __future__ import annotations
 
+import hashlib
 import shutil
 import subprocess
 from collections.abc import Callable
@@ -103,11 +104,14 @@ def to_16k_mono(path: Path, cache_dir: Path) -> Path:
             "Install it with `brew install ffmpeg`."
         )
 
-    cache_dir.mkdir(parents=True, exist_ok=True)
-    # Include the parent name to reduce collisions in the flat cache.
-    out = cache_dir / f"{path.parent.name}__{path.stem}.16k.wav"
+    stat = path.stat()
+    source = f"{path.resolve()}\0{stat.st_size}\0{stat.st_mtime_ns}"
+    key = hashlib.sha256(source.encode()).hexdigest()
+    out = cache_dir / key / f"{path.stem}.16k.wav"
     if out.exists():
         return out
+
+    out.parent.mkdir(parents=True, exist_ok=True)
 
     subprocess.run(
         [

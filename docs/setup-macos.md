@@ -105,9 +105,9 @@ uv run stt models --backend omniasr-gguf --download llm-unlimited-300m-v2
 The download command uses the same upstream cache as transcription. A later
 `stt transcribe -b omniasr-gguf -m llm-unlimited-300m-v2 ...` reuses it.
 The GGUF, Dolphin, and Transformers adapters use immutable upstream revisions.
-Running `stt compare` without `--only` considers cached defaults only and keeps
-the Transformers load offline; name `--only hf` to permit its normal first-use
-download behavior.
+A plain `stt compare` considers cached defaults only; `--all-cached-models`
+considers every model whose cache can be verified. Both keep Transformers
+offline. Name `--only hf` to permit its normal first-use download behavior.
 
 ## Dependency constraints
 

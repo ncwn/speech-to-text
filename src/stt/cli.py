@@ -7,7 +7,7 @@ stt fetch-fleurs                 download Burmese eval audio + references
 stt transcribe AUDIO...          run one backend
 stt eval RESULTS.jsonl           score a run against references
 stt align AUDIO --text FILE      time an existing transcript (subtitles)
-stt compare AUDIO...             compare cached defaults or selected backends
+stt compare AUDIO...             compare cached models or selected backends
 """
 
 from __future__ import annotations
@@ -489,10 +489,8 @@ def transcribe(
 def _same_audio(recorded: str, audio: Path) -> bool:
     """Whether a stored result refers to ``audio``.
 
-    Results usually record the *converted* file, which `stt.audio.to_16k_mono`
-    names ``<parent>__<stem>.16k.wav`` to keep same-named files in different
-    folders apart. So the original path has to be matched against that
-    derived name as well as against itself.
+    Current converted files retain the source stem. The parent-prefixed form is
+    also accepted for JSONL written by older versions.
     """
     stem = Path(recorded).stem.removesuffix(".16k")
     return stem in {audio.stem, f"{audio.parent.name}__{audio.stem}"}
@@ -721,6 +719,20 @@ def _confirm_download(cls) -> bool:
     )
 
 
+def _model_names_by_backend() -> dict[str, tuple[str, ...]]:
+    from stt.backends.dolphin import MODELS as DOLPHIN_MODELS
+    from stt.backends.omniasr_gguf import MODELS as GGUF_MODELS
+    from stt.backends.omniasr_torch import MODELS as TORCH_MODELS
+    from stt.backends.transformers_asr import MODELS as HF_MODELS
+
+    return {
+        "omniasr-gguf": tuple(GGUF_MODELS),
+        "omniasr-torch": tuple(TORCH_MODELS),
+        "hf": tuple(HF_MODELS),
+        "dolphin": tuple(DOLPHIN_MODELS),
+    }
+
+
 @app.command()
 def compare(
     audio: Annotated[list[Path], typer.Argument(help="Audio files or directories")],
@@ -732,12 +744,25 @@ def compare(
     only: Annotated[
         list[str] | None, typer.Option("--only", help="Restrict to these backends")
     ] = None,
+    all_cached_models: Annotated[
+        bool,
+        typer.Option(
+            "--all-cached-models",
+            help="Run every model whose existing cache can be verified",
+        ),
+    ] = False,
     output_dir: Annotated[Path, typer.Option("--output-dir")] = DEFAULT_OUTPUT_DIR,
     yes: Annotated[
         bool, typer.Option("--yes", "-y", help="Do not prompt before large downloads")
     ] = False,
 ) -> None:
-    """Compare cached defaults, or explicitly selected backends."""
+    """Compare cached models, or explicitly selected backend defaults."""
+    if all_cached_models and only is not None:
+        raise typer.BadParameter(
+            "--all-cached-models cannot be combined with --only",
+            param_hint="--all-cached-models",
+        )
+
     files = _prepare(audio, limit, convert=True)
     refs = load_references(reference) if reference else None
 
@@ -748,28 +773,53 @@ def compare(
     table.add_column("RTF", justify="right")
     table.add_column("Failed", justify="right")
 
+    known = all_backends()
+    targets = (
+        [
+            (name, model)
+            for name, models in _model_names_by_backend().items()
+            if name in known
+            for model in models
+        ]
+        if all_cached_models
+        else [(name, None) for name in known]
+    )
+
+    skipped_backends: set[str] = set()
     ran = 0
-    for name, cls in all_backends().items():
+    for name, selected_model in targets:
+        if name in skipped_backends:
+            continue
+        cls = known[name]
         if only is not None and name not in only:
             continue
         ok, reason = cls.is_available()
         if not ok:
             console.print(f"[yellow]skipping {name}[/yellow] — {reason}")
+            skipped_backends.add(name)
             continue
 
         if only is None:
-            probe = cls()
+            probe = cls(selected_model) if selected_model else cls()
             cached = probe.weights_cached()
             if cached is None:
-                console.print(
-                    f"[yellow]skipping {name}[/yellow] — cache status cannot be verified; "
-                    f"select it explicitly with `--only {name}`"
+                instruction = (
+                    f"benchmark it explicitly with `stt transcribe -b {name} -m {probe.model}`"
+                    if all_cached_models
+                    else f"select it explicitly with `--only {name}`"
                 )
+                console.print(
+                    f"[yellow]skipping {name} · {probe.model}[/yellow] — "
+                    f"cache status cannot be verified; {instruction}"
+                )
+                if all_cached_models:
+                    skipped_backends.add(name)
                 continue
             if not cached:
+                label = f"{name} · {probe.model}" if all_cached_models else name
                 console.print(
-                    f"[yellow]skipping {name}[/yellow] — default model is not cached; "
-                    f"download it with `stt models --backend {name} --download {probe.model}`"
+                    f"[yellow]skipping {label}[/yellow] — run "
+                    f"`stt models --backend {name} --download {probe.model}`; model is not cached"
                 )
                 continue
         elif not yes and not _confirm_download(cls):
@@ -777,14 +827,18 @@ def compare(
             continue
 
         options = {"local_files_only": True} if only is None and name == "hf" else {}
-        results = _run_backend(name, None, files, language, 1, options)
-        write_jsonl(results, output_dir / f"{name}.jsonl")
+        results = _run_backend(name, selected_model, files, language, 1, options)
+        suffix = f"{name}--{selected_model}" if selected_model else name
+        write_jsonl(results, output_dir / f"{suffix}.jsonl")
         ran += 1
 
         cer = "—"
-        if refs:
-            cer = _fmt(score_results(results, refs).cer)
         failed = sum(1 for r in results if r.error)
+        if refs is not None:
+            score = score_results(results, refs)
+            failed = score.n_failed
+            if not failed:
+                cer = _fmt(score.cer)
         model = results[0].model if results else "?"
         table.add_row(name, model, cer, _fmt(mean_rtf(results), ".2f"), str(failed))
 
@@ -796,7 +850,7 @@ def compare(
 
     console.print()
     console.print(table)
-    if not refs:
+    if refs is None:
         console.print("[dim]Pass --reference to get CER instead of just timings.[/dim]")
 
 

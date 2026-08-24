@@ -102,7 +102,12 @@ uv run stt transcribe data/fleurs/audio -b omniasr-torch \
 uv run stt eval outputs/omniasr-gguf.jsonl \
     --reference data/fleurs/references.tsv
 
-# Compare only the named, installed backends; each large download is confirmed
+# Compare every model whose existing cache can be verified; no downloads
+uv run stt compare data/fleurs/audio \
+    --reference data/fleurs/references.tsv --limit 10 \
+    --all-cached-models
+
+# Compare named backend defaults; each large first-use download is confirmed
 uv run stt compare data/fleurs/audio \
     --reference data/fleurs/references.tsv --limit 10 \
     --only omniasr-gguf --only hf
@@ -142,7 +147,7 @@ status](docs/findings.md) defines the evidence required before publishing one.
 src/stt/            CLI, scoring, alignment, voting, telemetry, and backends
 tests/              fast offline tests
 docs/               workflow, setup, model, scoring, and evidence documentation
-data/reference/     tracked reference transcript contract
+data/<dataset>/     audio, references, scripts, and provenance for one corpus
 data/fleurs*/       fetched, gitignored public datasets
 outputs/            generated, gitignored transcription runs
 ```
@@ -163,9 +168,10 @@ README is the repository documentation index:
 - [Setup on macOS](docs/setup-macos.md)
 - [Models and runtimes](docs/models.md)
 - [Dated external model survey](docs/model-survey.md)
+- [Benchmarking and CER](docs/benchmarking.md)
 - [Evaluating Burmese ASR](docs/burmese.md)
 - [Findings status and evidence requirements](docs/findings.md)
-- [Reference data contract](data/reference/README.md)
+- [Eternity held-out dataset](data/eternity-2026/README.md)
 - [Contributing](CONTRIBUTING.md)
 
 ## Licence
