@@ -112,6 +112,9 @@ uv run stt check-encoding data/fleurs/references.tsv
 # Verify an accepted baseline without loading model weights
 uv run stt bench --verify
 
+# Run the bounded CTC product-selection gate on short Burmese clips
+scripts/bench_ctc_product_gate.sh
+
 # Archive a recomputable long-audio sentinel observation
 uv run stt long-audio -b hf -m seamless-m4t-v2 -o outputs/seamless-long.json
 ```
