@@ -17,7 +17,7 @@ runner = CliRunner()
 
 
 def test_models_download_requires_a_backend():
-    result = runner.invoke(cli.app, ["models", "--download", "small"])
+    result = runner.invoke(cli.app, ["models", "--download", "small"], terminal_width=240)
 
     assert result.exit_code == 2
     assert "--backend is required" in result.output
@@ -65,7 +65,11 @@ def test_models_missing_runtime_includes_install_hint(monkeypatch):
         backend, "is_available", classmethod(lambda cls: (False, "missing dependency: dolphin"))
     )
 
-    result = runner.invoke(cli.app, ["models", "--backend", "dolphin", "--download", "small"])
+    result = runner.invoke(
+        cli.app,
+        ["models", "--backend", "dolphin", "--download", "small"],
+        terminal_width=240,
+    )
 
     assert result.exit_code == 2
     assert backend.install_hint in result.output
@@ -366,18 +370,15 @@ def test_torch_download_rejects_wrong_tokenizer_hash_without_deleting_it(monkeyp
 
 
 def test_torch_load_validates_download_before_pipeline_construction(monkeypatch):
-    from omnilingual_asr.models.inference import pipeline
-
     backend = get_backend("omniasr-torch")("omniASR_CTC_300M_v2")
     calls = []
+    pipeline = SimpleNamespace(
+        ASRInferencePipeline=lambda **kwargs: calls.append(("pipeline", kwargs)) or object()
+    )
+    monkeypatch.setitem(sys.modules, "omnilingual_asr.models.inference.pipeline", pipeline)
     monkeypatch.setattr(backend, "download_weights", lambda: calls.append("validate"))
     monkeypatch.setattr(backend, "_resolve_device", lambda: "cpu")
     monkeypatch.setattr(backend, "_resolve_dtype", lambda device: "float32")
-    monkeypatch.setattr(
-        pipeline,
-        "ASRInferencePipeline",
-        lambda **kwargs: calls.append(("pipeline", kwargs)) or object(),
-    )
 
     backend.load()
 
@@ -686,12 +687,12 @@ def test_dolphin_load_rejects_invalid_cache_before_upstream(monkeypatch, tmp_pat
 
 
 def test_dolphin_load_downloads_a_wholly_absent_cache(monkeypatch, tmp_path):
-    import dolphin as upstream
-
     from stt.backends import dolphin
 
     backend = get_backend("dolphin")("small")
     downloads = []
+    upstream = SimpleNamespace(load_model=lambda *args, **kwargs: object())
+    monkeypatch.setitem(sys.modules, "dolphin", upstream)
 
     def download():
         downloads.append(backend.model)
@@ -706,8 +707,8 @@ def test_dolphin_load_downloads_a_wholly_absent_cache(monkeypatch, tmp_path):
         "_sha256",
         lambda path: dict(backend.spec.artifacts)[path.name],
     )
+    monkeypatch.setattr(backend, "_resolve_device", lambda: "cpu")
     monkeypatch.setattr(backend, "download_weights", download)
-    monkeypatch.setattr(upstream, "load_model", lambda *args, **kwargs: object())
 
     backend.load()
 
