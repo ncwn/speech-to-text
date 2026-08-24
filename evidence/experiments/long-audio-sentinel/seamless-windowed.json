@@ -1,0 +1,328 @@
+{
+  "artifact_kind": "long-audio-observation-v2",
+  "schema_version": 2,
+  "spec": {
+    "runner_id": "hf-seamless-m4t-v2-windowed",
+    "backend": "hf",
+    "model": "seamless-m4t-v2",
+    "entrypoint": "seamless.windowed",
+    "audio_sha256": "ca1f29a2ea1a095b224c41c8845ff35afb34df4941735cf848939d94b930de0c",
+    "annotation_sha256": "0de651d8301d6180f72e9924ec2a93b7074bb365ebd3a9fbacb1d7b2f96b0576",
+    "boundaries_s": [
+      20.0,
+      40.0
+    ]
+  },
+  "result": {
+    "audio_path": "data/sentinels/long-audio-boundary-v1.wav",
+    "text": "သဝဏ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ် သဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈ မင်္ဂလာပါရှင် ။",
+    "backend": "hf",
+    "model": "seamless-m4t-v2",
+    "language": "mya_Mymr",
+    "elapsed_s": 11.16152495899587,
+    "audio_duration_s": 45.0,
+    "error": null,
+    "metadata": {
+      "repo": "facebook/seamless-m4t-v2-large",
+      "family": "seamless",
+      "device": "mps",
+      "dtype": "float32",
+      "max_new_tokens_per_second": 8.0,
+      "min_new_tokens": 32,
+      "max_new_tokens": 256,
+      "mps_batch_size_cap": 32,
+      "batch_size": 32,
+      "effective_batch_size": 32,
+      "batch_items": 1,
+      "batch_group": 0,
+      "batch_internal_serial": false,
+      "elapsed_s_source": "measured",
+      "host": {
+        "chip": "Apple M2 Max",
+        "platform": "macOS-27.0-arm64-arm-64bit",
+        "machine": "arm64",
+        "cores": {
+          "Performance": 8,
+          "Efficiency": 4
+        },
+        "compute_threads": 8,
+        "cpu_count": 12,
+        "ram_mb": 65536
+      },
+      "corpus_index": 0,
+      "corpus_size": 1,
+      "requested_batch_size": 32,
+      "corpus_wall_s": 11.172417084,
+      "resource_scope": "corpus",
+      "load": {
+        "wall_s": 4.7537,
+        "cpu_s": 4.5055,
+        "peak_rss_mb": 1040.2,
+        "started_ns": 224901269310000,
+        "ended_ns": 224906022971416,
+        "rss_peak_mb": 1028.9,
+        "process_peak_rss_mb": 1040.2,
+        "cpu_utilization": 0.95,
+        "gpu_mb": 6170.4,
+        "profiler_cpu_s": 0.0052
+      },
+      "load_s": 4.753661416
+    },
+    "segments": [
+      {
+        "text": "သဝဏ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်",
+        "start": 0.0,
+        "end": 18.0,
+        "confidence": null,
+        "speaker": null,
+        "source": "chunk"
+      },
+      {
+        "text": "သဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈ",
+        "start": 18.0,
+        "end": 36.0,
+        "confidence": null,
+        "speaker": null,
+        "source": "chunk"
+      },
+      {
+        "text": "မင်္ဂလာပါရှင် ။",
+        "start": 36.0,
+        "end": 45.0,
+        "confidence": null,
+        "speaker": null,
+        "source": "chunk"
+      }
+    ],
+    "resources": null,
+    "audio_id": "pcm16:16000:1:d4ae8ee5e0ae1f3a6c014bebc1329b56ad8b3062a565e9d28a67f12a2457941f",
+    "source_path": "data/sentinels/long-audio-boundary-v1.wav",
+    "source_sha256": "ca1f29a2ea1a095b224c41c8845ff35afb34df4941735cf848939d94b930de0c",
+    "reference_id": "long-audio-boundary-v1",
+    "trusted": true,
+    "trust_issues": [],
+    "model_provenance": {
+      "backend": "hf",
+      "requested_model": "seamless-m4t-v2",
+      "source_kind": "huggingface",
+      "source_locator": "facebook/seamless-m4t-v2-large",
+      "upstream_revision": "5f8cc790b19fc3f67a61c105133b20b34e3dcb76",
+      "revision_status": "pinned",
+      "artifacts": [
+        {
+          "role": "model-or-processor",
+          "name": "added_tokens.json",
+          "size_bytes": 2066,
+          "sha256": "9ac8a85d4e97d27fad026a813d52a069680e4e0cae701ef145b204bd533251b2",
+          "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/8e2982fdbfaf602b6c7c9e5b52f7153e14d832e3",
+          "stat": {
+            "device": 16777235,
+            "inode": 5984100,
+            "size": 2066,
+            "mtime_ns": 1787081749219003509,
+            "ctime_ns": 1787158436614653939
+          }
+        },
+        {
+          "role": "model-or-processor",
+          "name": "config.json",
+          "size_bytes": 2716,
+          "sha256": "4b2fa9d863cc3033adaf261e6c3e32ad90347ee2f199a349ba1c77d5e26a605f",
+          "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/44fc602f86a67ad9b25442ebe2116459952d8a98",
+          "stat": {
+            "device": 16777235,
+            "inode": 5984104,
+            "size": 2716,
+            "mtime_ns": 1787081755742154523,
+            "ctime_ns": 1787158436622495838
+          }
+        },
+        {
+          "role": "model-or-processor",
+          "name": "generation_config.json",
+          "size_bytes": 9906948,
+          "sha256": "febbbbac4f0b122473a0125165c9291add850956315e35a025e16474cc0da5f4",
+          "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/cab705d447c28aee5e50ebd31e33ccf267d65219",
+          "stat": {
+            "device": 16777235,
+            "inode": 5984103,
+            "size": 9906948,
+            "mtime_ns": 1787082625186041013,
+            "ctime_ns": 1787158436620316956
+          }
+        },
+        {
+          "role": "model-or-processor",
+          "name": "model-00001-of-00002.safetensors",
+          "size_bytes": 4999163080,
+          "sha256": "85cab984fbc111f8713827c440499453b9e66f262862866eeed8725c302ba2ac",
+          "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/85cab984fbc111f8713827c440499453b9e66f262862866eeed8725c302ba2ac",
+          "stat": {
+            "device": 16777235,
+            "inode": 5984106,
+            "size": 4999163080,
+            "mtime_ns": 1787082622568711603,
+            "ctime_ns": 1787158438357384648
+          }
+        },
+        {
+          "role": "model-or-processor",
+          "name": "model-00002-of-00002.safetensors",
+          "size_bytes": 4238114628,
+          "sha256": "9536dc05892a6ca8410bcfea763dde422e2430c3cc1f3acd26c55182c8989017",
+          "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/9536dc05892a6ca8410bcfea763dde422e2430c3cc1f3acd26c55182c8989017",
+          "stat": {
+            "device": 16777235,
+            "inode": 5984108,
+            "size": 4238114628,
+            "mtime_ns": 1787082328054878527,
+            "ctime_ns": 1787158439885179359
+          }
+        },
+        {
+          "role": "model-or-processor",
+          "name": "model.safetensors.index.json",
+          "size_bytes": 210713,
+          "sha256": "79d33aa045308d1a93b11952f2a3e6a647c107b688e5fdf1124c4601626dcdb2",
+          "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/f37bceddd602f9ffd93d6d329e5b2ed67b5251c6",
+          "stat": {
+            "device": 16777235,
+            "inode": 5984101,
+            "size": 210713,
+            "mtime_ns": 1787081757514082697,
+            "ctime_ns": 1787158436615159899
+          }
+        },
+        {
+          "role": "model-or-processor",
+          "name": "preprocessor_config.json",
+          "size_bytes": 1776,
+          "sha256": "59294da7ee216cf80f8083180cdb0ace7efabbe35a8b9009c5cab341af2bd1c7",
+          "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/7472c1ede2bb52298c22c063a0ad071c420e1e97",
+          "stat": {
+            "device": 16777235,
+            "inode": 5984098,
+            "size": 1776,
+            "mtime_ns": 1787081734717706286,
+            "ctime_ns": 1787158436613804561
+          }
+        },
+        {
+          "role": "model-or-processor",
+          "name": "sentencepiece.bpe.model",
+          "size_bytes": 5165809,
+          "sha256": "026a76827537db9f1348e4d5aaa127bb10a2f2ff633243f3a52d16be82d73f9d",
+          "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/026a76827537db9f1348e4d5aaa127bb10a2f2ff633243f3a52d16be82d73f9d",
+          "stat": {
+            "device": 16777235,
+            "inode": 5984102,
+            "size": 5165809,
+            "mtime_ns": 1787081748168676716,
+            "ctime_ns": 1787158436617226447
+          }
+        },
+        {
+          "role": "model-or-processor",
+          "name": "special_tokens_map.json",
+          "size_bytes": 2337,
+          "sha256": "36ba9ab56ea9a4d0182ae18aed1ff16a15bf91b8aa544722c686744d5972b522",
+          "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/742ad0be48090d31be618d4d152f734c26836fdb",
+          "stat": {
+            "device": 16777235,
+            "inode": 5984105,
+            "size": 2337,
+            "mtime_ns": 1787081749927072120,
+            "ctime_ns": 1787158436624634303
+          }
+        },
+        {
+          "role": "model-or-processor",
+          "name": "tokenizer.model",
+          "size_bytes": 5165809,
+          "sha256": "026a76827537db9f1348e4d5aaa127bb10a2f2ff633243f3a52d16be82d73f9d",
+          "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/026a76827537db9f1348e4d5aaa127bb10a2f2ff633243f3a52d16be82d73f9d",
+          "stat": {
+            "device": 16777235,
+            "inode": 5984102,
+            "size": 5165809,
+            "mtime_ns": 1787081748168676716,
+            "ctime_ns": 1787158436617226447
+          }
+        },
+        {
+          "role": "model-or-processor",
+          "name": "tokenizer_config.json",
+          "size_bytes": 19667,
+          "sha256": "0a184dd2f5b9ee02ddfa7fc2110b7e919c471f29e2e771d8c18b22b7758827c8",
+          "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/9868dae7e93dc4a41184f571b32b7b0a8627c7af",
+          "stat": {
+            "device": 16777235,
+            "inode": 5984099,
+            "size": 19667,
+            "mtime_ns": 1787081737075610262,
+            "ctime_ns": 1787158436614244104
+          }
+        }
+      ],
+      "runtime_packages": {
+        "torch": "2.8.0",
+        "torchaudio": "2.8.0",
+        "transformers": "4.57.6",
+        "huggingface-hub": "0.36.2",
+        "tokenizers": "0.22.2",
+        "accelerate": "1.14.0",
+        "sentencepiece": "0.2.2",
+        "omnilingual-asr": "0.2.0",
+        "fairseq2": "0.6",
+        "crispasr": "0.8.29",
+        "dataoceanai-dolphin": "20260513",
+        "modelscope": "1.39.1",
+        "funasr": "1.4.2",
+        "soundfile": "0.14.0",
+        "psutil": "5.9.8"
+      },
+      "requested_settings": {
+        "language": "mya_Mymr",
+        "batch_size": 32,
+        "device": "mps",
+        "dtype": "float32"
+      },
+      "resolved_settings": {
+        "device": "mps",
+        "dtype": "float32",
+        "n_threads": null,
+        "chunk_seconds": null,
+        "family": "seamless",
+        "lang": "mya"
+      },
+      "fallback_history": [],
+      "adapter_git_commit": "185b24b8df308a79c2afa3b741647e19f76bee6c",
+      "adapter_git_dirty": false,
+      "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5",
+      "issues": [],
+      "schema_version": 2,
+      "content_sha256": "3bc70cfa31110436ea9f065187e0a359bad5841f256d47aa350197b2f4884253",
+      "execution_sha256": "7689d8cc0643b3fbd91618c9ee346d5c0c28331bba113d408e2dcb7eed374abd"
+    },
+    "rtf": 0.248033887977686
+  },
+  "elapsed_s": 17.718116707983427,
+  "observation": {
+    "runner_id": "hf-seamless-m4t-v2-windowed",
+    "transcript": "သဝဏ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ်ဝ် သဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈဝ်ႈ မင်္ဂလာပါရှင် ။",
+    "elapsed_s": 17.718116707983427,
+    "n_segments": 3,
+    "matched_spans": 6,
+    "missed_spans": 0,
+    "duplicate_spans": 0,
+    "ordered": true,
+    "boundary_hits": [
+      20.0,
+      40.0
+    ],
+    "error": null
+  },
+  "spec_sha256": "2e4b4e2be749d0fc656a612473d0d0b2f0023e9a14879123e6d9542ad1821f52",
+  "result_sha256": "120d7b314298232aabd099f31638dd2583429d74234b4229a88b070747957970",
+  "observation_sha256": "59aeabee9d089c06aacf61b20f123a38d81d9e8378818c0ad8bf2a430fad29e5"
+}

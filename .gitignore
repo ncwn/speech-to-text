@@ -6,8 +6,12 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
+.firecrawl/
 
 # Model weights and caches — never commit, these are 1-31 GB each
+# .cache/ is the repo-local cache root (see src/stt/paths.py); it holds tens of
+# gigabytes of downloaded weights.
+.cache/
 models/
 *.pt
 *.gguf
@@ -21,12 +25,46 @@ data/audio/**
 # ground truth we have for audio the models cannot have trained on, and
 # unlike the FLEURS sets they cannot be re-fetched.
 !data/reference/**
-data/fleurs*/
+# FLEURS audio is re-fetchable, but its reference transcripts and corpus
+# identity are the other half of every published CER -- without them a
+# clone can audit nothing. `/**` rather than the bare directory because a
+# negation cannot re-include a file whose parent directory is excluded.
+data/fleurs*/**
+!data/fleurs*/references.tsv
+!data/fleurs*/corpus.json
 # Resampled 16 kHz mono copies produced by stt.audio, and ad-hoc slices
 data/.converted/
 data/.slices/
 outputs/**
 !outputs/.gitkeep
+!outputs/README.md
+# The runs behind every number in docs/findings.md. 1.3 MB, and the only way to
+# audit a published figure without re-running 88 GB of models for hours --
+# which is the same reason data/reference/ is tracked. Scratch runs stay out.
+!outputs/t120-*.jsonl
+!outputs/evidence-fleurs-test-mms.jsonl
+!outputs/evidence-fleurs-test-dolphin.jsonl
+!outputs/evidence-fleurs-test-seamless.jsonl
+!outputs/evidence-fleurs-test-omni7b.jsonl
+!outputs/evidence-fleurs-dev-seamless.jsonl
+!outputs/evidence-fleurs-dev-omni7b.jsonl
+!outputs/evidence-fleurs-dev-mms.jsonl
+!outputs/evidence-fleurs-dev-dolphin.jsonl
+# ...except a vote or route artifact, which `stt vote` and `stt route` write
+# with trusted=False and no model provenance by construction. Such a file can
+# never back a published number; the evidence renderer recomputes the vote from
+# its constituent runs instead, so tracking one would only invite it to be cited.
+outputs/t120-voted.jsonl
+# The held-out eternity-*.jsonl runs stay out: they are complete transcripts of
+# copyrighted third-party audio, and the audio itself is deliberately not in the
+# repo either (see data/reference/README.md). They cannot back a published
+# number today in any case -- their reference join is broken and they carry no
+# canonical audio_id -- so nothing is lost by keeping them local.
+
+# A hand-authored architecture page nothing links to. Deliberately not adopted:
+# CLAUDE.md is the one home for that description, and a second unlinked copy no
+# guard covers would drift out of agreement with it. Kept on disk, out of git.
+docs/architecture.html
 
 # Third-party sources built from scratch
 vendor/

@@ -37,19 +37,14 @@ uv run stt check-encoding data/fleurs/references.tsv
 uv run stt check-encoding "မြန်မာစာ"
 ```
 
-FLEURS `my_mm` references are Unicode, and both omniASR runtimes emit Unicode,
-so in practice this guard only fires on external data — legacy corpora, older
+FLEURS `my_mm` references are Unicode and every backend here emits Unicode, so
+in practice this guard only fires on external data — legacy corpora, older
 websites, and text from systems still using Zawgyi fonts.
 
-Converting Zawgyi to Unicode needs PyICU, which is optional because it requires
-a native ICU build:
-
-```bash
-brew install icu4c pkg-config
-PATH="$(brew --prefix icu4c)/bin:$PATH" \
-PKG_CONFIG_PATH="$(brew --prefix icu4c)/lib/pkgconfig" \
-uv pip install PyICU
-```
+The harness detects the encoding; it does not convert between them. Convert
+Zawgyi input before scoring it, with
+[Google's ICU rules](https://github.com/google/myanmar-tools) or any of the
+established web converters.
 
 ## 3. Combining-mark order and digits
 

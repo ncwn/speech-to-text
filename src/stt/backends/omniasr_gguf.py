@@ -15,10 +15,12 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, ClassVar
+from urllib.parse import urlparse
 
 from stt.audio import join_segments
 from stt.backends.base import ASRBackend
 from stt.native import suppress_native_output
+from stt.paths import cache_dir
 from stt.registry import register
 from stt.results import Segment, TranscriptionResult
 
@@ -124,19 +126,20 @@ class OmniASRGgufBackend(ASRBackend):
         if model not in MODELS:
             raise ValueError(f"Unknown GGUF model {model!r}. Available: {', '.join(MODELS)}")
         self.spec = MODELS[model]
-        # Left to CrispASR unless asked for. Measured on this backend: 4, 8 and
-        # 12 threads all give RTF 0.182, because the work is on the GPU and the
-        # CPU sits at 0.05 cores. Picking a number here would be noise dressed
-        # up as tuning.
+        # Left to CrispASR unless asked for: thread count makes no measurable
+        # difference when the work is on the GPU. docs/findings.md#threads
         self.n_threads = n_threads
+        #: CrispASR selects CUDA/Metal/Vulkan/CPU internally. The Python API does
+        #: not expose the selected backend reliably, so do not claim MPS here.
+        self.resolved_device: str | None = None
         # 0 lets CrispASR choose its own chunking for long audio.
         self.chunk_seconds = chunk_seconds
         # ggml logs every Metal kernel compile to fd 1/2; off unless asked for.
         self.verbose = verbose
         self.session = None
         self.model_path: str | None = None
-
-    # ------------------------------------------------------------------ setup
+        self.resolved_revision: str | None = None
+        self._revision_error: str | None = None
 
     @classmethod
     def is_available(cls) -> tuple[bool, str]:
@@ -150,15 +153,34 @@ class OmniASRGgufBackend(ASRBackend):
         return self.spec.approx_mb
 
     def weights_cached(self) -> bool | None:
-        from crispasr import cache_dir
+        from crispasr import cache_dir as crisp_cache_dir
 
-        return (Path(cache_dir()) / self.spec.filename).exists()
+        resolved = crisp_cache_dir(override=str(cache_dir("crispasr")))
+        return (Path(resolved) / self.spec.filename).exists() if resolved else None
 
     def ensure_weights(self, quiet: bool = False) -> Path:
         """Download the GGUF to ``~/.cache/crispasr`` if it is not already there."""
         from crispasr import cache_ensure_file
 
-        path = cache_ensure_file(self.spec.filename, self.spec.url, quiet=quiet)
+        url = self.spec.url
+        if "/resolve/main/" in url:
+            try:
+                from huggingface_hub import HfApi
+
+                parsed = urlparse(url)
+                parts = parsed.path.strip("/").split("/")
+                resolve_index = parts.index("resolve")
+                repo = "/".join(parts[:resolve_index])
+                self.resolved_revision = str(HfApi().model_info(repo).sha)
+                url = url.replace("/resolve/main/", f"/resolve/{self.resolved_revision}/")
+            except Exception as exc:  # noqa: BLE001 - immutable resolution is diagnostic
+                self._revision_error = f"could not resolve GGUF Hub revision: {exc}"
+        path = cache_ensure_file(
+            self.spec.filename,
+            url,
+            quiet=quiet,
+            cache_dir_override=str(cache_dir("crispasr")),
+        )
         if not path:
             raise RuntimeError(f"Failed to download {self.spec.filename} from {self.spec.url}")
         return Path(path)
@@ -166,8 +188,17 @@ class OmniASRGgufBackend(ASRBackend):
     def load(self) -> None:
         from crispasr import Session
 
-        # Download outside the suppression block so progress stays visible.
-        self.model_path = str(self.ensure_weights())
+        binding = self.model_binding
+        if binding is not None:
+            weights = [item for item in binding.paths if item.role == "weights" and item.path]
+            if len(weights) != 1:
+                raise RuntimeError("GGUF binding must contain exactly one weights artifact")
+            self.model_path = str(weights[0].path)
+            self.resolved_revision = binding.provenance.upstream_revision
+        else:
+            # Diagnostic runs without a trusted binding retain the convenience
+            # downloader, but cannot become baseline or evidence artifacts.
+            self.model_path = str(self.ensure_weights())
 
         with suppress_native_output(not self.verbose) as log:
             try:
@@ -185,8 +216,6 @@ class OmniASRGgufBackend(ASRBackend):
                 self.session.close()
             self.session = None
         self._loaded = False
-
-    # ------------------------------------------------------------- inference
 
     @staticmethod
     def _read_pcm(path: Path):

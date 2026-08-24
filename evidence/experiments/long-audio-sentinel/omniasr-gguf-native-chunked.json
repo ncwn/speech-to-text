@@ -1,0 +1,164 @@
+{
+  "artifact_kind": "long-audio-observation-v2",
+  "schema_version": 2,
+  "spec": {
+    "runner_id": "omniasr-gguf-llm-unlimited-300m-v2-transcribe_chunked",
+    "backend": "omniasr-gguf",
+    "model": "llm-unlimited-300m-v2",
+    "entrypoint": "crispasr.transcribe_chunked",
+    "audio_sha256": "ca1f29a2ea1a095b224c41c8845ff35afb34df4941735cf848939d94b930de0c",
+    "annotation_sha256": "0de651d8301d6180f72e9924ec2a93b7074bb365ebd3a9fbacb1d7b2f96b0576",
+    "boundaries_s": [
+      20.0,
+      40.0
+    ]
+  },
+  "result": {
+    "audio_path": "data/sentinels/long-audio-boundary-v1.wav",
+    "text": "he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he",
+    "backend": "omniasr-gguf",
+    "model": "llm-unlimited-300m-v2",
+    "language": "mya_Mymr",
+    "elapsed_s": 13.888779749977402,
+    "audio_duration_s": 45.0,
+    "error": null,
+    "metadata": {
+      "gguf": "omniasr-llm-unlimited-300m-v2-q4_k.gguf",
+      "crisp_backend": "omniasr-llm-unlimited",
+      "n_threads": null,
+      "n_segments": 1,
+      "host": {
+        "chip": "Apple M2 Max",
+        "platform": "macOS-27.0-arm64-arm-64bit",
+        "machine": "arm64",
+        "cores": {
+          "Performance": 8,
+          "Efficiency": 4
+        },
+        "compute_threads": 8,
+        "cpu_count": 12,
+        "ram_mb": 65536
+      },
+      "corpus_index": 0,
+      "corpus_size": 1,
+      "requested_batch_size": 1,
+      "corpus_wall_s": 13.890908417,
+      "resource_scope": "corpus",
+      "load": {
+        "wall_s": 0.1812,
+        "cpu_s": 0.1574,
+        "peak_rss_mb": 1143.3,
+        "started_ns": 225014515912666,
+        "ended_ns": 225014697137416,
+        "rss_peak_mb": 1143.3,
+        "process_peak_rss_mb": 1143.3,
+        "cpu_utilization": 0.87,
+        "profiler_cpu_s": 0.0002
+      },
+      "load_s": 0.18122475
+    },
+    "segments": [
+      {
+        "text": "he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he",
+        "start": 0.0,
+        "end": 45.0,
+        "confidence": null,
+        "speaker": null,
+        "source": "native"
+      }
+    ],
+    "resources": null,
+    "audio_id": "pcm16:16000:1:d4ae8ee5e0ae1f3a6c014bebc1329b56ad8b3062a565e9d28a67f12a2457941f",
+    "source_path": "data/sentinels/long-audio-boundary-v1.wav",
+    "source_sha256": "ca1f29a2ea1a095b224c41c8845ff35afb34df4941735cf848939d94b930de0c",
+    "reference_id": "long-audio-boundary-v1",
+    "trusted": false,
+    "trust_issues": [
+      "1/1 result(s) lack complete model provenance"
+    ],
+    "model_provenance": {
+      "backend": "omniasr-gguf",
+      "requested_model": "llm-unlimited-300m-v2",
+      "source_kind": "huggingface-gguf",
+      "source_locator": "https://huggingface.co/cstr/omniasr-llm-unlimited-300m-v2-GGUF/resolve/a68f5d040b483506c0966a1602050ee1550a0382/omniasr-llm-unlimited-300m-v2-q4_k.gguf",
+      "upstream_revision": "a68f5d040b483506c0966a1602050ee1550a0382",
+      "revision_status": "pinned",
+      "artifacts": [
+        {
+          "role": "weights",
+          "name": "omniasr-llm-unlimited-300m-v2-q4_k.gguf",
+          "size_bytes": 1075436320,
+          "sha256": "56879dd6c0411aa19b225440aac088f11bad9496f64a1c0aa0d293e1450d7203",
+          "path": ".cache/huggingface/hub/models--cstr--omniasr-llm-unlimited-300m-v2-GGUF/blobs/56879dd6c0411aa19b225440aac088f11bad9496f64a1c0aa0d293e1450d7203",
+          "stat": {
+            "device": 16777235,
+            "inode": 6004861,
+            "size": 1075436320,
+            "mtime_ns": 1787396025712231236,
+            "ctime_ns": 1787396025713316781
+          }
+        }
+      ],
+      "runtime_packages": {
+        "torch": "2.8.0",
+        "torchaudio": "2.8.0",
+        "transformers": "4.57.6",
+        "huggingface-hub": "0.36.2",
+        "tokenizers": "0.22.2",
+        "accelerate": "1.14.0",
+        "sentencepiece": "0.2.2",
+        "omnilingual-asr": "0.2.0",
+        "fairseq2": "0.6",
+        "crispasr": "0.8.29",
+        "dataoceanai-dolphin": "20260513",
+        "modelscope": "1.39.1",
+        "funasr": "1.4.2",
+        "soundfile": "0.14.0",
+        "psutil": "5.9.8"
+      },
+      "requested_settings": {
+        "language": "mya_Mymr",
+        "batch_size": 1,
+        "chunk_seconds": 15.0
+      },
+      "resolved_settings": {
+        "device": null,
+        "dtype": null,
+        "n_threads": 4,
+        "chunk_seconds": 15.0,
+        "crisp_backend": "omniasr-llm-unlimited",
+        "unlimited": true
+      },
+      "fallback_history": [],
+      "adapter_git_commit": "185b24b8df308a79c2afa3b741647e19f76bee6c",
+      "adapter_git_dirty": false,
+      "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5",
+      "issues": [
+        "resolved compute device is unavailable, so this run cannot carry a unique execution identity"
+      ],
+      "schema_version": 2,
+      "content_sha256": "68ebba7313927c1dfaf27a8eccc7732635c9b75de5c4e37c257d5b50b867c0cf",
+      "execution_sha256": "2be0066d0d664a73a2b3fc2754cbe17391d77d8b0a70f257066c4228c03ddbf3"
+    },
+    "rtf": 0.30863954999949783
+  },
+  "elapsed_s": 15.354894791991683,
+  "observation": {
+    "runner_id": "omniasr-gguf-llm-unlimited-300m-v2-transcribe_chunked",
+    "transcript": "he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he he",
+    "elapsed_s": 15.354894791991683,
+    "n_segments": 1,
+    "matched_spans": 6,
+    "missed_spans": 0,
+    "duplicate_spans": 0,
+    "ordered": true,
+    "boundary_hits": [
+      20.0,
+      40.0
+    ],
+    "error": null
+  },
+  "spec_sha256": "cd28cb916f82c4297f9deb040d103d40ebd9dbcd988bd0b7082f609ad9eb05bc",
+  "result_sha256": "5dcd2661fc93b4f1021e9a693f0a0c998d8d22f62618671d3e71b5954a9a3ab3",
+  "observation_sha256": "9ddb6885b83c433861c0bf3f3ea9ad178ef1f30f38a9337d43ea2aaf272c3648"
+}

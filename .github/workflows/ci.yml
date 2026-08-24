@@ -20,11 +20,14 @@ jobs:
 
   offline-tests:
     runs-on: macos-14
+    env:
+      COLUMNS: "160"
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
       - run: uv python install 3.12
-      - run: uv sync --dev
+      - run: brew install ffmpeg libsndfile
+      - run: uv sync --dev --extra hf --extra omniasr
       - run: make check

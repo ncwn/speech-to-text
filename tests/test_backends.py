@@ -67,12 +67,13 @@ def test_torch_backend_reports_download_size():
     assert cls("some_unrecognised_card").estimated_download_mb() is None
 
 
-def test_cpu_prefers_float32_because_bfloat16_is_emulated_there():
+def test_cpu_prefers_float32_because_bfloat16_is_emulated_there(monkeypatch):
     """Measured on the 7B: bf16 on CPU is RTF 8.85 against fp32's 2.14, for
     identical text. PyTorch has no native half kernels on CPU, so the only
     reason to pick bf16 is not fitting in memory."""
     torch = pytest.importorskip("torch")
     cls = get_backend("omniasr-torch")
+    monkeypatch.setattr("stt.hardware.total_ram_mb", lambda: 64 * 1024)
 
     assert cls("omniASR_LLM_Unlimited_300M_v2")._resolve_dtype("cpu") is torch.float32
     large = cls("omniASR_LLM_Unlimited_7B_v2")
@@ -229,6 +230,42 @@ def test_hf_defaults_to_float32():
     torch = pytest.importorskip("torch")
     cls = get_backend("hf")
     assert cls("whisper-my-small")._resolve_dtype("mps") is torch.float32
+
+
+def test_hf_uses_saturated_default_only_for_seamless_on_mps():
+    cls = get_backend("hf")
+    seamless = cls("seamless-m4t-v2")
+    seamless.resolved_device = "mps"
+    mms = cls("mms-1b-all")
+    mms.resolved_device = "mps"
+    cpu = cls("seamless-m4t-v2")
+    cpu.resolved_device = "cpu"
+
+    assert seamless.preferred_batch_size() == 32
+    assert mms.preferred_batch_size() == 1
+    assert cpu.preferred_batch_size() == 1
+
+
+@pytest.mark.parametrize(
+    ("version", "dtype_key", "audio_key"),
+    [
+        ("4.45.0", "torch_dtype", "audios"),
+        ("4.56.0", "dtype", "audios"),
+        ("4.57.6", "dtype", "audio"),
+    ],
+)
+def test_hf_uses_version_appropriate_transformers_kwargs(
+    monkeypatch, version, dtype_key, audio_key
+):
+    """Keep the declared Transformers 4.45+ range warning-free and usable."""
+    import sys
+    from types import SimpleNamespace
+
+    from stt.backends import transformers_asr
+
+    monkeypatch.setitem(sys.modules, "transformers", SimpleNamespace(__version__=version))
+    assert transformers_asr._dtype_kwargs("sentinel") == {dtype_key: "sentinel"}
+    assert transformers_asr._audio_kwarg("sentinel") == {audio_key: "sentinel"}
 
 
 def test_hf_rejects_non_burmese_language():

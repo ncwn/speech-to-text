@@ -3,9 +3,13 @@
 from __future__ import annotations
 
 import json
+import time
 
+import pytest
+
+import stt.telemetry as telemetry
 from stt.results import TranscriptionResult, read_jsonl, write_jsonl
-from stt.telemetry import ResourceUsage, describe_host, measure, peak_rss_mb
+from stt.telemetry import Profiler, ResourceUsage, Series, describe_host, measure, peak_rss_mb
 
 
 def test_measure_reports_wall_and_cpu_time():
@@ -17,11 +21,11 @@ def test_measure_reports_wall_and_cpu_time():
     assert u.peak_rss_mb > 0
 
 
-def test_busy_work_on_one_thread_reports_about_one_core():
+def test_busy_work_reports_at_least_one_half_core():
     with measure() as usage:
         sum(i * i for i in range(2_000_000))
-    # Pure Python holds the GIL, so this cannot exceed a core by much.
-    assert 0.5 < usage[0].cpu_utilization < 1.5
+    # The exact total includes any native worker threads owned by the process.
+    assert usage[0].cpu_utilization > 0.5
 
 
 def test_a_block_that_raises_still_reports_what_it_used():
@@ -57,13 +61,31 @@ def test_derived_utilization_is_written_but_is_not_a_field():
     assert json.dumps(d)  # must stay JSON-serialisable
 
 
+def test_resource_series_can_be_omitted_from_load_metadata():
+    usage = ResourceUsage(
+        wall_s=1.0,
+        cpu_s=1.0,
+        peak_rss_mb=1.0,
+        cpu=Series.from_samples([1.0]),
+    )
+    compact = usage.to_dict(include_series=False)
+    assert "cpu" not in compact
+    assert compact["cpu_utilization"] == 1.0
+
+
 def test_resources_survive_a_jsonl_round_trip(tmp_path):
     result = TranscriptionResult(
         audio_path="a.wav",
         text="ကမ္ဘာ",
         backend="b",
         model="m",
-        resources=ResourceUsage(wall_s=2.0, cpu_s=8.0, peak_rss_mb=512.0, gpu_mb=64.0),
+        resources=ResourceUsage(
+            wall_s=2.0,
+            cpu_s=8.0,
+            peak_rss_mb=512.0,
+            gpu_mb=64.0,
+            gpu_util=Series.from_samples([0, 50, 100], idle_threshold=1.0),
+        ),
     )
     path = tmp_path / "r.jsonl"
     write_jsonl([result], path)
@@ -73,6 +95,7 @@ def test_resources_survive_a_jsonl_round_trip(tmp_path):
     assert back.cpu_s == 8.0
     assert back.gpu_mb == 64.0
     assert back.cpu_utilization == 4.0  # recomputed, not read back as a field
+    assert back.gpu_util and back.gpu_util.samples == [0.0, 50.0, 100.0]
 
 
 def test_results_without_resources_still_load(tmp_path):
@@ -85,3 +108,327 @@ def test_host_description_identifies_the_machine():
     host = describe_host()
     assert host["cpu_count"] and host["cpu_count"] > 0
     assert host["machine"]
+
+
+def test_series_statistics_keep_count_shape_and_raw_samples():
+    series = Series.from_samples([0, 10, 20, 30, 100], idle_threshold=0)
+    assert series.n == 5
+    assert series.mean == 32.0
+    assert series.p50 == 20.0
+    assert series.p95 == pytest.approx(86.0)
+    assert series.max == 100.0
+    assert series.idle_pct == 20.0
+    assert series.samples == [0.0, 10.0, 20.0, 30.0, 100.0]
+
+
+def test_timestamped_series_uses_time_weighted_summaries():
+    series = Series.from_samples(
+        [0, 100],
+        offsets_ns=[10, 90],
+        window_ns=100,
+        idle_threshold=1,
+        source="observer",
+        scope="whole-device",
+        phase="corpus",
+    )
+
+    assert series.mean == pytest.approx(50.0)
+    assert series.idle_pct == pytest.approx(50.0)
+    assert series.offsets_ns == [10, 90]
+    assert series.window_ns == 100
+    assert series.to_dict()["source"] == "observer"
+
+
+def test_timestamped_series_round_trip_recomputes_with_recorded_threshold():
+    original = Series.from_samples(
+        [0, 2, 100], offsets_ns=[10, 20, 90], window_ns=100, idle_threshold=1
+    )
+    restored = Series.from_dict(original.to_dict())
+
+    assert restored.mean == original.mean
+    assert restored.idle_pct == original.idle_pct
+    assert restored.offsets_ns == original.offsets_ns
+
+
+def test_unknown_result_resource_series_and_segment_fields_warn_and_load(tmp_path):
+    path = tmp_path / "future.jsonl"
+    path.write_text(
+        json.dumps(
+            {
+                "audio_path": "a.wav",
+                "text": "x",
+                "backend": "b",
+                "model": "m",
+                "future_result": True,
+                "segments": [
+                    {
+                        "text": "x",
+                        "start": 0,
+                        "end": 1,
+                        "future_segment": True,
+                    }
+                ],
+                "resources": {
+                    "wall_s": 1,
+                    "cpu_s": 1,
+                    "peak_rss_mb": 1,
+                    "future_resource": 1,
+                    "cpu": {
+                        "n": 1,
+                        "mean": 1,
+                        "p50": 1,
+                        "p95": 1,
+                        "max": 1,
+                        "idle_pct": 0,
+                        "samples": [1],
+                        "future_series": 1,
+                    },
+                },
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    with pytest.warns(UserWarning) as caught:
+        loaded = read_jsonl(path)[0]
+    assert len(caught) == 4
+    assert loaded.text == "x"
+    assert loaded.segments and loaded.segments[0].text == "x"
+    assert loaded.resources and loaded.resources.cpu and loaded.resources.cpu.n == 1
+
+
+# --- GPU sampling ------------------------------------------------------------
+
+
+def test_sampler_cost_is_subtracted_from_cpu_seconds(monkeypatch):
+    """Unsubtracted, ioreg's own CPU lands on the workload's bill."""
+    from stt import telemetry
+
+    class FakeSampler(telemetry.GpuSampler):
+        def start(self):
+            self.samples = [40.0, 80.0]
+            self.cpu_cost_s = 0.25
+            return self
+
+        def stop(self):
+            return None
+
+    monkeypatch.setattr(telemetry, "GpuSampler", FakeSampler)
+    with telemetry.measure(sample_gpu=True) as box:
+        pass
+    usage = box[0]
+
+    assert usage.sampler_cpu_s == 0.25
+    # cpu_s clamps at zero rather than going negative on a trivial block.
+    assert usage.cpu_s >= 0.0
+    assert usage.gpu_util_mean == 60.0
+    assert usage.gpu_util_peak == 80.0
+
+
+def test_no_gpu_fields_when_sampling_is_off():
+    from stt.telemetry import measure
+
+    with measure(sample_gpu=False) as box:
+        pass
+    usage = box[0]
+
+    assert usage.gpu_util_mean is None
+    assert usage.gpu_util_peak is None
+    assert usage.sampler_cpu_s == 0.0
+    assert "gpu_util_mean" not in usage.to_dict()
+
+
+def test_unprofiled_measurement_still_reports_current_rss_window():
+    with measure(profile=False, phase="corpus") as box:
+        values = bytearray(1024)
+
+    usage = box[0]
+    assert values
+    assert usage.started_ns is not None
+    assert usage.ended_ns is not None
+    assert usage.ended_ns >= usage.started_ns
+    assert usage.rss_peak_mb is not None
+    assert usage.process_peak_rss_mb == usage.peak_rss_mb
+    assert usage.phase == "corpus"
+
+
+def test_measure_synchronizes_before_and_after_work(monkeypatch):
+    from stt import telemetry
+
+    events: list[str] = []
+    monkeypatch.setattr(
+        telemetry, "synchronize_device", lambda device: events.append(f"sync:{device}")
+    )
+
+    with telemetry.measure(profile=False, device="mps"):
+        events.append("work")
+
+    assert events == ["sync:mps", "work", "sync:mps"]
+
+
+def test_profiler_rejects_samples_that_finish_after_work_window(monkeypatch):
+    profiler = Profiler(sample_gpu=True)
+    profiler._started_ns = 100
+    profiler._ended_ns = 200
+    profiler.samples = [20.0]
+    profiler.gpu_offsets_ns = [50]
+
+    monkeypatch.setattr("stt.telemetry.time.perf_counter_ns", lambda: 250)
+    monkeypatch.setattr("stt.telemetry.gpu_utilization_now", lambda: 99.0)
+    profiler._sample_gpu()
+
+    assert profiler.samples == [20.0]
+    assert profiler.gpu_util and profiler.gpu_util.samples == [20.0]
+
+
+def test_gpu_utilisation_returns_none_without_ioreg(monkeypatch):
+    from stt import telemetry
+
+    monkeypatch.setattr(telemetry.shutil, "which", lambda _: None)
+    assert telemetry.gpu_utilization_now() is None
+
+
+def test_gpu_utilisation_keeps_subprocess_posix_spawn_eligible(monkeypatch):
+    from types import SimpleNamespace
+
+    from stt import telemetry
+
+    calls = []
+    monkeypatch.setattr(telemetry.shutil, "which", lambda _: "/usr/sbin/ioreg")
+
+    def run(argv, **kwargs):
+        calls.append((argv, kwargs))
+        return SimpleNamespace(stdout='"Device Utilization %"=73')
+
+    monkeypatch.setattr(telemetry.subprocess, "run", run)
+
+    assert telemetry.gpu_utilization_now() == 73.0
+    assert calls == [
+        (
+            [
+                "/usr/sbin/ioreg",
+                "-r",
+                "-d",
+                "1",
+                "-w",
+                "0",
+                "-c",
+                "IOAccelerator",
+            ],
+            {
+                "capture_output": True,
+                "close_fds": False,
+                "text": True,
+                "timeout": 5,
+            },
+        )
+    ]
+
+
+def test_saturation_names_the_busy_resource():
+    from stt.telemetry import ResourceUsage, saturation
+
+    def usage(cpu_s, wall_s=1.0, gpu=None):
+        return ResourceUsage(wall_s=wall_s, cpu_s=cpu_s, peak_rss_mb=1.0, gpu_util_mean=gpu)
+
+    assert saturation(usage(0.3, gpu=85.0), 8) == "GPU-bound"
+    assert saturation(usage(7.0), 8) == "CPU-bound"
+    assert saturation(usage(0.3, gpu=40.0), 8) == "GPU-light"
+    assert saturation(usage(0.3), 8) == "underutilised"
+    # A GPU-bound run is called that even when the CPU is nearly idle: that is
+    # the GGUF case, and calling it "underutilised" was the old blind spot.
+    assert saturation(usage(0.05, gpu=78.0), 12) == "GPU-bound"
+
+
+def test_uss_is_off_by_default_and_collected_when_asked():
+    """USS costs about 20x an RSS read, so it is opt-in rather than standard."""
+    sampler = telemetry.GpuSampler(sample_gpu=False)
+    assert sampler.sample_uss is False
+    assert sampler.uss is None
+
+    asked = telemetry.GpuSampler(sample_gpu=False, sample_uss=True)
+    assert asked.sample_uss is True
+
+
+def test_an_unavailable_uss_reading_does_not_take_the_sampler_down(monkeypatch):
+    """Some platforms refuse memory_full_info; that must stay a missing series.
+
+    A refused read must not cost the RSS series that shares the same tick.
+    """
+    import time as _time
+
+    monkeypatch.setattr(telemetry, "uss_now_mb", lambda: None)
+    sampler = telemetry.GpuSampler(sample_gpu=False, sample_uss=True)
+    started = _time.perf_counter_ns()
+    sampler.begin(started)
+    sampler._sample_cpu_rss(None)
+    sampler.finish(_time.perf_counter_ns() + 1_000_000)
+
+    assert sampler.uss is None
+    assert sampler.rss is not None
+
+
+def test_uss_series_survives_a_jsonl_round_trip(tmp_path):
+    """A diagnostic nobody can read back is not a diagnostic."""
+    usage = telemetry.ResourceUsage(
+        wall_s=1.0,
+        cpu_s=1.0,
+        peak_rss_mb=100.0,
+        uss=telemetry.Series.from_samples(
+            [10.0, 12.0, 11.0],
+            offsets_ns=[0, 1_000, 2_000],
+            window_ns=3_000,
+            source="psutil-uss",
+            scope="worker-process",
+        ),
+    )
+    result = TranscriptionResult(
+        audio_path="a.wav", text="x", backend="b", model="m", resources=usage
+    )
+    path = tmp_path / "run.jsonl"
+    write_jsonl([result], path)
+
+    loaded = read_jsonl(path)[0].resources
+    assert loaded is not None and loaded.uss is not None
+    assert loaded.uss.samples == [10.0, 12.0, 11.0]
+    assert loaded.uss.source == "psutil-uss"
+
+
+@pytest.mark.weights
+def test_real_mps_work_is_synchronized_on_both_sides_of_the_wall():
+    """The fake-clock test proves the calls happen; this proves they bite.
+
+    MPS dispatch is asynchronous, so without a real synchronize the measured
+    wall can close while the GPU is still working and the corpus looks faster
+    than it was. Queue enough work that an unsynchronized wall would visibly
+    under-measure it, then check the wall covers the work rather than the
+    dispatch.
+    """
+    torch = pytest.importorskip("torch")
+    if not torch.backends.mps.is_available():
+        pytest.skip("no MPS device")
+
+    size = 2048
+    left = torch.randn(size, size, device="mps")
+    right = torch.randn(size, size, device="mps")
+    torch.mps.synchronize()
+
+    with measure(profile=False, device="mps") as box:
+        product = left
+        for _ in range(60):
+            product = product @ right
+    usage = box[0]
+
+    # Time the same work with an explicit synchronize as the reference.
+    torch.mps.synchronize()
+    reference_start = time.perf_counter()
+    product = left
+    for _ in range(60):
+        product = product @ right
+    torch.mps.synchronize()
+    reference = time.perf_counter() - reference_start
+
+    assert usage.wall_s >= reference * 0.5, (
+        f"measured wall {usage.wall_s:.4f}s is far below the synchronized "
+        f"reference {reference:.4f}s, so the wall closed before the GPU did"
+    )

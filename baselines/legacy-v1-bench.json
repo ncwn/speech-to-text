@@ -1,0 +1,111 @@
+{
+  "batch_size": 1,
+  "clips": [
+    "10207165333468320061",
+    "10406743972683477081",
+    "12011678642037122936",
+    "12202394788954760188",
+    "14755840805814218163"
+  ],
+  "host": {
+    "chip": "Apple M2 Max",
+    "torch": "2.8.0"
+  },
+  "runs": [
+    {
+      "cpu_utilization": 0.478,
+      "error": null,
+      "gpu_idle_pct": 8.3,
+      "gpu_util_mean": 86.3,
+      "gpu_util_n": 12,
+      "gpu_util_p50": 91.5,
+      "hashes": {
+        "10207165333468320061": "5012ccd7fae4eeaf",
+        "10406743972683477081": "7562b169f646392b",
+        "12011678642037122936": "29dae9a2a30401c2",
+        "12202394788954760188": "394ab631d3009615",
+        "14755840805814218163": "1e3a9b024c6a03a8"
+      },
+      "model": "mms-1b-all",
+      "peak_rss_mb": 619.3125,
+      "rtf": 0.031046427745007446,
+      "subject": "hf/mms-1b-all"
+    },
+    {
+      "cpu_utilization": 1.704,
+      "error": null,
+      "gpu_idle_pct": 8.8,
+      "gpu_util_mean": 52.6,
+      "gpu_util_n": 57,
+      "gpu_util_p50": 52.0,
+      "hashes": {
+        "10207165333468320061": "fa784466f9daabf8",
+        "10406743972683477081": "8f8a7c319e36550c",
+        "12011678642037122936": "a796e086e64acc67",
+        "12202394788954760188": "d7532ffd3eb08562",
+        "14755840805814218163": "2967e46aed975361"
+      },
+      "model": "seamless-m4t-v2",
+      "peak_rss_mb": 1354.109375,
+      "rtf": 0.19488555648702258,
+      "subject": "hf/seamless-m4t-v2"
+    },
+    {
+      "cpu_utilization": 0.671,
+      "error": null,
+      "gpu_idle_pct": 1.8,
+      "gpu_util_mean": 85.7,
+      "gpu_util_n": 165,
+      "gpu_util_p50": 90.0,
+      "hashes": {
+        "10207165333468320061": "555ecf4bbd5b5501",
+        "10406743972683477081": "5b595771c764a95a",
+        "12011678642037122936": "44fb64d44505406e",
+        "12202394788954760188": "3db7c2bd50ac56cd",
+        "14755840805814218163": "752d87c18cca6e11"
+      },
+      "model": "llm-unlimited-300m-v2",
+      "peak_rss_mb": 2646.65625,
+      "rtf": 0.5756090488485472,
+      "subject": "omniasr-gguf"
+    },
+    {
+      "cpu_utilization": 1.988,
+      "error": null,
+      "gpu_idle_pct": null,
+      "gpu_util_mean": null,
+      "gpu_util_n": null,
+      "gpu_util_p50": null,
+      "hashes": {
+        "10207165333468320061": "217d5b588da4b948",
+        "10406743972683477081": "95096231fec4c8d3",
+        "12011678642037122936": "c4a2105137c1e7f0",
+        "12202394788954760188": "3cc2a1c20c756d45",
+        "14755840805814218163": "833c711cf02c0b70"
+      },
+      "model": "small",
+      "peak_rss_mb": 6029.578125,
+      "rtf": 0.18788122426283363,
+      "subject": "dolphin/small"
+    },
+    {
+      "cpu_utilization": 0.567,
+      "error": null,
+      "gpu_idle_pct": 5.3,
+      "gpu_util_mean": 55.6,
+      "gpu_util_n": 206,
+      "gpu_util_p50": 53.0,
+      "hashes": {
+        "10207165333468320061": "8f93bcf1189b6ca6",
+        "10406743972683477081": "ce7fd0bd2c19e106",
+        "12011678642037122936": "a244de4ab13b5197",
+        "12202394788954760188": "488706157a497744",
+        "14755840805814218163": "14a06ee91f211d69"
+      },
+      "model": "omniASR_LLM_Unlimited_7B_v2",
+      "peak_rss_mb": 21143.078125,
+      "rtf": 0.7193280422214291,
+      "subject": "omniasr-torch/omniASR_LLM_Unlimited_7B_v2"
+    }
+  ]
+}

@@ -1,0 +1,253 @@
+{
+  "artifact_kind": "experiment-v1",
+  "condition_summaries": [
+    {
+      "baseline_eligible": false,
+      "condition_id": "llm-unlimited-300m-v3-v3",
+      "content_sha256": "ee0dfbdcf108304f91195d417235f759fc508d12c466a60af519be3cbe249b2b",
+      "cpu_utilization": 0.040868243192389325,
+      "endpoint_rss_mb": 1392.1,
+      "environment_identity": "c9cc4ee6ed4aabacf10a90ca3c09030d6426f882dbeeca63f0bcb14304f01367",
+      "error": "1/1 result(s) lack complete model provenance",
+      "execution_sha256": "387835dbb6eb9cb239f6291396c475ba505eae2048fbc99a775736d1237da6b3",
+      "gpu_idle_pct": null,
+      "gpu_scope": null,
+      "gpu_util_mean": null,
+      "gpu_util_n": null,
+      "gpu_util_p50": null,
+      "hashes": {
+        "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0": "03c704e3fd91b2e59ead81d7a957c6029c009901fd93a31d04fb8424a9f43ac7"
+      },
+      "host_identity": "822f056562677109078af817bb8a4077165c054b083f1746b438ebab79bfb675",
+      "input_set_id": "canonical",
+      "memory_metric": "worker-lifetime-ru-maxrss-diagnostic",
+      "model": "llm-unlimited-300m-v2",
+      "natural_variation_ratio_99": null,
+      "observer": {
+        "load_wall_s": 0.1632,
+        "observer_cpu_s": 0.0,
+        "profile": false,
+        "profiler_cpu_s": 0.0,
+        "repeat_wall_s": 0.0,
+        "sample_uss": false,
+        "sampler_cpu_s": 0.0,
+        "uss_sample_count": 0,
+        "uss_status": "disabled"
+      },
+      "peak_rss_mb": 1392.1,
+      "profile": false,
+      "protocol": {
+        "repeats": 1,
+        "schedule_seed": 0,
+        "sessions": 1,
+        "warmups": 0
+      },
+      "provenance_issues": [
+        "runtime did not report the selected device",
+        "resolved compute device is unavailable, so this run cannot carry a unique execution identity",
+        "worker (0, 'omniasr-gguf-quantization-v3:session-0') has incomplete model provenance"
+      ],
+      "repeats": 1,
+      "request_key": "omniasr-gguf/llm-unlimited-300m-v2:2eb8c8d1f9fef614",
+      "rtf": null,
+      "rtf_ci95": null,
+      "rtf_p25": null,
+      "rtf_p75": null,
+      "runner_id": "adapter",
+      "sample_uss": false,
+      "subject": "omniasr-gguf/llm-unlimited-300m-v2",
+      "text_digest": "5045bb0277950ed90e7833cc635ca47129263975b7e14cae43be93475f4cbe13",
+      "transcript_hashes": {
+        "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0": "03c704e3fd91b2e59ead81d7a957c6029c009901fd93a31d04fb8424a9f43ac7"
+      },
+      "worker_blocks": [
+        {
+          "hashes": {
+            "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0": "03c704e3fd91b2e59ead81d7a957c6029c009901fd93a31d04fb8424a9f43ac7"
+          },
+          "launch_position": 0,
+          "process_peak_rss_mb": 1392.1,
+          "repeat_rtfs": [
+            null
+          ],
+          "representative_rtf": null,
+          "session_id": "omniasr-gguf-quantization-v3:session-0",
+          "session_index": 0,
+          "worker_index": 0
+        }
+      ],
+      "worker_lifetime_peak_rss_mb": 1392.1,
+      "workers": 1
+    },
+    {
+      "baseline_eligible": false,
+      "condition_id": "llm-unlimited-300m-v3-f16-v3",
+      "content_sha256": "2efd48c31bffff0eba901dcfcf3502d7205ac215d80b0c9d34b4a00b97f7b3e1",
+      "cpu_utilization": 0.03613863479400697,
+      "endpoint_rss_mb": 3479.2,
+      "environment_identity": "c9cc4ee6ed4aabacf10a90ca3c09030d6426f882dbeeca63f0bcb14304f01367",
+      "error": "1/1 result(s) lack complete model provenance",
+      "execution_sha256": "caa5a3689bd5ee2671460c36e644dbef835feb267b7ed0c5acd036e23fb43737",
+      "gpu_idle_pct": null,
+      "gpu_scope": null,
+      "gpu_util_mean": null,
+      "gpu_util_n": null,
+      "gpu_util_p50": null,
+      "hashes": {
+        "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0": "a1e9d32b0ac915bdb2b8b145f583294e866bd8b725da463ff40b1539662705d0"
+      },
+      "host_identity": "822f056562677109078af817bb8a4077165c054b083f1746b438ebab79bfb675",
+      "input_set_id": "canonical",
+      "memory_metric": "worker-lifetime-ru-maxrss-diagnostic",
+      "model": "llm-unlimited-300m-v2-f16",
+      "natural_variation_ratio_99": null,
+      "observer": {
+        "load_wall_s": 0.3823,
+        "observer_cpu_s": 0.0,
+        "profile": false,
+        "profiler_cpu_s": 0.0,
+        "repeat_wall_s": 0.0,
+        "sample_uss": false,
+        "sampler_cpu_s": 0.0,
+        "uss_sample_count": 0,
+        "uss_status": "disabled"
+      },
+      "peak_rss_mb": 3479.2,
+      "profile": false,
+      "protocol": {
+        "repeats": 1,
+        "schedule_seed": 0,
+        "sessions": 1,
+        "warmups": 0
+      },
+      "provenance_issues": [
+        "runtime did not report the selected device",
+        "resolved compute device is unavailable, so this run cannot carry a unique execution identity",
+        "worker (0, 'omniasr-gguf-quantization-v3:session-0') has incomplete model provenance"
+      ],
+      "repeats": 1,
+      "request_key": "omniasr-gguf/llm-unlimited-300m-v2-f16:bc317893cdfaf021",
+      "rtf": null,
+      "rtf_ci95": null,
+      "rtf_p25": null,
+      "rtf_p75": null,
+      "runner_id": "adapter",
+      "sample_uss": false,
+      "subject": "omniasr-gguf/llm-unlimited-300m-v2-f16",
+      "text_digest": "2c212177c9fdb24fb6196cc1a18589832abb13e0a582d197797e6b00e6c667a4",
+      "transcript_hashes": {
+        "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0": "a1e9d32b0ac915bdb2b8b145f583294e866bd8b725da463ff40b1539662705d0"
+      },
+      "worker_blocks": [
+        {
+          "hashes": {
+            "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0": "a1e9d32b0ac915bdb2b8b145f583294e866bd8b725da463ff40b1539662705d0"
+          },
+          "launch_position": 1,
+          "process_peak_rss_mb": 3479.2,
+          "repeat_rtfs": [
+            null
+          ],
+          "representative_rtf": null,
+          "session_id": "omniasr-gguf-quantization-v3:session-0",
+          "session_index": 0,
+          "worker_index": 0
+        }
+      ],
+      "worker_lifetime_peak_rss_mb": 3479.2,
+      "workers": 1
+    }
+  ],
+  "contrasts": [],
+  "experiment_id": "omniasr-gguf-quantization-v3",
+  "gate_eligible": false,
+  "schema_version": 1,
+  "session_schedule": [
+    [
+      {
+        "condition_id": "llm-unlimited-300m-v3-v3",
+        "launch_position": 0,
+        "request_key": "omniasr-gguf/llm-unlimited-300m-v2:2eb8c8d1f9fef614"
+      },
+      {
+        "condition_id": "llm-unlimited-300m-v3-f16-v3",
+        "launch_position": 1,
+        "request_key": "omniasr-gguf/llm-unlimited-300m-v2-f16:bc317893cdfaf021"
+      }
+    ]
+  ],
+  "spec": {
+    "conditions": [
+      {
+        "condition_id": "llm-unlimited-300m-v3-v3",
+        "input_set_id": "canonical",
+        "profile": false,
+        "runner_id": "adapter",
+        "sample_uss": false,
+        "subject": {
+          "backend": "omniasr-gguf",
+          "batch_size": 1,
+          "language": "mya_Mymr",
+          "model": "llm-unlimited-300m-v2",
+          "options": {
+            "batch_size": 1,
+            "language": "mya_Mymr",
+            "n_threads": 8
+          }
+        }
+      },
+      {
+        "condition_id": "llm-unlimited-300m-v3-f16-v3",
+        "input_set_id": "canonical",
+        "profile": false,
+        "runner_id": "adapter",
+        "sample_uss": false,
+        "subject": {
+          "backend": "omniasr-gguf",
+          "batch_size": 1,
+          "language": "mya_Mymr",
+          "model": "llm-unlimited-300m-v2-f16",
+          "options": {
+            "batch_size": 1,
+            "language": "mya_Mymr",
+            "n_threads": 8
+          }
+        }
+      }
+    ],
+    "contrasts": [],
+    "experiment_id": "omniasr-gguf-quantization-v3",
+    "input_sets": [
+      {
+        "input_mode": "prepared",
+        "input_set_id": "canonical",
+        "inputs": [
+          {
+            "audio_id": "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0",
+            "channels": 1,
+            "duration_s": 27.6,
+            "frames": 441600,
+            "prepared_path": "data/.converted/pcm16-mono-16000-v1__36c25f8b1db4ba5ddab8b3edd0bbd8f2b2af1aeb466863f77cfacad95197ee61.wav",
+            "reference_id": "10207165333468320061",
+            "sample_rate": 16000,
+            "source_path": "data/fleurs/audio/10207165333468320061.wav",
+            "source_sha256": "36c25f8b1db4ba5ddab8b3edd0bbd8f2b2af1aeb466863f77cfacad95197ee61"
+          }
+        ]
+      }
+    ],
+    "repeats": 1,
+    "schedule_seed": 0,
+    "sessions": 1,
+    "statistics": {
+      "draws": 20000,
+      "estimator": "paired-session-median-log-ratio",
+      "min_repeats": 3,
+      "min_sessions": 5,
+      "min_warmups": 3,
+      "quantile_method": "linear",
+      "version": 1
+    },
+    "warmups": 0
+  }
+}

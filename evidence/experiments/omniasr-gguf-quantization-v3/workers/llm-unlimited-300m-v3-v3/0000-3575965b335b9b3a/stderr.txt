@@ -1,0 +1,1 @@
+crispasr_metal_pipeline_cache_flush: pipeline cache serialised → <external-path>

@@ -25,6 +25,7 @@ from typing import Any, ClassVar
 from stt.audio import join_segments
 from stt.backends.base import ASRBackend
 from stt.native import suppress_native_output
+from stt.paths import cache_dir
 from stt.registry import register
 from stt.results import Segment, TranscriptionResult
 
@@ -50,13 +51,12 @@ MODELS: dict[str, DolphinModel] = {
 
 DEFAULT_MODEL = "small"
 
-#: Weights land here rather than in the repo, matching the other backends.
 #: Dolphin writes ``config.yaml`` and ``train.yaml`` alongside the ``.pt`` under
 #: whatever directory it is handed, and skips files that already exist. Sharing
 #: one directory across sizes therefore leaves the *first* model's config next to
 #: a later model's weights, and the load fails with a shape mismatch. Give each
 #: size its own directory.
-CACHE_ROOT = Path.home() / ".cache" / "dolphin"
+CACHE_ROOT = cache_dir("dolphin", create=False)
 
 
 def cache_dir(size: str) -> Path:
@@ -116,8 +116,11 @@ class DolphinBackend(ASRBackend):
         self.device_arg = device
         self.engine: Any = None
         self.resolved_device: str | None = None
-
-    # ------------------------------------------------------------------ setup
+        #: Dolphin's checkpoint is float32 throughout; the only precision
+        #: decision this adapter makes is the float64 compatibility cast in
+        #: `_demote_float64`, which is recorded as a fallback rather than
+        #: folded into this value.
+        self.resolved_dtype: str | None = None
 
     @classmethod
     def is_available(cls) -> tuple[bool, str]:
@@ -134,18 +137,22 @@ class DolphinBackend(ASRBackend):
             return self.device_arg
         if torch.cuda.is_available():
             return "cuda"
-        # Metal works here — see `_demote_float64` for what it took — but it is
-        # slower for this model, so it is not the default. Measured on three
-        # FLEURS clips, identical text either way:
-        #
-        #   cpu   RTF 0.18   1.89 cores
-        #   mps   RTF 0.25   0.27 cores, 5.0 GB GPU
-        #
-        # Dolphin is small and runs 20-second windows one at a time, so kernel
-        # launch overhead outweighs what the GPU wins back. `--device mps` is
-        # still worth having: it frees the CPU almost entirely, which is what
-        # matters when something else needs those cores.
+        # Metal works here — see `_demote_float64` for what it took — but is
+        # slower for this model, so CPU is the default. `--device mps` is still
+        # worth having: it frees the CPU almost entirely.
+        # docs/findings.md#device-defaults
         return "cpu"
+
+    def _resolve_dtype(self, device: str) -> str:
+        """Return Dolphin's native precision for provenance preflight.
+
+        Dolphin's checkpoint parameters are float32 on every device.  MPS may
+        additionally demote its float64 CMVN buffers at load time; that change
+        is recorded as a fallback there, while the resolved model dtype remains
+        the same value reported by preflight.
+        """
+        del device
+        return "float32"
 
     def estimated_download_mb(self) -> int | None:
         return self.spec.approx_mb
@@ -156,16 +163,34 @@ class DolphinBackend(ASRBackend):
     def load(self) -> None:
         import dolphin
 
-        directory = cache_dir(self.spec.size)
+        binding = self.model_binding
+        if binding is not None:
+            bound_files = [Path(str(item.path)) for item in binding.paths if item.path]
+            directories = {path.resolve().parent for path in bound_files}
+            if len(directories) != 1:
+                raise RuntimeError("Dolphin binding artifacts must share one loader directory")
+            directory = next(iter(directories))
+        else:
+            directory = cache_dir(self.spec.size)
         directory.mkdir(parents=True, exist_ok=True)
         self.resolved_device = self._resolve_device()
+        self.resolved_dtype = self._resolve_dtype(self.resolved_device)
 
         with suppress_native_output(not self.options.get("verbose")):
             if self.resolved_device == "mps":
                 # Metal has no float64 at all, and `load_model` moves the model
                 # to the device itself, so the cast has to happen in between.
                 self.engine = dolphin.load_model(self.spec.size, str(directory), "cpu")
-                _demote_float64(self.engine)
+                demoted = _demote_float64(self.engine)
+                if demoted:
+                    # A change to the numbers, so it is provenance, not a
+                    # detail: the run is comparable only to other runs that
+                    # made the same cast.
+                    self.record_fallback(
+                        reason="metal has no float64",
+                        cast="float64->float32",
+                        tensors=demoted,
+                    )
                 self.engine = self.engine.to("mps")
                 # `dolphin.transcribe` places its inputs with `model.device`,
                 # a plain string set when the model was built. Moving the
@@ -184,8 +209,6 @@ class DolphinBackend(ASRBackend):
         import gc
 
         gc.collect()
-
-    # ------------------------------------------------------------- inference
 
     def _check_language(self, language: str | None) -> None:
         if language is None:
@@ -233,6 +256,139 @@ class DolphinBackend(ASRBackend):
                 return (getattr(out, "text_nospecial", None) or "").strip()
 
             return windowed(pcm, rate, WINDOW_SEC, decode)
+
+    def _parity_trace(self, path: Path, *, language: str | None, adapter: bool):
+        """Capture Dolphin's repository path and its upstream single-file path.
+
+        The repository path writes each fixed-window chunk to a temporary WAV
+        before calling ``dolphin.transcribe``.  The reference path calls that
+        upstream function on the prepared file directly.  Both paths share the
+        same loaded model, while hooks capture the values each call actually
+        decoded, fed to the encoder, and passed through the CTC head.
+        """
+        if self.engine is None:
+            raise RuntimeError("Dolphin parity requires a loaded model")
+        self._check_language(language)
+        import importlib
+
+        import numpy as np
+        import soundfile as sf
+        import torch
+        import torchaudio
+
+        from stt.parity import ParityTrace
+
+        info = sf.info(str(path))
+        if info.duration >= WINDOW_SEC:
+            raise RuntimeError("Dolphin parity fixture must be shorter than one adapter window")
+
+        dolphin = importlib.import_module("dolphin")
+        transcribe_module = importlib.import_module("dolphin.transcribe")
+        original_entry = dolphin.transcribe
+        original_extract = transcribe_module.extract_feats
+        original_decode = self.engine.decode
+        original_ctc = self.engine.ctc_logprobs
+        features: list[np.ndarray] = []
+        encoders: list[np.ndarray] = []
+        ctc_values: list[np.ndarray] = []
+        token_values: list[np.ndarray] = []
+        decoded: list[np.ndarray] = []
+        outputs: list[Any] = []
+
+        def capture_features(audios, configs):
+            batch = original_extract(audios, configs)
+            features.append(batch["feats"].detach().cpu().numpy().copy())
+            source = audios[0]
+            if isinstance(source, (str, Path)):
+                waveform, _ = torchaudio.load(str(source))
+            elif isinstance(source, torch.Tensor):
+                waveform = source.detach().cpu()
+            else:
+                waveform = torch.as_tensor(source).detach().cpu()
+            if waveform.ndim > 1:
+                waveform = waveform[0]
+            decoded.append(waveform.numpy().copy())
+            return batch
+
+        def capture_encoder(module, args, output):
+            del module, args
+            value = output[0] if isinstance(output, tuple) else output
+            encoders.append(value.detach().cpu().numpy().copy())
+
+        def capture_ctc(*args, **kwargs):
+            value = original_ctc(*args, **kwargs)
+            ctc_values.append(value.detach().cpu().numpy().copy())
+            return value
+
+        def capture_decode(*args, **kwargs):
+            result = original_decode(*args, **kwargs)
+            method = kwargs.get("methods", ["attention_rescoring"])[0]
+            item = result[method][0]
+            tokens = getattr(item, "tokens", None)
+            if tokens is None:
+                raise RuntimeError("Dolphin parity could not observe decoded token IDs")
+            token_values.append(np.asarray(tokens, dtype=np.int64).copy())
+            return result
+
+        def capture_entry(*args, **kwargs):
+            result = original_entry(*args, **kwargs)
+            outputs.append(result)
+            return result
+
+        encoder_hook = self.engine.encoder.register_forward_hook(capture_encoder)
+        self.engine.ctc_logprobs = capture_ctc
+        self.engine.decode = capture_decode
+        transcribe_module.extract_feats = capture_features
+        dolphin.transcribe = capture_entry
+        try:
+            if adapter:
+                segments = self._transcribe_file(path)
+                final = join_segments(segments).strip()
+                entrypoint = "repository-windowed-upstream"
+            else:
+                result = dolphin.transcribe(
+                    self.engine,
+                    str(path),
+                    lang_sym=BURMESE_LANG,
+                    region_sym=BURMESE_REGION,
+                )
+                final = (getattr(result, "text_nospecial", None) or "").strip()
+                entrypoint = "dolphin-transcribe-direct"
+        finally:
+            dolphin.transcribe = original_entry
+            transcribe_module.extract_feats = original_extract
+            self.engine.decode = original_decode
+            self.engine.ctc_logprobs = original_ctc
+            encoder_hook.remove()
+
+        if len(features) != 1 or len(decoded) != 1 or len(encoders) != 1:
+            raise RuntimeError("Dolphin parity expected one feature and encoder call")
+        if len(ctc_values) != 1 or len(token_values) != 1 or len(outputs) != 1:
+            raise RuntimeError("Dolphin parity expected one CTC decode result")
+        result = outputs[0]
+        raw = str(getattr(result, "text", ""))
+        return ParityTrace(
+            decoded_pcm=decoded[0],
+            features=features[0],
+            logits_or_encoder=ctc_values[0],
+            token_ids=token_values[0],
+            raw_transcript=raw,
+            final_transcript=final,
+            metadata={
+                "entrypoint": entrypoint,
+                "decoder": "dolphin.transcribe",
+                "feature_extractor": "dolphin.processor.extract_feats",
+                "encoder_observed": True,
+                "ctc_stage": "ctc_logprobs",
+                "torch_inference_mode": False,
+            },
+        )
+
+    def parity_adapter_trace(self, path: Path, *, language: str | None = None):
+        return self._parity_trace(path, language=language, adapter=True)
+
+    def parity_reference_trace(self, path: Path, *, language: str | None = None):
+        return self._parity_trace(path, language=language, adapter=False)
 
     def transcribe(
         self,

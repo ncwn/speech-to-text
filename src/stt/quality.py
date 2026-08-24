@@ -40,7 +40,11 @@ class LoopSite:
 
     @property
     def excess(self) -> int:
-        """Repetitions beyond what the reference justifies."""
+        """How often this span repeats here, beyond what the reference justifies.
+
+        ``max(reference_count, 1)`` is the divisor, so a span absent from the
+        reference is compared against one legitimate occurrence rather than zero.
+        """
         return self.count - max(self.reference_count, 1)
 
 

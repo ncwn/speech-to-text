@@ -1,0 +1,657 @@
+{
+  "artifact_kind": "experiment-v1",
+  "condition_summaries": [
+    {
+      "baseline_eligible": true,
+      "condition_id": "cpu-float32",
+      "content_sha256": "2b8ee7972365d6233a5b5e5c16db24bbfa27635e31d67086fd8a674f9309f8b0",
+      "cpu_utilization": 1.9451281186783547,
+      "endpoint_rss_mb": 6988.8,
+      "environment_identity": "1811956f101127deb509cbc356bc79cb6a1b785fce592a38ef031af1f43538e1",
+      "error": null,
+      "execution_sha256": "6f33dcd0594d71a8f3370d0ac4f32be1454291aa1d5daf5c92617f4cf9366e68",
+      "gpu_idle_pct": null,
+      "gpu_scope": null,
+      "gpu_util_mean": null,
+      "gpu_util_n": null,
+      "gpu_util_p50": null,
+      "hashes": {
+        "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a": "2967e46aed975361601affd17aac215358e21d517da3f51547e72f6e95ea712a"
+      },
+      "host_identity": "822f056562677109078af817bb8a4077165c054b083f1746b438ebab79bfb675",
+      "input_set_id": "canonical",
+      "memory_metric": "worker-lifetime-ru-maxrss-diagnostic",
+      "model": "seamless-m4t-v2",
+      "natural_variation_ratio_99": 1.0,
+      "observer": {
+        "load_wall_s": 3.9626,
+        "observer_cpu_s": 0.0,
+        "profile": false,
+        "profiler_cpu_s": 0.0,
+        "repeat_wall_s": 5.932037583,
+        "sample_uss": false,
+        "sampler_cpu_s": 0.0,
+        "uss_sample_count": 0,
+        "uss_status": "disabled"
+      },
+      "peak_rss_mb": 6988.8,
+      "profile": false,
+      "protocol": {
+        "repeats": 1,
+        "schedule_seed": 0,
+        "sessions": 1,
+        "warmups": 0
+      },
+      "provenance_issues": [],
+      "repeats": 1,
+      "request_key": "hf/seamless-m4t-v2:5e7e6687d80f12c6",
+      "rtf": 0.46416569507042255,
+      "rtf_ci95": [
+        0.46416569507042255,
+        0.46416569507042255
+      ],
+      "rtf_p25": 0.46416569507042255,
+      "rtf_p75": 0.46416569507042255,
+      "runner_id": "adapter",
+      "sample_uss": false,
+      "subject": "hf/seamless-m4t-v2",
+      "text_digest": "27049e8bd5b907e5d168d697cbf8e3e84d658cf85c3b29d9073c3ae73fc89ac8",
+      "transcript_hashes": {
+        "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a": "2967e46aed975361601affd17aac215358e21d517da3f51547e72f6e95ea712a"
+      },
+      "worker_blocks": [
+        {
+          "hashes": {
+            "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a": "2967e46aed975361601affd17aac215358e21d517da3f51547e72f6e95ea712a"
+          },
+          "launch_position": 4,
+          "process_peak_rss_mb": 6988.8,
+          "repeat_rtfs": [
+            0.46416569507042255
+          ],
+          "representative_rtf": 0.46416569507042255,
+          "session_id": "seamless-device-dtype-v1:session-0",
+          "session_index": 0,
+          "worker_index": 0
+        }
+      ],
+      "worker_lifetime_peak_rss_mb": 6988.8,
+      "workers": 1
+    },
+    {
+      "baseline_eligible": true,
+      "condition_id": "cpu-float16",
+      "content_sha256": "2b8ee7972365d6233a5b5e5c16db24bbfa27635e31d67086fd8a674f9309f8b0",
+      "cpu_utilization": 1.862569887236637,
+      "endpoint_rss_mb": 3910.2,
+      "environment_identity": "1811956f101127deb509cbc356bc79cb6a1b785fce592a38ef031af1f43538e1",
+      "error": null,
+      "execution_sha256": "8c862aa430749ba069ec503d3fab66d9cecacf9fc070ddc83c20bf0b809bb844",
+      "gpu_idle_pct": null,
+      "gpu_scope": null,
+      "gpu_util_mean": null,
+      "gpu_util_n": null,
+      "gpu_util_p50": null,
+      "hashes": {
+        "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a": "2967e46aed975361601affd17aac215358e21d517da3f51547e72f6e95ea712a"
+      },
+      "host_identity": "822f056562677109078af817bb8a4077165c054b083f1746b438ebab79bfb675",
+      "input_set_id": "canonical",
+      "memory_metric": "worker-lifetime-ru-maxrss-diagnostic",
+      "model": "seamless-m4t-v2",
+      "natural_variation_ratio_99": 1.0,
+      "observer": {
+        "load_wall_s": 4.6732,
+        "observer_cpu_s": 0.0,
+        "profile": false,
+        "profiler_cpu_s": 0.0,
+        "repeat_wall_s": 26.489085625,
+        "sample_uss": false,
+        "sampler_cpu_s": 0.0,
+        "uss_sample_count": 0,
+        "uss_status": "disabled"
+      },
+      "peak_rss_mb": 6561.7,
+      "profile": false,
+      "protocol": {
+        "repeats": 1,
+        "schedule_seed": 0,
+        "sessions": 1,
+        "warmups": 0
+      },
+      "provenance_issues": [],
+      "repeats": 1,
+      "request_key": "hf/seamless-m4t-v2:ec50df175e21f9a2",
+      "rtf": 2.07269840571205,
+      "rtf_ci95": [
+        2.07269840571205,
+        2.07269840571205
+      ],
+      "rtf_p25": 2.07269840571205,
+      "rtf_p75": 2.07269840571205,
+      "runner_id": "adapter",
+      "sample_uss": false,
+      "subject": "hf/seamless-m4t-v2",
+      "text_digest": "27049e8bd5b907e5d168d697cbf8e3e84d658cf85c3b29d9073c3ae73fc89ac8",
+      "transcript_hashes": {
+        "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a": "2967e46aed975361601affd17aac215358e21d517da3f51547e72f6e95ea712a"
+      },
+      "worker_blocks": [
+        {
+          "hashes": {
+            "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a": "2967e46aed975361601affd17aac215358e21d517da3f51547e72f6e95ea712a"
+          },
+          "launch_position": 5,
+          "process_peak_rss_mb": 6561.7,
+          "repeat_rtfs": [
+            2.07269840571205
+          ],
+          "representative_rtf": 2.07269840571205,
+          "session_id": "seamless-device-dtype-v1:session-0",
+          "session_index": 0,
+          "worker_index": 0
+        }
+      ],
+      "worker_lifetime_peak_rss_mb": 6561.7,
+      "workers": 1
+    },
+    {
+      "baseline_eligible": true,
+      "condition_id": "cpu-bfloat16",
+      "content_sha256": "2b8ee7972365d6233a5b5e5c16db24bbfa27635e31d67086fd8a674f9309f8b0",
+      "cpu_utilization": 2.1060382649926637,
+      "endpoint_rss_mb": 3955.4,
+      "environment_identity": "1811956f101127deb509cbc356bc79cb6a1b785fce592a38ef031af1f43538e1",
+      "error": null,
+      "execution_sha256": "97ce25759f2f2a43d749bd32a3d33dbc13c6cee345359f7d194e13131d4ca7ab",
+      "gpu_idle_pct": null,
+      "gpu_scope": null,
+      "gpu_util_mean": null,
+      "gpu_util_n": null,
+      "gpu_util_p50": null,
+      "hashes": {
+        "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a": "2967e46aed975361601affd17aac215358e21d517da3f51547e72f6e95ea712a"
+      },
+      "host_identity": "822f056562677109078af817bb8a4077165c054b083f1746b438ebab79bfb675",
+      "input_set_id": "canonical",
+      "memory_metric": "worker-lifetime-ru-maxrss-diagnostic",
+      "model": "seamless-m4t-v2",
+      "natural_variation_ratio_99": 1.0,
+      "observer": {
+        "load_wall_s": 4.3027,
+        "observer_cpu_s": 0.0,
+        "profile": false,
+        "profiler_cpu_s": 0.0,
+        "repeat_wall_s": 27.670200417,
+        "sample_uss": false,
+        "sampler_cpu_s": 0.0,
+        "uss_sample_count": 0,
+        "uss_status": "disabled"
+      },
+      "peak_rss_mb": 6605.2,
+      "profile": false,
+      "protocol": {
+        "repeats": 1,
+        "schedule_seed": 0,
+        "sessions": 1,
+        "warmups": 0
+      },
+      "provenance_issues": [],
+      "repeats": 1,
+      "request_key": "hf/seamless-m4t-v2:19843663ad8aab91",
+      "rtf": 2.1651174035211267,
+      "rtf_ci95": [
+        2.1651174035211267,
+        2.1651174035211267
+      ],
+      "rtf_p25": 2.1651174035211267,
+      "rtf_p75": 2.1651174035211267,
+      "runner_id": "adapter",
+      "sample_uss": false,
+      "subject": "hf/seamless-m4t-v2",
+      "text_digest": "27049e8bd5b907e5d168d697cbf8e3e84d658cf85c3b29d9073c3ae73fc89ac8",
+      "transcript_hashes": {
+        "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a": "2967e46aed975361601affd17aac215358e21d517da3f51547e72f6e95ea712a"
+      },
+      "worker_blocks": [
+        {
+          "hashes": {
+            "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a": "2967e46aed975361601affd17aac215358e21d517da3f51547e72f6e95ea712a"
+          },
+          "launch_position": 1,
+          "process_peak_rss_mb": 6605.2,
+          "repeat_rtfs": [
+            2.1651174035211267
+          ],
+          "representative_rtf": 2.1651174035211267,
+          "session_id": "seamless-device-dtype-v1:session-0",
+          "session_index": 0,
+          "worker_index": 0
+        }
+      ],
+      "worker_lifetime_peak_rss_mb": 6605.2,
+      "workers": 1
+    },
+    {
+      "baseline_eligible": true,
+      "condition_id": "mps-float32",
+      "content_sha256": "2b8ee7972365d6233a5b5e5c16db24bbfa27635e31d67086fd8a674f9309f8b0",
+      "cpu_utilization": 1.606410994979837,
+      "endpoint_rss_mb": 1053.0,
+      "environment_identity": "1811956f101127deb509cbc356bc79cb6a1b785fce592a38ef031af1f43538e1",
+      "error": null,
+      "execution_sha256": "1f7c888008c5bfd2beca10ca3df5f9b354562755cf400d805c29589bab9a081a",
+      "gpu_idle_pct": null,
+      "gpu_scope": null,
+      "gpu_util_mean": null,
+      "gpu_util_n": null,
+      "gpu_util_p50": null,
+      "hashes": {
+        "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a": "2967e46aed975361601affd17aac215358e21d517da3f51547e72f6e95ea712a"
+      },
+      "host_identity": "822f056562677109078af817bb8a4077165c054b083f1746b438ebab79bfb675",
+      "input_set_id": "canonical",
+      "memory_metric": "worker-lifetime-ru-maxrss-diagnostic",
+      "model": "seamless-m4t-v2",
+      "natural_variation_ratio_99": 1.0,
+      "observer": {
+        "load_wall_s": 7.2613,
+        "observer_cpu_s": 0.0,
+        "profile": false,
+        "profiler_cpu_s": 0.0,
+        "repeat_wall_s": 2.430221834,
+        "sample_uss": false,
+        "sampler_cpu_s": 0.0,
+        "uss_sample_count": 0,
+        "uss_status": "disabled"
+      },
+      "peak_rss_mb": 1053.0,
+      "profile": false,
+      "protocol": {
+        "repeats": 1,
+        "schedule_seed": 0,
+        "sessions": 1,
+        "warmups": 0
+      },
+      "provenance_issues": [],
+      "repeats": 1,
+      "request_key": "hf/seamless-m4t-v2:a1613936da4ea143",
+      "rtf": 0.19015820297339595,
+      "rtf_ci95": [
+        0.19015820297339595,
+        0.19015820297339595
+      ],
+      "rtf_p25": 0.19015820297339595,
+      "rtf_p75": 0.19015820297339595,
+      "runner_id": "adapter",
+      "sample_uss": false,
+      "subject": "hf/seamless-m4t-v2",
+      "text_digest": "27049e8bd5b907e5d168d697cbf8e3e84d658cf85c3b29d9073c3ae73fc89ac8",
+      "transcript_hashes": {
+        "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a": "2967e46aed975361601affd17aac215358e21d517da3f51547e72f6e95ea712a"
+      },
+      "worker_blocks": [
+        {
+          "hashes": {
+            "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a": "2967e46aed975361601affd17aac215358e21d517da3f51547e72f6e95ea712a"
+          },
+          "launch_position": 0,
+          "process_peak_rss_mb": 1053.0,
+          "repeat_rtfs": [
+            0.19015820297339595
+          ],
+          "representative_rtf": 0.19015820297339595,
+          "session_id": "seamless-device-dtype-v1:session-0",
+          "session_index": 0,
+          "worker_index": 0
+        }
+      ],
+      "worker_lifetime_peak_rss_mb": 1053.0,
+      "workers": 1
+    },
+    {
+      "baseline_eligible": true,
+      "condition_id": "mps-float16",
+      "content_sha256": "2b8ee7972365d6233a5b5e5c16db24bbfa27635e31d67086fd8a674f9309f8b0",
+      "cpu_utilization": 1.8577814569536426,
+      "endpoint_rss_mb": 2563.2,
+      "environment_identity": "1811956f101127deb509cbc356bc79cb6a1b785fce592a38ef031af1f43538e1",
+      "error": null,
+      "execution_sha256": "d605de0ea76bc3dce41d8e8d52aef6548051d98094dc6206405261403ae10412",
+      "gpu_idle_pct": null,
+      "gpu_scope": null,
+      "gpu_util_mean": null,
+      "gpu_util_n": null,
+      "gpu_util_p50": null,
+      "hashes": {
+        "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a": "2967e46aed975361601affd17aac215358e21d517da3f51547e72f6e95ea712a"
+      },
+      "host_identity": "822f056562677109078af817bb8a4077165c054b083f1746b438ebab79bfb675",
+      "input_set_id": "canonical",
+      "memory_metric": "worker-lifetime-ru-maxrss-diagnostic",
+      "model": "seamless-m4t-v2",
+      "natural_variation_ratio_99": 1.0,
+      "observer": {
+        "load_wall_s": 4.743,
+        "observer_cpu_s": 0.0,
+        "profile": false,
+        "profiler_cpu_s": 0.0,
+        "repeat_wall_s": 2.416026833,
+        "sample_uss": false,
+        "sampler_cpu_s": 0.0,
+        "uss_sample_count": 0,
+        "uss_status": "disabled"
+      },
+      "peak_rss_mb": 6590.4,
+      "profile": false,
+      "protocol": {
+        "repeats": 1,
+        "schedule_seed": 0,
+        "sessions": 1,
+        "warmups": 0
+      },
+      "provenance_issues": [],
+      "repeats": 1,
+      "request_key": "hf/seamless-m4t-v2:870dda9c8d921c8a",
+      "rtf": 0.18904748302034433,
+      "rtf_ci95": [
+        0.18904748302034433,
+        0.18904748302034433
+      ],
+      "rtf_p25": 0.18904748302034433,
+      "rtf_p75": 0.18904748302034433,
+      "runner_id": "adapter",
+      "sample_uss": false,
+      "subject": "hf/seamless-m4t-v2",
+      "text_digest": "27049e8bd5b907e5d168d697cbf8e3e84d658cf85c3b29d9073c3ae73fc89ac8",
+      "transcript_hashes": {
+        "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a": "2967e46aed975361601affd17aac215358e21d517da3f51547e72f6e95ea712a"
+      },
+      "worker_blocks": [
+        {
+          "hashes": {
+            "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a": "2967e46aed975361601affd17aac215358e21d517da3f51547e72f6e95ea712a"
+          },
+          "launch_position": 3,
+          "process_peak_rss_mb": 6590.4,
+          "repeat_rtfs": [
+            0.1890474830203443
+          ],
+          "representative_rtf": 0.18904748302034433,
+          "session_id": "seamless-device-dtype-v1:session-0",
+          "session_index": 0,
+          "worker_index": 0
+        }
+      ],
+      "worker_lifetime_peak_rss_mb": 6590.4,
+      "workers": 1
+    },
+    {
+      "baseline_eligible": true,
+      "condition_id": "mps-bfloat16",
+      "content_sha256": "2b8ee7972365d6233a5b5e5c16db24bbfa27635e31d67086fd8a674f9309f8b0",
+      "cpu_utilization": 1.727349899675876,
+      "endpoint_rss_mb": 2534.7,
+      "environment_identity": "1811956f101127deb509cbc356bc79cb6a1b785fce592a38ef031af1f43538e1",
+      "error": null,
+      "execution_sha256": "1ef6cb06e0414e18e1d047419d64797d345d90754101710151ba786cef4086ac",
+      "gpu_idle_pct": null,
+      "gpu_scope": null,
+      "gpu_util_mean": null,
+      "gpu_util_n": null,
+      "gpu_util_p50": null,
+      "hashes": {
+        "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a": "2967e46aed975361601affd17aac215358e21d517da3f51547e72f6e95ea712a"
+      },
+      "host_identity": "822f056562677109078af817bb8a4077165c054b083f1746b438ebab79bfb675",
+      "input_set_id": "canonical",
+      "memory_metric": "worker-lifetime-ru-maxrss-diagnostic",
+      "model": "seamless-m4t-v2",
+      "natural_variation_ratio_99": 1.0,
+      "observer": {
+        "load_wall_s": 4.7999,
+        "observer_cpu_s": 0.0,
+        "profile": false,
+        "profiler_cpu_s": 0.0,
+        "repeat_wall_s": 2.591623541,
+        "sample_uss": false,
+        "sampler_cpu_s": 0.0,
+        "uss_sample_count": 0,
+        "uss_status": "disabled"
+      },
+      "peak_rss_mb": 6560.1,
+      "profile": false,
+      "protocol": {
+        "repeats": 1,
+        "schedule_seed": 0,
+        "sessions": 1,
+        "warmups": 0
+      },
+      "provenance_issues": [],
+      "repeats": 1,
+      "request_key": "hf/seamless-m4t-v2:52eb5fe95768110f",
+      "rtf": 0.20278744452269173,
+      "rtf_ci95": [
+        0.20278744452269173,
+        0.20278744452269173
+      ],
+      "rtf_p25": 0.20278744452269173,
+      "rtf_p75": 0.20278744452269173,
+      "runner_id": "adapter",
+      "sample_uss": false,
+      "subject": "hf/seamless-m4t-v2",
+      "text_digest": "27049e8bd5b907e5d168d697cbf8e3e84d658cf85c3b29d9073c3ae73fc89ac8",
+      "transcript_hashes": {
+        "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a": "2967e46aed975361601affd17aac215358e21d517da3f51547e72f6e95ea712a"
+      },
+      "worker_blocks": [
+        {
+          "hashes": {
+            "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a": "2967e46aed975361601affd17aac215358e21d517da3f51547e72f6e95ea712a"
+          },
+          "launch_position": 2,
+          "process_peak_rss_mb": 6560.1,
+          "repeat_rtfs": [
+            0.20278744452269173
+          ],
+          "representative_rtf": 0.20278744452269173,
+          "session_id": "seamless-device-dtype-v1:session-0",
+          "session_index": 0,
+          "worker_index": 0
+        }
+      ],
+      "worker_lifetime_peak_rss_mb": 6560.1,
+      "workers": 1
+    }
+  ],
+  "contrasts": [],
+  "experiment_id": "seamless-device-dtype-v1",
+  "gate_eligible": false,
+  "schema_version": 1,
+  "session_schedule": [
+    [
+      {
+        "condition_id": "mps-float32",
+        "launch_position": 0,
+        "request_key": "hf/seamless-m4t-v2:a1613936da4ea143"
+      },
+      {
+        "condition_id": "cpu-bfloat16",
+        "launch_position": 1,
+        "request_key": "hf/seamless-m4t-v2:19843663ad8aab91"
+      },
+      {
+        "condition_id": "mps-bfloat16",
+        "launch_position": 2,
+        "request_key": "hf/seamless-m4t-v2:52eb5fe95768110f"
+      },
+      {
+        "condition_id": "mps-float16",
+        "launch_position": 3,
+        "request_key": "hf/seamless-m4t-v2:870dda9c8d921c8a"
+      },
+      {
+        "condition_id": "cpu-float32",
+        "launch_position": 4,
+        "request_key": "hf/seamless-m4t-v2:5e7e6687d80f12c6"
+      },
+      {
+        "condition_id": "cpu-float16",
+        "launch_position": 5,
+        "request_key": "hf/seamless-m4t-v2:ec50df175e21f9a2"
+      }
+    ]
+  ],
+  "spec": {
+    "conditions": [
+      {
+        "condition_id": "cpu-float32",
+        "input_set_id": "canonical",
+        "profile": false,
+        "runner_id": "adapter",
+        "sample_uss": false,
+        "subject": {
+          "backend": "hf",
+          "batch_size": 1,
+          "language": "mya_Mymr",
+          "model": "seamless-m4t-v2",
+          "options": {
+            "batch_size": 1,
+            "device": "cpu",
+            "dtype": "float32",
+            "language": "mya_Mymr"
+          }
+        }
+      },
+      {
+        "condition_id": "cpu-float16",
+        "input_set_id": "canonical",
+        "profile": false,
+        "runner_id": "adapter",
+        "sample_uss": false,
+        "subject": {
+          "backend": "hf",
+          "batch_size": 1,
+          "language": "mya_Mymr",
+          "model": "seamless-m4t-v2",
+          "options": {
+            "batch_size": 1,
+            "device": "cpu",
+            "dtype": "float16",
+            "language": "mya_Mymr"
+          }
+        }
+      },
+      {
+        "condition_id": "cpu-bfloat16",
+        "input_set_id": "canonical",
+        "profile": false,
+        "runner_id": "adapter",
+        "sample_uss": false,
+        "subject": {
+          "backend": "hf",
+          "batch_size": 1,
+          "language": "mya_Mymr",
+          "model": "seamless-m4t-v2",
+          "options": {
+            "batch_size": 1,
+            "device": "cpu",
+            "dtype": "bfloat16",
+            "language": "mya_Mymr"
+          }
+        }
+      },
+      {
+        "condition_id": "mps-float32",
+        "input_set_id": "canonical",
+        "profile": false,
+        "runner_id": "adapter",
+        "sample_uss": false,
+        "subject": {
+          "backend": "hf",
+          "batch_size": 1,
+          "language": "mya_Mymr",
+          "model": "seamless-m4t-v2",
+          "options": {
+            "batch_size": 1,
+            "device": "mps",
+            "dtype": "float32",
+            "language": "mya_Mymr"
+          }
+        }
+      },
+      {
+        "condition_id": "mps-float16",
+        "input_set_id": "canonical",
+        "profile": false,
+        "runner_id": "adapter",
+        "sample_uss": false,
+        "subject": {
+          "backend": "hf",
+          "batch_size": 1,
+          "language": "mya_Mymr",
+          "model": "seamless-m4t-v2",
+          "options": {
+            "batch_size": 1,
+            "device": "mps",
+            "dtype": "float16",
+            "language": "mya_Mymr"
+          }
+        }
+      },
+      {
+        "condition_id": "mps-bfloat16",
+        "input_set_id": "canonical",
+        "profile": false,
+        "runner_id": "adapter",
+        "sample_uss": false,
+        "subject": {
+          "backend": "hf",
+          "batch_size": 1,
+          "language": "mya_Mymr",
+          "model": "seamless-m4t-v2",
+          "options": {
+            "batch_size": 1,
+            "device": "mps",
+            "dtype": "bfloat16",
+            "language": "mya_Mymr"
+          }
+        }
+      }
+    ],
+    "contrasts": [],
+    "experiment_id": "seamless-device-dtype-v1",
+    "input_sets": [
+      {
+        "input_mode": "prepared",
+        "input_set_id": "canonical",
+        "inputs": [
+          {
+            "audio_id": "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a",
+            "channels": 1,
+            "duration_s": 12.78,
+            "frames": 204480,
+            "prepared_path": "data/.converted/pcm16-mono-16000-v1__8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28.wav",
+            "reference_id": "14755840805814218163",
+            "sample_rate": 16000,
+            "source_path": "data/fleurs/audio/14755840805814218163.wav",
+            "source_sha256": "8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28"
+          }
+        ]
+      }
+    ],
+    "repeats": 1,
+    "schedule_seed": 0,
+    "sessions": 1,
+    "statistics": {
+      "draws": 20000,
+      "estimator": "paired-session-median-log-ratio",
+      "min_repeats": 3,
+      "min_sessions": 5,
+      "min_warmups": 3,
+      "quantile_method": "linear",
+      "version": 1
+    },
+    "warmups": 0
+  }
+}

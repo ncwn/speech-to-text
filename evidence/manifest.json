@@ -1,0 +1,801 @@
+{
+  "version": 1,
+  "document": "docs/findings.md",
+  "blocks": [
+    {
+      "id": "input-control",
+      "corpus": "fleurs-dev-one-float-wav",
+      "reference": "data/fleurs/references.tsv",
+      "source_kind": "experiment-v1",
+      "source": "evidence/experiments/mms-input-control-v1/experiment.json",
+      "deriver": "input-control:v1",
+      "runs": [],
+      "metrics": [],
+      "reference_sha256": "3542fb7c5da470b54ff54e4e0ff7a328ae8e187acbcec06ea3af549e22e92f16",
+      "expected_reference_count": 12,
+      "expected_input_count": 1,
+      "expected_input_count": 1,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      }
+    },
+    {
+      "id": "baseline",
+      "corpus": "fleurs-dev-5",
+      "reference": "data/fleurs/references.tsv",
+      "status_only": false,
+      "runs": [],
+      "metrics": [],
+      "reference_sha256": "3542fb7c5da470b54ff54e4e0ff7a328ae8e187acbcec06ea3af549e22e92f16",
+      "expected_reference_count": 12,
+      "expected_input_count": 5,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      },
+      "source_kind": "baseline-v2",
+      "source": "baselines/bench.json",
+      "deriver": "baseline:v1"
+    },
+    {
+      "id": "accuracy-fleurs-test-120",
+      "corpus": "fleurs-test-120",
+      "reference": "data/fleurs-test/references.tsv",
+      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
+      "expected_reference_count": 120,
+      "runs": [
+        {
+          "artifact": "outputs/evidence-fleurs-test-mms.jsonl",
+          "label": "MMS-1B (verified accuracy)",
+          "backend": "hf",
+          "model": "mms-1b-all",
+          "settings": {
+            "device": "mps",
+            "dtype": "float32"
+          }
+        },
+        {
+          "artifact": "outputs/evidence-fleurs-test-dolphin.jsonl",
+          "label": "Dolphin small (verified accuracy)",
+          "backend": "dolphin",
+          "model": "small",
+          "settings": {
+            "device": "cpu",
+            "dtype": "float32"
+          }
+        },
+        {
+          "artifact": "outputs/evidence-fleurs-test-seamless.jsonl",
+          "label": "SeamlessM4T v2 (verified accuracy)",
+          "backend": "hf",
+          "model": "seamless-m4t-v2",
+          "settings": {
+            "device": "mps",
+            "dtype": "float32"
+          }
+        },
+        {
+          "artifact": "outputs/evidence-fleurs-test-omni7b.jsonl",
+          "label": "omniASR 7B (verified accuracy)",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_7B_v2",
+          "settings": {
+            "device": "mps",
+            "dtype": "float16"
+          }
+        }
+      ],
+      "metrics": [
+        {
+          "name": "cer",
+          "label": "CER",
+          "digits": 4
+        },
+        {
+          "name": "n_total",
+          "label": "N",
+          "digits": 0
+        },
+        {
+          "name": "n_scored",
+          "label": "Scored",
+          "digits": 0
+        }
+      ],
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      }
+    },
+    {
+      "id": "accuracy-fleurs-dev-12",
+      "corpus": "fleurs-dev-12",
+      "reference": "data/fleurs/references.tsv",
+      "reference_sha256": "3542fb7c5da470b54ff54e4e0ff7a328ae8e187acbcec06ea3af549e22e92f16",
+      "expected_reference_count": 12,
+      "runs": [
+        {
+          "artifact": "outputs/evidence-fleurs-dev-seamless.jsonl",
+          "label": "SeamlessM4T v2 (verified accuracy)",
+          "backend": "hf",
+          "model": "seamless-m4t-v2",
+          "settings": {
+            "device": "mps",
+            "dtype": "float32"
+          }
+        },
+        {
+          "artifact": "outputs/evidence-fleurs-dev-omni7b.jsonl",
+          "label": "omniASR 7B (verified accuracy)",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_7B_v2",
+          "settings": {
+            "device": "cpu",
+            "dtype": "float32"
+          }
+        },
+        {
+          "artifact": "outputs/evidence-fleurs-dev-mms.jsonl",
+          "label": "MMS-1B (verified accuracy)",
+          "backend": "hf",
+          "model": "mms-1b-all",
+          "settings": {
+            "device": "mps",
+            "dtype": "float32"
+          }
+        },
+        {
+          "artifact": "outputs/evidence-fleurs-dev-dolphin.jsonl",
+          "label": "Dolphin small (verified accuracy)",
+          "backend": "dolphin",
+          "model": "small",
+          "settings": {
+            "device": "cpu",
+            "dtype": "float32"
+          }
+        }
+      ],
+      "metrics": [
+        {
+          "name": "cer",
+          "label": "CER",
+          "digits": 4
+        },
+        {
+          "name": "n_total",
+          "label": "N",
+          "digits": 0
+        },
+        {
+          "name": "n_scored",
+          "label": "Scored",
+          "digits": 0
+        }
+      ],
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      }
+    },
+    {
+      "id": "tails",
+      "corpus": "fleurs-test-120",
+      "reference": "data/fleurs-test/references.tsv",
+      "status_only": false,
+      "runs": [
+        {
+          "artifact": "outputs/evidence-fleurs-test-omni7b.jsonl",
+          "label": "omniASR 7B",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_7B_v2",
+          "settings": {
+            "device": "mps",
+            "dtype": "float16"
+          }
+        },
+        {
+          "artifact": "outputs/evidence-fleurs-test-seamless.jsonl",
+          "label": "SeamlessM4T v2",
+          "backend": "hf",
+          "model": "seamless-m4t-v2",
+          "settings": {
+            "device": "mps",
+            "dtype": "float32"
+          }
+        },
+        {
+          "artifact": "outputs/evidence-fleurs-test-dolphin.jsonl",
+          "label": "Dolphin small",
+          "backend": "dolphin",
+          "model": "small",
+          "settings": {
+            "device": "cpu",
+            "dtype": "float32"
+          }
+        },
+        {
+          "artifact": "outputs/evidence-fleurs-test-mms.jsonl",
+          "label": "MMS-1B",
+          "backend": "hf",
+          "model": "mms-1b-all",
+          "settings": {
+            "device": "mps",
+            "dtype": "float32"
+          }
+        }
+      ],
+      "metrics": [],
+      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
+      "expected_reference_count": 120,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      },
+      "deriver": "tails:v1"
+    },
+    {
+      "id": "held-out",
+      "corpus": "held-out-eternity",
+      "reference": "data/reference/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/eternity-omni7b.jsonl",
+          "label": "omniASR 7B",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_7B_v2"
+        },
+        {
+          "artifact": "outputs/eternity-seamless.jsonl",
+          "label": "SeamlessM4T v2",
+          "backend": "hf",
+          "model": "seamless-m4t-v2"
+        },
+        {
+          "artifact": "outputs/eternity-dolphin.jsonl",
+          "label": "Dolphin small",
+          "backend": "dolphin",
+          "model": "small"
+        },
+        {
+          "artifact": "outputs/eternity-gguf.jsonl",
+          "label": "omniASR 300M Q4_K",
+          "backend": "omniasr-gguf",
+          "model": "llm-unlimited-300m-v2"
+        }
+      ],
+      "metrics": [
+        {
+          "name": "cer",
+          "label": "CER",
+          "digits": 4
+        }
+      ],
+      "reference_sha256": "09a3091bad88e549a6a66a688cabf02118a3487cd6b9744c4e1be90a99adfe34",
+      "expected_reference_count": 1,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      },
+      "status_reason": "Held-out audio and full transcript JSONL are deliberately untracked under the redistribution policy; a clean clone cannot audit a numeric table."
+    },
+    {
+      "id": "held-out-name-corrected",
+      "corpus": "held-out-eternity",
+      "reference": "data/reference/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/eternity-omni7b.jsonl",
+          "label": "omniASR 7B",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_7B_v2"
+        },
+        {
+          "artifact": "outputs/eternity-seamless.jsonl",
+          "label": "SeamlessM4T v2",
+          "backend": "hf",
+          "model": "seamless-m4t-v2"
+        }
+      ],
+      "metrics": [
+        {
+          "name": "cer",
+          "label": "CER",
+          "digits": 4
+        }
+      ],
+      "reference_sha256": "09a3091bad88e549a6a66a688cabf02118a3487cd6b9744c4e1be90a99adfe34",
+      "expected_reference_count": 1,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      },
+      "status_reason": "The corrected-name held-out result depends on deliberately untracked copyrighted transcript artifacts and remains diagnostic only."
+    },
+    {
+      "id": "punctuation",
+      "corpus": "held-out-eternity",
+      "reference": "data/reference/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/eternity-omni7b.jsonl",
+          "label": "omniASR 7B",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_7B_v2"
+        },
+        {
+          "artifact": "outputs/eternity-seamless.jsonl",
+          "label": "SeamlessM4T v2",
+          "backend": "hf",
+          "model": "seamless-m4t-v2"
+        },
+        {
+          "artifact": "outputs/eternity-dolphin.jsonl",
+          "label": "Dolphin small",
+          "backend": "dolphin",
+          "model": "small"
+        },
+        {
+          "artifact": "outputs/eternity-gguf.jsonl",
+          "label": "omniASR 300M Q4_K",
+          "backend": "omniasr-gguf",
+          "model": "llm-unlimited-300m-v2"
+        }
+      ],
+      "metrics": [
+        {
+          "name": "rtf",
+          "label": "RTF",
+          "digits": 2
+        }
+      ],
+      "reference_sha256": "09a3091bad88e549a6a66a688cabf02118a3487cd6b9744c4e1be90a99adfe34",
+      "expected_reference_count": 1,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      },
+      "status_reason": "Held-out punctuation counts depend on deliberately untracked copyrighted transcript artifacts and remain diagnostic only."
+    },
+    {
+      "id": "voting",
+      "corpus": "fleurs-test-120",
+      "reference": "data/fleurs-test/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/t120-omni7b.jsonl",
+          "label": "best single",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_7B_v2"
+        },
+        {
+          "artifact": "outputs/t120-voted.jsonl",
+          "label": "voted",
+          "backend": "vote",
+          "model": "mms-1b-all+omniASR_LLM_Unlimited_7B_v2+seamless-m4t-v2+small"
+        }
+      ],
+      "metrics": [
+        {
+          "name": "cer",
+          "label": "CER",
+          "digits": 4
+        }
+      ],
+      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
+      "expected_reference_count": 120,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      },
+      "status_reason": "No current trusted full-cohort vote inputs are tracked; derived voting remains status-only until every constituent run shares complete waveform identity."
+    },
+    {
+      "id": "confidence-quartiles",
+      "corpus": "held-out-eternity",
+      "reference": "data/reference/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/eternity-omni7b.jsonl",
+          "label": "omniASR 7B confidence run",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_7B_v2"
+        }
+      ],
+      "metrics": [
+        {
+          "name": "cer",
+          "label": "CER",
+          "digits": 4
+        }
+      ],
+      "reference_sha256": "09a3091bad88e549a6a66a688cabf02118a3487cd6b9744c4e1be90a99adfe34",
+      "expected_reference_count": 1,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      },
+      "status_reason": "No redistributable trusted run currently carries aligned confidence segments; confidence quartiles cannot be published."
+    },
+    {
+      "id": "confidence-routing",
+      "corpus": "held-out-eternity",
+      "reference": "data/reference/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/eternity-omni7b.jsonl",
+          "label": "omniASR 7B confidence run",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_7B_v2"
+        }
+      ],
+      "metrics": [
+        {
+          "name": "cer",
+          "label": "CER",
+          "digits": 4
+        }
+      ],
+      "reference_sha256": "09a3091bad88e549a6a66a688cabf02118a3487cd6b9744c4e1be90a99adfe34",
+      "expected_reference_count": 1,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      },
+      "status_reason": "No redistributable trusted base/strong pair currently carries aligned confidence segments; confidence routing cannot be published."
+    },
+    {
+      "id": "seam-tax",
+      "corpus": "held-out-eternity",
+      "reference": "data/reference/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/eternity-seamless.jsonl",
+          "label": "SeamlessM4T v2",
+          "backend": "hf",
+          "model": "seamless-m4t-v2"
+        },
+        {
+          "artifact": "outputs/eternity-omni7b.jsonl",
+          "label": "omniASR 7B",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_7B_v2"
+        }
+      ],
+      "metrics": [
+        {
+          "name": "cer",
+          "label": "CER",
+          "digits": 4
+        }
+      ],
+      "reference_sha256": "09a3091bad88e549a6a66a688cabf02118a3487cd6b9744c4e1be90a99adfe34",
+      "expected_reference_count": 1,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      },
+      "status_reason": "No redistributable trusted aligned base/strong pair exists for recomputing splice-seam endpoints."
+    },
+    {
+      "id": "routing",
+      "corpus": "fleurs-test-120",
+      "reference": "data/fleurs-test/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/t120-seamless-1.jsonl",
+          "label": "SeamlessM4T v2",
+          "backend": "hf",
+          "model": "seamless-m4t-v2"
+        },
+        {
+          "artifact": "outputs/t120-omni7b.jsonl",
+          "label": "omniASR 7B",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_7B_v2"
+        }
+      ],
+      "metrics": [
+        {
+          "name": "cer",
+          "label": "CER",
+          "digits": 4
+        },
+        {
+          "name": "rtf",
+          "label": "RTF",
+          "digits": 2
+        }
+      ],
+      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
+      "expected_reference_count": 120,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      },
+      "status_reason": "No redistributable trusted aligned base/strong pair exists for recomputing the routing curve and its endpoints."
+    },
+    {
+      "id": "device-defaults",
+      "corpus": "fleurs-test-120",
+      "reference": "data/fleurs-test/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/t120-omni7b.jsonl",
+          "label": "omniASR Torch",
+          "backend": "omniasr-torch",
+          "model": "omniASR_LLM_Unlimited_7B_v2"
+        },
+        {
+          "artifact": "outputs/bench-omniasr-gguf-.jsonl",
+          "label": "omniASR GGUF",
+          "backend": "omniasr-gguf",
+          "model": "llm-unlimited-300m-v2"
+        },
+        {
+          "artifact": "outputs/bench-hf-seamless-m4t-v2.jsonl",
+          "label": "Hugging Face",
+          "backend": "hf",
+          "model": "seamless-m4t-v2"
+        },
+        {
+          "artifact": "outputs/bench-dolphin-.jsonl",
+          "label": "Dolphin",
+          "backend": "dolphin",
+          "model": "small"
+        }
+      ],
+      "metrics": [
+        {
+          "name": "rtf",
+          "label": "RTF",
+          "digits": 2
+        }
+      ],
+      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
+      "expected_reference_count": 120,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      },
+      "status_reason": "CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity."
+    },
+    {
+      "id": "mms-device-dtype-smoke",
+      "corpus": "fleurs-dev-one-clip",
+      "reference": "data/fleurs/references.tsv",
+      "source_kind": "experiment-v1",
+      "source": "evidence/experiments/mms-device-dtype-smoke/experiment.json",
+      "deriver": "experiment:v1",
+      "runs": [],
+      "metrics": [],
+      "reference_sha256": "3542fb7c5da470b54ff54e4e0ff7a328ae8e187acbcec06ea3af549e22e92f16",
+      "expected_reference_count": 12,
+      "expected_input_count": 1,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      }
+    },
+    {
+      "id": "omniasr-metal",
+      "corpus": "fleurs-test-duration-bucket-8",
+      "reference": "data/fleurs-test/references.tsv",
+      "status_only": false,
+      "runs": [],
+      "metrics": [],
+      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
+      "expected_reference_count": 120,
+      "expected_input_count": 8,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      },
+      "source_kind": "experiment-v1",
+      "source": "evidence/experiments/omni7b-mps-utilization-v2/experiment.json",
+      "deriver": "experiment:v1"
+    },
+    {
+      "id": "dolphin-device",
+      "corpus": "fleurs-test-5",
+      "reference": "data/fleurs-test/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/bench-dolphin-.jsonl",
+          "label": "Dolphin device sweep",
+          "backend": "dolphin",
+          "model": "small"
+        }
+      ],
+      "metrics": [
+        {
+          "name": "rtf",
+          "label": "RTF",
+          "digits": 2
+        }
+      ],
+      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
+      "expected_reference_count": 120,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      },
+      "status_reason": "The historical Dolphin CPU/MPS comparison predates the experiment archive contract; MPS also records a float64-to-float32 numerical fallback, so no trusted causal table is published."
+    },
+    {
+      "id": "seamless-device-dtype",
+      "corpus": "fleurs-dev-one-clip",
+      "reference": "data/fleurs/references.tsv",
+      "source_kind": "experiment-v1",
+      "source": "evidence/experiments/seamless-device-dtype-v1/experiment.json",
+      "deriver": "experiment:v1",
+      "runs": [],
+      "metrics": [],
+      "reference_sha256": "3542fb7c5da470b54ff54e4e0ff7a328ae8e187acbcec06ea3af549e22e92f16",
+      "expected_reference_count": 12,
+      "expected_input_count": 1,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      }
+    },
+    {
+      "id": "seamless-utilization",
+      "corpus": "fleurs-test-duration-bucket-32",
+      "reference": "data/fleurs-test/references.tsv",
+      "source_kind": "experiment-v1",
+      "source": "evidence/experiments/seamless-mps-utilization-v2/experiment.json",
+      "deriver": "experiment:v1",
+      "runs": [],
+      "metrics": [],
+      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
+      "expected_reference_count": 120,
+      "expected_input_count": 32,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      }
+    },
+    {
+      "id": "threads",
+      "corpus": "fleurs-test-5",
+      "reference": "data/fleurs-test/references.tsv",
+      "status_only": true,
+      "runs": [
+        {
+          "artifact": "outputs/bench-omniasr-gguf-.jsonl",
+          "label": "GGUF thread sweep",
+          "backend": "omniasr-gguf",
+          "model": "llm-unlimited-300m-v2"
+        }
+      ],
+      "metrics": [
+        {
+          "name": "rtf",
+          "label": "RTF",
+          "digits": 3
+        }
+      ],
+      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
+      "expected_reference_count": 120,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      },
+      "status_reason": "CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity."
+    },
+    {
+      "id": "telemetry-cost",
+      "corpus": "fleurs-dev-one-clip",
+      "reference": "data/fleurs/references.tsv",
+      "status_only": false,
+      "runs": [],
+      "metrics": [],
+      "reference_sha256": "3542fb7c5da470b54ff54e4e0ff7a328ae8e187acbcec06ea3af549e22e92f16",
+      "expected_reference_count": 12,
+      "expected_input_count": 1,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      },
+      "status_reason": "CrispASR does not expose the selected compute device; this measurement cannot carry a trusted execution identity.",
+      "source_kind": "experiment-v1",
+      "source": "evidence/experiments/observer-calibration-v3/experiment.json",
+      "deriver": "observer:v1"
+    },
+    {
+      "id": "batching",
+      "corpus": "fleurs-test-fixed-and-mixed-8",
+      "reference": "data/fleurs-test/references.tsv",
+      "status_only": false,
+      "runs": [],
+      "metrics": [],
+      "reference_sha256": "6a1e380e1f2cd959106a2fad597dcf748a2a5bd774831125966dbf9ee655bda7",
+      "expected_reference_count": 120,
+      "expected_input_count": 8,
+      "normalization": {
+        "nfc": true,
+        "strip_whitespace": true,
+        "strip_punctuation": true,
+        "normalize_digits": true,
+        "lowercase": true
+      },
+      "source_kind": "experiment-v1",
+      "source": "evidence/experiments/mms-batching-matrix-v1/experiment.json",
+      "deriver": "experiment:v1"
+    }
+  ]
+}

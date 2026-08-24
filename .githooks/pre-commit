@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+#
+# Runs fast guards before every commit. Real-model benchmarks remain explicit
+# because a slow hook will eventually be bypassed.
 
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"

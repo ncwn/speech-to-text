@@ -1,0 +1,403 @@
+{
+  "condition_id": "mps-float32",
+  "experiment_id": "seamless-device-dtype-v1",
+  "input_mode": "prepared",
+  "inputs": [
+    {
+      "audio_id": "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a",
+      "channels": 1,
+      "duration_s": 12.78,
+      "frames": 204480,
+      "prepared_path": "data/.converted/pcm16-mono-16000-v1__8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28.wav",
+      "reference_id": "14755840805814218163",
+      "sample_rate": 16000,
+      "source_path": "data/fleurs/audio/14755840805814218163.wav",
+      "source_sha256": "8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28"
+    }
+  ],
+  "launch_position": 0,
+  "model_binding": {
+    "paths": [
+      {
+        "name": "added_tokens.json",
+        "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/8e2982fdbfaf602b6c7c9e5b52f7153e14d832e3",
+        "role": "model-or-processor",
+        "sha256": "9ac8a85d4e97d27fad026a813d52a069680e4e0cae701ef145b204bd533251b2",
+        "size_bytes": 2066,
+        "stat": {
+          "ctime_ns": 1787158436614653939,
+          "device": 16777235,
+          "inode": 5984100,
+          "mtime_ns": 1787081749219003509,
+          "size": 2066
+        }
+      },
+      {
+        "name": "config.json",
+        "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/44fc602f86a67ad9b25442ebe2116459952d8a98",
+        "role": "model-or-processor",
+        "sha256": "4b2fa9d863cc3033adaf261e6c3e32ad90347ee2f199a349ba1c77d5e26a605f",
+        "size_bytes": 2716,
+        "stat": {
+          "ctime_ns": 1787158436622495838,
+          "device": 16777235,
+          "inode": 5984104,
+          "mtime_ns": 1787081755742154523,
+          "size": 2716
+        }
+      },
+      {
+        "name": "generation_config.json",
+        "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/cab705d447c28aee5e50ebd31e33ccf267d65219",
+        "role": "model-or-processor",
+        "sha256": "febbbbac4f0b122473a0125165c9291add850956315e35a025e16474cc0da5f4",
+        "size_bytes": 9906948,
+        "stat": {
+          "ctime_ns": 1787158436620316956,
+          "device": 16777235,
+          "inode": 5984103,
+          "mtime_ns": 1787082625186041013,
+          "size": 9906948
+        }
+      },
+      {
+        "name": "model-00001-of-00002.safetensors",
+        "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/85cab984fbc111f8713827c440499453b9e66f262862866eeed8725c302ba2ac",
+        "role": "model-or-processor",
+        "sha256": "85cab984fbc111f8713827c440499453b9e66f262862866eeed8725c302ba2ac",
+        "size_bytes": 4999163080,
+        "stat": {
+          "ctime_ns": 1787158438357384648,
+          "device": 16777235,
+          "inode": 5984106,
+          "mtime_ns": 1787082622568711603,
+          "size": 4999163080
+        }
+      },
+      {
+        "name": "model-00002-of-00002.safetensors",
+        "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/9536dc05892a6ca8410bcfea763dde422e2430c3cc1f3acd26c55182c8989017",
+        "role": "model-or-processor",
+        "sha256": "9536dc05892a6ca8410bcfea763dde422e2430c3cc1f3acd26c55182c8989017",
+        "size_bytes": 4238114628,
+        "stat": {
+          "ctime_ns": 1787158439885179359,
+          "device": 16777235,
+          "inode": 5984108,
+          "mtime_ns": 1787082328054878527,
+          "size": 4238114628
+        }
+      },
+      {
+        "name": "model.safetensors.index.json",
+        "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/f37bceddd602f9ffd93d6d329e5b2ed67b5251c6",
+        "role": "model-or-processor",
+        "sha256": "79d33aa045308d1a93b11952f2a3e6a647c107b688e5fdf1124c4601626dcdb2",
+        "size_bytes": 210713,
+        "stat": {
+          "ctime_ns": 1787158436615159899,
+          "device": 16777235,
+          "inode": 5984101,
+          "mtime_ns": 1787081757514082697,
+          "size": 210713
+        }
+      },
+      {
+        "name": "preprocessor_config.json",
+        "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/7472c1ede2bb52298c22c063a0ad071c420e1e97",
+        "role": "model-or-processor",
+        "sha256": "59294da7ee216cf80f8083180cdb0ace7efabbe35a8b9009c5cab341af2bd1c7",
+        "size_bytes": 1776,
+        "stat": {
+          "ctime_ns": 1787158436613804561,
+          "device": 16777235,
+          "inode": 5984098,
+          "mtime_ns": 1787081734717706286,
+          "size": 1776
+        }
+      },
+      {
+        "name": "sentencepiece.bpe.model",
+        "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/026a76827537db9f1348e4d5aaa127bb10a2f2ff633243f3a52d16be82d73f9d",
+        "role": "model-or-processor",
+        "sha256": "026a76827537db9f1348e4d5aaa127bb10a2f2ff633243f3a52d16be82d73f9d",
+        "size_bytes": 5165809,
+        "stat": {
+          "ctime_ns": 1787158436617226447,
+          "device": 16777235,
+          "inode": 5984102,
+          "mtime_ns": 1787081748168676716,
+          "size": 5165809
+        }
+      },
+      {
+        "name": "special_tokens_map.json",
+        "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/742ad0be48090d31be618d4d152f734c26836fdb",
+        "role": "model-or-processor",
+        "sha256": "36ba9ab56ea9a4d0182ae18aed1ff16a15bf91b8aa544722c686744d5972b522",
+        "size_bytes": 2337,
+        "stat": {
+          "ctime_ns": 1787158436624634303,
+          "device": 16777235,
+          "inode": 5984105,
+          "mtime_ns": 1787081749927072120,
+          "size": 2337
+        }
+      },
+      {
+        "name": "tokenizer.model",
+        "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/026a76827537db9f1348e4d5aaa127bb10a2f2ff633243f3a52d16be82d73f9d",
+        "role": "model-or-processor",
+        "sha256": "026a76827537db9f1348e4d5aaa127bb10a2f2ff633243f3a52d16be82d73f9d",
+        "size_bytes": 5165809,
+        "stat": {
+          "ctime_ns": 1787158436617226447,
+          "device": 16777235,
+          "inode": 5984102,
+          "mtime_ns": 1787081748168676716,
+          "size": 5165809
+        }
+      },
+      {
+        "name": "tokenizer_config.json",
+        "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/9868dae7e93dc4a41184f571b32b7b0a8627c7af",
+        "role": "model-or-processor",
+        "sha256": "0a184dd2f5b9ee02ddfa7fc2110b7e919c471f29e2e771d8c18b22b7758827c8",
+        "size_bytes": 19667,
+        "stat": {
+          "ctime_ns": 1787158436614244104,
+          "device": 16777235,
+          "inode": 5984099,
+          "mtime_ns": 1787081737075610262,
+          "size": 19667
+        }
+      }
+    ],
+    "provenance": {
+      "adapter_git_commit": "af068b7d607a8455f99570be3c2bd74b1f63ad3c",
+      "adapter_git_dirty": false,
+      "artifacts": [
+        {
+          "name": "added_tokens.json",
+          "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/8e2982fdbfaf602b6c7c9e5b52f7153e14d832e3",
+          "role": "model-or-processor",
+          "sha256": "9ac8a85d4e97d27fad026a813d52a069680e4e0cae701ef145b204bd533251b2",
+          "size_bytes": 2066,
+          "stat": {
+            "ctime_ns": 1787158436614653939,
+            "device": 16777235,
+            "inode": 5984100,
+            "mtime_ns": 1787081749219003509,
+            "size": 2066
+          }
+        },
+        {
+          "name": "config.json",
+          "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/44fc602f86a67ad9b25442ebe2116459952d8a98",
+          "role": "model-or-processor",
+          "sha256": "4b2fa9d863cc3033adaf261e6c3e32ad90347ee2f199a349ba1c77d5e26a605f",
+          "size_bytes": 2716,
+          "stat": {
+            "ctime_ns": 1787158436622495838,
+            "device": 16777235,
+            "inode": 5984104,
+            "mtime_ns": 1787081755742154523,
+            "size": 2716
+          }
+        },
+        {
+          "name": "generation_config.json",
+          "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/cab705d447c28aee5e50ebd31e33ccf267d65219",
+          "role": "model-or-processor",
+          "sha256": "febbbbac4f0b122473a0125165c9291add850956315e35a025e16474cc0da5f4",
+          "size_bytes": 9906948,
+          "stat": {
+            "ctime_ns": 1787158436620316956,
+            "device": 16777235,
+            "inode": 5984103,
+            "mtime_ns": 1787082625186041013,
+            "size": 9906948
+          }
+        },
+        {
+          "name": "model-00001-of-00002.safetensors",
+          "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/85cab984fbc111f8713827c440499453b9e66f262862866eeed8725c302ba2ac",
+          "role": "model-or-processor",
+          "sha256": "85cab984fbc111f8713827c440499453b9e66f262862866eeed8725c302ba2ac",
+          "size_bytes": 4999163080,
+          "stat": {
+            "ctime_ns": 1787158438357384648,
+            "device": 16777235,
+            "inode": 5984106,
+            "mtime_ns": 1787082622568711603,
+            "size": 4999163080
+          }
+        },
+        {
+          "name": "model-00002-of-00002.safetensors",
+          "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/9536dc05892a6ca8410bcfea763dde422e2430c3cc1f3acd26c55182c8989017",
+          "role": "model-or-processor",
+          "sha256": "9536dc05892a6ca8410bcfea763dde422e2430c3cc1f3acd26c55182c8989017",
+          "size_bytes": 4238114628,
+          "stat": {
+            "ctime_ns": 1787158439885179359,
+            "device": 16777235,
+            "inode": 5984108,
+            "mtime_ns": 1787082328054878527,
+            "size": 4238114628
+          }
+        },
+        {
+          "name": "model.safetensors.index.json",
+          "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/f37bceddd602f9ffd93d6d329e5b2ed67b5251c6",
+          "role": "model-or-processor",
+          "sha256": "79d33aa045308d1a93b11952f2a3e6a647c107b688e5fdf1124c4601626dcdb2",
+          "size_bytes": 210713,
+          "stat": {
+            "ctime_ns": 1787158436615159899,
+            "device": 16777235,
+            "inode": 5984101,
+            "mtime_ns": 1787081757514082697,
+            "size": 210713
+          }
+        },
+        {
+          "name": "preprocessor_config.json",
+          "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/7472c1ede2bb52298c22c063a0ad071c420e1e97",
+          "role": "model-or-processor",
+          "sha256": "59294da7ee216cf80f8083180cdb0ace7efabbe35a8b9009c5cab341af2bd1c7",
+          "size_bytes": 1776,
+          "stat": {
+            "ctime_ns": 1787158436613804561,
+            "device": 16777235,
+            "inode": 5984098,
+            "mtime_ns": 1787081734717706286,
+            "size": 1776
+          }
+        },
+        {
+          "name": "sentencepiece.bpe.model",
+          "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/026a76827537db9f1348e4d5aaa127bb10a2f2ff633243f3a52d16be82d73f9d",
+          "role": "model-or-processor",
+          "sha256": "026a76827537db9f1348e4d5aaa127bb10a2f2ff633243f3a52d16be82d73f9d",
+          "size_bytes": 5165809,
+          "stat": {
+            "ctime_ns": 1787158436617226447,
+            "device": 16777235,
+            "inode": 5984102,
+            "mtime_ns": 1787081748168676716,
+            "size": 5165809
+          }
+        },
+        {
+          "name": "special_tokens_map.json",
+          "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/742ad0be48090d31be618d4d152f734c26836fdb",
+          "role": "model-or-processor",
+          "sha256": "36ba9ab56ea9a4d0182ae18aed1ff16a15bf91b8aa544722c686744d5972b522",
+          "size_bytes": 2337,
+          "stat": {
+            "ctime_ns": 1787158436624634303,
+            "device": 16777235,
+            "inode": 5984105,
+            "mtime_ns": 1787081749927072120,
+            "size": 2337
+          }
+        },
+        {
+          "name": "tokenizer.model",
+          "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/026a76827537db9f1348e4d5aaa127bb10a2f2ff633243f3a52d16be82d73f9d",
+          "role": "model-or-processor",
+          "sha256": "026a76827537db9f1348e4d5aaa127bb10a2f2ff633243f3a52d16be82d73f9d",
+          "size_bytes": 5165809,
+          "stat": {
+            "ctime_ns": 1787158436617226447,
+            "device": 16777235,
+            "inode": 5984102,
+            "mtime_ns": 1787081748168676716,
+            "size": 5165809
+          }
+        },
+        {
+          "name": "tokenizer_config.json",
+          "path": ".cache/huggingface/hub/models--facebook--seamless-m4t-v2-large/blobs/9868dae7e93dc4a41184f571b32b7b0a8627c7af",
+          "role": "model-or-processor",
+          "sha256": "0a184dd2f5b9ee02ddfa7fc2110b7e919c471f29e2e771d8c18b22b7758827c8",
+          "size_bytes": 19667,
+          "stat": {
+            "ctime_ns": 1787158436614244104,
+            "device": 16777235,
+            "inode": 5984099,
+            "mtime_ns": 1787081737075610262,
+            "size": 19667
+          }
+        }
+      ],
+      "backend": "hf",
+      "content_sha256": "2b8ee7972365d6233a5b5e5c16db24bbfa27635e31d67086fd8a674f9309f8b0",
+      "execution_sha256": "1f7c888008c5bfd2beca10ca3df5f9b354562755cf400d805c29589bab9a081a",
+      "fallback_history": [],
+      "issues": [],
+      "requested_model": "seamless-m4t-v2",
+      "requested_settings": {
+        "batch_size": 1,
+        "device": "mps",
+        "dtype": "float32",
+        "language": "mya_Mymr"
+      },
+      "resolved_settings": {
+        "chunk_seconds": null,
+        "device": "mps",
+        "dtype": "float32",
+        "family": "seamless",
+        "lang": "mya",
+        "n_threads": null
+      },
+      "revision_status": "pinned",
+      "runtime_packages": {
+        "accelerate": "1.14.0",
+        "crispasr": "0.8.29",
+        "dataoceanai-dolphin": "20260513",
+        "fairseq2": "0.6",
+        "funasr": "1.4.2",
+        "huggingface-hub": "0.36.2",
+        "modelscope": "1.39.1",
+        "omnilingual-asr": "0.2.0",
+        "psutil": "5.9.8",
+        "sentencepiece": "0.2.2",
+        "soundfile": "0.14.0",
+        "tokenizers": "0.22.2",
+        "torch": "2.8.0",
+        "torchaudio": "2.8.0",
+        "transformers": "4.57.6"
+      },
+      "schema_version": 1,
+      "source_kind": "huggingface",
+      "source_locator": "facebook/seamless-m4t-v2-large",
+      "upstream_revision": "5f8cc790b19fc3f67a61c105133b20b34e3dcb76",
+      "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+    }
+  },
+  "profile": false,
+  "protocol_version": 3,
+  "repeats": 1,
+  "run_id": "seamless-device-dtype-v1",
+  "runner_id": "adapter",
+  "sample_uss": false,
+  "schedule_seed": 0,
+  "session_id": "seamless-device-dtype-v1:session-0",
+  "session_index": 0,
+  "subject": {
+    "backend": "hf",
+    "batch_size": 1,
+    "language": "mya_Mymr",
+    "model": "seamless-m4t-v2",
+    "options": {
+      "batch_size": 1,
+      "device": "mps",
+      "dtype": "float32",
+      "language": "mya_Mymr"
+    }
+  },
+  "warmups": 0,
+  "worker_index": 0
+}

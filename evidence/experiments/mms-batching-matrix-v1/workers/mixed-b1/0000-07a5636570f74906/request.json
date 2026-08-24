@@ -1,0 +1,452 @@
+{
+  "condition_id": "mixed-b1",
+  "experiment_id": "mms-batching-matrix-v1",
+  "input_mode": "prepared",
+  "inputs": [
+    {
+      "audio_id": "pcm16:16000:1:84b665f66d9897d822e3f09d454c20ad13101d5f6b2a1ee08be7b54bbf221e11",
+      "channels": 1,
+      "duration_s": 5.04,
+      "frames": 80640,
+      "prepared_path": "data/.converted/pcm16-mono-16000-v1__5ada6969325f7057128f65c5a6f1c3b72efdc0fc9d3e5e259e86b95f2d25a2cb.wav",
+      "reference_id": "18231029135548085189",
+      "sample_rate": 16000,
+      "source_path": "data/fleurs-test/audio/18231029135548085189.wav",
+      "source_sha256": "5ada6969325f7057128f65c5a6f1c3b72efdc0fc9d3e5e259e86b95f2d25a2cb"
+    },
+    {
+      "audio_id": "pcm16:16000:1:fa919569a5b5ccabdee4ef888ea0e6979f2d120355e5915a4d3604605d205e10",
+      "channels": 1,
+      "duration_s": 8.76,
+      "frames": 140160,
+      "prepared_path": "data/.converted/pcm16-mono-16000-v1__0b152d617080a6cfb70a1bc97db8bfdf8cd5d8abeae3a7076daa5828676efde0.wav",
+      "reference_id": "11476439009992881773",
+      "sample_rate": 16000,
+      "source_path": "data/fleurs-test/audio/11476439009992881773.wav",
+      "source_sha256": "0b152d617080a6cfb70a1bc97db8bfdf8cd5d8abeae3a7076daa5828676efde0"
+    },
+    {
+      "audio_id": "pcm16:16000:1:03a32c71f1fe8ecc349b91fb71f81c8ec023f9afa87b550753064d4454c713af",
+      "channels": 1,
+      "duration_s": 11.52,
+      "frames": 184320,
+      "prepared_path": "data/.converted/pcm16-mono-16000-v1__3ea6fc728898be204df12c9eb1abdc0b4c497ac312b4d400ec2cdd930ba5f6cc.wav",
+      "reference_id": "2848537164131934419",
+      "sample_rate": 16000,
+      "source_path": "data/fleurs-test/audio/2848537164131934419.wav",
+      "source_sha256": "3ea6fc728898be204df12c9eb1abdc0b4c497ac312b4d400ec2cdd930ba5f6cc"
+    },
+    {
+      "audio_id": "pcm16:16000:1:7f3d16e46fec4be39a2e1e7b53f7e5615d2c680dc04f543ef916f1f45d3cddce",
+      "channels": 1,
+      "duration_s": 14.04,
+      "frames": 224640,
+      "prepared_path": "data/.converted/pcm16-mono-16000-v1__3914e15f46dfd3f537ebe1635f80aba8754ad8811fa796785fcd61815a9c09aa.wav",
+      "reference_id": "9921869522546379025",
+      "sample_rate": 16000,
+      "source_path": "data/fleurs-test/audio/9921869522546379025.wav",
+      "source_sha256": "3914e15f46dfd3f537ebe1635f80aba8754ad8811fa796785fcd61815a9c09aa"
+    },
+    {
+      "audio_id": "pcm16:16000:1:b79ddcd69d72855a7b8cd427ee338ef8510a136d0c1569f31d3aa033fb82d15d",
+      "channels": 1,
+      "duration_s": 15.6,
+      "frames": 249600,
+      "prepared_path": "data/.converted/pcm16-mono-16000-v1__91d8956401b547d2ed6c4375fb35900489c51f54a12739fb15ee67be05310ae5.wav",
+      "reference_id": "8120071718566166336",
+      "sample_rate": 16000,
+      "source_path": "data/fleurs-test/audio/8120071718566166336.wav",
+      "source_sha256": "91d8956401b547d2ed6c4375fb35900489c51f54a12739fb15ee67be05310ae5"
+    },
+    {
+      "audio_id": "pcm16:16000:1:a1201226b71035c4ce662b4a913f58f9b11d08589b8393d1800dbe8e84aba44d",
+      "channels": 1,
+      "duration_s": 17.88,
+      "frames": 286080,
+      "prepared_path": "data/.converted/pcm16-mono-16000-v1__f2372cf8d3a003e8ca88aa6a341c35873060e88d1e67465c3500e843a96076a4.wav",
+      "reference_id": "15209984090173476124",
+      "sample_rate": 16000,
+      "source_path": "data/fleurs-test/audio/15209984090173476124.wav",
+      "source_sha256": "f2372cf8d3a003e8ca88aa6a341c35873060e88d1e67465c3500e843a96076a4"
+    },
+    {
+      "audio_id": "pcm16:16000:1:6f1a7c7d510d4fa6409bdbe093bed8b66c82f2dd2153cc6091971a42c9362b93",
+      "channels": 1,
+      "duration_s": 20.82,
+      "frames": 333120,
+      "prepared_path": "data/.converted/pcm16-mono-16000-v1__6533eb880f71cd7482ccbef05d398f8608fe5f27e66d960ccaa1a31dd41b5efb.wav",
+      "reference_id": "12112438778681308056",
+      "sample_rate": 16000,
+      "source_path": "data/fleurs-test/audio/12112438778681308056.wav",
+      "source_sha256": "6533eb880f71cd7482ccbef05d398f8608fe5f27e66d960ccaa1a31dd41b5efb"
+    },
+    {
+      "audio_id": "pcm16:16000:1:c76732fde00d53137b78f38b6658968e4c8a5d0ba15858c71aad2b56f34ae5ee",
+      "channels": 1,
+      "duration_s": 26.94,
+      "frames": 431040,
+      "prepared_path": "data/.converted/pcm16-mono-16000-v1__c5a6ba5e5bebe703e8737c2ebcebeaed0e1c9df07fbfc238566cf35d741d68a4.wav",
+      "reference_id": "3526672706556712064",
+      "sample_rate": 16000,
+      "source_path": "data/fleurs-test/audio/3526672706556712064.wav",
+      "source_sha256": "c5a6ba5e5bebe703e8737c2ebcebeaed0e1c9df07fbfc238566cf35d741d68a4"
+    }
+  ],
+  "launch_position": 0,
+  "model_binding": {
+    "paths": [
+      {
+        "name": "adapter.mya.safetensors",
+        "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+        "role": "model-or-processor",
+        "sha256": "c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+        "size_bytes": 9357088,
+        "stat": {
+          "ctime_ns": 1787158435149503713,
+          "device": 16777235,
+          "inode": 5984066,
+          "mtime_ns": 1787079596406661677,
+          "size": 9357088
+        }
+      },
+      {
+        "name": "config.json",
+        "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/dd547cc1b61ca6edfefb2f0cf65e3d8f81eceb6a",
+        "role": "model-or-processor",
+        "sha256": "ee172ef39a0e40c55403fb811fa0f56c6198c7ed21a2bdf5bd0e72e52c07a41c",
+        "size_bytes": 2040,
+        "stat": {
+          "ctime_ns": 1787158435152482514,
+          "device": 16777235,
+          "inode": 5984069,
+          "mtime_ns": 1787079452518242432,
+          "size": 2040
+        }
+      },
+      {
+        "name": "create_adapters.py",
+        "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b2e99c339dafb630e1b02c44f5c267927979106f",
+        "role": "model-or-processor",
+        "sha256": "b5f11c4e55342e718fa90697f34f82664fbff16a421d8fae206d997045f73921",
+        "size_bytes": 10188,
+        "stat": {
+          "ctime_ns": 1787235792760670739,
+          "device": 16777235,
+          "inode": 5986586,
+          "mtime_ns": 1787235792759124152,
+          "size": 10188
+        }
+      },
+      {
+        "name": "create_vocab.py",
+        "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b36fe95573033e2a2742aaeed8d3078946b7a320",
+        "role": "model-or-processor",
+        "sha256": "a6e7e16a54f0b09f46045b9135483776393267d0d8a6b3e86072906e61be46f5",
+        "size_bytes": 878,
+        "stat": {
+          "ctime_ns": 1787235792684531696,
+          "device": 16777235,
+          "inode": 5986580,
+          "mtime_ns": 1787235792683967611,
+          "size": 878
+        }
+      },
+      {
+        "name": "model.safetensors",
+        "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+        "role": "model-or-processor",
+        "sha256": "0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+        "size_bytes": 3859521128,
+        "stat": {
+          "ctime_ns": 1787158436530154511,
+          "device": 16777235,
+          "inode": 5984070,
+          "mtime_ns": 1787079592306092277,
+          "size": 3859521128
+        }
+      },
+      {
+        "name": "preprocessor_config.json",
+        "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/e7d53bd058c34639e2dec1357537a3d013bcda63",
+        "role": "model-or-processor",
+        "sha256": "f724fdad65341e79bd9741888fe4e8ce1bb2e7b44fc8216c28c591afb1e202f4",
+        "size_bytes": 254,
+        "stat": {
+          "ctime_ns": 1787158435150048006,
+          "device": 16777235,
+          "inode": 5984067,
+          "mtime_ns": 1787079443378807804,
+          "size": 254
+        }
+      },
+      {
+        "name": "special_tokens_map.json",
+        "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/fdafe480f024ff444c7492147536765ce5d55a2d",
+        "role": "model-or-processor",
+        "sha256": "9046da57c270c8e74d0f38832b4adce269c9d914ef21d2a0925e7772152dd793",
+        "size_bytes": 96,
+        "stat": {
+          "ctime_ns": 1787158435143879487,
+          "device": 16777235,
+          "inode": 5984065,
+          "mtime_ns": 1787079449792831686,
+          "size": 96
+        }
+      },
+      {
+        "name": "tokenizer_config.json",
+        "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/8119434548d4a82fbe4e5e53c95d186bca037257",
+        "role": "model-or-processor",
+        "sha256": "42a65547cf0654d12263ece7c909c4b0c574b660c78658f806c772cc223bc01b",
+        "size_bytes": 397,
+        "stat": {
+          "ctime_ns": 1787158435143238985,
+          "device": 16777235,
+          "inode": 5984064,
+          "mtime_ns": 1787079445299892278,
+          "size": 397
+        }
+      },
+      {
+        "name": "vocab.json",
+        "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/5c1626173fb1db1da574d16b6e924e8efc1ade4c",
+        "role": "model-or-processor",
+        "sha256": "0375a07a977a599040a7ff333b6974996965cd93754020619518c15db7691f01",
+        "size_bytes": 1340148,
+        "stat": {
+          "ctime_ns": 1787158435151871262,
+          "device": 16777235,
+          "inode": 5984068,
+          "mtime_ns": 1787079449054862750,
+          "size": 1340148
+        }
+      },
+      {
+        "name": "vocabs/mya.txt",
+        "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/49191e00b11ea3281db39a6b8022d0b003bae2da",
+        "role": "model-or-processor",
+        "sha256": "d01af8e834039592efc79902675773d7ef622a4ce07cccd46fb2644785cc0734",
+        "size_bytes": 1005,
+        "stat": {
+          "ctime_ns": 1787235938363752533,
+          "device": 16777235,
+          "inode": 5987135,
+          "mtime_ns": 1787235938362249071,
+          "size": 1005
+        }
+      }
+    ],
+    "provenance": {
+      "adapter_git_commit": "3c99f0609bf6feac9bf4a8da7e26b6e3c16aeb3c",
+      "adapter_git_dirty": false,
+      "artifacts": [
+        {
+          "name": "adapter.mya.safetensors",
+          "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+          "role": "model-or-processor",
+          "sha256": "c2932d7e0ec0b7cc0421f69faceedc0a4588148ed1147c0dcd50bc738d9ca399",
+          "size_bytes": 9357088,
+          "stat": {
+            "ctime_ns": 1787158435149503713,
+            "device": 16777235,
+            "inode": 5984066,
+            "mtime_ns": 1787079596406661677,
+            "size": 9357088
+          }
+        },
+        {
+          "name": "config.json",
+          "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/dd547cc1b61ca6edfefb2f0cf65e3d8f81eceb6a",
+          "role": "model-or-processor",
+          "sha256": "ee172ef39a0e40c55403fb811fa0f56c6198c7ed21a2bdf5bd0e72e52c07a41c",
+          "size_bytes": 2040,
+          "stat": {
+            "ctime_ns": 1787158435152482514,
+            "device": 16777235,
+            "inode": 5984069,
+            "mtime_ns": 1787079452518242432,
+            "size": 2040
+          }
+        },
+        {
+          "name": "create_adapters.py",
+          "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b2e99c339dafb630e1b02c44f5c267927979106f",
+          "role": "model-or-processor",
+          "sha256": "b5f11c4e55342e718fa90697f34f82664fbff16a421d8fae206d997045f73921",
+          "size_bytes": 10188,
+          "stat": {
+            "ctime_ns": 1787235792760670739,
+            "device": 16777235,
+            "inode": 5986586,
+            "mtime_ns": 1787235792759124152,
+            "size": 10188
+          }
+        },
+        {
+          "name": "create_vocab.py",
+          "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/b36fe95573033e2a2742aaeed8d3078946b7a320",
+          "role": "model-or-processor",
+          "sha256": "a6e7e16a54f0b09f46045b9135483776393267d0d8a6b3e86072906e61be46f5",
+          "size_bytes": 878,
+          "stat": {
+            "ctime_ns": 1787235792684531696,
+            "device": 16777235,
+            "inode": 5986580,
+            "mtime_ns": 1787235792683967611,
+            "size": 878
+          }
+        },
+        {
+          "name": "model.safetensors",
+          "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+          "role": "model-or-processor",
+          "sha256": "0f1d95ce43d27e03d5d8dd56c697c805460f967c793dd2cbec2e8e8012deda98",
+          "size_bytes": 3859521128,
+          "stat": {
+            "ctime_ns": 1787158436530154511,
+            "device": 16777235,
+            "inode": 5984070,
+            "mtime_ns": 1787079592306092277,
+            "size": 3859521128
+          }
+        },
+        {
+          "name": "preprocessor_config.json",
+          "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/e7d53bd058c34639e2dec1357537a3d013bcda63",
+          "role": "model-or-processor",
+          "sha256": "f724fdad65341e79bd9741888fe4e8ce1bb2e7b44fc8216c28c591afb1e202f4",
+          "size_bytes": 254,
+          "stat": {
+            "ctime_ns": 1787158435150048006,
+            "device": 16777235,
+            "inode": 5984067,
+            "mtime_ns": 1787079443378807804,
+            "size": 254
+          }
+        },
+        {
+          "name": "special_tokens_map.json",
+          "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/fdafe480f024ff444c7492147536765ce5d55a2d",
+          "role": "model-or-processor",
+          "sha256": "9046da57c270c8e74d0f38832b4adce269c9d914ef21d2a0925e7772152dd793",
+          "size_bytes": 96,
+          "stat": {
+            "ctime_ns": 1787158435143879487,
+            "device": 16777235,
+            "inode": 5984065,
+            "mtime_ns": 1787079449792831686,
+            "size": 96
+          }
+        },
+        {
+          "name": "tokenizer_config.json",
+          "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/8119434548d4a82fbe4e5e53c95d186bca037257",
+          "role": "model-or-processor",
+          "sha256": "42a65547cf0654d12263ece7c909c4b0c574b660c78658f806c772cc223bc01b",
+          "size_bytes": 397,
+          "stat": {
+            "ctime_ns": 1787158435143238985,
+            "device": 16777235,
+            "inode": 5984064,
+            "mtime_ns": 1787079445299892278,
+            "size": 397
+          }
+        },
+        {
+          "name": "vocab.json",
+          "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/5c1626173fb1db1da574d16b6e924e8efc1ade4c",
+          "role": "model-or-processor",
+          "sha256": "0375a07a977a599040a7ff333b6974996965cd93754020619518c15db7691f01",
+          "size_bytes": 1340148,
+          "stat": {
+            "ctime_ns": 1787158435151871262,
+            "device": 16777235,
+            "inode": 5984068,
+            "mtime_ns": 1787079449054862750,
+            "size": 1340148
+          }
+        },
+        {
+          "name": "vocabs/mya.txt",
+          "path": ".cache/huggingface/hub/models--facebook--mms-1b-all/blobs/49191e00b11ea3281db39a6b8022d0b003bae2da",
+          "role": "model-or-processor",
+          "sha256": "d01af8e834039592efc79902675773d7ef622a4ce07cccd46fb2644785cc0734",
+          "size_bytes": 1005,
+          "stat": {
+            "ctime_ns": 1787235938363752533,
+            "device": 16777235,
+            "inode": 5987135,
+            "mtime_ns": 1787235938362249071,
+            "size": 1005
+          }
+        }
+      ],
+      "backend": "hf",
+      "content_sha256": "b6bf21929e857519387e3994e47a10f6530f7bbcb9427c87ebc3ca064b573cd6",
+      "execution_sha256": "6d359e472ec895c95c80621b4d36aa76462dc4259978978826688fed6044bcac",
+      "fallback_history": [],
+      "issues": [],
+      "requested_model": "mms-1b-all",
+      "requested_settings": {
+        "batch_size": 1,
+        "device": "mps",
+        "dtype": "float32",
+        "language": "mya_Mymr"
+      },
+      "resolved_settings": {
+        "chunk_seconds": null,
+        "device": "mps",
+        "dtype": "float32",
+        "family": "mms",
+        "lang": "mya",
+        "n_threads": null
+      },
+      "revision_status": "pinned",
+      "runtime_packages": {
+        "accelerate": "1.14.0",
+        "crispasr": "0.8.29",
+        "dataoceanai-dolphin": "20260513",
+        "fairseq2": "0.6",
+        "funasr": "1.4.2",
+        "huggingface-hub": "0.36.2",
+        "modelscope": "1.39.1",
+        "omnilingual-asr": "0.2.0",
+        "psutil": "5.9.8",
+        "sentencepiece": "0.2.2",
+        "soundfile": "0.14.0",
+        "tokenizers": "0.22.2",
+        "torch": "2.8.0",
+        "torchaudio": "2.8.0",
+        "transformers": "4.57.6"
+      },
+      "schema_version": 1,
+      "source_kind": "huggingface",
+      "source_locator": "facebook/mms-1b-all",
+      "upstream_revision": "3d33597edbdaaba14a8e858e2c8caa76e3cec0cd",
+      "uv_lock_sha256": "e1cfd429f47c669a4093b844e25f4eba673c76aeb7d397dcc2ded08739b705a5"
+    }
+  },
+  "profile": false,
+  "protocol_version": 3,
+  "repeats": 3,
+  "run_id": "mms-batching-matrix-v1",
+  "runner_id": "adapter",
+  "sample_uss": false,
+  "schedule_seed": 20260823,
+  "session_id": "mms-batching-matrix-v1:session-0",
+  "session_index": 0,
+  "subject": {
+    "backend": "hf",
+    "batch_size": 1,
+    "language": "mya_Mymr",
+    "model": "mms-1b-all",
+    "options": {
+      "batch_size": 1,
+      "device": "mps",
+      "dtype": "float32",
+      "language": "mya_Mymr"
+    }
+  },
+  "warmups": 3,
+  "worker_index": 0
+}

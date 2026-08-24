@@ -1,0 +1,490 @@
+{
+  "artifact_kind": "experiment-v1",
+  "condition_summaries": [
+    {
+      "baseline_eligible": true,
+      "condition_id": "canonical",
+      "content_sha256": "b6bf21929e857519387e3994e47a10f6530f7bbcb9427c87ebc3ca064b573cd6",
+      "cpu_utilization": 0.17717898539816349,
+      "endpoint_rss_mb": 527.2,
+      "environment_identity": "7be28433de401aefa30220c491cd82229cbce6600a52dfafec3e712b310da65a",
+      "error": null,
+      "execution_sha256": "6d359e472ec895c95c80621b4d36aa76462dc4259978978826688fed6044bcac",
+      "gpu_idle_pct": null,
+      "gpu_scope": null,
+      "gpu_util_mean": null,
+      "gpu_util_n": null,
+      "gpu_util_p50": null,
+      "hashes": {
+        "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0": "2c9bfc4460412cf8562e300d0c3f5c0d1f81b781f1de3e463a91c9b9c3f4200c"
+      },
+      "host_identity": "822f056562677109078af817bb8a4077165c054b083f1746b438ebab79bfb675",
+      "input_set_id": "canonical",
+      "memory_metric": "worker-lifetime-ru-maxrss-diagnostic",
+      "model": "mms-1b-all",
+      "natural_variation_ratio_99": 1.0255062843881617,
+      "observer": {
+        "load_wall_s": 12.0382,
+        "observer_cpu_s": 0.0,
+        "profile": false,
+        "profiler_cpu_s": 0.0,
+        "repeat_wall_s": 9.934469582,
+        "sample_uss": false,
+        "sampler_cpu_s": 0.0,
+        "uss_sample_count": 0,
+        "uss_status": "disabled"
+      },
+      "peak_rss_mb": 527.2,
+      "profile": false,
+      "protocol": {
+        "repeats": 3,
+        "schedule_seed": 20260823,
+        "sessions": 5,
+        "warmups": 3
+      },
+      "provenance_issues": [],
+      "repeats": 15,
+      "request_key": "hf/mms-1b-all:6bd4d1faa9ac1420",
+      "rtf": 0.02387339822463768,
+      "rtf_ci95": [
+        0.023762632862318844,
+        0.024440150942028983
+      ],
+      "rtf_p25": 0.023832278079710147,
+      "rtf_p75": 0.023969817355072462,
+      "runner_id": "adapter",
+      "sample_uss": false,
+      "subject": "hf/mms-1b-all",
+      "text_digest": "c664f82543f5e719b1a1222d662e905beb92fa9d059b5667cba615348c7e48b4",
+      "transcript_hashes": {
+        "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0": "2c9bfc4460412cf8562e300d0c3f5c0d1f81b781f1de3e463a91c9b9c3f4200c"
+      },
+      "worker_blocks": [
+        {
+          "hashes": {
+            "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0": "2c9bfc4460412cf8562e300d0c3f5c0d1f81b781f1de3e463a91c9b9c3f4200c"
+          },
+          "launch_position": 1,
+          "process_peak_rss_mb": 527.2,
+          "repeat_rtfs": [
+            0.025280016594202898,
+            0.024440150942028983,
+            0.024257371702898548
+          ],
+          "representative_rtf": 0.024440150942028983,
+          "session_id": "mms-input-control-v1:session-0",
+          "session_index": 0,
+          "worker_index": 0
+        },
+        {
+          "hashes": {
+            "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0": "2c9bfc4460412cf8562e300d0c3f5c0d1f81b781f1de3e463a91c9b9c3f4200c"
+          },
+          "launch_position": 0,
+          "process_peak_rss_mb": 522.4,
+          "repeat_rtfs": [
+            0.0237590956884058,
+            0.02406924061594203,
+            0.023969817355072462
+          ],
+          "representative_rtf": 0.023969817355072462,
+          "session_id": "mms-input-control-v1:session-1",
+          "session_index": 1,
+          "worker_index": 1
+        },
+        {
+          "hashes": {
+            "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0": "2c9bfc4460412cf8562e300d0c3f5c0d1f81b781f1de3e463a91c9b9c3f4200c"
+          },
+          "launch_position": 1,
+          "process_peak_rss_mb": 521.3,
+          "repeat_rtfs": [
+            0.023580961666666667,
+            0.02376263286231884,
+            0.023787343007246373
+          ],
+          "representative_rtf": 0.023762632862318844,
+          "session_id": "mms-input-control-v1:session-2",
+          "session_index": 2,
+          "worker_index": 2
+        },
+        {
+          "hashes": {
+            "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0": "2c9bfc4460412cf8562e300d0c3f5c0d1f81b781f1de3e463a91c9b9c3f4200c"
+          },
+          "launch_position": 0,
+          "process_peak_rss_mb": 519.7,
+          "repeat_rtfs": [
+            0.023895753297101446,
+            0.023832278079710143,
+            0.02380164706521739
+          ],
+          "representative_rtf": 0.023832278079710147,
+          "session_id": "mms-input-control-v1:session-3",
+          "session_index": 3,
+          "worker_index": 3
+        },
+        {
+          "hashes": {
+            "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0": "2c9bfc4460412cf8562e300d0c3f5c0d1f81b781f1de3e463a91c9b9c3f4200c"
+          },
+          "launch_position": 1,
+          "process_peak_rss_mb": 520.5,
+          "repeat_rtfs": [
+            0.02387867449275362,
+            0.02375616847826087,
+            0.02387339822463768
+          ],
+          "representative_rtf": 0.02387339822463768,
+          "session_id": "mms-input-control-v1:session-4",
+          "session_index": 4,
+          "worker_index": 4
+        }
+      ],
+      "worker_lifetime_peak_rss_mb": 527.2,
+      "workers": 5
+    },
+    {
+      "baseline_eligible": true,
+      "condition_id": "native",
+      "content_sha256": "b6bf21929e857519387e3994e47a10f6530f7bbcb9427c87ebc3ca064b573cd6",
+      "cpu_utilization": 0.1798069784706756,
+      "endpoint_rss_mb": 529.2,
+      "environment_identity": "7be28433de401aefa30220c491cd82229cbce6600a52dfafec3e712b310da65a",
+      "error": null,
+      "execution_sha256": "6d359e472ec895c95c80621b4d36aa76462dc4259978978826688fed6044bcac",
+      "gpu_idle_pct": null,
+      "gpu_scope": null,
+      "gpu_util_mean": null,
+      "gpu_util_n": null,
+      "gpu_util_p50": null,
+      "hashes": {
+        "pcm16:16000:1:9b17e18ee7dcda30ae8220aa21ca8957593d72f15ad3c758ab8815f3cf0e937b": "5012ccd7fae4eeafd0471e0b2d4f744c5dcffa9bee127d7e01e403e38f45e429"
+      },
+      "host_identity": "822f056562677109078af817bb8a4077165c054b083f1746b438ebab79bfb675",
+      "input_set_id": "native",
+      "memory_metric": "worker-lifetime-ru-maxrss-diagnostic",
+      "model": "mms-1b-all",
+      "natural_variation_ratio_99": 1.027721375781867,
+      "observer": {
+        "load_wall_s": 12.2499,
+        "observer_cpu_s": 0.0,
+        "profile": false,
+        "profiler_cpu_s": 0.0,
+        "repeat_wall_s": 9.956172581999999,
+        "sample_uss": false,
+        "sampler_cpu_s": 0.0,
+        "uss_sample_count": 0,
+        "uss_status": "disabled"
+      },
+      "peak_rss_mb": 529.2,
+      "profile": false,
+      "protocol": {
+        "repeats": 3,
+        "schedule_seed": 20260823,
+        "sessions": 5,
+        "warmups": 3
+      },
+      "provenance_issues": [],
+      "repeats": 15,
+      "request_key": "hf/mms-1b-all:6bd4d1faa9ac1420",
+      "rtf": 0.02383699123188406,
+      "rtf_ci95": [
+        0.02375783815217391,
+        0.024481438695652176
+      ],
+      "rtf_p25": 0.023821085434782608,
+      "rtf_p75": 0.02437157307971014,
+      "runner_id": "source",
+      "sample_uss": false,
+      "subject": "hf/mms-1b-all",
+      "text_digest": "c4a96627463b9928a83805e3d57374cadceaae9767b68a4ef6ae6fea393ded45",
+      "transcript_hashes": {
+        "pcm16:16000:1:9b17e18ee7dcda30ae8220aa21ca8957593d72f15ad3c758ab8815f3cf0e937b": "5012ccd7fae4eeafd0471e0b2d4f744c5dcffa9bee127d7e01e403e38f45e429"
+      },
+      "worker_blocks": [
+        {
+          "hashes": {
+            "pcm16:16000:1:9b17e18ee7dcda30ae8220aa21ca8957593d72f15ad3c758ab8815f3cf0e937b": "5012ccd7fae4eeafd0471e0b2d4f744c5dcffa9bee127d7e01e403e38f45e429"
+          },
+          "launch_position": 0,
+          "process_peak_rss_mb": 525.8,
+          "repeat_rtfs": [
+            0.024403108369565215,
+            0.024481438695652172,
+            0.024674020253623186
+          ],
+          "representative_rtf": 0.024481438695652176,
+          "session_id": "mms-input-control-v1:session-0",
+          "session_index": 0,
+          "worker_index": 0
+        },
+        {
+          "hashes": {
+            "pcm16:16000:1:9b17e18ee7dcda30ae8220aa21ca8957593d72f15ad3c758ab8815f3cf0e937b": "5012ccd7fae4eeafd0471e0b2d4f744c5dcffa9bee127d7e01e403e38f45e429"
+          },
+          "launch_position": 1,
+          "process_peak_rss_mb": 526.8,
+          "repeat_rtfs": [
+            0.024517933297101446,
+            0.024371573079710142,
+            0.02396602956521739
+          ],
+          "representative_rtf": 0.02437157307971014,
+          "session_id": "mms-input-control-v1:session-1",
+          "session_index": 1,
+          "worker_index": 1
+        },
+        {
+          "hashes": {
+            "pcm16:16000:1:9b17e18ee7dcda30ae8220aa21ca8957593d72f15ad3c758ab8815f3cf0e937b": "5012ccd7fae4eeafd0471e0b2d4f744c5dcffa9bee127d7e01e403e38f45e429"
+          },
+          "launch_position": 0,
+          "process_peak_rss_mb": 529.2,
+          "repeat_rtfs": [
+            0.02369788644927536,
+            0.023821085434782605,
+            0.023841310398550725
+          ],
+          "representative_rtf": 0.023821085434782608,
+          "session_id": "mms-input-control-v1:session-2",
+          "session_index": 2,
+          "worker_index": 2
+        },
+        {
+          "hashes": {
+            "pcm16:16000:1:9b17e18ee7dcda30ae8220aa21ca8957593d72f15ad3c758ab8815f3cf0e937b": "5012ccd7fae4eeafd0471e0b2d4f744c5dcffa9bee127d7e01e403e38f45e429"
+          },
+          "launch_position": 1,
+          "process_peak_rss_mb": 521.3,
+          "repeat_rtfs": [
+            0.02388983242753623,
+            0.023756372282608695,
+            0.023757838152173912
+          ],
+          "representative_rtf": 0.02375783815217391,
+          "session_id": "mms-input-control-v1:session-3",
+          "session_index": 3,
+          "worker_index": 3
+        },
+        {
+          "hashes": {
+            "pcm16:16000:1:9b17e18ee7dcda30ae8220aa21ca8957593d72f15ad3c758ab8815f3cf0e937b": "5012ccd7fae4eeafd0471e0b2d4f744c5dcffa9bee127d7e01e403e38f45e429"
+          },
+          "launch_position": 0,
+          "process_peak_rss_mb": 528.9,
+          "repeat_rtfs": [
+            0.02383699123188406,
+            0.023902888007246374,
+            0.023812583007246375
+          ],
+          "representative_rtf": 0.02383699123188406,
+          "session_id": "mms-input-control-v1:session-4",
+          "session_index": 4,
+          "worker_index": 4
+        }
+      ],
+      "worker_lifetime_peak_rss_mb": 529.2,
+      "workers": 5
+    }
+  ],
+  "contrasts": [
+    {
+      "bootstrap_seed": 9019561770585036760,
+      "classification": "descriptive-only",
+      "classification_reasons": [
+        "cross-arm transcripts changed"
+      ],
+      "contrast_id": "native-over-canonical",
+      "control_condition_id": "canonical",
+      "direction": "treatment/control",
+      "gating": false,
+      "gating_eligible": false,
+      "join_on": "source_sha256",
+      "material_regression_limit": 1.02,
+      "paired_ratio": {
+        "high": 1.012560947334909,
+        "low": 0.9981594167444192,
+        "point": 1.0016893411878316
+      },
+      "require_same_execution": true,
+      "threshold": 0.02,
+      "transcript_changes": [
+        "36c25f8b1db4ba5ddab8b3edd0bbd8f2b2af1aeb466863f77cfacad95197ee61"
+      ],
+      "treatment_condition_id": "native"
+    }
+  ],
+  "experiment_id": "mms-input-control-v1",
+  "gate_eligible": false,
+  "schema_version": 1,
+  "session_schedule": [
+    [
+      {
+        "condition_id": "native",
+        "launch_position": 0,
+        "request_key": "hf/mms-1b-all:6bd4d1faa9ac1420"
+      },
+      {
+        "condition_id": "canonical",
+        "launch_position": 1,
+        "request_key": "hf/mms-1b-all:6bd4d1faa9ac1420"
+      }
+    ],
+    [
+      {
+        "condition_id": "canonical",
+        "launch_position": 0,
+        "request_key": "hf/mms-1b-all:6bd4d1faa9ac1420"
+      },
+      {
+        "condition_id": "native",
+        "launch_position": 1,
+        "request_key": "hf/mms-1b-all:6bd4d1faa9ac1420"
+      }
+    ],
+    [
+      {
+        "condition_id": "native",
+        "launch_position": 0,
+        "request_key": "hf/mms-1b-all:6bd4d1faa9ac1420"
+      },
+      {
+        "condition_id": "canonical",
+        "launch_position": 1,
+        "request_key": "hf/mms-1b-all:6bd4d1faa9ac1420"
+      }
+    ],
+    [
+      {
+        "condition_id": "canonical",
+        "launch_position": 0,
+        "request_key": "hf/mms-1b-all:6bd4d1faa9ac1420"
+      },
+      {
+        "condition_id": "native",
+        "launch_position": 1,
+        "request_key": "hf/mms-1b-all:6bd4d1faa9ac1420"
+      }
+    ],
+    [
+      {
+        "condition_id": "native",
+        "launch_position": 0,
+        "request_key": "hf/mms-1b-all:6bd4d1faa9ac1420"
+      },
+      {
+        "condition_id": "canonical",
+        "launch_position": 1,
+        "request_key": "hf/mms-1b-all:6bd4d1faa9ac1420"
+      }
+    ]
+  ],
+  "spec": {
+    "conditions": [
+      {
+        "condition_id": "canonical",
+        "input_set_id": "canonical",
+        "profile": false,
+        "runner_id": "adapter",
+        "sample_uss": false,
+        "subject": {
+          "backend": "hf",
+          "batch_size": 1,
+          "language": "mya_Mymr",
+          "model": "mms-1b-all",
+          "options": {
+            "batch_size": 1,
+            "device": "mps",
+            "dtype": "float32",
+            "language": "mya_Mymr"
+          }
+        }
+      },
+      {
+        "condition_id": "native",
+        "input_set_id": "native",
+        "profile": false,
+        "runner_id": "source",
+        "sample_uss": false,
+        "subject": {
+          "backend": "hf",
+          "batch_size": 1,
+          "language": "mya_Mymr",
+          "model": "mms-1b-all",
+          "options": {
+            "batch_size": 1,
+            "device": "mps",
+            "dtype": "float32",
+            "language": "mya_Mymr"
+          }
+        }
+      }
+    ],
+    "contrasts": [
+      {
+        "contrast_id": "native-over-canonical",
+        "control_condition_id": "canonical",
+        "gating": false,
+        "join_on": "source_sha256",
+        "require_same_execution": true,
+        "threshold": 0.02,
+        "treatment_condition_id": "native"
+      }
+    ],
+    "experiment_id": "mms-input-control-v1",
+    "input_sets": [
+      {
+        "input_mode": "prepared",
+        "input_set_id": "canonical",
+        "inputs": [
+          {
+            "audio_id": "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0",
+            "channels": 1,
+            "duration_s": 27.6,
+            "frames": 441600,
+            "prepared_path": "data/.converted/mms-input-control-v1/pcm16-mono-16000-v1__36c25f8b1db4ba5ddab8b3edd0bbd8f2b2af1aeb466863f77cfacad95197ee61.wav",
+            "reference_id": "10207165333468320061",
+            "sample_rate": 16000,
+            "source_path": "data/fleurs/audio/10207165333468320061.wav",
+            "source_sha256": "36c25f8b1db4ba5ddab8b3edd0bbd8f2b2af1aeb466863f77cfacad95197ee61"
+          }
+        ],
+        "preparation_kind": "canonical-decode-resample",
+        "preparation_wall_s": 0.03935824998188764
+      },
+      {
+        "input_mode": "source",
+        "input_set_id": "native",
+        "inputs": [
+          {
+            "audio_id": "pcm16:16000:1:9b17e18ee7dcda30ae8220aa21ca8957593d72f15ad3c758ab8815f3cf0e937b",
+            "channels": 1,
+            "duration_s": 27.6,
+            "frames": 441600,
+            "prepared_path": "data/fleurs/audio/10207165333468320061.wav",
+            "reference_id": "10207165333468320061",
+            "sample_rate": 16000,
+            "source_path": "data/fleurs/audio/10207165333468320061.wav",
+            "source_sha256": "36c25f8b1db4ba5ddab8b3edd0bbd8f2b2af1aeb466863f77cfacad95197ee61"
+          }
+        ],
+        "preparation_kind": "native-identity-probe",
+        "preparation_wall_s": 0.0031120830099098384
+      }
+    ],
+    "repeats": 3,
+    "schedule_seed": 20260823,
+    "sessions": 5,
+    "statistics": {
+      "draws": 20000,
+      "estimator": "paired-session-median-log-ratio",
+      "min_repeats": 3,
+      "min_sessions": 5,
+      "min_warmups": 3,
+      "quantile_method": "linear",
+      "version": 1
+    },
+    "warmups": 3
+  }
+}

@@ -16,6 +16,7 @@ dependencies = [
     "tqdm>=4.67",
     "jiwer>=4.0",
     "myanmartools>=1.2.1",
+    "psutil>=5.9,<6.dev0",
 ]
 
 [project.optional-dependencies]
@@ -77,3 +78,9 @@ select = ["E", "F", "I", "UP", "B"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+# `weights` tests load real models from the cache. Deselected by default so the
+# suite stays offline and fast; `make bench` runs them.
+addopts = "-m 'not weights'"
+markers = [
+    "weights: needs model weights on disk (deselected by default)",
+]

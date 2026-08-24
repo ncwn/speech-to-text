@@ -1,0 +1,4 @@
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00, 17.47it/s]
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00, 17.45it/s]

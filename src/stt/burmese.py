@@ -1,21 +1,12 @@
 """Burmese (မြန်မာ) text handling for fair ASR scoring.
 
-Three things make Burmese different from the languages ASR tooling is usually
-tuned for, and all three will silently wreck an accuracy number if ignored:
+Three things will silently wreck an accuracy number if ignored: Burmese has no
+word delimiters (so CER, not WER, and whitespace is stripped); Zawgyi and
+Unicode share the same code block and render identically while being different
+bytes (so encoding is detected and a mismatch refused rather than scored); and
+combining-mark order varies (so NFC first).
 
-1. **No word delimiters.** Burmese is written without spaces between words;
-   whatever spaces appear are phrase-level and inconsistent between annotators
-   and models. Word Error Rate is therefore meaningless — CER is the metric,
-   and whitespace is stripped before comparison by default.
-
-2. **Zawgyi vs Unicode.** Two incompatible encodings share the same Myanmar
-   code block. Text that renders identically on screen can be a completely
-   different byte sequence. Comparing a Unicode reference against a Zawgyi
-   hypothesis produces a garbage CER near 1.0, so we detect and refuse rather
-   than report a wrong number.
-
-3. **Combining-mark order.** The same syllable can be encoded with its marks in
-   different orders. NFC normalisation collapses the common cases.
+See ``docs/burmese.md``.
 """
 
 from __future__ import annotations
@@ -70,29 +61,10 @@ def is_zawgyi(text: str, threshold: float = ZAWGYI_THRESHOLD) -> bool:
 
 
 def has_myanmar(text: str) -> bool:
-    """True if the string contains any character from the Myanmar block."""
-    return any("က" <= ch <= "႟" or "ꩠ" <= ch <= "ꩿ" for ch in text)
-
-
-def zawgyi_to_unicode(text: str) -> str:
-    """Convert Zawgyi to Unicode.
-
-    Requires PyICU, which is an optional dependency because it needs a native
-    ICU build. Install with ``brew install icu4c && uv pip install PyICU``.
-    """
-    try:
-        from icu import Transliterator
-    except ImportError as exc:  # pragma: no cover - depends on optional native lib
-        raise RuntimeError(
-            "Zawgyi->Unicode conversion needs PyICU. Install it with:\n"
-            "  brew install icu4c pkg-config\n"
-            '  PATH="$(brew --prefix icu4c)/bin:$PATH" '
-            'PKG_CONFIG_PATH="$(brew --prefix icu4c)/lib/pkgconfig" uv pip install PyICU'
-        ) from exc
-
-    from myanmartools import ZAWGYI_TO_UNICODE_RULES
-
-    return Transliterator.createFromRules("z2u", ZAWGYI_TO_UNICODE_RULES).transliterate(text)
+    return any(
+        "\u1000" <= ch <= "\u109f" or "\ua9e0" <= ch <= "\ua9ff" or "\uaa60" <= ch <= "\uaa7f"
+        for ch in text
+    )
 
 
 @dataclass(frozen=True)

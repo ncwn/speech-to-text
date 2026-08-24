@@ -1,0 +1,277 @@
+{
+  "metadata": {
+    "entrypoint_order": [
+      "adapter",
+      "reference"
+    ]
+  },
+  "schema": "parity-v1",
+  "schema_version": 1,
+  "subjects": {
+    "hf+seamless-m4t-v2": {
+      "backend": "hf",
+      "binding_stable": true,
+      "cases": [
+        {
+          "adapter_metadata": {
+            "decoder": "soundfile",
+            "entrypoint": "repository-single-window",
+            "torch_inference_mode": true
+          },
+          "audio": {
+            "audio_id": "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a",
+            "channels": 1,
+            "duration_s": 12.78,
+            "frames": 204480,
+            "pcm_sha256": "04f3631c67ae49a523e8c82de1182ff29cfb23c8f3ff5bae6339bbd8eafe4431",
+            "representation": {
+              "byte_order": "little",
+              "dtype": "int16",
+              "kind": "pcm16",
+              "shape": [
+                204480,
+                1
+              ]
+            },
+            "sample_rate": 16000,
+            "sha256": "04f3631c67ae49a523e8c82de1182ff29cfb23c8f3ff5bae6339bbd8eafe4431"
+          },
+          "contract_issues": [],
+          "first_divergent_stage": null,
+          "parity_eligible": true,
+          "reference_metadata": {
+            "decoder": "soundfile",
+            "entrypoint": "processor-generate-direct",
+            "torch_inference_mode": true
+          },
+          "stages": [
+            {
+              "adapter": {
+                "digest": "243144f8c32778647547527ad3b05ccb32ac3e8ffa118377b9de4c24e770bc22",
+                "reachable": true,
+                "representation": {
+                  "dtype": "float32",
+                  "kind": "array",
+                  "shape": [
+                    204480
+                  ]
+                }
+              },
+              "max_abs": null,
+              "max_rel": null,
+              "name": "decoded_pcm",
+              "reason": null,
+              "reference": {
+                "digest": "243144f8c32778647547527ad3b05ccb32ac3e8ffa118377b9de4c24e770bc22",
+                "reachable": true,
+                "representation": {
+                  "dtype": "float32",
+                  "kind": "array",
+                  "shape": [
+                    204480
+                  ]
+                }
+              },
+              "status": "match",
+              "tolerance": null
+            },
+            {
+              "adapter": {
+                "digest": "ec012d8c1342cd8d295511f58e673ab59c170c52be4082e1d6fbc86571c11cd1",
+                "reachable": true,
+                "representation": {
+                  "dtype": "float32",
+                  "kind": "array",
+                  "shape": [
+                    1,
+                    638,
+                    160
+                  ]
+                }
+              },
+              "max_abs": 0.0,
+              "max_rel": 0.0,
+              "name": "features",
+              "reason": null,
+              "reference": {
+                "digest": "ec012d8c1342cd8d295511f58e673ab59c170c52be4082e1d6fbc86571c11cd1",
+                "reachable": true,
+                "representation": {
+                  "dtype": "float32",
+                  "kind": "array",
+                  "shape": [
+                    1,
+                    638,
+                    160
+                  ]
+                }
+              },
+              "status": "match",
+              "tolerance": {
+                "atol": 1e-06,
+                "rtol": 1e-06
+              }
+            },
+            {
+              "adapter": {
+                "digest": "4b7603a9bf542bf60edc5b8517eb5ff0b8fbb74f89f79ec01514b51c83be6e43",
+                "reachable": true,
+                "representation": {
+                  "dtype": "float32",
+                  "kind": "array",
+                  "shape": [
+                    1,
+                    80,
+                    1024
+                  ]
+                }
+              },
+              "max_abs": 0.0,
+              "max_rel": 0.0,
+              "name": "logits_or_encoder",
+              "reason": null,
+              "reference": {
+                "digest": "4b7603a9bf542bf60edc5b8517eb5ff0b8fbb74f89f79ec01514b51c83be6e43",
+                "reachable": true,
+                "representation": {
+                  "dtype": "float32",
+                  "kind": "array",
+                  "shape": [
+                    1,
+                    80,
+                    1024
+                  ]
+                }
+              },
+              "status": "match",
+              "tolerance": {
+                "atol": 1e-05,
+                "rtol": 0.0001
+              }
+            },
+            {
+              "adapter": {
+                "digest": "c87d33ead099332ff27737278b62e2d5faaccfc8e09efee52e4aac2a2d09dbbb",
+                "reachable": true,
+                "representation": {
+                  "dtype": "int64",
+                  "kind": "array",
+                  "shape": [
+                    1,
+                    46
+                  ]
+                }
+              },
+              "max_abs": null,
+              "max_rel": null,
+              "name": "token_ids",
+              "reason": null,
+              "reference": {
+                "digest": "c87d33ead099332ff27737278b62e2d5faaccfc8e09efee52e4aac2a2d09dbbb",
+                "reachable": true,
+                "representation": {
+                  "dtype": "int64",
+                  "kind": "array",
+                  "shape": [
+                    1,
+                    46
+                  ]
+                }
+              },
+              "status": "match",
+              "tolerance": null
+            },
+            {
+              "adapter": {
+                "digest": "2967e46aed975361601affd17aac215358e21d517da3f51547e72f6e95ea712a",
+                "reachable": true,
+                "representation": {
+                  "encoding": "utf-8",
+                  "kind": "text"
+                }
+              },
+              "max_abs": null,
+              "max_rel": null,
+              "name": "raw_transcript",
+              "reason": null,
+              "reference": {
+                "digest": "2967e46aed975361601affd17aac215358e21d517da3f51547e72f6e95ea712a",
+                "reachable": true,
+                "representation": {
+                  "encoding": "utf-8",
+                  "kind": "text"
+                }
+              },
+              "status": "match",
+              "tolerance": null
+            },
+            {
+              "adapter": {
+                "digest": "2967e46aed975361601affd17aac215358e21d517da3f51547e72f6e95ea712a",
+                "reachable": true,
+                "representation": {
+                  "encoding": "utf-8",
+                  "kind": "text"
+                }
+              },
+              "max_abs": null,
+              "max_rel": null,
+              "name": "final_transcript",
+              "reason": null,
+              "reference": {
+                "digest": "2967e46aed975361601affd17aac215358e21d517da3f51547e72f6e95ea712a",
+                "reachable": true,
+                "representation": {
+                  "encoding": "utf-8",
+                  "kind": "text"
+                }
+              },
+              "status": "match",
+              "tolerance": null
+            }
+          ]
+        }
+      ],
+      "key": "hf+seamless-m4t-v2",
+      "language": "mya_Mymr",
+      "loaded_instance_id": null,
+      "metadata": {
+        "content_sha256": "2b8ee7972365d6233a5b5e5c16db24bbfa27635e31d67086fd8a674f9309f8b0",
+        "contract": {
+          "backend": "hf",
+          "expected_reachability": {
+            "decoded_pcm": true,
+            "features": true,
+            "final_transcript": true,
+            "logits_or_encoder": true,
+            "raw_transcript": true,
+            "token_ids": true
+          },
+          "model": "seamless-m4t-v2",
+          "tolerances": {
+            "features": {
+              "atol": 1e-06,
+              "rtol": 1e-06
+            },
+            "logits_or_encoder": {
+              "atol": 1e-05,
+              "rtol": 0.0001
+            }
+          }
+        },
+        "entrypoint_order": [
+          "adapter",
+          "reference"
+        ],
+        "execution_sha256": "6f33dcd0594d71a8f3370d0ac4f32be1454291aa1d5daf5c92617f4cf9366e68",
+        "source_sha256": "8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28"
+      },
+      "model": "seamless-m4t-v2",
+      "parity_eligible": true,
+      "settings": {
+        "device": "cpu",
+        "dtype": "float32"
+      }
+    }
+  }
+}

@@ -1,0 +1,309 @@
+{
+  "conditions": [
+    {
+      "condition_id": "fast-off",
+      "input_set_id": "canonical",
+      "profile": false,
+      "runner_id": "adapter",
+      "sample_uss": false,
+      "subject": {
+        "backend": "hf",
+        "batch_size": 1,
+        "language": "mya_Mymr",
+        "model": "mms-1b-all",
+        "options": {
+          "batch_size": 1,
+          "device": "mps",
+          "dtype": "float32",
+          "language": "mya_Mymr"
+        }
+      }
+    },
+    {
+      "condition_id": "fast-profile",
+      "input_set_id": "canonical",
+      "profile": true,
+      "runner_id": "adapter",
+      "sample_uss": false,
+      "subject": {
+        "backend": "hf",
+        "batch_size": 1,
+        "language": "mya_Mymr",
+        "model": "mms-1b-all",
+        "options": {
+          "batch_size": 1,
+          "device": "mps",
+          "dtype": "float32",
+          "language": "mya_Mymr"
+        }
+      }
+    },
+    {
+      "condition_id": "fast-profile-uss",
+      "input_set_id": "canonical",
+      "profile": true,
+      "runner_id": "adapter",
+      "sample_uss": true,
+      "subject": {
+        "backend": "hf",
+        "batch_size": 1,
+        "language": "mya_Mymr",
+        "model": "mms-1b-all",
+        "options": {
+          "batch_size": 1,
+          "device": "mps",
+          "dtype": "float32",
+          "language": "mya_Mymr"
+        }
+      }
+    },
+    {
+      "condition_id": "slow-off",
+      "input_set_id": "canonical",
+      "profile": false,
+      "runner_id": "adapter",
+      "sample_uss": false,
+      "subject": {
+        "backend": "omniasr-torch",
+        "batch_size": 1,
+        "language": "mya_Mymr",
+        "model": "omniASR_LLM_Unlimited_7B_v2",
+        "options": {
+          "batch_size": 1,
+          "device": "cpu",
+          "dtype": "float32",
+          "language": "mya_Mymr"
+        }
+      }
+    },
+    {
+      "condition_id": "slow-profile",
+      "input_set_id": "canonical",
+      "profile": true,
+      "runner_id": "adapter",
+      "sample_uss": false,
+      "subject": {
+        "backend": "omniasr-torch",
+        "batch_size": 1,
+        "language": "mya_Mymr",
+        "model": "omniASR_LLM_Unlimited_7B_v2",
+        "options": {
+          "batch_size": 1,
+          "device": "cpu",
+          "dtype": "float32",
+          "language": "mya_Mymr"
+        }
+      }
+    },
+    {
+      "condition_id": "slow-profile-uss",
+      "input_set_id": "canonical",
+      "profile": true,
+      "runner_id": "adapter",
+      "sample_uss": true,
+      "subject": {
+        "backend": "omniasr-torch",
+        "batch_size": 1,
+        "language": "mya_Mymr",
+        "model": "omniASR_LLM_Unlimited_7B_v2",
+        "options": {
+          "batch_size": 1,
+          "device": "cpu",
+          "dtype": "float32",
+          "language": "mya_Mymr"
+        }
+      }
+    }
+  ],
+  "contrasts": [
+    {
+      "contrast_id": "fast-profile-overhead",
+      "control_condition_id": "fast-off",
+      "gating": true,
+      "join_on": "audio_id",
+      "require_same_execution": true,
+      "threshold": 0.02,
+      "treatment_condition_id": "fast-profile"
+    },
+    {
+      "contrast_id": "fast-uss-overhead",
+      "control_condition_id": "fast-off",
+      "gating": true,
+      "join_on": "audio_id",
+      "require_same_execution": true,
+      "threshold": 0.02,
+      "treatment_condition_id": "fast-profile-uss"
+    },
+    {
+      "contrast_id": "slow-profile-overhead",
+      "control_condition_id": "slow-off",
+      "gating": true,
+      "join_on": "audio_id",
+      "require_same_execution": true,
+      "threshold": 0.02,
+      "treatment_condition_id": "slow-profile"
+    },
+    {
+      "contrast_id": "slow-uss-overhead",
+      "control_condition_id": "slow-off",
+      "gating": true,
+      "join_on": "audio_id",
+      "require_same_execution": true,
+      "threshold": 0.02,
+      "treatment_condition_id": "slow-profile-uss"
+    }
+  ],
+  "experiment_id": "observer-calibration-v2",
+  "input_sets": [
+    {
+      "input_set_id": "canonical",
+      "inputs": [
+        {
+          "audio_id": "pcm16:16000:1:b07dd43ca93583ec8aa74529beff13f2609cc6918b384019e616466c683b97d0",
+          "channels": 1,
+          "duration_s": 27.6,
+          "frames": 441600,
+          "prepared_path": "data/.converted/pcm16-mono-16000-v1__36c25f8b1db4ba5ddab8b3edd0bbd8f2b2af1aeb466863f77cfacad95197ee61.wav",
+          "reference_id": "10207165333468320061",
+          "sample_rate": 16000,
+          "source_path": "data/fleurs/audio/10207165333468320061.wav",
+          "source_sha256": "36c25f8b1db4ba5ddab8b3edd0bbd8f2b2af1aeb466863f77cfacad95197ee61"
+        },
+        {
+          "audio_id": "pcm16:16000:1:fe0efa457ae9f7f11a5483e78adaa5795f11b3bf0d5882d7a670ca05ee6ec0e4",
+          "channels": 1,
+          "duration_s": 9.18,
+          "frames": 146880,
+          "prepared_path": "data/.converted/pcm16-mono-16000-v1__0f5596159ca1e135211cef735e90b32a3ca6fade92c6508f9f1d8b1b8a7a0979.wav",
+          "reference_id": "10406743972683477081",
+          "sample_rate": 16000,
+          "source_path": "data/fleurs/audio/10406743972683477081.wav",
+          "source_sha256": "0f5596159ca1e135211cef735e90b32a3ca6fade92c6508f9f1d8b1b8a7a0979"
+        },
+        {
+          "audio_id": "pcm16:16000:1:71a3b3b9e7886757e59ac908a3e9edb5188a430b50690285b250583008660f24",
+          "channels": 1,
+          "duration_s": 7.5,
+          "frames": 120000,
+          "prepared_path": "data/.converted/pcm16-mono-16000-v1__fc22a3c0a78d1c25a94274cc87c2fda6b7a668ca72913cd1fc928470c9790607.wav",
+          "reference_id": "12011678642037122936",
+          "sample_rate": 16000,
+          "source_path": "data/fleurs/audio/12011678642037122936.wav",
+          "source_sha256": "fc22a3c0a78d1c25a94274cc87c2fda6b7a668ca72913cd1fc928470c9790607"
+        },
+        {
+          "audio_id": "pcm16:16000:1:57d0567a6d1c2c3b6a64ff09fd774af475b077840c117d443a07a07dc94832a1",
+          "channels": 1,
+          "duration_s": 14.16,
+          "frames": 226560,
+          "prepared_path": "data/.converted/pcm16-mono-16000-v1__122b1a2eaf5afbf4081a308f4cfc74a164fa3d42d4f3080c96ddce05d2f7333c.wav",
+          "reference_id": "12202394788954760188",
+          "sample_rate": 16000,
+          "source_path": "data/fleurs/audio/12202394788954760188.wav",
+          "source_sha256": "122b1a2eaf5afbf4081a308f4cfc74a164fa3d42d4f3080c96ddce05d2f7333c"
+        },
+        {
+          "audio_id": "pcm16:16000:1:043a5f39e5bfb1b19f677f3b7d291561ce32daefa9c4301aca03cfcaaf40de5a",
+          "channels": 1,
+          "duration_s": 12.78,
+          "frames": 204480,
+          "prepared_path": "data/.converted/pcm16-mono-16000-v1__8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28.wav",
+          "reference_id": "14755840805814218163",
+          "sample_rate": 16000,
+          "source_path": "data/fleurs/audio/14755840805814218163.wav",
+          "source_sha256": "8721b8c1952ea582389133b1d8dfc39df8095ec9cf2988d803fb27d208da6f28"
+        },
+        {
+          "audio_id": "pcm16:16000:1:c8eb27933b3b28cf4933842b97defb1941261a00dd8f6bbca9b4f3f51e040987",
+          "channels": 1,
+          "duration_s": 7.32,
+          "frames": 117120,
+          "prepared_path": "data/.converted/pcm16-mono-16000-v1__627a541f0b076ed2fdd752dd02d33a00c4e6d998817722c92db0940fcf353fc7.wav",
+          "reference_id": "15565044170778636507",
+          "sample_rate": 16000,
+          "source_path": "data/fleurs/audio/15565044170778636507.wav",
+          "source_sha256": "627a541f0b076ed2fdd752dd02d33a00c4e6d998817722c92db0940fcf353fc7"
+        },
+        {
+          "audio_id": "pcm16:16000:1:fcd118011b1c33b89bf54c87d0d26ffa85fa2ca8c7e2c11cef58141a0eb7e99c",
+          "channels": 1,
+          "duration_s": 10.44,
+          "frames": 167040,
+          "prepared_path": "data/.converted/pcm16-mono-16000-v1__55a039822bb0daa8099d746c3a9b2c5dc721adb019b0d074c9334f2c5d7bce25.wav",
+          "reference_id": "16051659439686946231",
+          "sample_rate": 16000,
+          "source_path": "data/fleurs/audio/16051659439686946231.wav",
+          "source_sha256": "55a039822bb0daa8099d746c3a9b2c5dc721adb019b0d074c9334f2c5d7bce25"
+        },
+        {
+          "audio_id": "pcm16:16000:1:23060f4cf96fac925d342a962a344762ef97b6144299a2c171a0c0c009674cbd",
+          "channels": 1,
+          "duration_s": 18.9,
+          "frames": 302400,
+          "prepared_path": "data/.converted/pcm16-mono-16000-v1__20edd9de642fee683c9d9d5419a407c6b376b5c0151edf01acc7710adb2983b5.wav",
+          "reference_id": "16273375266957931459",
+          "sample_rate": 16000,
+          "source_path": "data/fleurs/audio/16273375266957931459.wav",
+          "source_sha256": "20edd9de642fee683c9d9d5419a407c6b376b5c0151edf01acc7710adb2983b5"
+        },
+        {
+          "audio_id": "pcm16:16000:1:357e19eb06673ab6415ceb6c0cc3b0ed9aca89c26499ff98428ebedddc20892f",
+          "channels": 1,
+          "duration_s": 10.14,
+          "frames": 162240,
+          "prepared_path": "data/.converted/pcm16-mono-16000-v1__35671b237bcc927f0e18c3ab95545928811c4f8cfeeb0ca4c8c8d781e6f9d0f1.wav",
+          "reference_id": "1966097717794402409",
+          "sample_rate": 16000,
+          "source_path": "data/fleurs/audio/1966097717794402409.wav",
+          "source_sha256": "35671b237bcc927f0e18c3ab95545928811c4f8cfeeb0ca4c8c8d781e6f9d0f1"
+        },
+        {
+          "audio_id": "pcm16:16000:1:033509b2ae8f8fc91efb37f8f0978bc82f28cb1df65d88b870ad736e8ed3c886",
+          "channels": 1,
+          "duration_s": 16.68,
+          "frames": 266880,
+          "prepared_path": "data/.converted/pcm16-mono-16000-v1__338403ee043555e2ca136289a8783485fa487ccf4bb8d9e2bfac95a078191ca7.wav",
+          "reference_id": "2736081486220456460",
+          "sample_rate": 16000,
+          "source_path": "data/fleurs/audio/2736081486220456460.wav",
+          "source_sha256": "338403ee043555e2ca136289a8783485fa487ccf4bb8d9e2bfac95a078191ca7"
+        },
+        {
+          "audio_id": "pcm16:16000:1:ac9aca858d930ced4667e2f32f19d68f590863b0505bbf59e9f4437764b975f5",
+          "channels": 1,
+          "duration_s": 19.08,
+          "frames": 305280,
+          "prepared_path": "data/.converted/pcm16-mono-16000-v1__dccf033d63dbb3ce2473da42d03f4fc959ffe975e6b12dc384a8d7342b66a097.wav",
+          "reference_id": "3332794734215124213",
+          "sample_rate": 16000,
+          "source_path": "data/fleurs/audio/3332794734215124213.wav",
+          "source_sha256": "dccf033d63dbb3ce2473da42d03f4fc959ffe975e6b12dc384a8d7342b66a097"
+        },
+        {
+          "audio_id": "pcm16:16000:1:581a485d3de868e586aaf4fe7304b6e9f32395acda56ef23f40afc09170e1f7f",
+          "channels": 1,
+          "duration_s": 12.36,
+          "frames": 197760,
+          "prepared_path": "data/.converted/pcm16-mono-16000-v1__34af770a2aea87b84cc6ea1013d8943487fe1f285659e0bb69d865c3d4ac9a53.wav",
+          "reference_id": "6664351831731656725",
+          "sample_rate": 16000,
+          "source_path": "data/fleurs/audio/6664351831731656725.wav",
+          "source_sha256": "34af770a2aea87b84cc6ea1013d8943487fe1f285659e0bb69d865c3d4ac9a53"
+        }
+      ]
+    }
+  ],
+  "repeats": 3,
+  "schedule_seed": 20260823,
+  "sessions": 6,
+  "statistics": {
+    "draws": 20000,
+    "estimator": "paired-session-median-log-ratio",
+    "min_repeats": 3,
+    "min_sessions": 5,
+    "min_warmups": 3,
+    "quantile_method": "linear",
+    "version": 1
+  },
+  "warmups": 3
+}

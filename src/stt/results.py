@@ -12,11 +12,12 @@ time. ``text`` remains the source of truth for scoring; segments are additive.
 from __future__ import annotations
 
 import json
+import warnings
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
-from stt.telemetry import ResourceUsage
+from stt.telemetry import ResourceUsage, Series
 
 #: How a segment's timings were obtained. Recorded so that a run mixing
 #: backends stays honest about which timings were measured and which inferred.
@@ -25,6 +26,25 @@ from stt.telemetry import ResourceUsage
 #: ``chunk``    the timing is the window we fed the model, not a word boundary
 #: ``aligned``  recovered after the fact by forced alignment (see :mod:`stt.align`)
 SegmentSource = str
+
+
+def _normalize_trust_issues(value: Any) -> tuple[list[str], bool]:
+    """Return readable trust issues and whether their serialized shape was invalid."""
+    if isinstance(value, list):
+        normalized: list[str] = []
+        malformed = False
+        for issue in value:
+            if isinstance(issue, str):
+                normalized.append(issue)
+            else:
+                normalized.append(str(issue))
+                malformed = True
+        return normalized, malformed
+    if value is None:
+        return [], True
+    if isinstance(value, str):
+        return [value], True
+    return [str(value)], True
 
 
 @dataclass
@@ -66,6 +86,38 @@ class TranscriptionResult:
     segments: list[Segment] | None = None
     #: What this file cost in CPU, memory and GPU. See :mod:`stt.telemetry`.
     resources: ResourceUsage | None = None
+    #: Canonical identity of the exact prepared PCM waveform seen by the model.
+    audio_id: str | None = None
+    #: Original user- or dataset-supplied path, before any preparation.
+    source_path: str | None = None
+    #: SHA-256 of the source file's bytes, used for conversion-cache invalidation.
+    source_sha256: str | None = None
+    #: Stable key used to join this result to its reference transcript.
+    reference_id: str | None = None
+    #: Whether this record is complete enough to support publishable evidence.
+    #:
+    #: The conservative default is deliberate: JSONL written before provenance
+    #: fields existed remains readable, but is never silently promoted to trusted.
+    trusted: bool = False
+    trust_issues: list[str] = field(default_factory=list)
+    #: Immutable model/runtime provenance. Legacy JSONL has no value here and
+    #: therefore remains readable but untrusted.
+    model_provenance: dict[str, Any] | None = None
+
+    def __post_init__(self) -> None:
+        """Keep malformed serialized trust fields readable but never trusted."""
+        trust_issues, malformed_issues = _normalize_trust_issues(self.trust_issues)
+        if malformed_issues:
+            trust_issues.append("trust_issues field must be a list of strings")
+
+        trusted = self.trusted
+        if malformed_issues or not isinstance(trusted, bool):
+            trusted = False
+        if not isinstance(self.trusted, bool):
+            trust_issues.append("trusted field must be a JSON boolean")
+
+        self.trusted = trusted
+        self.trust_issues = list(dict.fromkeys(trust_issues))
 
     @property
     def rtf(self) -> float | None:
@@ -73,7 +125,9 @@ class TranscriptionResult:
 
         Lower is faster; 1.0 means transcription takes as long as the clip.
         """
-        if not self.elapsed_s or not self.audio_duration_s:
+        if self.elapsed_s is None or self.audio_duration_s is None:
+            return None
+        if self.elapsed_s < 0 or self.audio_duration_s <= 0:
             return None
         return self.elapsed_s / self.audio_duration_s
 
@@ -115,6 +169,21 @@ def read_jsonl(path: Path) -> list[TranscriptionResult]:
     loadable as the schema grows.
     """
     results: list[TranscriptionResult] = []
+
+    def filtered(mapping: dict[str, Any], cls: type[Any], label: str) -> dict[str, Any]:
+        """Keep known constructor fields so newer writers remain readable."""
+        from dataclasses import fields
+
+        known = {item.name for item in fields(cls) if item.init}
+        unknown = sorted(set(mapping) - known)
+        if unknown:
+            warnings.warn(
+                f"Ignoring unknown {label} field(s): {', '.join(unknown)}",
+                UserWarning,
+                stacklevel=3,
+            )
+        return {key: value for key, value in mapping.items() if key in known}
+
     with path.open(encoding="utf-8") as f:
         for line in f:
             line = line.strip()
@@ -126,18 +195,27 @@ def read_jsonl(path: Path) -> list[TranscriptionResult]:
             usage = d.pop("resources", None)
             if usage is not None:
                 # `cpu_utilization` is derived on write; it is not a field.
-                usage = ResourceUsage(**{k: v for k, v in usage.items() if k != "cpu_utilization"})
+                usage.pop("cpu_utilization", None)
+                for name in ("cpu", "rss", "uss", "gpu_util", "gpu_mem"):
+                    series = usage.get(name)
+                    if series is not None:
+                        usage[name] = Series.from_dict(
+                            filtered(series, Series, f"resources.{name}")
+                        )
+                usage = ResourceUsage(**filtered(usage, ResourceUsage, "resources"))
+            parsed_segments = None
+            if segments:
+                parsed_segments = [
+                    Segment(**filtered(segment, Segment, "segments")) for segment in segments
+                ]
             results.append(
                 TranscriptionResult(
-                    **d,
-                    segments=[Segment(**s) for s in segments] if segments else None,
+                    **filtered(d, TranscriptionResult, "result"),
+                    segments=parsed_segments,
                     resources=usage,
                 )
             )
     return results
-
-
-# ------------------------------------------------------------------ subtitles
 
 
 def _timestamp(seconds: float, decimal: str = ",") -> str:

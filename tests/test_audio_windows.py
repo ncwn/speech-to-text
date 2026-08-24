@@ -5,7 +5,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from stt.audio import join_segments, windowed
+from stt.audio import find_audio, join_segments, windowed
 
 RATE = 16_000
 
@@ -65,3 +65,42 @@ def test_windows_that_decode_to_nothing_are_dropped():
 def test_joining_reproduces_the_flat_transcript():
     segments = windowed(_speech(20.0), RATE, 5.0, lambda _c: "ကမ္ဘာ")
     assert join_segments(segments) == " ".join(["ကမ္ဘာ"] * len(segments))
+
+
+# --- directory scanning ------------------------------------------------------
+
+
+def test_find_audio_reports_what_it_skipped(tmp_path):
+    """A short file count used to be the only clue that files were dropped."""
+    for name in ("a.wav", "b.mov", "c.aiff", "notes.txt", ".DS_Store"):
+        (tmp_path / name).touch()
+
+    files, skipped = find_audio([tmp_path])
+
+    assert sorted(p.name for p in files) == ["a.wav", "b.mov", "c.aiff"]
+    assert skipped == []
+
+
+def test_find_audio_flags_genuinely_unknown_extensions(tmp_path):
+    (tmp_path / "a.wav").touch()
+    (tmp_path / "recording.xyz").touch()
+
+    files, skipped = find_audio([tmp_path])
+
+    assert [p.name for p in files] == ["a.wav"]
+    assert [p.name for p in skipped] == ["recording.xyz"]
+
+
+def test_an_explicit_file_is_taken_whatever_its_extension(tmp_path):
+    odd = tmp_path / "recording.xyz"
+    odd.touch()
+
+    files, skipped = find_audio([odd])
+
+    assert files == [odd]
+    assert skipped == []
+
+
+def test_find_audio_still_raises_on_a_missing_path(tmp_path):
+    with pytest.raises(FileNotFoundError):
+        find_audio([tmp_path / "nope"])
