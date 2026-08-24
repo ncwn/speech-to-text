@@ -28,6 +28,6 @@ jobs:
         with:
           enable-cache: true
       - run: uv python install 3.12
-      - run: brew install ffmpeg
+      - run: brew install ffmpeg libsndfile
       - run: uv sync --dev --extra hf --extra omniasr
       - run: make check

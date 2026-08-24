@@ -9,6 +9,7 @@ from contextlib import contextmanager
 import numpy as np
 import pytest
 import soundfile as sf
+import typer
 from typer.testing import CliRunner
 
 import stt.cli as cli_mod
@@ -566,14 +567,8 @@ def test_align_text_serializes_the_same_alignment_metadata(monkeypatch, tmp_path
 
 
 def test_bench_rejects_partial_baseline_updates_before_loading_models():
-    result = runner.invoke(
-        app,
-        ["bench", "--update", "--only", "hf"],
-        terminal_width=240,
-    )
-
-    assert result.exit_code != 0
-    assert "--update cannot be combined with --only" in result.output
+    with pytest.raises(typer.BadParameter, match="--update cannot be combined with --only"):
+        cli_mod.bench(update=True, only=["hf"])
 
 
 def test_bench_rejects_smoke_protocol_for_baseline_update():
