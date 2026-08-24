@@ -19,7 +19,7 @@ The default gate runs:
 | Model | Device | Dtype | Batch sizes | Default clips |
 | --- | --- | --- | --- | ---: |
 | `omniASR_CTC_300M_v2` | `mps` | `float16` | 1, 8 | all 120 |
-| `omniASR_CTC_1B_v2` | `mps` | `float16` | 1, 8 | all 120 |
+| `omniASR_CTC_1B_v2` | `mps` | `float32` | 1, 8 | all 120 |
 
 Override the bounded run without editing the script:
 
@@ -27,6 +27,10 @@ Override the bounded run without editing the script:
 CTC_GATE_LIMIT=16 CTC_GATE_DEVICE=mps CTC_GATE_DTYPE=float16 \
   scripts/bench_ctc_product_gate.sh
 ```
+
+The 1B card's MPS/float16 arm is retained as a diagnostic failure: on this
+machine it returns empty transcripts, while its float32 arm is valid. The
+default gate therefore uses float16 for 300M and float32 for 1B.
 
 Artifacts land under `outputs/ctc-product-gate/` and are ignored. Each arm
 records CER, RTF, model provenance, GPU utilization, CPU time, and RSS.

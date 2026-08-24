@@ -12,7 +12,6 @@ reference="${root}/data/fleurs-test/references.tsv"
 output_dir="${root}/outputs/ctc-product-gate"
 limit="${CTC_GATE_LIMIT:-0}"
 device="${CTC_GATE_DEVICE:-mps}"
-dtype="${CTC_GATE_DTYPE:-float16}"
 
 if [[ ! -d "${audio_dir}" || ! -f "${reference}" ]]; then
     printf 'CTC gate needs data/fleurs-test/audio and data/fleurs-test/references.tsv\n' >&2
@@ -42,11 +41,15 @@ models=(
     omniASR_CTC_300M_v2
     omniASR_CTC_1B_v2
 )
+model_dtypes=(float16 float32)
 batches=(1 8)
 
-for model in "${models[@]}"; do
+for model_index in "${!models[@]}"; do
+    model="${models[model_index]}"
+    model_dtype="${model_dtypes[model_index]}"
+    effective_dtype="${CTC_GATE_DTYPE:-${model_dtype}}"
     for batch_size in "${batches[@]}"; do
-        stem="omniasr-torch--${model}-mps-${dtype}-batch${batch_size}"
+        stem="omniasr-torch--${model}-mps-${effective_dtype}-batch${batch_size}"
         result="${output_dir}/${stem}.jsonl"
         log="${output_dir}/logs/${stem}.log"
 
@@ -57,7 +60,7 @@ for model in "${models[@]}"; do
             --language mya_Mymr \
             --limit "${limit}" \
             --device "${device}" \
-            --dtype "${dtype}" \
+            --dtype "${effective_dtype}" \
             --batch-size "${batch_size}" \
             --output "${result}" \
             --no-show >"${log}" 2>&1
