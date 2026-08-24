@@ -1,7 +1,6 @@
 """Hugging Face ``transformers`` ASR runtime, accelerated with Metal (MPS).
 
-This is the GPU path for everything that is not omniASR. It covers four model
-families behind one interface:
+This adapter covers four model families behind one interface:
 
 ``whisper``    Burmese fine-tunes of Whisper, plus stock Whisper as a baseline.
 ``mms``        Meta MMS-1B with its per-language adapter (``mya``).
@@ -9,10 +8,7 @@ families behind one interface:
 ``seamless``   SeamlessM4T v2, which transcribes Burmese speech but cannot
                synthesise it — source-side only.
 
-Unlike fairseq2, ``transformers`` runs cleanly on MPS, so these models use the
-GPU on Apple Silicon. That does not make them *better* than omniASR: every
-Burmese Whisper fine-tune on the Hub was trained on a small read-speech corpus.
-See ``docs/model-survey.md`` for what the published numbers actually say.
+Transformers uses MPS by default on Apple Silicon.
 
 Licensing: MMS and SeamlessM4T weights are CC-BY-NC-4.0. Fine for evaluation,
 not for a commercial product.
@@ -57,7 +53,7 @@ MODELS: dict[str, HFModel] = {
         "whisper",
         6174,
         "my",
-        "Burmese fine-tune; card reports 54.9 WER on its own eval",
+        "Burmese Whisper fine-tune",
     ),
     "whisper-my-medium": HFModel(
         "chuuhtetnaing/whisper-medium-myanmar",
@@ -78,14 +74,14 @@ MODELS: dict[str, HFModel] = {
         "whisper",
         3087,
         "my",
-        "stock Whisper; Burmese is below OpenAI's published quality bar",
+        "stock Whisper baseline",
     ),
     "mms-1b-all": HFModel(
         "facebook/mms-1b-all",
         "mms",
         3869,
         "mya",
-        "CC-BY-NC; very fast; 37.9 WER on third-party medical data",
+        "CC-BY-NC; Burmese adapter",
     ),
     "seamless-m4t-v2": HFModel(
         "facebook/seamless-m4t-v2-large",
@@ -99,13 +95,12 @@ MODELS: dict[str, HFModel] = {
         "ctc",
         2423,
         None,
-        "monolingual Burmese CTC fine-tune; no published score",
+        "monolingual Burmese CTC fine-tune",
     ),
 }
 
-# Chosen on measured CER over FLEURS Burmese (see README), not on reputation:
-# Seamless beat every Whisper fine-tune by a factor of six. Note its weights
-# are CC-BY-NC-4.0 -- fine for evaluation, not for a commercial product.
+# Selected from historical local CER; see docs/findings.md. Its weights are
+# CC-BY-NC-4.0 and unsuitable for commercial use.
 DEFAULT_MODEL = "seamless-m4t-v2"
 
 
@@ -157,8 +152,7 @@ class TransformersASRBackend(ASRBackend):
             return self.device_arg
         if torch.cuda.is_available():
             return "cuda"
-        # Unlike fairseq2, transformers has a working MPS path for these
-        # architectures, so Metal is the sensible default on Apple Silicon.
+        # These architectures use MPS by default on Apple Silicon.
         if torch.backends.mps.is_available():
             return "mps"
         return "cpu"
@@ -178,18 +172,8 @@ class TransformersASRBackend(ASRBackend):
             if self.dtype_arg not in named:
                 raise ValueError(f"Unknown dtype {self.dtype_arg!r}. Choose from {sorted(named)}")
             return named[self.dtype_arg]
-        # float32 everywhere by default, and measurement backs this up rather
-        # than mere caution. On five FLEURS clips with SeamlessM4T v2 on Metal:
-        #
-        #   float32   RTF 0.16   CER 0.0420
-        #   float16   RTF 0.26   CER 0.0455   (4/5 transcripts differ)
-        #   bfloat16  RTF 0.26   CER 0.0420   (4/5 transcripts differ)
-        #
-        # Half precision is both slower *and* no more accurate here, so it buys
-        # nothing but GPU memory. That is the opposite of omniASR's LLM decoder,
-        # which is matmul-bound and gains from float16 — the best dtype is a
-        # property of the model as much as of the chip, so this backend does not
-        # share omniASR's probe.
+        # Historical local checks favored float32 for both speed and output
+        # stability; see docs/findings.md.
         return torch.float32
 
     def estimated_download_mb(self) -> int | None:

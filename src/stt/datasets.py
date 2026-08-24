@@ -1,8 +1,8 @@
 """Fetch public Burmese evaluation audio.
 
 FLEURS (``google/fleurs``, config ``my_mm``) is the default source: read speech
-with human transcripts, already in Unicode rather than Zawgyi, and small enough
-to iterate on. The dev split is used because it is the smallest.
+with human transcripts in Unicode. The dev split is the default for short
+iteration runs.
 
 Downloads land in ``data/fleurs/`` and are gitignored.
 """

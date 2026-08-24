@@ -107,7 +107,7 @@ def measure():
     so the caller can read it after the block::
 
         with measure() as usage:
-            text = backend.transcribe(path)
+            results = backend.transcribe([path])
         print(usage[0].cpu_utilization)
 
     Populated even when the block raises, so a failed decode still reports what

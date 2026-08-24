@@ -14,7 +14,7 @@ def _layout(*levels: tuple[str, int]) -> CoreLayout:
 
 
 def test_efficiency_cores_are_excluded_from_compute():
-    """An M2 Max is 8 performance + 4 efficiency; only the 8 are worth using."""
+    """Only non-efficiency levels count as compute cores."""
     layout = _layout(("Performance", 8), ("Efficiency", 4))
     assert layout.compute == 8
     assert layout.efficiency == 4
@@ -22,8 +22,7 @@ def test_efficiency_cores_are_excluded_from_compute():
 
 
 def test_a_chip_without_efficiency_cores_uses_all_of_them():
-    """An M5 Pro pairs super cores with performance cores and has no efficiency
-    tier. Taking only the fastest level would idle two thirds of the CPU."""
+    """All named levels count when none is an efficiency tier."""
     layout = _layout(("Super", 6), ("Performance", 12))
     assert layout.compute == 18
     assert layout.efficiency == 0
@@ -58,7 +57,7 @@ def test_real_layout_is_consistent():
     assert layout.compute + layout.efficiency == layout.total
 
 
-@pytest.mark.skipif(sys.platform != "darwin", reason="Apple Silicon only")
+@pytest.mark.skipif(sys.platform != "darwin", reason="macOS only")
 def test_chip_name_is_reported_on_macos():
     assert "Apple" in chip_name() or chip_name() == "unknown"
 
@@ -74,7 +73,7 @@ def test_describe_reports_what_a_benchmark_needs():
 
 
 def test_cpu_never_gets_half_precision():
-    """PyTorch emulates half precision on CPU: 4.1x slower for identical text."""
+    """The hardware probe uses float32 for CPU inference."""
     pytest.importorskip("torch")
     from stt.hardware import fastest_dtype
 
@@ -82,8 +81,7 @@ def test_cpu_never_gets_half_precision():
 
 
 def test_gpu_dtype_choice_is_between_the_two_half_formats():
-    """float32 is timed as a control but must never be selected: holding a 7B
-    card's weights at float32 would want ~28 GB on the GPU."""
+    """A working MPS probe selects one of the supported half formats."""
     torch = pytest.importorskip("torch")
     if not torch.backends.mps.is_available():
         pytest.skip("no Metal device")

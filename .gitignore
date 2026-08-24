@@ -17,9 +17,8 @@ models/
 # Audio and transcripts
 data/audio/**
 !data/audio/.gitkeep
-# Hand-corrected reference transcripts ARE tracked -- they are the only
-# ground truth we have for audio the models cannot have trained on, and
-# unlike the FLEURS sets they cannot be re-fetched.
+# Hand-corrected reference transcripts are tracked because they cannot be
+# re-fetched; the corresponding third-party audio remains untracked.
 !data/reference/**
 data/fleurs*/
 # Resampled 16 kHz mono copies produced by stt.audio, and ad-hoc slices
@@ -31,7 +30,7 @@ outputs/**
 # Third-party sources built from scratch
 vendor/
 
-# Secrets (ElevenLabs / Google Cloud keys, for later backends)
+# Credentials reserved for unimplemented cloud backends
 .env
 *.json.key
 service-account*.json

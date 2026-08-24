@@ -1,7 +1,8 @@
 # Evaluating Burmese ASR
 
 Three properties of written Burmese will silently corrupt an accuracy number if
-the harness ignores them. All three are handled in `src/stt/burmese.py`.
+the harness ignores them. Text normalisation and encoding detection live in
+`src/stt/burmese.py`; `score_results()` applies the encoding guard.
 
 ## 1. No word delimiters — use CER, not WER
 
@@ -37,9 +38,9 @@ uv run stt check-encoding data/fleurs/references.tsv
 uv run stt check-encoding "မြန်မာစာ"
 ```
 
-FLEURS `my_mm` references are Unicode, and both omniASR runtimes emit Unicode,
-so in practice this guard only fires on external data — legacy corpora, older
-websites, and text from systems still using Zawgyi fonts.
+FLEURS `my_mm` references are Unicode. The guard applies to every scored
+hypothesis and refuses Unicode/Zawgyi mismatches, including external data from
+legacy corpora, older websites, or systems still using Zawgyi fonts.
 
 Converting Zawgyi to Unicode needs PyICU, which is optional because it requires
 a native ICU build:
@@ -73,27 +74,21 @@ By default, both reference and hypothesis go through:
 Override with `--keep-whitespace` and `--keep-punctuation` on `stt eval` when
 you want to measure those dimensions rather than normalise them away.
 
-## Reference file format
+## Reference files
 
-A two-column TSV, header optional:
-
-```
-audio_id	transcript
-10406743972683477081	ငါ့အတွက်တော့ ဒါက လုံးဝအဓိပ္ပာယ်မရှိဘူး
-```
-
-The key is matched against the audio file's stem, so `foo`, `foo.wav`, and
-`data/x/foo.wav` all resolve to the same entry. Files converted to 16 kHz mono
-pick up a `.16k` suffix, which is stripped before lookup.
+The authoritative TSV layout, `audio_id` contract, converted-file naming, and
+held-out audio workflow are in
+[`data/reference/README.md`](../data/reference/README.md). Keep that contract
+in sync with the transcription JSONL rather than duplicating it here.
 
 ## Getting reference data
 
-`stt fetch-fleurs` pulls the Burmese split of
+`uv run stt fetch-fleurs` pulls the Burmese split of
 [FLEURS](https://huggingface.co/datasets/google/fleurs) — read speech with human
 transcripts, already in Unicode. The dev split is used by default because it is
-the smallest.
+suited to quick iteration.
 
 FLEURS is read speech from a narrow domain. A model that scores well there can
 still struggle with conversational Burmese, regional accents, or code-switching
-with English. Record your own clips into `data/audio/` for anything you actually
-care about, and write references in the TSV format above.
+with English. For custom audio, pass the file path explicitly to `stt transcribe`
+and add its recorded stem and transcript to the reference contract above.

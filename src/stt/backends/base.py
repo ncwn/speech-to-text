@@ -1,8 +1,7 @@
 """The interface every ASR backend implements.
 
-Adding a new engine (Dolphin, ElevenLabs Scribe v2, Google Chirp 3) means
-writing one module in this package that subclasses :class:`ASRBackend` and
-calls :func:`stt.registry.register`. Nothing else in the codebase changes.
+Adding an engine means writing a module that subclasses :class:`ASRBackend`,
+registering it, and importing that module from :mod:`stt.backends`.
 
 Backends must not import heavy or optional dependencies at module scope —
 do it inside ``load()`` or ``is_available()`` so that ``stt backends`` keeps

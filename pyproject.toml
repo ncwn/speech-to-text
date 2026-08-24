@@ -19,7 +19,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# Meta's reference PyTorch/fairseq2 runtime. CPU-only on Apple Silicon.
+# Meta's reference PyTorch/fairseq2 runtime; device selection happens at runtime.
 # fairseq2n 0.6 pins torch==2.8.0 exactly (it links against libtorch's C++ ABI).
 omniasr = [
     "omnilingual-asr==0.2.0",

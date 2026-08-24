@@ -25,7 +25,7 @@ AUDIO_SUFFIXES = {".wav", ".flac", ".mp3", ".m4a", ".ogg", ".opus", ".aac", ".mp
 
 
 def find_audio(paths: list[Path]) -> list[Path]:
-    """Expand a mix of files and directories into a sorted list of audio files."""
+    """Expand paths in input order, sorting files discovered within each directory."""
     found: list[Path] = []
     for p in paths:
         if p.is_dir():
@@ -104,8 +104,7 @@ def to_16k_mono(path: Path, cache_dir: Path) -> Path:
         )
 
     cache_dir.mkdir(parents=True, exist_ok=True)
-    # Include the parent directory name so same-named files in different folders
-    # do not collide in the flat cache.
+    # Include the parent name to reduce collisions in the flat cache.
     out = cache_dir / f"{path.parent.name}__{path.stem}.16k.wav"
     if out.exists():
         return out
@@ -209,8 +208,8 @@ def windowed(
     result instead of being thrown away, which is what makes subtitles and
     per-region confidence possible for those backends.
 
-    Windows shorter than ``min_s`` are skipped: a sub-200 ms tail carries no
-    intelligible speech and models tend to hallucinate a token for it.
+    Windows shorter than ``min_s`` are skipped because very short tails tend
+    to produce unstable tokens.
 
     ``decode`` is called once per window and returns that window's transcript.
     """

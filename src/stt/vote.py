@@ -1,22 +1,8 @@
-"""ROVER-style voting across several transcription runs.
+"""ROVER-style voting across transcription runs.
 
-Different ASR systems fail on different words. On the held-out 17-minute
-recording the best single model scores CER 0.0857, but an oracle that picked
-the better of the top two per 200-character span would score 0.0571 — a third
-of the remaining error is recoverable purely by choosing between hypotheses we
-already have.
-
-This implements the practical version of that: align every hypothesis to a
-pivot, then vote position by position. Measured effect, with the system set and
-weights chosen on FLEURS and verified on held-out audio:
-
-    FLEURS 120 test clips   0.1017 -> 0.0930   (-8.6 %)
-    held-out 16.8 min       0.0857 -> 0.0714   (-16.7 %)
-
-The pivot matters: voting can only correct characters the pivot proposed, so
-it should be the most accurate system available. Weaker systems still help by
-outvoting the pivot where it is wrong, but a pool of only weak systems does
-nothing — seamless+dolphin+mms scores exactly what seamless scores alone.
+Hypotheses are aligned to a pivot and voted position by position. The pivot
+should be the strongest input because voting can only correct characters that
+it proposed. Historical measurements live in ``docs/findings.md``.
 """
 
 from __future__ import annotations
@@ -28,9 +14,7 @@ import jiwer
 
 from stt.burmese import tidy_spacing
 
-#: Sensible default weights, ordered by measured CER on FLEURS Burmese. Anything
-#: not listed votes with weight 1.0. These are deliberately coarse — the ranking
-#: matters far more than the exact values.
+#: Coarse defaults from historical FLEURS ranking; unknown models use 1.0.
 DEFAULT_WEIGHTS: dict[str, float] = {
     "omniASR_LLM_Unlimited_7B_v2": 2.0,
     "seamless-m4t-v2": 1.9,
@@ -73,13 +57,8 @@ def rover(
     Ties resolve in the pivot's favour, so adding a system can never make the
     result worse than the pivot on a position where nothing outvotes it.
 
-    ``prepare`` runs on every hypothesis first, and it matters more than it
-    looks: SeamlessM4T emits a space per sub-word while omniASR emits none, so
-    on raw text the aligner spends its budget on spacing rather than on the
-    characters being voted. Measured on held-out audio — raw 0.0764,
-    :func:`~stt.burmese.tidy_spacing` 0.0718, full normalisation 0.0714. The
-    default is ``tidy_spacing`` because it captures nearly all of that while
-    keeping the ၊ and ။ delimiters that normalisation would throw away.
+    ``prepare`` normalizes model-specific spacing before alignment. The default
+    keeps Burmese delimiters that full scoring normalization would remove.
     """
     if pivot not in hypotheses:
         raise KeyError(f"pivot {pivot!r} is not one of {sorted(hypotheses)}")

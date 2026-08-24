@@ -1,22 +1,7 @@
-"""Spend the expensive model only where the cheap one is unsure.
+"""Spend the expensive model on coarse, low-confidence spans.
 
-The 7B is 82–90% of what a voted run costs, and most of the audio does not need
-it: on the FLEURS test set, escalating the least-confident 30% of clips captures
-**72.5%** of the 7B's advantage over Seamless for 30% of its compute. Routing
-the same share at random captures 30% by definition, so the ordering is what
-does the work — it is the error concentration measured by :mod:`stt.align`,
-cashed in.
-
-Two rules fall out of the measurements and both are enforced here.
-
-**Switch in coarse blocks.** Substituting one model's text into another's costs
-roughly 11 characters per seam, because their segment boundaries do not
-coincide. The same 30% of audio escalated to the same model scores 0.075 with
-3 seams or 0.162 with 139. Fragmentation, not the escalation itself, is what
-ruins a naive cascade.
-
-**Merge what is adjacent.** Neighbouring escalated blocks become one interval,
-so consecutive escalations cost one seam rather than two.
+Coarse blocks limit transcript seams, and adjacent selected blocks are merged.
+Historical measurements behind the defaults live in ``docs/findings.md``.
 """
 
 from __future__ import annotations
@@ -25,12 +10,10 @@ from dataclasses import dataclass
 
 from stt.results import Segment
 
-#: Blocks are this many base segments wide. Coarse on purpose: below roughly 8
-#: the seam tax overwhelms the benefit of routing more precisely.
+#: Coarse blocks reduce joins between independently segmented transcripts.
 DEFAULT_BLOCK = 16
 
-#: Share of audio duration handed to the expensive model. 0.3 is the knee of
-#: the measured curve — most of the accuracy, a third of the compute.
+#: Historical default share of audio handed to the expensive model.
 DEFAULT_ESCALATE = 0.3
 
 

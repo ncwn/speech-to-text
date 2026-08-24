@@ -11,15 +11,14 @@
 ## Risk
 
 - Behavioral or compatibility risk:
-- Model/license/provenance impact:
+- Model/license impact:
 - Rollback plan:
 
 ## Validation
 
 - [ ] `git diff --check`
 - [ ] `make check`
-- [ ] Focused tests listed below
-- [ ] Evidence/parity/real-weight checks run when applicable
+- [ ] Applicable real-model commands and results are listed below, or runtime/model changes are not applicable.
 
 Commands and results:
 
@@ -29,9 +28,7 @@ Commands and results:
 
 ## Checklist
 
-- [ ] Branch name follows `type/lowercase-kebab-case`
-- [ ] Commits use Conventional Commits
-- [ ] Tests cover changed behavior and failure paths
+- [ ] Changed behavior has focused test coverage where applicable
 - [ ] Documentation and model/license metadata are current
 - [ ] No weights, caches, secrets, or local outputs are committed
-- [ ] This PR will use a merge commit, not squash/rebase
+- [ ] This PR follows [`docs/GIT_WORKFLOW.md`](../docs/GIT_WORKFLOW.md)

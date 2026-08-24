@@ -72,7 +72,7 @@ class Score:
 
     @property
     def mean_rtf(self) -> float | None:
-        return None  # populated by the caller from TranscriptionResult timings
+        return None
 
 
 def load_references(path: Path) -> dict[str, str]:

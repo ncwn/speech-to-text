@@ -4,9 +4,7 @@ CrispASR is a whisper.cpp/ggml fork with an ``omniasr-llm`` backend. It picks
 the best available ggml backend at init (CUDA > Metal > Vulkan > CPU), so on a
 Mac this runs on the GPU with no configuration.
 
-The trade-off versus :mod:`stt.backends.omniasr_torch` is coverage: only the
-300M and 1B LLM cards have been converted to GGUF. There is no 3B or 7B. Use
-this backend to iterate quickly, then confirm on the 7B with the PyTorch one.
+The model table below defines the GGUF conversions exposed by this adapter.
 """
 
 from __future__ import annotations
@@ -36,9 +34,7 @@ class GgufModel:
     unlimited: bool
 
 
-#: Every omniASR checkpoint currently available as GGUF. Keys are what the user
-#: passes to ``-m``. Q4_K is the default quantisation; f16 variants are listed
-#: where they exist, for checking how much the quantisation costs on Burmese.
+#: GGUF checkpoints exposed by this adapter. Keys are accepted by ``-m``.
 MODELS: dict[str, GgufModel] = {
     "llm-unlimited-300m-v2": GgufModel(
         filename="omniasr-llm-unlimited-300m-v2-q4_k.gguf",
@@ -107,7 +103,7 @@ def _speech_confidence(no_speech_prob: float) -> float | None:
 @register
 class OmniASRGgufBackend(ASRBackend):
     name: ClassVar[str] = "omniasr-gguf"
-    description: ClassVar[str] = "Meta Omnilingual ASR via CrispASR/ggml (Metal GPU, 300M-1B only)"
+    description: ClassVar[str] = "Meta Omnilingual ASR via CrispASR/ggml (bundled 300M/1B cards)"
     install_hint: ClassVar[str] = "uv sync --extra gguf"
     accepts_language: ClassVar[bool] = True
     is_local: ClassVar[bool] = True
@@ -124,12 +120,9 @@ class OmniASRGgufBackend(ASRBackend):
         if model not in MODELS:
             raise ValueError(f"Unknown GGUF model {model!r}. Available: {', '.join(MODELS)}")
         self.spec = MODELS[model]
-        # Left to CrispASR unless asked for. Measured on this backend: 4, 8 and
-        # 12 threads all give RTF 0.182, because the work is on the GPU and the
-        # CPU sits at 0.05 cores. Picking a number here would be noise dressed
-        # up as tuning.
+        # Leave thread selection to CrispASR unless explicitly overridden.
         self.n_threads = n_threads
-        # 0 lets CrispASR choose its own chunking for long audio.
+        # Unlimited cards decode directly at 0; limited cards use chunked mode.
         self.chunk_seconds = chunk_seconds
         # ggml logs every Metal kernel compile to fd 1/2; off unless asked for.
         self.verbose = verbose
@@ -190,7 +183,7 @@ class OmniASRGgufBackend(ASRBackend):
 
     @staticmethod
     def _read_pcm(path: Path):
-        """Read a file as mono float32 at 16 kHz — the format ggml expects."""
+        """Read mono float32 PCM; callers provide normalized 16 kHz audio."""
         import numpy as np
         import soundfile as sf
 

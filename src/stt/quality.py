@@ -1,20 +1,7 @@
-"""Reference-free defect detection for ASR output.
+"""Detect repeated spans that CER alone does not describe.
 
-CER answers "how many characters are wrong". It does not answer "did the
-decoder get stuck", and the two come apart badly on long audio: a sentence
-emitted four times costs only a few percent of CER but tells you the model
-lost the plot, and everything downstream of it is suspect.
-
-Two failure modes matter for the models in this repo:
-
-* **Tight loops** — ``ဖြစ်တဲ့ဖြစ်တဲ့ဖြစ်တဲ့``, a handful of syllables cycling.
-  4-bit quantised decoders do this.
-* **Sentence loops** — a whole clause repeated verbatim at a distance. Full
-  precision models do this instead, and a short sliding window will not see it.
-
-:func:`find_loops` catches both by looking for long character n-grams that
-appear more often than they do in the reference (or, with no reference, more
-than once at all).
+:func:`find_loops` finds long character n-grams repeated more often than the
+reference, or more than once when no reference is available.
 """
 
 from __future__ import annotations
@@ -24,9 +11,7 @@ from dataclasses import dataclass
 
 from stt.burmese import normalize
 
-#: Long enough that a repeat is a decoder loop rather than a common turn of
-#: phrase. Burmese averages roughly four characters per syllable, so 30
-#: characters is on the order of a clause.
+#: Long enough to avoid reporting common short phrases as decoder loops.
 DEFAULT_K = 30
 
 

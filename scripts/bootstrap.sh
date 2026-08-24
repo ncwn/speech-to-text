@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # Set up the environment on macOS (Apple Silicon).
-# Verifies prerequisites, then installs both ASR runtimes.
+# Verifies prerequisites, then installs both omniASR runtimes.
 #
 # Usage: ./scripts/bootstrap.sh [--gguf-only | --torch-only]
 

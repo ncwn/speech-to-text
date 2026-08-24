@@ -5,13 +5,8 @@ Southeast Asian speech. Burmese is in its language table as ``my`` with region
 ``MM``, which makes it one of the few general-purpose multilingual recognisers
 that covers Burmese at all.
 
-Only the small (372M) and base (140M) checkpoints were released publicly; the
-medium and large rows in the paper are not downloadable. No Burmese-specific
-error rate has been published — the 25.2 WER quoted for ``small`` is averaged
-across all 40 languages, so treat it as a reason to test, not a prediction.
-
-Language table:
-https://github.com/DataoceanAI/Dolphin/blob/main/languages.md
+This adapter exposes the public base and small checkpoints. Upstream language
+coverage is linked from ``docs/models.md``.
 """
 
 from __future__ import annotations
@@ -66,11 +61,8 @@ def cache_dir(size: str) -> Path:
 def _demote_float64(module: Any) -> list[str]:
     """Cast a model's float64 buffers to float32, in place.
 
-    Metal does not implement float64 at all, so a single such tensor makes the
-    whole model unloadable. In Dolphin's case there are exactly two, both tiny:
-    ``encoder.global_cmvn.mean`` and ``.std``, the 80-dimensional mean and
-    standard deviation used to normalise filterbank features. All 819 real
-    parameters are already float32.
+    Metal does not implement float64. Dolphin stores its CMVN mean and standard
+    deviation buffers in that dtype, so they must be demoted before an MPS move.
 
     Normalisation statistics do not need more than float32's seven significant
     digits, so this is a compatibility cast rather than a quantisation — but it
@@ -97,7 +89,7 @@ def _demote_float64(module: Any) -> list[str]:
 @register
 class DolphinBackend(ASRBackend):
     name: ClassVar[str] = "dolphin"
-    description: ClassVar[str] = "DataoceanAI Dolphin, 40 Eastern languages incl. Burmese"
+    description: ClassVar[str] = "DataoceanAI Dolphin with Burmese my/MM support"
     install_hint: ClassVar[str] = "uv sync --extra dolphin"
     accepts_language: ClassVar[bool] = True
     is_local: ClassVar[bool] = True
@@ -134,17 +126,8 @@ class DolphinBackend(ASRBackend):
             return self.device_arg
         if torch.cuda.is_available():
             return "cuda"
-        # Metal works here — see `_demote_float64` for what it took — but it is
-        # slower for this model, so it is not the default. Measured on three
-        # FLEURS clips, identical text either way:
-        #
-        #   cpu   RTF 0.18   1.89 cores
-        #   mps   RTF 0.25   0.27 cores, 5.0 GB GPU
-        #
-        # Dolphin is small and runs 20-second windows one at a time, so kernel
-        # launch overhead outweighs what the GPU wins back. `--device mps` is
-        # still worth having: it frees the CPU almost entirely, which is what
-        # matters when something else needs those cores.
+        # Historical local checks favored CPU for this windowed model. MPS
+        # remains available when freeing CPU capacity matters.
         return "cpu"
 
     def estimated_download_mb(self) -> int | None:

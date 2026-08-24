@@ -1,12 +1,10 @@
 """Meta Omnilingual ASR via the official PyTorch/fairseq2 runtime.
 
-This is the reference implementation — every model card Meta published works
-here, including ``omniASR_LLM_Unlimited_7B_v2``, and it is the accuracy
-ground truth the faster backends are measured against.
+This adapter accepts upstream model card names, including
+``omniASR_LLM_Unlimited_7B_v2``.
 
-Apple Silicon note: there is no CUDA, and fairseq2 has no validated Metal path,
-so this runs on CPU. That is slow but correct. Use the ``omniasr-gguf`` backend
-when you want Metal acceleration and can accept a smaller model.
+Device ``auto`` selects CUDA, then MPS, then CPU. A failed MPS decode is
+retried on CPU for the rest of the run.
 """
 
 from __future__ import annotations
@@ -31,9 +29,7 @@ _DOWNLOAD_MB = {"300M": 6500, "1B": 9100, "3B": 17500, "7B": 31200}
 @register
 class OmniASRTorchBackend(ASRBackend):
     name: ClassVar[str] = "omniasr-torch"
-    description: ClassVar[str] = (
-        "Meta Omnilingual ASR, official PyTorch/fairseq2 runtime (CPU on macOS)"
-    )
+    description: ClassVar[str] = "Meta Omnilingual ASR, official PyTorch/fairseq2 runtime"
     install_hint: ClassVar[str] = "uv sync --extra omniasr"
     accepts_language: ClassVar[bool] = True
     is_local: ClassVar[bool] = True
@@ -71,11 +67,7 @@ class OmniASRTorchBackend(ASRBackend):
         if torch.cuda.is_available():
             return "cuda"
         if torch.backends.mps.is_available():
-            # Metal was measured, not assumed. On the 7B card, five FLEURS clips
-            # decoded to text identical to CPU, at RTF 0.70 against 8.85 for the
-            # same dtype on CPU and 2.14 for CPU's fastest dtype, using 13.9 GB
-            # against 22.3 GB. Faster and smaller with no change in output, so
-            # it is the default; `transcribe` falls back to CPU if it fails.
+            # MPS is the locally validated default; transcribe falls back to CPU.
             return "mps"
         return "cpu"
 
@@ -96,19 +88,12 @@ class OmniASRTorchBackend(ASRBackend):
             return named[self.dtype_arg]
 
         if device != "cpu":
-            # Which 16-bit format is fastest is a property of the GPU, not of
-            # the model: an M2 Max runs float16 at 12,306 GFLOP/s and bfloat16
-            # at 5,797, while later chips may invert that. Measured once per
-            # machine and cached rather than assumed.
+            # Probe the machine because the fastest 16-bit format varies by GPU.
             from stt.hardware import fastest_dtype
 
             return named[fastest_dtype(device)]
 
-        # On CPU, float32 is the fast path — PyTorch lacks native half-precision
-        # kernels there and emulates them. Measured on the 7B: bfloat16 on CPU
-        # runs at RTF 8.85 against float32's 2.14, a 4.1x penalty for identical
-        # text. So float32 unless the machine cannot hold it: the large cards
-        # need roughly 34 GB resident at float32, on top of the checkpoint read.
+        # CPU float32 is the fast path; use bfloat16 only when memory is tight.
         if not self._has_headroom_for_float32():
             return torch.bfloat16
         return torch.float32
@@ -193,11 +178,9 @@ class OmniASRTorchBackend(ASRBackend):
     def _transcribe_one(self, path: str, lang_arg: list[str] | None, batch_size: int) -> list[str]:
         """Decode one file, retrying on CPU if Metal fails.
 
-        Metal is the measured-faster default, but fairseq2 does not test it and
-        an unimplemented kernel would otherwise turn a slow run into a failed
-        one. Falling back costs speed; not falling back costs the transcript.
-        The switch is permanent for this instance, so a systematic failure does
-        not pay the Metal attempt on every remaining file.
+        An unsupported kernel would otherwise fail the run. The switch is
+        permanent for this instance so a systematic failure does not repeat the
+        MPS attempt for every remaining file.
         """
         assert self.pipeline is not None
         try:

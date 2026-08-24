@@ -1,120 +1,67 @@
-# The omniASR landscape on Apple Silicon
+# Models and runtimes
 
-Meta's [Omnilingual ASR](https://github.com/facebookresearch/omnilingual-asr)
-covers 1,672 languages. Burmese (`mya_Mymr`) is in the supported set with
-**321.1 hours** of training data and a published **CER of 4.4** on the 7B LLM
-model. Two neighbouring languages in the same script are also covered: Mon
-(`mnw_Mymr`) and Shan (`shn_Mymr`).
+This page is the current catalog for the backends implemented in this repo.
+Run `uv run stt models` for the accepted model IDs and download estimates; that
+command is the source of truth for the mutable lists.
 
-## Running the 7B on Apple Silicon
+- [Setup and cache troubleshooting](setup-macos.md)
+- [Historical measured findings](findings.md)
+- [External Burmese ASR survey](model-survey.md)
 
-**fairseq2's PyTorch MPS path works for the 7B LLM card**, which this repo
-previously stated was impossible. Measured on five FLEURS clips, same model,
-same audio:
+## Implemented backends
 
-| config | RTF | peak RSS | GPU | text |
-|---|---:|---:|---:|---|
-| CPU, bfloat16 | 8.85 | 22.3 GB | — | reference |
-| CPU, float32 | 2.14 | — | — | identical |
-| **Metal (MPS), bfloat16** | **0.70** | **13.9 GB** | 17.1 GB | identical |
-
-Corpus CER was 0.0280 in all three. Metal is **12.6× faster than CPU at the same
-dtype**, 3.0× faster than CPU's best dtype, and uses less memory — so
-`--device auto` now selects it, with an automatic fall back to CPU if a Metal
-kernel fails mid-run.
-
-Two things this table also settles:
-
-* **bfloat16 on CPU is a trap.** PyTorch has no native half-precision CPU
-  kernels and emulates them, costing 4.1× for identical output. On CPU, float32
-  is the fast path; bfloat16 is only for machines that cannot hold float32.
-* The published RTF 1.79 baseline for the 7B was a float32 CPU run.
-
-The other two runtimes still have the gaps described below, so they remain the
-reason to reach for `omniasr-gguf` when iterating:
-
-| Runtime | GPU | Variants ported | API |
+| Backend | Runtime | Apple Silicon default | Scope |
 |---|---|---|---|
-| Meta `omnilingual-asr` (PyTorch + fairseq2) | CUDA, **Metal (measured here)** | all | Python |
-| [soniqo/speech-swift](https://github.com/soniqo/speech-swift) (MLX + CoreML) | Metal / ANE | **CTC only**, 300M–7B | Swift |
-| [CrispASR](https://github.com/CrispStrobe/CrispASR) (ggml) | Metal | **LLM 300M/1B**, CTC 300M/1B | C++, Python, others |
+| `omniasr-torch` | Meta PyTorch + fairseq2 | MPS when available; CPU fallback | Upstream omniASR cards, including the 7B LLM |
+| `omniasr-gguf` | CrispASR/ggml | Metal when available | GGUF omniASR cards up to 1B; 300M Unlimited is the default |
+| `hf` | Hugging Face `transformers` | MPS when available; CPU fallback | Burmese Whisper fine-tunes, MMS-1B, SeamlessM4T v2, and w2v-BERT |
+| `dolphin` | DataoceanAI Dolphin + funasr | CPU by default; MPS is explicit | Public `base` and `small` checkpoints |
 
-- The MLX port's docs state the LLM decoder variant is "a separate follow-up
-  module" — it has not been built. Its CTC models also ignore the language
-  hint entirely, which matters when you specifically want Burmese decoding.
-- The GGUF ladder stops at 1B. No 3B or 7B LLM conversion exists.
+The PyTorch backend resolves `--device auto` as CUDA, then MPS, then CPU. If a
+Metal decode fails, it reloads on CPU for the rest of that run. The other
+backends keep their own runtime defaults because the fastest device is model
+dependent.
 
 ## Model families
 
-**CTC** — wav2vec2 encoder plus a linear CTC head. One forward pass, no decoder
-loop, so it is fast. It ignores the language hint and emits no punctuation.
+**CTC** uses an encoder and CTC head in one forward pass. It has no autoregressive
+decoder, so output behavior depends on the selected checkpoint rather than a
+language prompt.
 
-**LLM** — the same encoder feeding a LLaMA decoder. Autoregressive, slower,
-noticeably more accurate, accepts a language code, and produces punctuation.
-This is the family worth testing for Burmese.
+**LLM** uses an autoregressive decoder and accepts an omniASR language code.
+Punctuation is checkpoint output; the adapter does not synthesize it. See
+[findings](findings.md) for historical Burmese observations.
 
-**Unlimited** — LLM variants that decode arbitrarily long audio via a 15-second
-sliding-segment protocol. Non-Unlimited cards **reject audio over 40 seconds**.
-Accuracy is comparable, so prefer Unlimited unless you are reproducing a
-specific published number. Fine-tuning recipes do not support them.
+**Unlimited** cards are the long-audio option in the omniASR adapter. The adapter
+rejects non-Unlimited cards above 40 seconds; the exact upstream segmentation
+protocol is not part of this repo's public contract.
 
-## Available checkpoints
+## Defaults and device policy
 
-### `omniasr-torch` (PyTorch, CPU on this machine)
+The defaults are `omniASR_LLM_Unlimited_7B_v2` for `omniasr-torch`,
+`llm-unlimited-300m-v2` for `omniasr-gguf`, `seamless-m4t-v2` for `hf`, and
+`small` for `dolphin`. Use `uv run stt models` instead of copying a full model
+table into documentation.
 
-Downloads to `~/.cache/fairseq2/assets/`, fp32.
+For `omniasr-torch`, `--dtype auto` chooses the fastest measured 16-bit format
+on a GPU. On CPU it chooses float32 when the actual machine has enough RAM for
+the card and bfloat16 only when that headroom is unavailable. `hf` currently
+defaults to float32; GGUF precision is part of the selected model file.
 
-| Card | Download |
-|---|---|
-| `omniASR_LLM_Unlimited_300M_v2` | 6.5 GB |
-| `omniASR_LLM_Unlimited_1B_v2` | 9.1 GB |
-| `omniASR_LLM_Unlimited_3B_v2` | 17.5 GB |
-| `omniASR_LLM_Unlimited_7B_v2` | **31.2 GB** |
+`fairseq2n` requires the exact `torch==2.8.0` ABI pin. Do not upgrade torch
+independently; see [setup-macos.md](setup-macos.md) for installation details.
 
-Any card name from the upstream repo works — `omniASR_CTC_*`, the length-limited
-`omniASR_LLM_*_v2`, and the zero-shot `omniASR_LLM_7B_ZS` included.
+## Weights and licensing
 
-### `omniasr-gguf` (ggml, Metal GPU)
+Weights are downloaded outside the repository. Cache locations and recovery
+steps belong in [setup-macos.md](setup-macos.md), not in this catalog.
 
-Downloads to `~/.cache/crispasr/`. See `stt models` for the live list.
+The omniASR weights are Apache-2.0. MMS-1B and SeamlessM4T weights are
+CC-BY-NC-4.0. Every other checkpoint keeps the license stated by its upstream
+card; check that card before redistribution.
 
-| Name | Size | Notes |
-|---|---|---|
-| `llm-unlimited-300m-v2` | 1.0 GB | default; Q4_K, unlimited length |
-| `llm-unlimited-300m-v2-f16` | 3.1 GB | unquantised, for measuring quantisation loss |
-| `llm-1b` | 1.4 GB | Q4_K, chunked |
-| `ctc-1b-v2` | 658 MB | no language hint, no punctuation |
-| `ctc-300m-v2` | 194 MB | smallest |
+## Future backends
 
-## Memory and dtype
-
-fairseq2n pins `torch==2.8.0` exactly because it links against libtorch's C++
-ABI. Upgrading torch alone produces symbol errors.
-
-On CPU, **float32 is the fast path** — PyTorch has no native half-precision CPU
-kernels and emulates them, which upstream users measured as 2–3× slower than
-fp32. But fp32 for the 7B needs roughly 34 GB resident on top of reading a
-31 GB checkpoint, so `--dtype auto` selects bfloat16 for the 3B and 7B cards
-and float32 below that. Override with `--dtype float32` if you have the memory
-headroom and want the speed.
-
-## Where the weights live
-
-Neither cache is inside this repo, and both are gitignored regardless:
-
-```
-~/.cache/fairseq2/assets/     PyTorch checkpoints (up to 31 GB each)
-~/.cache/crispasr/            GGUF checkpoints (~1 GB each)
-```
-
-## Planned backends
-
-The `ASRBackend` interface is what the remaining engines you mentioned will
-implement:
-
-- **Dolphin** — local, Asian-language focused
-- **ElevenLabs Scribe v2** — cloud; needs an API key and sends audio off-machine
-- **Google Chirp 3** — cloud; same caveat
-
-Cloud backends should set `is_local = False` so `stt compare` can warn before
-uploading audio.
+ElevenLabs Scribe v2 and Google Chirp 3 are not implemented. A future remote
+backend must set `is_local = False`. `stt compare` currently does not turn that
+field into an upload warning, so it is metadata rather than a consent prompt.

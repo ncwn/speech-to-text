@@ -1,33 +1,7 @@
-"""What this Apple Silicon machine can actually do quickly.
+"""Detect hardware capabilities without hardcoding Apple chip generations.
 
-Two choices matter enough to get right, and both are hardware-dependent in ways
-that are easy to get wrong by assumption:
-
-**Which 16-bit format.** Apple's GPUs are built around float16. bfloat16 is
-accepted everywhere but is not equally accelerated: on an M2 Max a 4096²
-matmul runs at 11,391 GFLOP/s in float16 and 5,348 in bfloat16 — bfloat16 is
-2.1× *slower* than float16, and slower than float32. Whether any given
-generation accelerates bfloat16 is disputed and changes between chips, so this
-module measures the machine in front of it instead of consulting a table that
-will be wrong for the next one.
-
-**How many cores, for reporting only.** Apple splits the CPU into performance
-and efficiency cores, and macOS places threads across them itself. This module
-reports the split so a benchmark stays interpretable; it does not override
-anyone's thread count. Measurement is why: the GGUF backend runs at RTF 0.182
-on 4, 8 or 12 threads alike because the work is on the GPU, a torch matmul
-scales 1.09x from 1 thread to 12 because Accelerate threads itself through the
-AMX unit, and torch already derives its own default from the system. Forcing a
-number on top of that changed nothing measurable and could only be wrong on
-hardware we have not seen.
-
-The core split is not a constant, which is the other reason not to encode one:
-an M2 Max is 8 performance + 4 efficiency, while an M5 Pro has no efficiency
-cores at all — it pairs super cores with performance cores. macOS names each
-level (``hw.perflevel0.name``), so the names are read rather than the counts
-guessed at.
-
-Everything here is cached: the probe runs once per machine, not once per run.
+Core layout and RAM are read at runtime for reporting and memory decisions.
+Only the dtype benchmark is cached, keyed by chip, device, and torch version.
 """
 
 from __future__ import annotations
@@ -68,13 +42,7 @@ class CoreLayout:
 
     @property
     def compute(self) -> int:
-        """Cores that are not efficiency cores — reported, never imposed.
-
-        On an M2 Max this is 8 of 12. On an M5 Pro, whose levels are super and
-        performance with no efficiency tier, it is all of them. Read the names
-        rather than taking the fastest level, or an M5 Pro looks like a 6-core
-        machine.
-        """
+        """Cores not named efficiency cores, reported but never imposed."""
         n = sum(count for name, count in self.levels if EFFICIENCY not in name.lower())
         return n or self.total
 
@@ -115,22 +83,14 @@ def chip_name() -> str:
 
 
 def compute_threads() -> int:
-    """How many non-efficiency cores this machine has.
-
-    Informational. Nothing in this repo sets a thread count from it: macOS
-    schedules across the levels itself, torch already derives its default from
-    the system, and the measurements above found no workload here that responds
-    to the number anyway.
-    """
+    """How many non-efficiency cores this machine reports."""
     return core_layout().compute
 
 
 # ------------------------------------------------------------- dtype probing
 
-#: The choice that actually matters. Weights are held in 16 bits on the GPU for
-#: memory reasons regardless — a 7B card at float32 would want ~28 GB — so the
-#: open question is only *which* 16-bit format this chip runs faster. float32 is
-#: timed too, as a control: a 16-bit format losing to it means it is emulated.
+#: Half formats considered for memory-bounded GPU inference. float32 is timed as
+#: a control and used as a fallback when neither half format works.
 _HALF_DTYPES = ("float16", "bfloat16")
 _DTYPES = (*_HALF_DTYPES, "float32")
 
@@ -184,20 +144,15 @@ def _save_cache(data: dict[str, Any]) -> None:
 def fastest_dtype(device: str, refresh: bool = False) -> str:
     """Name of the fastest working dtype on ``device``, measured once and cached.
 
-    Chooses between float16 and bfloat16 only. float32 is timed as a control but
-    never selected: 16-bit is a memory decision already made, and on this class
-    of model float32 weights do not fit comfortably on the GPU.
-
-    Measured rather than looked up because the answer genuinely differs across
-    Apple generations and the public accounts of which chips accelerate bfloat16
-    disagree with each other. The cache key includes the torch version, since a
-    kernel that is slow today may not be after an upgrade.
+    Prefers the fastest supported half format and falls back to float32. The
+    cache key includes the torch version because kernel performance can change
+    with the runtime.
     """
     import torch
 
     if device == "cpu":
-        # PyTorch has no native half-precision CPU kernels and emulates them:
-        # measured at 4.1x slower than float32 on the 7B, for identical text.
+        # CPU inference uses float32; half precision is handled as a separate
+        # memory decision by the backend.
         return "float32"
 
     key = f"{chip_name()}|{device}|torch{torch.__version__}"

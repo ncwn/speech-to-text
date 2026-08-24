@@ -1,8 +1,7 @@
 """Common result types shared by every backend, plus output writers.
 
-Every backend returns ``TranscriptionResult`` objects so that the CLI, the
-evaluation harness, and any future backend (Dolphin, ElevenLabs Scribe v2,
-Google Chirp 3) all speak the same shape.
+Every backend returns ``TranscriptionResult`` objects so that the CLI,
+evaluation harness, and output writers all speak the same shape.
 
 A result carries the whole transcript as ``text`` and, where the backend can
 supply it, a list of :class:`Segment` locating each piece of that transcript in
@@ -61,8 +60,7 @@ class TranscriptionResult:
     audio_duration_s: float | None = None
     error: str | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
-    #: Timed breakdown of ``text``, when the backend can provide one. ``None``
-    #: means "not available", which is different from "the audio was silent".
+    #: Timed breakdown of ``text``; ``None`` means no timings are available.
     segments: list[Segment] | None = None
     #: What this file cost in CPU, memory and GPU. See :mod:`stt.telemetry`.
     resources: ResourceUsage | None = None

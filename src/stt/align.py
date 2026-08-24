@@ -11,9 +11,8 @@ output lattice that spells exactly that transcript; where that path places each
 character is where the character was spoken, and how much probability mass sits
 on it is how well the audio supports it.
 
-MMS-1B is the natural aligner here. It is already a dependency, its Burmese
-adapter is **character-level** (75 Myanmar characters), and it runs at RTF 0.04
-— so timing a 7B transcript costs about 2.5% on top of producing it.
+MMS-1B provides a character-level Burmese adapter, which avoids a pronunciation
+lexicon for a script written without word delimiters.
 
 The alignment is over characters, not words, because Burmese is written without
 word delimiters. See :mod:`stt.burmese`.
@@ -136,9 +135,8 @@ def build_targets(text: str, vocab: dict[str, int]) -> tuple[list[int], list[int
     aligner cannot represent still keep their place in the output.
 
     MMS's Burmese vocabulary is lowercase, and its word-delimiter token stands
-    in for the space. Anything left over — measured at 0.15% on a real Burmese
-    transcript, all of it uppercase Latin — is dropped: it cannot be aligned,
-    but neighbouring characters still bracket it in time.
+    in for the space. Unrepresentable characters are skipped while neighbouring
+    aligned characters retain their source positions.
     """
     import unicodedata
 
@@ -171,25 +169,13 @@ def build_targets(text: str, vocab: dict[str, int]) -> tuple[list[int], list[int
 def _forced_align(
     log_probs: torch.Tensor, targets: torch.Tensor, blank: int
 ) -> tuple[torch.Tensor, torch.Tensor]:
-    """Constrain the CTC lattice to the one path spelling ``targets``.
-
-    The deprecation warning torchaudio 2.8 emits here is stale. ``forced_align``
-    was slated for deletion in 2.9 as part of the move to a Python-only
-    TorchAudio, but the C++-backed operators were reprieved: pytorch/audio#3902
-    records that ``forced_align``, ``lfilter``, ``RNNTLoss``, ``CUCTC`` and
-    ``overdrive`` were preserved in 2.10 by porting them to PyTorch's stable ABI.
-    The warning text shipped in 2.8 predates that reversal.
-
-    So there is nothing to migrate to. It stays isolated in its own function
-    anyway, because that is cheap and this is the only third-party call in the
-    alignment path.
-    """
+    """Constrain the CTC lattice to the path spelling ``targets``."""
     import warnings
 
     import torchaudio.functional as AF
 
     with warnings.catch_warnings():
-        # Suppressed because it is inaccurate, not merely inconvenient.
+        # Keep the version-specific warning isolated at this adapter boundary.
         warnings.filterwarnings("ignore", message=".*forced_align has been deprecated.*")
         return AF.forced_align(log_probs, targets, blank=blank)
 
@@ -348,9 +334,8 @@ def group_segments(
             or at_limit
         )
         if boundary:
-            # A model that emits no punctuation (omniASR emits none at all)
-            # hits the length limit instead, and cutting blindly there lands
-            # mid-syllable. Retreat to the best nearby seam.
+            # Text without punctuation hits the length limit; retreat to a
+            # nearby cut that does not split a syllable.
             cut = i if not at_limit else _best_break(chars, start_i, i)
             flush(cut + 1)
             start_i = cut + 1

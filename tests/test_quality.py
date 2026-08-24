@@ -31,7 +31,7 @@ def test_overlapping_ngrams_from_one_loop_collapse_to_one_site():
 
 
 def test_a_tight_syllable_loop_is_found():
-    """The 4-bit quantised decoder's signature failure."""
+    """A short repeated syllable sequence is still detectable."""
     assert find_loops("ဖြစ်တဲ့" * 20)
 
 

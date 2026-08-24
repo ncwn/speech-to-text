@@ -1,9 +1,8 @@
 """Silencing chatty native runtimes.
 
-ggml logs every Metal kernel it compiles, straight to fd 1/2 from C. Python's
-``contextlib.redirect_stdout`` cannot see that, so we swap the file descriptors
-themselves. Captured output is kept so it can be replayed when something fails —
-suppressing logs must never mean losing the traceback that explains a crash.
+Some native runtimes write directly to file descriptors 1 and 2, beyond
+``contextlib.redirect_stdout``. Swap the descriptors while retaining captured
+output so callers can surface the native log when a load or decode fails.
 """
 
 from __future__ import annotations

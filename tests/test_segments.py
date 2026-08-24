@@ -39,7 +39,7 @@ def test_segments_survive_a_jsonl_round_trip(tmp_path):
 
 
 def test_old_results_without_segments_still_load(tmp_path):
-    """The committed baseline JSONL predates segments and must keep working."""
+    """Legacy JSONL without segment fields must keep working."""
     path = tmp_path / "old.jsonl"
     path.write_text(
         json.dumps(
@@ -66,13 +66,11 @@ def test_old_results_without_segments_still_load(tmp_path):
     assert back.rtf == 0.5
 
 
-def test_no_segments_is_distinct_from_empty_segments(tmp_path):
-    """`None` means "the backend cannot tell us"; `[]` means "nothing to say"."""
+def test_absent_and_empty_segments_are_both_falsy(tmp_path):
     path = tmp_path / "r.jsonl"
     write_jsonl([_result(segments=None), _result(segments=[])], path)
     back = read_jsonl(path)
     assert back[0].segments is None
-    # An empty list survives as a falsy value; callers only branch on truthiness.
     assert not back[1].segments
 
 

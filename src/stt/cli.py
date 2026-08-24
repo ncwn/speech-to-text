@@ -102,7 +102,7 @@ def models(
         console.print(table)
 
     if backend in (None, "omniasr-torch"):
-        table = Table(title="omniasr-torch  (CPU)")
+        table = Table(title="omniasr-torch  (auto device)")
         table.add_column("Model card", style="bold")
         table.add_column("Download", justify="right")
         table.add_column("Long audio")
@@ -118,10 +118,7 @@ def models(
             label = f"{card}  [dim](default)[/dim]" if card == TORCH_DEFAULT else card
             table.add_row(label, size, limit)
         console.print(table)
-        console.print(
-            "[dim]Any card from facebookresearch/omnilingual-asr works; "
-            "these are the common ones.[/dim]"
-        )
+        console.print("[dim]Upstream card names are accepted; these are the common ones.[/dim]")
 
     if backend in (None, "hf"):
         from stt.backends.transformers_asr import DEFAULT_MODEL as HF_DEFAULT
@@ -150,7 +147,7 @@ def models(
             label = f"{key}  [dim](default)[/dim]" if key == DOLPHIN_DEFAULT else key
             table.add_row(label, f"{spec.params_m}M", f"{spec.approx_mb} MB")
         console.print(table)
-        console.print("[dim]Only base and small were publicly released.[/dim]")
+        console.print("[dim]This adapter exposes the base and small cards.[/dim]")
 
 
 @app.command()
@@ -161,8 +158,7 @@ def hardware(
 ) -> None:
     """Show what this machine is, and which precision it runs fastest.
 
-    Everything shown is read or measured from the machine — nothing about the
-    chip is written down in this repo.
+    Capabilities are read from the machine; dtype probe results are cached.
     """
     from stt.hardware import describe, fastest_dtype
 
@@ -195,10 +191,7 @@ def hardware(
         table.add_row("torch", "[dim]not installed[/dim]")
 
     console.print(table)
-    console.print(
-        "[dim]Thread counts are left to macOS and to each runtime: measured on this "
-        "stack, 4, 8 and 12 threads all give the same RTF.[/dim]"
-    )
+    console.print("[dim]Thread counts are left to the operating system and runtime.[/dim]")
 
 
 # ------------------------------------------------------------------- data
@@ -268,8 +261,8 @@ def _subtitle_paths(out: Path, results: list[TranscriptionResult], srt: bool, vt
 def _add_alignment(results: list[TranscriptionResult], device: str = "cpu") -> None:
     """Fill in timings for results whose backend could not supply any.
 
-    Only touches results that need it, so a backend with native timestamps
-    keeps its own — they are measured, whereas these are inferred.
+    Existing native or chunk timings remain unchanged; only missing timings are
+    inferred.
     """
     from stt.align import align, load_aligner
 
@@ -374,10 +367,11 @@ def transcribe(
     limit: Annotated[int, typer.Option(help="Only the first N files; 0 for all")] = 0,
     output: Annotated[Path | None, typer.Option("--output", "-o", help="JSONL path")] = None,
     device: Annotated[
-        str | None, typer.Option(help="omniasr-torch only: auto, cpu, mps, cuda")
+        str | None, typer.Option(help="Backend device override: auto, cpu, mps, cuda")
     ] = None,
     dtype: Annotated[
-        str | None, typer.Option(help="omniasr-torch only: auto, float32, bfloat16")
+        str | None,
+        typer.Option(help="omniasr-torch only: auto, float32, float16, bfloat16"),
     ] = None,
     threads: Annotated[
         int | None, typer.Option(help="omniasr-gguf only: ggml thread count")
@@ -582,15 +576,13 @@ def vote(
     output: Annotated[Path, typer.Option("--output", "-o", help="Where to write the result")],
     weight: Annotated[
         list[str] | None,
-        typer.Option("--weight", "-w", help="model=value, repeatable. Default: measured ranking"),
+        typer.Option("--weight", "-w", help="model=value, repeatable. Default: historical ranking"),
     ] = None,
 ) -> None:
     """Combine several transcription runs by weighted per-character vote.
 
-    Different systems fail on different words, so voting recovers accuracy that
-    no single model reaches. Measured: FLEURS 0.1017 -> 0.0930, held-out audio
-    0.0857 -> 0.0714. The first run given is the pivot and should be your best
-    model — voting can only correct characters the pivot proposed.
+    The first run is the pivot and should be the strongest input because voting
+    can only correct characters the pivot proposed.
     """
     if len(runs) < 2:
         raise typer.BadParameter("need at least two runs to vote between")
