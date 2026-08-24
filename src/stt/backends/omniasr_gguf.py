@@ -193,6 +193,18 @@ class OmniASRGgufBackend(ASRBackend):
             raise RuntimeError("CrispASR did not provide a cache directory")
         return Path(directory) / self.spec.filename
 
+    def _hf_cache_path(self) -> Path:
+        from huggingface_hub import constants
+
+        repo = self.spec.url.removeprefix(f"{_HF}/").split("/resolve/", 1)[0]
+        return (
+            Path(constants.HF_HUB_CACHE)
+            / f"models--{repo.replace('/', '--')}"
+            / "snapshots"
+            / self.spec.revision
+            / self.spec.filename
+        )
+
     def _weights_valid(self, path: Path) -> bool:
         try:
             return path.is_file() and _sha256(path) == self.spec.sha256
@@ -201,7 +213,9 @@ class OmniASRGgufBackend(ASRBackend):
 
     def weights_cached(self) -> bool | None:
         try:
-            return self._weights_valid(self._cache_path())
+            return any(
+                self._weights_valid(path) for path in (self._cache_path(), self._hf_cache_path())
+            )
         except RuntimeError:
             return False
 
@@ -213,8 +227,9 @@ class OmniASRGgufBackend(ASRBackend):
         from crispasr import cache_ensure_file
 
         cached = self._cache_path()
-        if self._weights_valid(cached):
-            return cached
+        for candidate in (cached, self._hf_cache_path()):
+            if self._weights_valid(candidate):
+                return candidate
         # The model is authoritative; a stale .src must not trigger replacement.
         if cached.exists() or cached.is_symlink():
             raise RuntimeError(

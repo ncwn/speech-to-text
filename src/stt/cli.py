@@ -12,6 +12,7 @@ stt compare AUDIO...             compare cached models or selected backends
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Annotated
 
@@ -49,6 +50,22 @@ DEFAULT_CACHE = Path("data/.converted")
 DEFAULT_OUTPUT_DIR = Path("outputs")
 
 
+def _configure_project_model_caches(root: Path | None = None) -> None:
+    root = root or Path(__file__).resolve().parents[2] / ".cache"
+    for variable, relative, alternatives in (
+        ("CRISPASR_CACHE_DIR", "crispasr", ()),
+        ("DOLPHIN_CACHE_DIR", "dolphin", ()),
+        ("FAIRSEQ2_CACHE_DIR", "fairseq2/assets", ("XDG_CACHE_HOME",)),
+        ("HF_HUB_CACHE", "huggingface/hub", ("HF_HOME", "XDG_CACHE_HOME")),
+    ):
+        path = root / relative
+        if path.is_dir() and not any(name in os.environ for name in (variable, *alternatives)):
+            os.environ[variable] = str(path)
+
+
+_configure_project_model_caches()
+
+
 def _fmt(value: float | None, spec: str = ".4f", dash: str = "—") -> str:
     if value is None or value != value:  # None or NaN
         return dash
@@ -56,6 +73,16 @@ def _fmt(value: float | None, spec: str = ".4f", dash: str = "—") -> str:
 
 
 # --------------------------------------------------------------------- info
+
+
+def _offline_status(cls, model: str) -> str:
+    try:
+        cached = cls(model).weights_cached()
+    except (ImportError, RuntimeError):
+        cached = None
+    if cached is None:
+        return "[yellow]unknown[/yellow]"
+    return "[green]yes[/green]" if cached else "[dim]no[/dim]"
 
 
 @app.command()
@@ -103,12 +130,14 @@ def models(
         table = Table(title="omniasr-gguf  (runtime-selected device)")
         table.add_column("Model", style="bold")
         table.add_column("Size", justify="right")
+        table.add_column("Offline")
         table.add_column("Long audio")
         for key, spec in GGUF_MODELS.items():
             label = f"{key}  [dim](default)[/dim]" if key == GGUF_DEFAULT else key
             table.add_row(
                 label,
                 f"{spec.approx_mb} MB",
+                _offline_status(known["omniasr-gguf"], key),
                 "unlimited" if spec.unlimited else "chunked",
             )
         console.print(table)
@@ -116,13 +145,15 @@ def models(
     if backend in (None, "omniasr-torch"):
         table = Table(title="omniasr-torch  (auto device)")
         table.add_column("Model card", style="bold")
-        table.add_column("Download", justify="right")
+        table.add_column("Size", justify="right")
+        table.add_column("Offline")
         table.add_column("Long audio")
         for card, spec in TORCH_MODELS.items():
             label = f"{card}  [dim](default)[/dim]" if card == TORCH_DEFAULT else card
             table.add_row(
                 label,
                 f"{spec.approx_mb} MB",
+                _offline_status(known["omniasr-torch"], card),
                 "unlimited" if spec.unlimited else "40 s max",
             )
         console.print(table)
@@ -133,12 +164,19 @@ def models(
 
         table = Table(title="hf  (auto device)")
         table.add_column("Model", style="bold")
-        table.add_column("Download", justify="right")
+        table.add_column("Size", justify="right")
+        table.add_column("Offline")
         table.add_column("Family")
         table.add_column("Notes")
         for key, spec in HF_MODELS.items():
             label = f"{key}  [dim](default)[/dim]" if key == HF_DEFAULT else key
-            table.add_row(label, f"{spec.approx_mb} MB", spec.family, spec.note)
+            table.add_row(
+                label,
+                f"{spec.approx_mb} MB",
+                _offline_status(known["hf"], key),
+                spec.family,
+                spec.note,
+            )
         console.print(table)
         console.print("[dim]MMS and SeamlessM4T weights are CC-BY-NC-4.0.[/dim]")
 
@@ -149,10 +187,16 @@ def models(
         table = Table(title="dolphin  (CPU default)")
         table.add_column("Model", style="bold")
         table.add_column("Params", justify="right")
-        table.add_column("Download", justify="right")
+        table.add_column("Size", justify="right")
+        table.add_column("Offline")
         for key, spec in DOLPHIN_MODELS.items():
             label = f"{key}  [dim](default)[/dim]" if key == DOLPHIN_DEFAULT else key
-            table.add_row(label, f"{spec.params_m}M", f"{spec.approx_mb} MB")
+            table.add_row(
+                label,
+                f"{spec.params_m}M",
+                f"{spec.approx_mb} MB",
+                _offline_status(known["dolphin"], key),
+            )
         console.print(table)
         console.print("[dim]This adapter exposes the base and small cards.[/dim]")
 

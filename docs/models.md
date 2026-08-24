@@ -6,7 +6,8 @@ estimates because those values can change with the code.
 
 ## List, download, and select
 
-Listing models does not download weights:
+Listing models does not download weights. The `Offline` column verifies whether
+each selectable model is complete in the active cache:
 
 ```bash
 uv run stt models
