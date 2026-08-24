@@ -1,8 +1,7 @@
 """The interface every ASR backend implements.
 
-Adding a new engine (Dolphin, ElevenLabs Scribe v2, Google Chirp 3) means
-writing one module in this package that subclasses :class:`ASRBackend` and
-calls :func:`stt.registry.register`. Nothing else in the codebase changes.
+Adding an engine means writing a module that subclasses :class:`ASRBackend`,
+registering it, and importing that module from :mod:`stt.backends`.
 
 Backends must not import heavy or optional dependencies at module scope —
 do it inside ``load()`` or ``is_available()`` so that ``stt backends`` keeps
@@ -30,11 +29,8 @@ class ASRBackend(ABC):
     #: How to install this backend, shown when it is unavailable.
     install_hint: ClassVar[str] = ""
 
-    #: Whether this backend accepts a language code such as ``mya_Mymr``.
-    accepts_language: ClassVar[bool] = True
-
-    #: Whether the engine runs locally (affects whether audio leaves the machine).
-    is_local: ClassVar[bool] = True
+    #: Constructor options accepted from ``stt transcribe``.
+    supported_options: ClassVar[frozenset[str]] = frozenset()
 
     def __init__(self, model: str, **options: Any) -> None:
         self.model = model
@@ -66,6 +62,10 @@ class ASRBackend(ABC):
         return None
 
     @abstractmethod
+    def download_weights(self) -> None:
+        """Download this model through its upstream cache without loading it."""
+
+    @abstractmethod
     def load(self) -> None:
         """Load weights / establish a session. Called once before transcribing."""
 
@@ -85,12 +85,3 @@ class ASRBackend(ABC):
     def unload(self) -> None:
         """Release weights. Default is a no-op; override when it matters."""
         self._loaded = False
-
-    def __enter__(self) -> ASRBackend:
-        if not self._loaded:
-            self.load()
-            self._loaded = True
-        return self
-
-    def __exit__(self, *exc: object) -> None:
-        self.unload()

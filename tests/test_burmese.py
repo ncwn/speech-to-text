@@ -94,7 +94,7 @@ def test_tidy_spacing_keeps_one_space_after_burmese_delimiters():
 
 
 def test_tidy_spacing_preserves_spaces_around_latin_and_digits():
-    """Only spaces with Burmese on both sides are artifacts."""
+    """Myanmar-to-Myanmar spaces collapse; Latin and numeric spacing remains."""
     from stt.burmese import tidy_spacing
 
     assert tidy_spacing("အသက် 80 ကျော် COVID 19 ဖြစ် တယ်") == "အသက် 80 ကျော် COVID 19 ဖြစ်တယ်"

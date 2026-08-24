@@ -11,7 +11,7 @@ from stt.registry import all_backends, get_backend
 from stt.results import TranscriptionResult, read_jsonl, write_jsonl
 
 
-def test_both_backends_are_registered():
+def test_both_omniasr_backends_are_registered():
     names = set(all_backends())
     assert {"omniasr-torch", "omniasr-gguf"} <= names
 
@@ -42,11 +42,47 @@ def test_gguf_backend_rejects_unknown_model():
 def test_gguf_model_table_is_coherent():
     from stt.backends.omniasr_gguf import DEFAULT_MODEL, MODELS
 
+    expected = {
+        "llm-unlimited-300m-v2": (
+            "a68f5d040b483506c0966a1602050ee1550a0382",
+            "56879dd6c0411aa19b225440aac088f11bad9496f64a1c0aa0d293e1450d7203",
+            1075,
+        ),
+        "llm-unlimited-300m-v2-f16": (
+            "a68f5d040b483506c0966a1602050ee1550a0382",
+            "e6e2220532ec7f76d0bdb0896109b2ab3d14bd46d639123a6212a57a932b3d8b",
+            3264,
+        ),
+        "llm-300m-v2": (
+            "f77a5ccffff18e90f8e5605279103cec2b184b46",
+            "2039697e6d21d27a2394372c972de6f3439a0a74a3575876949130466d87f90c",
+            1068,
+        ),
+        "llm-1b": (
+            "7b433b6ab2b211c3cdde8591d8bb23642fe2742f",
+            "0181ce14efc1197222601c330035ccb7446119c4d8ffb0b0cdb526634c404fdf",
+            1442,
+        ),
+        "ctc-1b-v2": (
+            "317880194be65674e7b27efba10273be1afeb9f1",
+            "fcd75539c542f335877c04a83cbe6d9ccf31deae42ee72c655a8adefd6627036",
+            691,
+        ),
+        "ctc-300m-v2": (
+            "fc3e3765175be5aaf0c9e75ed25a7e8843ef04d5",
+            "cac0ae5eef46f146e47a1445e9fb8a4e894fac78c5b90e4d6318dc3734b34808",
+            204,
+        ),
+    }
     assert DEFAULT_MODEL in MODELS
     assert MODELS[DEFAULT_MODEL].unlimited, "default should handle long audio"
+    assert {
+        key: (spec.revision, spec.sha256, spec.approx_mb) for key, spec in MODELS.items()
+    } == expected
     for key, spec in MODELS.items():
         assert spec.url.endswith(spec.filename), f"{key}: url/filename mismatch"
-        assert spec.approx_mb > 0
+        assert f"/resolve/{spec.revision}/" in spec.url
+        assert "/resolve/main/" not in spec.url
 
 
 def test_torch_backend_identifies_unlimited_cards():
@@ -55,22 +91,31 @@ def test_torch_backend_identifies_unlimited_cards():
     assert not cls("omniASR_LLM_7B_v2").is_unlimited
 
 
-def test_torch_backend_parses_model_size():
-    cls = get_backend("omniasr-torch")
-    assert cls("omniASR_LLM_Unlimited_7B_v2")._model_size_tag() == "7B"
-    assert cls("omniASR_LLM_Unlimited_300M_v2")._model_size_tag() == "300M"
-
-
 def test_torch_backend_reports_download_size():
+    from stt.backends.omniasr_torch import MODELS
+
     cls = get_backend("omniasr-torch")
-    assert cls("omniASR_LLM_Unlimited_7B_v2").estimated_download_mb() == 31200
-    assert cls("some_unrecognised_card").estimated_download_mb() is None
+    expected = {
+        "omniASR_CTC_300M_v2": (1_304_065_508, 1304),
+        "omniASR_CTC_1B_v2": (3_902_956_068, 3903),
+        "omniASR_CTC_3B_v2": (12_325_920_624, 12326),
+        "omniASR_CTC_7B_v2": (26_023_732_143, 26024),
+        "omniASR_LLM_300M_v2": (6_526_183_880, 6526),
+        "omniASR_LLM_1B_v2": (9_118_733_852, 9119),
+        "omniASR_LLM_3B_v2": (17_522_679_843, 17523),
+        "omniASR_LLM_7B_v2": (31_220_488_063, 31220),
+        "omniASR_LLM_Unlimited_300M_v2": (6_526_216_648, 6526),
+        "omniASR_LLM_Unlimited_1B_v2": (9_118_766_620, 9119),
+        "omniASR_LLM_Unlimited_3B_v2": (17_522_712_611, 17523),
+        "omniASR_LLM_Unlimited_7B_v2": (31_220_520_831, 31221),
+    }
+    assert {name: (spec.size_bytes, spec.approx_mb) for name, spec in MODELS.items()} == expected
+    with pytest.raises(ValueError, match="Unknown omniASR model"):
+        cls("some_unrecognised_card")
 
 
 def test_cpu_prefers_float32_because_bfloat16_is_emulated_there():
-    """Measured on the 7B: bf16 on CPU is RTF 8.85 against fp32's 2.14, for
-    identical text. PyTorch has no native half kernels on CPU, so the only
-    reason to pick bf16 is not fitting in memory."""
+    """bfloat16 is the memory fallback, not the CPU fast path."""
     torch = pytest.importorskip("torch")
     cls = get_backend("omniasr-torch")
 
@@ -81,7 +126,7 @@ def test_cpu_prefers_float32_because_bfloat16_is_emulated_there():
 
 
 def test_a_large_card_falls_back_to_bfloat16_on_a_small_machine():
-    """fp32 for the big cards needs ~34 GB resident; bf16 is the fit-in-RAM path."""
+    """bfloat16 is selected when estimated float32 memory does not fit."""
     torch = pytest.importorskip("torch")
     cls = get_backend("omniasr-torch")
     large = cls("omniASR_LLM_Unlimited_7B_v2")
@@ -90,9 +135,7 @@ def test_a_large_card_falls_back_to_bfloat16_on_a_small_machine():
 
 
 def test_gpu_dtype_follows_the_measured_probe_not_a_constant():
-    """Which 16-bit format is fast is a property of the GPU. An M2 Max runs
-    float16 at 12,306 GFLOP/s and bfloat16 at 5,797; a later chip may invert
-    that, so the backend asks rather than hardcoding either one."""
+    """The backend asks the local probe instead of hardcoding a half dtype."""
     torch = pytest.importorskip("torch")
     if not torch.backends.mps.is_available():
         pytest.skip("no Metal device")
@@ -120,9 +163,7 @@ def test_unknown_dtype_is_rejected():
 
 
 def test_metal_is_auto_selected_when_available():
-    """Metal was measured on the 7B: identical text to CPU, RTF 0.70 against
-    8.85 at the same dtype, and 13.9 GB against 22.3 GB. Faster and smaller
-    with no change in output, so auto should take it."""
+    """Auto uses the first available accelerator, then CPU."""
     torch = pytest.importorskip("torch")
     cls = get_backend("omniasr-torch")
     resolved = cls("omniASR_LLM_Unlimited_7B_v2")._resolve_device()
@@ -197,7 +238,17 @@ def test_hf_backend_rejects_unknown_model():
 def test_hf_model_table_is_coherent():
     from stt.backends.transformers_asr import _CHUNKING, DEFAULT_MODEL, MODELS
 
+    expected_revisions = {
+        "whisper-my-large-v3": "c6d3e92a45b561cb5c00724625ca1904f830d887",
+        "whisper-my-medium": "6ddaae5665c80e0d3c322bd352656074b9851566",
+        "whisper-my-small": "f3de3c167914fec3c0974aad1189eda3fa77d8cd",
+        "whisper-large-v3": "06f233fe06e710322aca913c1bc4249a0d71fce1",
+        "mms-1b-all": "3d33597edbdaaba14a8e858e2c8caa76e3cec0cd",
+        "seamless-m4t-v2": "5f8cc790b19fc3f67a61c105133b20b34e3dcb76",
+        "w2v-bert-my": "3a0bb058936140acfe7c905171eefc78234e93be",
+    }
     assert DEFAULT_MODEL in MODELS
+    assert {key: spec.revision for key, spec in MODELS.items()} == expected_revisions
     for key, spec in MODELS.items():
         assert "/" in spec.repo, f"{key}: repo should be owner/name"
         assert spec.approx_mb > 0
@@ -214,18 +265,20 @@ def test_hf_language_codes_match_each_family():
     assert MODELS["w2v-bert-my"].lang is None  # monolingual, no code needed
 
 
-def test_hf_prefers_metal_over_cpu():
+def test_hf_prefers_an_available_accelerator():
     torch = pytest.importorskip("torch")
     cls = get_backend("hf")
     resolved = cls("whisper-my-small")._resolve_device()
-    if torch.backends.mps.is_available():
+    if torch.cuda.is_available():
+        assert resolved == "cuda"
+    elif torch.backends.mps.is_available():
         assert resolved == "mps"
     else:
-        assert resolved in {"cpu", "cuda"}
+        assert resolved == "cpu"
 
 
 def test_hf_defaults_to_float32():
-    """Half precision on MPS produces NaNs in some attention kernels."""
+    """The Transformers adapter keeps its validated float32 default."""
     torch = pytest.importorskip("torch")
     cls = get_backend("hf")
     assert cls("whisper-my-small")._resolve_dtype("mps") is torch.float32
@@ -246,7 +299,7 @@ def test_hf_rejects_non_burmese_language():
 def test_dolphin_backend_rejects_unknown_model():
     cls = get_backend("dolphin")
     with pytest.raises(ValueError, match="Unknown Dolphin model"):
-        cls("large")  # real in the paper, never publicly released
+        cls("large")
 
 
 def test_dolphin_model_table_is_coherent():
@@ -343,8 +396,7 @@ def test_split_on_quiet_still_splits_continuous_speech():
 
 
 def test_float64_buffers_are_demoted_for_metal():
-    """Metal implements no float64 at all, so one such buffer makes a model
-    unloadable. Dolphin has exactly two: the CMVN mean and standard deviation."""
+    """Every float64 buffer is demoted before an MPS model move."""
     torch = pytest.importorskip("torch")
     from stt.backends.dolphin import _demote_float64
 

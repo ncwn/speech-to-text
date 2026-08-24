@@ -1,120 +1,122 @@
-# The omniASR landscape on Apple Silicon
+# Models and runtimes
 
-Meta's [Omnilingual ASR](https://github.com/facebookresearch/omnilingual-asr)
-covers 1,672 languages. Burmese (`mya_Mymr`) is in the supported set with
-**321.1 hours** of training data and a published **CER of 4.4** on the 7B LLM
-model. Two neighbouring languages in the same script are also covered: Mon
-(`mnw_Mymr`) and Shan (`shn_Mymr`).
+This is the implementation catalog for the current checkout. `uv run stt
+models` is authoritative for accepted model IDs, defaults, and download
+estimates because those values can change with the code.
 
-## Running the 7B on Apple Silicon
+## List, download, and select
 
-**fairseq2's PyTorch MPS path works for the 7B LLM card**, which this repo
-previously stated was impossible. Measured on five FLEURS clips, same model,
-same audio:
+Listing models does not download weights:
 
-| config | RTF | peak RSS | GPU | text |
-|---|---:|---:|---:|---|
-| CPU, bfloat16 | 8.85 | 22.3 GB | — | reference |
-| CPU, float32 | 2.14 | — | — | identical |
-| **Metal (MPS), bfloat16** | **0.70** | **13.9 GB** | 17.1 GB | identical |
+```bash
+uv run stt models
+uv run stt models --backend hf
+```
 
-Corpus CER was 0.0280 in all three. Metal is **12.6× faster than CPU at the same
-dtype**, 3.0× faster than CPU's best dtype, and uses less memory — so
-`--device auto` now selects it, with an automatic fall back to CPU if a Metal
-kernel fails mid-run.
+Download one model through its backend's normal cache, then select that same ID
+for transcription:
 
-Two things this table also settles:
+```bash
+uv run stt models --backend hf --download whisper-my-small
+uv run stt transcribe recording.mp3 \
+  --backend hf --model whisper-my-small
+```
 
-* **bfloat16 on CPU is a trap.** PyTorch has no native half-precision CPU
-  kernels and emulates them, costing 4.1× for identical output. On CPU, float32
-  is the fast path; bfloat16 is only for machines that cannot hold float32.
-* The published RTF 1.79 baseline for the 7B was a float32 CPU run.
+Use `--backend BACKEND --download MODEL` for each additional model needed. The
+command does not prefetch the other cards in that backend.
 
-The other two runtimes still have the gaps described below, so they remain the
-reason to reach for `omniasr-gguf` when iterating:
+## Implemented backends
 
-| Runtime | GPU | Variants ported | API |
+| Backend | Runtime | `auto` device behavior | Implemented scope |
 |---|---|---|---|
-| Meta `omnilingual-asr` (PyTorch + fairseq2) | CUDA, **Metal (measured here)** | all | Python |
-| [soniqo/speech-swift](https://github.com/soniqo/speech-swift) (MLX + CoreML) | Metal / ANE | **CTC only**, 300M–7B | Swift |
-| [CrispASR](https://github.com/CrispStrobe/CrispASR) (ggml) | Metal | **LLM 300M/1B**, CTC 300M/1B | C++, Python, others |
+| `omniasr-torch` | Meta PyTorch/fairseq2 | CUDA, then MPS, then CPU; a failed MPS decode is retried on CPU | Upstream omniASR v2 CTC, LLM, and Unlimited cards |
+| `omniasr-gguf` | CrispASR/ggml | CrispASR chooses the native backend; Metal is available on Apple Silicon | Selected downloadable GGUF conversions up to 1B |
+| `hf` | Hugging Face Transformers | CUDA, then MPS, then CPU; no automatic CPU retry | Burmese Whisper fine-tunes, MMS-1B, SeamlessM4T v2, and w2v-BERT |
+| `dolphin` | DataoceanAI Dolphin | CUDA when available, otherwise CPU; MPS must be requested explicitly | Public `base` and `small` checkpoints |
 
-- The MLX port's docs state the LLM decoder variant is "a separate follow-up
-  module" — it has not been built. Its CTC models also ignore the language
-  hint entirely, which matters when you specifically want Burmese decoding.
-- The GGUF ladder stops at 1B. No 3B or 7B LLM conversion exists.
+The `omniasr-torch` MPS path is a repository policy: the adapter passes
+`device="mps"` to the PyTorch pipeline and catches decode failures so it can
+reload on CPU. It is not a claim that fairseq2 officially supports Metal or that
+every fairseq2 operation is implemented by MPS. A result recorded after retry
+must identify CPU as the resolved device.
 
-## Model families
+## Model behavior
 
-**CTC** — wav2vec2 encoder plus a linear CTC head. One forward pass, no decoder
-loop, so it is fast. It ignores the language hint and emits no punctuation.
+The fairseq2 adapter accepts only the v2 cards listed by the CLI. CTC and
+non-Unlimited LLM cards reject audio longer than 40 seconds. Unlimited cards
+are the upstream long-audio variants.
 
-**LLM** — the same encoder feeding a LLaMA decoder. Autoregressive, slower,
-noticeably more accurate, accepts a language code, and produces punctuation.
-This is the family worth testing for Burmese.
+The omniASR models are trained to emit spoken-form transcripts without
+punctuation or capitalization. The adapter does not add either. This behavior
+is documented in Meta's [inference
+guide](https://github.com/facebookresearch/omnilingual-asr/blob/main/src/omnilingual_asr/models/inference/README.md#44-punctuation-and-capitalization).
 
-**Unlimited** — LLM variants that decode arbitrarily long audio via a 15-second
-sliding-segment protocol. Non-Unlimited cards **reject audio over 40 seconds**.
-Accuracy is comparable, so prefer Unlimited unless you are reproducing a
-specific published number. Fine-tuning recipes do not support them.
+For SeamlessM4T v2, the upstream language table lists Burmese (`mya`, `Mymr`)
+as source speech and source text, with target text only. This repository uses
+its speech-to-text path; Burmese target speech is not supported by that card.
 
-## Available checkpoints
+Dolphin's upstream `SPEECH_LENGTH = 30` controls when its CLI chooses long-form
+transcription and caps VAD segments at 30 seconds. It is not evidence that the
+single-file feature extractor is a fixed Whisper 30-second window. This adapter
+windows input at 30 seconds as its own integration policy.
 
-### `omniasr-torch` (PyTorch, CPU on this machine)
+## Defaults and precision
 
-Downloads to `~/.cache/fairseq2/assets/`, fp32.
+The current defaults are:
 
-| Card | Download |
+| Backend | Default model |
 |---|---|
-| `omniASR_LLM_Unlimited_300M_v2` | 6.5 GB |
-| `omniASR_LLM_Unlimited_1B_v2` | 9.1 GB |
-| `omniASR_LLM_Unlimited_3B_v2` | 17.5 GB |
-| `omniASR_LLM_Unlimited_7B_v2` | **31.2 GB** |
+| `omniasr-torch` | `omniASR_LLM_Unlimited_7B_v2` |
+| `omniasr-gguf` | `llm-unlimited-300m-v2` |
+| `hf` | `seamless-m4t-v2` |
+| `dolphin` | `small` |
 
-Any card name from the upstream repo works — `omniASR_CTC_*`, the length-limited
-`omniASR_LLM_*_v2`, and the zero-shot `omniASR_LLM_7B_ZS` included.
+Defaults do not cause setup to download weights. A transcription or explicit
+model-download command fetches only the selected model.
 
-### `omniasr-gguf` (ggml, Metal GPU)
+Dolphin, GGUF, and Transformers downloads are pinned to immutable upstream
+revisions. A plain `stt compare` and `--all-cached-models` run Hugging Face in
+cached-files-only mode, so a missing file cannot trigger a download after its
+cache check. An explicit `--only hf` comparison or transcription retains normal
+first-use download behavior.
 
-Downloads to `~/.cache/crispasr/`. See `stt models` for the live list.
+Dolphin downloads are restricted to the five files its loader consumes at a
+pinned Hugging Face revision. The adapter verifies every file, including
+`train.yaml`, against its SHA-256 digest before passing the cache to Dolphin.
+GGUF URLs are likewise pinned to immutable Hugging Face revisions, and the
+adapter verifies the selected model's SHA-256 digest before native loading.
+The fairseq2 adapter verifies each returned checkpoint's exact byte length and
+the shared tokenizer's byte length and SHA-256 digest. Upstream does not publish
+checkpoint digests, so its checkpoint check detects incomplete or wrong-sized
+files but cannot detect a same-sized modification. A failed check leaves the
+cache untouched for inspection or quarantine.
 
-| Name | Size | Notes |
-|---|---|---|
-| `llm-unlimited-300m-v2` | 1.0 GB | default; Q4_K, unlimited length |
-| `llm-unlimited-300m-v2-f16` | 3.1 GB | unquantised, for measuring quantisation loss |
-| `llm-1b` | 1.4 GB | Q4_K, chunked |
-| `ctc-1b-v2` | 658 MB | no language hint, no punctuation |
-| `ctc-300m-v2` | 194 MB | smallest |
+For `omniasr-torch`, `--dtype auto` measures float16 and bfloat16 on an
+accelerator. On CPU it uses float32 when the machine has the adapter's estimated
+memory headroom and bfloat16 otherwise. The Transformers backend currently uses
+float32 by default. GGUF precision is part of the selected file.
 
-## Memory and dtype
+## Upstream identity and licences
 
-fairseq2n pins `torch==2.8.0` exactly because it links against libtorch's C++
-ABI. Upgrading torch alone produces symbol errors.
+- [Meta Omnilingual ASR](https://github.com/facebookresearch/omnilingual-asr)
+  publishes the model table and Apache-2.0 code and weights. The exact v2 asset
+  definitions are in the upstream [asset
+  cards](https://github.com/facebookresearch/omnilingual-asr/blob/main/src/omnilingual_asr/cards/models/rc_models_v2.yaml).
+- The GGUF files come from the exact `cstr/*-GGUF` URLs encoded in the adapter.
+  Check both the conversion card and the original omniASR terms before
+  redistribution.
+- The implemented [Burmese Whisper large
+  card](https://huggingface.co/chuuhtetnaing/whisper-large-v3-myanmar) is
+  Apache-2.0; the medium, small, and stock Whisper cards retain their own card
+  metadata.
+- [MMS-1B](https://huggingface.co/facebook/mms-1b-all) and [SeamlessM4T
+  v2](https://huggingface.co/facebook/seamless-m4t-v2-large) are
+  CC-BY-NC-4.0.
+- The implemented [Burmese w2v-BERT
+  fine-tune](https://huggingface.co/YonaKhine/finetuned-w2v2-bert-burmese-asr)
+  is MIT.
+- [Dolphin](https://github.com/DataoceanAI/Dolphin) publishes its code and
+  checkpoints under Apache-2.0.
 
-On CPU, **float32 is the fast path** — PyTorch has no native half-precision CPU
-kernels and emulates them, which upstream users measured as 2–3× slower than
-fp32. But fp32 for the 7B needs roughly 34 GB resident on top of reading a
-31 GB checkpoint, so `--dtype auto` selects bfloat16 for the 3B and 7B cards
-and float32 below that. Override with `--dtype float32` if you have the memory
-headroom and want the speed.
-
-## Where the weights live
-
-Neither cache is inside this repo, and both are gitignored regardless:
-
-```
-~/.cache/fairseq2/assets/     PyTorch checkpoints (up to 31 GB each)
-~/.cache/crispasr/            GGUF checkpoints (~1 GB each)
-```
-
-## Planned backends
-
-The `ASRBackend` interface is what the remaining engines you mentioned will
-implement:
-
-- **Dolphin** — local, Asian-language focused
-- **ElevenLabs Scribe v2** — cloud; needs an API key and sends audio off-machine
-- **Google Chirp 3** — cloud; same caveat
-
-Cloud backends should set `is_local = False` so `stt compare` can warn before
-uploading audio.
+Model licences are separate from this harness's MIT licence. Recheck the exact
+upstream card and revision before redistribution or product use.

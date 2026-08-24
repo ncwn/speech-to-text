@@ -1,7 +1,7 @@
 [project]
 name = "stt"
 version = "0.1.0"
-description = "Burmese-focused ASR evaluation harness for local and cloud speech-to-text models"
+description = "Burmese-focused ASR evaluation harness for local speech-to-text models"
 readme = "README.md"
 license = { text = "MIT" }
 # fairseq2n ships wheels for cp310-cp312 only, and omnilingual-asr caps at 3.12.
@@ -19,10 +19,11 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# Meta's reference PyTorch/fairseq2 runtime. CPU-only on Apple Silicon.
-# fairseq2n 0.6 pins torch==2.8.0 exactly (it links against libtorch's C++ ABI).
+# Released omnilingual-asr 0.2.0 requires fairseq2 <=0.6.0; fairseq2n 0.6
+# pins torch==2.8.0 exactly because it links against libtorch's C++ ABI.
 omniasr = [
     "omnilingual-asr==0.2.0",
+    "fairseq2==0.6.0",
     "torch==2.8.0",
     "torchaudio==2.8.0",
 ]

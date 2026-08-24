@@ -1,226 +1,213 @@
 # Setup on macOS (Apple Silicon)
 
-## Requirements
+These instructions were checked against `scripts/bootstrap.sh`, `pyproject.toml`,
+the locked environment, and the installed runtime metadata on 2026-08-24.
 
-- macOS 14 or newer. `fairseq2n` wheels are tagged `macosx_14_0_arm64`; on
-  anything older pip falls back to building from source and fails.
-- Apple Silicon. There are no `fairseq2n` wheels for Intel Macs.
-- Python 3.12. `omnilingual-asr` caps at 3.12 and `fairseq2n` publishes
-  cp310–cp312 only. `uv` installs the right interpreter for you.
-- [uv](https://docs.astral.sh/uv/), ffmpeg, libsndfile.
+## Choose a runtime set
 
-## Install
+The default and `--torch-only` bootstrap paths install `omnilingual-asr 0.2.0`
+and therefore require:
+
+- Apple Silicon and macOS 14 or newer; the locked `fairseq2n 0.6` wheel is
+  tagged `macosx_14_0_arm64` and has no Intel macOS wheel.
+- Python 3.12. `uv` installs it; this project requires `>=3.12,<3.13`.
+- Xcode Command Line Tools, because `kenlm` builds a C++ extension.
+- Homebrew `libsndfile`, which fairseq2 loads as a system library.
+- `uv` and ffmpeg.
+
+The `--gguf-only` path does not install fairseq2, so the script does not require
+macOS 14, Xcode Command Line Tools, Homebrew, or `libsndfile`. It still requires
+Apple Silicon, `uv`, and ffmpeg. The locked CrispASR wheel is tagged for arm64
+macOS 11 or newer.
+
+## Default setup, step by step
+
+From the repository root:
+
+1. Confirm Apple Silicon and macOS 14 or newer.
+
+   ```bash
+   uname -m
+   sw_vers -productVersion
+   ```
+
+2. Install Homebrew if `brew --version` fails, using the instructions at
+   <https://brew.sh/>.
+
+3. Install the system dependencies.
+
+   ```bash
+   xcode-select -p || xcode-select --install
+   # If the installer opened, finish it before continuing.
+   xcode-select -p
+   brew install ffmpeg libsndfile
+   ```
+
+4. Install `uv` if `uv --version` fails, using the instructions at
+   <https://docs.astral.sh/uv/getting-started/installation/>.
+
+5. Install the default runtime set.
+
+   ```bash
+   ./scripts/bootstrap.sh
+   ```
+
+6. Verify the environment without downloading weights.
+
+   ```bash
+   uv run python -VV
+   uv run stt backends
+   uv run stt models
+   ```
+
+The bootstrap creates or updates `.venv` with
+`uv sync --frozen --extra gguf --extra omniasr`. It installs the project and
+runtime dependencies only. It does not download model weights and does not
+remove, rewrite, or validate model caches.
+
+For the smaller GGUF-only setup:
 
 ```bash
-brew install ffmpeg libsndfile
-./scripts/bootstrap.sh
+brew install ffmpeg
+./scripts/bootstrap.sh --gguf-only
+uv run stt backends
 ```
 
-`bootstrap.sh` verifies the prerequisites, creates a Python 3.12 virtualenv, and
-installs both runtimes.
+## Selective dependency sets
 
-To install selectively:
+`uv sync` makes the environment match the extras named in that invocation.
+Extras are not an additive install history: always name the complete set you
+want to keep. Each command below also installs the project's default `dev`
+dependency group.
 
 ```bash
-uv sync                                    # core CLI + evaluation only
-uv sync --extra gguf                       # + Metal runtime  (small)
-uv sync --extra omniasr                    # + PyTorch stack  (~3 GB of wheels)
-uv sync --extra gguf --extra omniasr       # both
+uv sync --frozen                                      # no backend extra
+uv sync --frozen --extra gguf                         # core + GGUF
+uv sync --frozen --extra omniasr                      # core + fairseq2 omniASR
+uv sync --frozen --extra hf                           # core + Transformers
+uv sync --frozen --extra dolphin                      # core + Dolphin
+uv sync --frozen --extra omniasr --extra hf           # fairseq2 + alignment
+uv sync --frozen --extra gguf --extra omniasr --extra hf --extra dolphin
 ```
 
-Verify with `uv run stt backends`.
+After changing the set, run `uv run stt backends` again.
 
-## Things that will bite you
+## Download one model
 
-**libsndfile must come from Homebrew.** The Python `soundfile` wheel bundles its
-own copy, but `fairseq2n` loads the system library by name via `dlopen`. Without
-it you get `OSError: fairseq2 requires libsndfile` on import — even though
-`import soundfile` works fine.
+Model listing is read-only. Download only the selected backend/model pair:
 
-**Do not upgrade torch on its own.** `fairseq2n` links against libtorch's C++
-ABI, which has no stability guarantee between releases, so `fairseq2n 0.6`
-requires exactly `torch==2.8.0`. Upgrading produces missing-symbol errors at
-import. The pin is in `pyproject.toml`; leave it.
-
-**kenlm builds from source.** It is a dependency of `omnilingual-asr` and ships
-no wheels, so the install compiles a C++ extension. Xcode Command Line Tools are
-enough (`xcode-select --install`); cmake is pulled in automatically as a build
-requirement.
-
-**Dependency resolution failures** that backtrack through old `fairseq2`
-versions almost always mean no matching `fairseq2n` wheel was found for your
-Python version or macOS version. Check `python -VV` reports 3.12 and that
-`pip debug --verbose` lists a `macosx_14_0_arm64` platform tag — an x86_64
-Python running under Rosetta is the other usual culprit.
-
-## Disk
-
-Model weights are cached outside the repo:
-
-```
-~/.cache/fairseq2/assets/     PyTorch checkpoints — up to 31 GB each
-~/.cache/crispasr/            GGUF checkpoints — around 1 GB each
+```bash
+uv run stt models
+uv run stt models --backend omniasr-gguf
+uv run stt models --backend omniasr-gguf --download llm-unlimited-300m-v2
 ```
 
-Downloading every PyTorch card would need well over 60 GB. Check free space
-before pulling the 7B, and delete cards you are done with rather than letting
-them accumulate.
+The download command uses the same upstream cache as transcription. A later
+`stt transcribe -b omniasr-gguf -m llm-unlimited-300m-v2 ...` reuses it.
+The GGUF, Dolphin, and Transformers adapters use immutable upstream revisions.
+A plain `stt compare` considers cached defaults only; `--all-cached-models`
+considers every model whose cache can be verified. Both keep Transformers
+offline. Name `--only hf` to permit its normal first-use download behavior.
 
-## GPU status
+## Dependency constraints
 
-`torch.backends.mps.is_available()` returns True, but that only says Metal
-exists — fairseq2 has no validated MPS path, so `omniasr-torch` defaults to CPU
-and will not silently pick MPS. `--device mps` is available to experiment with;
-expect unimplemented-operator errors or wrong output rather than a clean
-speedup.
+[`omnilingual-asr==0.2.0`](https://pypi.org/project/omnilingual-asr/) declares
+`fairseq2[arrow]>=0.5.2,<=0.6.0`; the lock selects `fairseq2==0.6` and
+`fairseq2n==0.6`. The native package requires `torch==2.8.0`, so this repository
+pins both `torch` and `torchaudio` to 2.8.0. Do not upgrade either package
+independently: `fairseq2n` links against the libtorch C++ ABI.
 
-For actual GPU acceleration use `omniasr-gguf`, which reaches roughly RTF 0.2
-on an M2 Max with the 300M model — about five times faster than real time.
+The latest [fairseq2 release](https://github.com/facebookresearch/fairseq2/releases/tag/v0.8.1)
+checked for this audit was 0.8.1, whose
+[`fairseq2n` metadata](https://pypi.org/project/fairseq2n/) requires
+`torch==2.9.1`. That newer pair is not compatible with `omnilingual-asr
+0.2.0`'s fairseq2 upper bound, so it is not used here.
+
+## Model caches
+
+Bootstrap and `uv sync` leave these caches in place:
+
+| Runtime | Default used here | Supported location controls |
+|---|---|---|
+| fairseq2 | `~/.cache/fairseq2/assets/` | `FAIRSEQ2_CACHE_DIR`; otherwise `XDG_CACHE_HOME/fairseq2/assets` |
+| CrispASR | `~/.cache/crispasr/` | `CRISPASR_CACHE_DIR` |
+| Hugging Face Hub | `~/.cache/huggingface/hub/` | `HF_HUB_CACHE`; otherwise `HF_HOME/hub` or `XDG_CACHE_HOME/huggingface/hub` |
+| Dolphin | `~/.cache/dolphin/<size>/` | No repository override; each size has its own directory |
+| dtype probe | `~/.cache/stt/hardware.json` | No repository override |
+| ggml Metal kernels | `~/Library/Caches/ggml-metal/` | Managed by ggml |
+
+Set cache variables before the first command in a shell; changing one points the
+runtime at a different cache and does not migrate existing files.
+
+Never delete an entire user cache tree to recover one model. That can destroy
+unrelated application data and every working checkpoint. Preserve the existing
+cache and test a fresh isolated location instead:
+
+```bash
+FAIRSEQ2_CACHE_DIR="$PWD/.cache/recovery/fairseq2" \
+  uv run stt models --backend omniasr-torch \
+  --download omniASR_LLM_Unlimited_300M_v2
+
+CRISPASR_CACHE_DIR="$PWD/.cache/recovery/crispasr" \
+  uv run stt models --backend omniasr-gguf \
+  --download llm-unlimited-300m-v2
+
+HF_HUB_CACHE="$PWD/.cache/recovery/huggingface" \
+  uv run stt models --backend hf --download whisper-my-small
+```
+
+The repository ignores `.cache/`. After confirming a replacement, quarantine
+only the suspect model directory by renaming it; do not mix files from two
+downloads. fairseq2 uses content-hashed paths, so use a fresh
+`FAIRSEQ2_CACHE_DIR` rather than editing its internal layout. Dolphin has no
+cache override in this adapter: stop active runs and rename only the affected
+`~/.cache/dolphin/<size>/` directory before downloading that size again. The
+adapter leaves a mismatched cache untouched and refuses to load it.
+
+The GGUF adapter also leaves a mismatched or partial model untouched. Quarantine
+only the affected `.gguf` and its same-name `.gguf.src` sidecar before retrying
+the selective download; the model's SHA-256 digest, not the advisory sidecar,
+determines whether the cache is usable.
+
+Inspect space without modifying anything:
+
+```bash
+du -sh ~/.cache/fairseq2/assets ~/.cache/crispasr \
+  ~/.cache/huggingface/hub ~/.cache/dolphin 2>/dev/null
+```
+
+## Device behavior
+
+The repository's `omniasr-torch` adapter asks PyTorch for MPS when available.
+If decode raises on MPS, the adapter reloads the model on CPU and retries the
+file. This is repository behavior, not a claim that fairseq2 officially
+supports Metal or that every fairseq2 operation has an MPS kernel. Use
+`--device cpu` to avoid the attempt or `--device mps` to request it explicitly.
+
+The Transformers adapter selects MPS when available but does not perform the
+same automatic CPU retry. CrispASR selects its native ggml device. Dolphin
+defaults to CPU; `--device mps` requests the adapter's explicit MPS path.
 
 ## Troubleshooting
 
-**`ggml_metal_*` log spam.** ggml logs kernel compilation to fd 1/2 from native
-code. It is suppressed by default; pass `-v` to see it, which is what you want
-when a Metal load fails.
+**`fairseq2 requires libsndfile`.** Install Homebrew `libsndfile`; the copy
+bundled inside the Python `soundfile` wheel does not satisfy fairseq2's system
+library lookup.
 
-**First GGUF run is slow.** Metal kernels are compiled and cached to
-`~/Library/Caches/ggml-metal/`. Subsequent runs skip it.
+**`kenlm` fails to build.** Confirm `xcode-select -p` succeeds, then rerun the
+same frozen sync. No separate CMake install is required by this project.
 
-**`omniasr-torch` first run takes a long time.** It is downloading — 6.5 GB for
-the 300M card, 31.2 GB for the 7B. fairseq2 prints a progress bar to stderr; if
-you have redirected it, watch the cache directory instead:
+**Dependency resolution backtracks through fairseq2 releases.** Confirm
+`uv run python -VV` reports Python 3.12, `uname -m` reports `arm64`, and macOS is
+14 or newer for the fairseq2 path.
 
-```bash
-du -sh ~/.cache/fairseq2/assets/
-```
+**Native GGUF logs are hidden.** Pass `-v` to transcription when diagnosing a
+Metal load; the adapter suppresses native ggml output otherwise.
 
-**fairseq2 does not resume interrupted downloads.** It writes to
-`*.download.tmp` and only renames on completion, so a failed download never
-leaves a corrupt checkpoint — but every retry restarts from byte zero. On a slow
-or flaky link the 3B (17.5 GB) and 7B (31.2 GB) cards may never finish:
+**A first run appears idle.** Download the selected model explicitly with
+`stt models --backend BACKEND --download MODEL`, keep stderr visible, and watch
+only that runtime's cache with `du -sh`. Do not insert partial files manually.
 
-```
-AssetDownloadError: The server sent 3,712,927,948 bytes which is less than the
-expected size of 17,522,712,611 bytes.
-```
-
-`dl.fbaipublicfiles.com` *does* honour HTTP Range requests, so fetch the large
-cards with `curl -C -` straight into the cache instead. fairseq2 keys the cache
-directory on the first 24 hex characters of `sha1(uri)`:
-
-```bash
-FILE=omniASR-LLM-Unlimited-7B-v2.pt
-URL=https://dl.fbaipublicfiles.com/mms/$FILE
-DIR=$(python -c "import hashlib,sys;print(hashlib.sha1(sys.argv[1].encode()).hexdigest()[:24])" "$URL")
-
-mkdir -p ~/.cache/fairseq2/assets/$DIR
-curl -L --fail -C - --retry 100 --retry-all-errors --retry-delay 5 \
-     --speed-limit 10240 --speed-time 60 \
-     -o ~/.cache/fairseq2/assets/$DIR/$FILE "$URL"
-```
-
-Re-run the identical command after any interruption and it picks up where it
-stopped. Verify the size is byte-exact before using it — a truncated checkpoint
-loads and emits silent garbage rather than raising.
-
-## Dolphin weights
-
-`dolphin.load_model(size, directory, device)` writes `config.yaml` and
-`train.yaml` beside the checkpoint and skips files that already exist. Pointing
-two sizes at one directory leaves the first model's config next to the second
-model's weights, and the load dies with `size mismatch for
-decoder.decoders.5.norm3.bias`. This backend gives each size its own directory
-under `~/.cache/dolphin/<size>/`; delete any older flat cache.
-
-## Apple Silicon: which precision, which cores
-
-Two hardware-dependent choices matter, and both are measured rather than
-assumed — the repo probes the machine once and caches the answer under
-`~/.cache/stt/hardware.json`.
-
-### bfloat16 is not the safe default on Apple GPUs
-
-Apple's GPUs are built around float16. bfloat16 is *accepted* everywhere but is
-not equally *accelerated*. A 4096² matmul on an M2 Max:
-
-| dtype | GFLOP/s |
-|---|---:|
-| float16 | **12,306** |
-| float32 | 11,253 |
-| bfloat16 | 5,797 |
-
-bfloat16 is 2.1× slower than float16 and slower than float32 — it is being
-emulated. Metal exposes the `bfloat` type broadly, but the simdgroup matrix
-intrinsics that make it fast arrived with Metal 3.1 and the M3-era GPUs, and
-whether *any* shipped Apple GPU has true hardware bfloat16 matrix units is
-disputed. Since that answer changes per generation, `stt.hardware.fastest_dtype`
-times both formats on the actual device instead of consulting a table.
-
-End to end on the omniASR 7B, five FLEURS clips, all producing identical text
-and identical corpus CER (0.0280):
-
-| config | RTF | GPU |
-|---|---:|---:|
-| Metal float16 | **0.61** | 17.1 GB |
-| Metal bfloat16 | 0.70 | 17.1 GB |
-| CPU float32 | 2.14 | — |
-| CPU bfloat16 | 8.85 | — |
-
-### …but the best dtype belongs to the model, not just the chip
-
-SeamlessM4T v2 on the same GPU goes the other way — float32 is both faster and
-more accurate, so half precision buys only memory:
-
-| dtype | RTF | CER |
-|---|---:|---:|
-| float32 | **0.16** | **0.0420** |
-| float16 | 0.26 | 0.0455 |
-| bfloat16 | 0.26 | 0.0420 |
-
-omniASR's LLM decoder is matmul-bound and gains from float16; Seamless is not
-and does not. So the probe drives `omniasr-torch` only, and the `hf` backend
-keeps float32.
-
-### Thread counts are left to macOS
-
-macOS places threads across performance and efficiency cores itself, and
-nothing here overrides it. That is a measured decision, not a stylistic one:
-
-* the GGUF backend runs at **RTF 0.182 on 4, 8 and 12 threads alike** — the
-  work is on the GPU and the CPU sits at 0.05 cores;
-* a torch matmul scales **1.09× from 1 thread to 12**, because Accelerate does
-  its own threading through the AMX unit;
-* torch already derives its default from the system — it picks 8 on an M2 Max,
-  matching `hw.perflevel0.physicalcpu`, without being told.
-
-An earlier version of this repo set thread counts from a detected performance-
-core count and hardcoded `n_threads=8` for the GGUF backend. Both are gone:
-neither changed any measurement, and both could only be wrong on hardware that
-has not been tested.
-
-The core split *is* still detected, for reporting — a benchmark number is not
-interpretable without knowing the machine. `stt hardware` shows it, and it is
-stamped on every result record. Reading macOS's level *names*
-(`hw.perflevel<N>.name`) rather than assuming level 0 is what keeps that correct
-across chips:
-
-| chip | levels |
-|---|---|
-| M2 Max | Performance 8 + Efficiency 4 |
-| M5 Pro | Super 6 + Performance 12 — no efficiency tier at all |
-
-### Nothing about a chip is written down here
-
-Precision, memory headroom and core layout are all read or timed from the
-machine at runtime and cached:
-
-* the float16-versus-bfloat16 choice is **timed on the device**, not looked up,
-  because which one is fast changes by generation and the public accounts
-  disagree;
-* whether a card can afford float32 on CPU is computed from **its checkpoint
-  size against detected RAM**, not from a fixed threshold — the same model is
-  comfortable on a 64 GB machine and impossible on a 16 GB one;
-* core counts and names come from `sysctl`.
-
-`stt hardware` prints the lot. On an untested chip it should need no code
-change to do the right thing.
+**Dolphin reports a tensor size mismatch.** Each size must keep its own cache
+directory. Quarantine the affected size directory and download that size again;
+do not reuse a flat directory containing another size's configuration.

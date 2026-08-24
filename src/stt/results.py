@@ -1,8 +1,7 @@
 """Common result types shared by every backend, plus output writers.
 
-Every backend returns ``TranscriptionResult`` objects so that the CLI, the
-evaluation harness, and any future backend (Dolphin, ElevenLabs Scribe v2,
-Google Chirp 3) all speak the same shape.
+Every backend returns ``TranscriptionResult`` objects so that the CLI,
+evaluation harness, and output writers all speak the same shape.
 
 A result carries the whole transcript as ``text`` and, where the backend can
 supply it, a list of :class:`Segment` locating each piece of that transcript in
@@ -37,13 +36,9 @@ class Segment:
     end: float
     #: 0..1, higher is better. ``None`` when the backend offers no signal.
     confidence: float | None = None
-    #: Reserved for diarization; nothing populates this yet.
+    #: Reserved for diarization; retained in the persisted result schema.
     speaker: str | None = None
     source: SegmentSource = "chunk"
-
-    @property
-    def duration(self) -> float:
-        return max(0.0, self.end - self.start)
 
 
 @dataclass
@@ -61,8 +56,7 @@ class TranscriptionResult:
     audio_duration_s: float | None = None
     error: str | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
-    #: Timed breakdown of ``text``, when the backend can provide one. ``None``
-    #: means "not available", which is different from "the audio was silent".
+    #: Timed breakdown of ``text``; ``None`` means no timings are available.
     segments: list[Segment] | None = None
     #: What this file cost in CPU, memory and GPU. See :mod:`stt.telemetry`.
     resources: ResourceUsage | None = None
@@ -109,11 +103,7 @@ def write_text(results: list[TranscriptionResult], path: Path) -> None:
 
 
 def read_jsonl(path: Path) -> list[TranscriptionResult]:
-    """Read back a JSONL file written by :func:`write_jsonl`.
-
-    Tolerates files written before a field existed, so older result files stay
-    loadable as the schema grows.
-    """
+    """Read back a JSONL file written by :func:`write_jsonl`."""
     results: list[TranscriptionResult] = []
     with path.open(encoding="utf-8") as f:
         for line in f:

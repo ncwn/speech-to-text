@@ -6,6 +6,7 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
+.cache/
 
 # Model weights and caches — never commit, these are 1-31 GB each
 models/
@@ -14,13 +15,10 @@ models/
 *.safetensors
 *.mlmodelc/
 
-# Audio and transcripts
+# Dataset audio stays local; references, transcripts, and provenance are tracked.
+data/*/audio/**
+# Keep audio from older checkouts ignored after the layout migration.
 data/audio/**
-!data/audio/.gitkeep
-# Hand-corrected reference transcripts ARE tracked -- they are the only
-# ground truth we have for audio the models cannot have trained on, and
-# unlike the FLEURS sets they cannot be re-fetched.
-!data/reference/**
 data/fleurs*/
 # Resampled 16 kHz mono copies produced by stt.audio, and ad-hoc slices
 data/.converted/
@@ -31,7 +29,7 @@ outputs/**
 # Third-party sources built from scratch
 vendor/
 
-# Secrets (ElevenLabs / Google Cloud keys, for later backends)
+# Local credentials
 .env
 *.json.key
 service-account*.json

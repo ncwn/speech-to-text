@@ -1,17 +1,18 @@
 """Meta Omnilingual ASR via the official PyTorch/fairseq2 runtime.
 
-This is the reference implementation — every model card Meta published works
-here, including ``omniASR_LLM_Unlimited_7B_v2``, and it is the accuracy
-ground truth the faster backends are measured against.
+This adapter accepts upstream model card names, including
+``omniASR_LLM_Unlimited_7B_v2``.
 
-Apple Silicon note: there is no CUDA, and fairseq2 has no validated Metal path,
-so this runs on CPU. That is slow but correct. Use the ``omniasr-gguf`` backend
-when you want Metal acceleration and can accept a smaller model.
+Device ``auto`` selects CUDA, then MPS, then CPU. A failed MPS decode is
+retried on CPU for the rest of the run.
 """
 
 from __future__ import annotations
 
+import hashlib
+import os
 import time
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, ClassVar
 
@@ -24,19 +25,52 @@ MAX_LIMITED_AUDIO_SEC = 40
 
 DEFAULT_MODEL = "omniASR_LLM_Unlimited_7B_v2"
 
-#: Approximate fp32 checkpoint download size per card, in MB.
-_DOWNLOAD_MB = {"300M": 6500, "1B": 9100, "3B": 17500, "7B": 31200}
+
+@dataclass(frozen=True)
+class OmniASRModel:
+    family: str
+    size: str
+    size_bytes: int
+    unlimited: bool = False
+
+    @property
+    def approx_mb(self) -> int:
+        return round(self.size_bytes / 1_000_000)
+
+
+#: Upstream v2 cards and exact checkpoint sizes reported by their origin server.
+MODELS: dict[str, OmniASRModel] = {
+    "omniASR_CTC_300M_v2": OmniASRModel("CTC", "300M", 1_304_065_508),
+    "omniASR_CTC_1B_v2": OmniASRModel("CTC", "1B", 3_902_956_068),
+    "omniASR_CTC_3B_v2": OmniASRModel("CTC", "3B", 12_325_920_624),
+    "omniASR_CTC_7B_v2": OmniASRModel("CTC", "7B", 26_023_732_143),
+    "omniASR_LLM_300M_v2": OmniASRModel("LLM", "300M", 6_526_183_880),
+    "omniASR_LLM_1B_v2": OmniASRModel("LLM", "1B", 9_118_733_852),
+    "omniASR_LLM_3B_v2": OmniASRModel("LLM", "3B", 17_522_679_843),
+    "omniASR_LLM_7B_v2": OmniASRModel("LLM", "7B", 31_220_488_063),
+    "omniASR_LLM_Unlimited_300M_v2": OmniASRModel("LLM", "300M", 6_526_216_648, True),
+    "omniASR_LLM_Unlimited_1B_v2": OmniASRModel("LLM", "1B", 9_118_766_620, True),
+    "omniASR_LLM_Unlimited_3B_v2": OmniASRModel("LLM", "3B", 17_522_712_611, True),
+    "omniASR_LLM_Unlimited_7B_v2": OmniASRModel("LLM", "7B", 31_220_520_831, True),
+}
+
+TOKENIZER_SIZE_BYTES = 91_481
+TOKENIZER_SHA256 = "8aa11a1092142ef472537476ef6e76541123e2f0d789b79f3ebd119008240b1e"
+_ASSET_BASE = "https://dl.fbaipublicfiles.com/mms"
+_TOKENIZER_FILENAME = "omniASR_tokenizer_written_v2.model"
+
+
+def _sha256(path: Path) -> str:
+    with path.open("rb") as source:
+        return hashlib.file_digest(source, "sha256").hexdigest()
 
 
 @register
 class OmniASRTorchBackend(ASRBackend):
     name: ClassVar[str] = "omniasr-torch"
-    description: ClassVar[str] = (
-        "Meta Omnilingual ASR, official PyTorch/fairseq2 runtime (CPU on macOS)"
-    )
+    description: ClassVar[str] = "Meta Omnilingual ASR, official PyTorch/fairseq2 runtime"
     install_hint: ClassVar[str] = "uv sync --extra omniasr"
-    accepts_language: ClassVar[bool] = True
-    is_local: ClassVar[bool] = True
+    supported_options: ClassVar[frozenset[str]] = frozenset({"device", "dtype"})
 
     def __init__(
         self,
@@ -45,7 +79,11 @@ class OmniASRTorchBackend(ASRBackend):
         dtype: str = "auto",
         **options: Any,
     ) -> None:
+        if model not in MODELS:
+            known = ", ".join(MODELS)
+            raise ValueError(f"Unknown omniASR model {model!r}. Available: {known}")
         super().__init__(model, **options)
+        self.spec = MODELS[model]
         self.device_arg = device
         self.dtype_arg = dtype
         self.pipeline = None
@@ -71,11 +109,7 @@ class OmniASRTorchBackend(ASRBackend):
         if torch.cuda.is_available():
             return "cuda"
         if torch.backends.mps.is_available():
-            # Metal was measured, not assumed. On the 7B card, five FLEURS clips
-            # decoded to text identical to CPU, at RTF 0.70 against 8.85 for the
-            # same dtype on CPU and 2.14 for CPU's fastest dtype, using 13.9 GB
-            # against 22.3 GB. Faster and smaller with no change in output, so
-            # it is the default; `transcribe` falls back to CPU if it fails.
+            # MPS is the locally validated default; transcribe falls back to CPU.
             return "mps"
         return "cpu"
 
@@ -96,19 +130,12 @@ class OmniASRTorchBackend(ASRBackend):
             return named[self.dtype_arg]
 
         if device != "cpu":
-            # Which 16-bit format is fastest is a property of the GPU, not of
-            # the model: an M2 Max runs float16 at 12,306 GFLOP/s and bfloat16
-            # at 5,797, while later chips may invert that. Measured once per
-            # machine and cached rather than assumed.
+            # Probe the machine because the fastest 16-bit format varies by GPU.
             from stt.hardware import fastest_dtype
 
             return named[fastest_dtype(device)]
 
-        # On CPU, float32 is the fast path — PyTorch lacks native half-precision
-        # kernels there and emulates them. Measured on the 7B: bfloat16 on CPU
-        # runs at RTF 8.85 against float32's 2.14, a 4.1x penalty for identical
-        # text. So float32 unless the machine cannot hold it: the large cards
-        # need roughly 34 GB resident at float32, on top of the checkpoint read.
+        # CPU float32 is the fast path; use bfloat16 only when memory is tight.
         if not self._has_headroom_for_float32():
             return torch.bfloat16
         return torch.float32
@@ -127,36 +154,85 @@ class OmniASRTorchBackend(ASRBackend):
         """
         from stt.hardware import total_ram_mb
 
-        checkpoint_mb = _DOWNLOAD_MB.get(self._model_size_tag())
+        checkpoint_mb = self.spec.approx_mb
         ram_mb = total_ram_mb()
         if not checkpoint_mb or not ram_mb:
             return True  # unknown card or unknown machine: keep the fast path
         return ram_mb >= checkpoint_mb * self._FLOAT32_OVERHEAD
 
-    def _model_size_tag(self) -> str:
-        for tag in ("300M", "1B", "3B", "7B"):
-            if f"_{tag}_" in self.model or self.model.endswith(f"_{tag}"):
-                return tag
-        return "unknown"
-
     @property
     def is_unlimited(self) -> bool:
-        return "Unlimited" in self.model
+        return self.spec.unlimited
 
     def estimated_download_mb(self) -> int | None:
-        return _DOWNLOAD_MB.get(self._model_size_tag())
+        return self.spec.approx_mb
 
     def weights_cached(self) -> bool | None:
-        """Unknowable: fairseq2 stores assets under opaque content hashes.
+        root = Path(
+            os.environ.get(
+                "FAIRSEQ2_CACHE_DIR",
+                Path(os.environ.get("XDG_CACHE_HOME", Path.home() / ".cache"))
+                / "fairseq2"
+                / "assets",
+            )
+        )
+        checkpoint_name = self.model.replace("_", "-") + ".pt"
+        checkpoint = self._asset_path(root, checkpoint_name)
+        tokenizer = self._asset_path(root, _TOKENIZER_FILENAME)
+        return self._valid_checkpoint(checkpoint) and self._valid_tokenizer(tokenizer)
 
-        Returning None makes callers warn about the download rather than
-        wrongly promising it is either cached or not.
-        """
-        return None
+    @staticmethod
+    def _asset_path(root: Path, filename: str) -> Path:
+        uri = f"{_ASSET_BASE}/{filename}"
+        directory = hashlib.sha1(uri.encode(), usedforsecurity=False).hexdigest()[:24]
+        return root / directory / filename
+
+    def _valid_checkpoint(self, path: Path) -> bool:
+        try:
+            return path.is_file() and path.stat().st_size == self.spec.size_bytes
+        except OSError:
+            return False
+
+    @staticmethod
+    def _valid_tokenizer(path: Path) -> bool:
+        try:
+            return (
+                path.is_file()
+                and path.stat().st_size == TOKENIZER_SIZE_BYTES
+                and _sha256(path) == TOKENIZER_SHA256
+            )
+        except OSError:
+            return False
+
+    def download_weights(self) -> None:
+        from fairseq2.assets import AssetDownloadManager, AssetStore
+        from fairseq2.data.tokenizers.ref import resolve_tokenizer_reference
+        from fairseq2.runtime.dependency import get_dependency_resolver
+
+        resolver = get_dependency_resolver()
+        store = resolver.resolve(AssetStore)
+        manager = resolver.resolve(AssetDownloadManager)
+        card = store.retrieve_card(self.model)
+        checkpoint = Path(manager.download_model(card.field("checkpoint").as_uri(), card.name))
+        tokenizer = resolve_tokenizer_reference(store, card)
+        tokenizer_path = Path(
+            manager.download_tokenizer(tokenizer.field("tokenizer").as_uri(), tokenizer.name)
+        )
+
+        invalid = []
+        if not self._valid_checkpoint(checkpoint):
+            invalid.append(f"checkpoint {checkpoint}")
+        if not self._valid_tokenizer(tokenizer_path):
+            invalid.append(f"tokenizer {tokenizer_path}")
+        if invalid:
+            raise RuntimeError(
+                "omniASR download failed integrity validation: " + ", ".join(invalid)
+            )
 
     def load(self) -> None:
         from omnilingual_asr.models.inference.pipeline import ASRInferencePipeline
 
+        self.download_weights()
         device = self._resolve_device()
         dtype = self._resolve_dtype(device)
 
@@ -193,11 +269,9 @@ class OmniASRTorchBackend(ASRBackend):
     def _transcribe_one(self, path: str, lang_arg: list[str] | None, batch_size: int) -> list[str]:
         """Decode one file, retrying on CPU if Metal fails.
 
-        Metal is the measured-faster default, but fairseq2 does not test it and
-        an unimplemented kernel would otherwise turn a slow run into a failed
-        one. Falling back costs speed; not falling back costs the transcript.
-        The switch is permanent for this instance, so a systematic failure does
-        not pay the Metal attempt on every remaining file.
+        An unsupported kernel would otherwise fail the run. The switch is
+        permanent for this instance so a systematic failure does not repeat the
+        MPS attempt for every remaining file.
         """
         assert self.pipeline is not None
         try:

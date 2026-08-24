@@ -1,8 +1,7 @@
 """Forced-alignment logic.
 
-These exercise the pure parts only — target construction and segment grouping —
-with hand-built inputs, so the suite stays fast and works offline. The acoustic
-model is verified separately by aligning real audio.
+These exercise target construction and segment grouping with hand-built inputs,
+so the suite stays fast and works offline.
 """
 
 from __future__ import annotations

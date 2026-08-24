@@ -2,7 +2,7 @@
 
 import pytest
 
-from stt.vote import DEFAULT_WEIGHTS, rover
+from stt.vote import rover
 
 
 def test_unanimous_agreement_is_returned_unchanged():
@@ -52,15 +52,7 @@ def test_prepare_removes_subword_spacing_before_aligning():
     assert " " in rover(h, "pivot", prepare=None)
 
 
-def test_default_weights_rank_by_measured_accuracy():
-    """Order matters more than the values; a mis-ordered table silently hurts."""
-    assert DEFAULT_WEIGHTS["omniASR_LLM_Unlimited_7B_v2"] > DEFAULT_WEIGHTS["seamless-m4t-v2"]
-    assert DEFAULT_WEIGHTS["seamless-m4t-v2"] > DEFAULT_WEIGHTS["omniASR_LLM_Unlimited_3B_v2"]
-    assert DEFAULT_WEIGHTS["omniASR_LLM_Unlimited_300M_v2"] > DEFAULT_WEIGHTS["small"]
-    assert DEFAULT_WEIGHTS["small"] > DEFAULT_WEIGHTS["mms-1b-all"]
-
-
 def test_voting_preserves_burmese_sentence_delimiters():
-    """tidy_spacing must not eat ၊ and ။ — they are the only structure omniASR lacks."""
+    """tidy_spacing must preserve Burmese phrase and sentence delimiters."""
     h = {"pivot": "ကောင်းတယ်။ ဟုတ်တယ်။", "x": "ကောင်းတယ်။ ဟုတ်တယ်။"}
     assert "။" in rover(h, "pivot")

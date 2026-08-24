@@ -46,7 +46,7 @@ def test_encoding_check_can_be_disabled():
     why the guard is on by default."""
     score = score_results([_result(ZAWGYI_REF)], {"clip1": UNICODE_REF}, check_encoding=False)
     assert score.n_failed == 0
-    assert score.cer > 0  # identical audio content, non-zero CER: pure artefact
+    assert score.cer > 0  # visually equivalent encodings still differ in code points
 
 
 def test_missing_reference_is_reported():

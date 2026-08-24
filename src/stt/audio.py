@@ -7,6 +7,7 @@ they can read directly.
 
 from __future__ import annotations
 
+import hashlib
 import shutil
 import subprocess
 from collections.abc import Callable
@@ -25,7 +26,7 @@ AUDIO_SUFFIXES = {".wav", ".flac", ".mp3", ".m4a", ".ogg", ".opus", ".aac", ".mp
 
 
 def find_audio(paths: list[Path]) -> list[Path]:
-    """Expand a mix of files and directories into a sorted list of audio files."""
+    """Expand paths in input order, sorting files discovered within each directory."""
     found: list[Path] = []
     for p in paths:
         if p.is_dir():
@@ -103,12 +104,14 @@ def to_16k_mono(path: Path, cache_dir: Path) -> Path:
             "Install it with `brew install ffmpeg`."
         )
 
-    cache_dir.mkdir(parents=True, exist_ok=True)
-    # Include the parent directory name so same-named files in different folders
-    # do not collide in the flat cache.
-    out = cache_dir / f"{path.parent.name}__{path.stem}.16k.wav"
+    stat = path.stat()
+    source = f"{path.resolve()}\0{stat.st_size}\0{stat.st_mtime_ns}"
+    key = hashlib.sha256(source.encode()).hexdigest()
+    out = cache_dir / key / f"{path.stem}.16k.wav"
     if out.exists():
         return out
+
+    out.parent.mkdir(parents=True, exist_ok=True)
 
     subprocess.run(
         [
@@ -205,12 +208,11 @@ def windowed(
 
     Seamless and Dolphin both have a fixed input length, so both have to slice
     long audio and stitch the pieces back together. Sharing the loop here means
-    the sample offsets :func:`split_on_quiet` already computed survive into the
-    result instead of being thrown away, which is what makes subtitles and
-    per-region confidence possible for those backends.
+    the sample offsets :func:`split_on_quiet` already computed survive for
+    subtitle output.
 
-    Windows shorter than ``min_s`` are skipped: a sub-200 ms tail carries no
-    intelligible speech and models tend to hallucinate a token for it.
+    Windows shorter than ``min_s`` are skipped because very short tails tend
+    to produce unstable tokens.
 
     ``decode`` is called once per window and returns that window's transcript.
     """

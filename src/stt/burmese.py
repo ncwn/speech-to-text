@@ -70,29 +70,8 @@ def is_zawgyi(text: str, threshold: float = ZAWGYI_THRESHOLD) -> bool:
 
 
 def has_myanmar(text: str) -> bool:
-    """True if the string contains any character from the Myanmar block."""
+    """True if the string contains a main or Extended-A Myanmar character."""
     return any("က" <= ch <= "႟" or "ꩠ" <= ch <= "ꩿ" for ch in text)
-
-
-def zawgyi_to_unicode(text: str) -> str:
-    """Convert Zawgyi to Unicode.
-
-    Requires PyICU, which is an optional dependency because it needs a native
-    ICU build. Install with ``brew install icu4c && uv pip install PyICU``.
-    """
-    try:
-        from icu import Transliterator
-    except ImportError as exc:  # pragma: no cover - depends on optional native lib
-        raise RuntimeError(
-            "Zawgyi->Unicode conversion needs PyICU. Install it with:\n"
-            "  brew install icu4c pkg-config\n"
-            '  PATH="$(brew --prefix icu4c)/bin:$PATH" '
-            'PKG_CONFIG_PATH="$(brew --prefix icu4c)/lib/pkgconfig" uv pip install PyICU'
-        ) from exc
-
-    from myanmartools import ZAWGYI_TO_UNICODE_RULES
-
-    return Transliterator.createFromRules("z2u", ZAWGYI_TO_UNICODE_RULES).transliterate(text)
 
 
 @dataclass(frozen=True)
@@ -143,15 +122,13 @@ def tidy_spacing(text: str) -> str:
     expects ``လူသားတွေသေဆုံးပြီး``. That costs nothing at scoring time — CER
     strips whitespace — but it makes the transcript itself look wrong.
 
-    Only spaces with a Myanmar character on *both* sides are dropped, so
-    spacing around Latin words, numerals and punctuation survives. A single
-    space is kept after ``၊`` and ``။`` because those are the real phrase and
-    sentence delimiters.
+    Spaces between Myanmar characters and immediately before ``၊`` or ``။``
+    are dropped. A single space is kept after those delimiters; spacing around
+    Latin words and numerals survives.
     """
     text = unicodedata.normalize("NFC", text)
     text = _SPACE_BEFORE_DELIM.sub(r"\1", text)
-    # Repeat: each pass removes one space from a run, and NFC leaves no
-    # zero-width joiners that would defeat the lookbehind.
+    # Repeat because each pass can expose another Myanmar-to-Myanmar boundary.
     while True:
         collapsed = _SPACE_BETWEEN_MYANMAR.sub("", text)
         if collapsed == text:
