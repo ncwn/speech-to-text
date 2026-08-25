@@ -1,14 +1,20 @@
 # Benchmarking and CER
 
-Keep each evaluation corpus self-contained:
+Keep each evaluation corpus self-contained. YouTube datasets use the source
+channel and dataset name as their parent directories:
 
 ```text
-data/<dataset>/
+data/YouTube/<channel>/<dataset>/
   README.md                 source, retrieval date, licence, split, corrections
   audio/<audio-id>.<ext>    local input; ignored by Git
   transcripts/<audio-id>.txt  optional human-readable scripts
   references.tsv           audio_id<TAB>transcript
 ```
+
+Every dataset below `data/YouTube/<channel>/` must use this exact layout. Keep
+audio and transcript files out of the dataset root. Non-YouTube corpora such as
+FLEURS may remain directly below `data/` but use the same files within each
+dataset directory.
 
 FLEURS already uses the core `audio/` plus `references.tsv` shape. Use a unique
 filename stem for every clip within a dataset. The evaluator matches `audio_id`

@@ -147,7 +147,7 @@ status](docs/findings.md) defines the evidence required before publishing one.
 src/stt/            CLI, scoring, alignment, voting, telemetry, and backends
 tests/              fast offline tests
 docs/               workflow, setup, model, scoring, and evidence documentation
-data/<dataset>/     audio, references, scripts, and provenance for one corpus
+data/YouTube/<channel>/<dataset>/  real-world audio, references, and provenance
 data/fleurs*/       fetched, gitignored public datasets
 outputs/            generated, gitignored transcription runs
 ```
@@ -171,7 +171,7 @@ README is the repository documentation index:
 - [Benchmarking and CER](docs/benchmarking.md)
 - [Evaluating Burmese ASR](docs/burmese.md)
 - [Findings status and evidence requirements](docs/findings.md)
-- [Eternity held-out dataset](data/eternity-2026/README.md)
+- [Eternity held-out dataset](data/YouTube/Recappian%20Myanmar/eternity-2026/README.md)
 - [Contributing](CONTRIBUTING.md)
 
 ## Licence

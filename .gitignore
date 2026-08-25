@@ -16,9 +16,7 @@ models/
 *.mlmodelc/
 
 # Dataset audio stays local; references, transcripts, and provenance are tracked.
-data/*/audio/**
-# Keep audio from older checkouts ignored after the layout migration.
-data/audio/**
+data/**/audio/**
 data/fleurs*/
 # Resampled 16 kHz mono copies produced by stt.audio, and ad-hoc slices
 data/.converted/
